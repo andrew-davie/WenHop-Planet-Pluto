@@ -24,17 +24,17 @@
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Kernel 00 Routine @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-.kernel_00
+kernel_00
 
 	ldx #192
-.kernel_00_loop				;kernel_00 shows a "standard" display loop
+kernel_00_loop				;kernel_00 shows a "standard" display loop
 	sta WSYNC
 
 	lda #DS0DATA
 	sta COLUBK
 
 	dex
-	bne .kernel_00_loop
+	bne kernel_00_loop
 
 	rts
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Kernel 00 Routine @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -42,7 +42,7 @@
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Kernel 01 Routine @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-.kernel_01
+kernel_01
 
 _kernel_01_loop				;kernel_01 demontrates the FastJump streams
 	sta WSYNC

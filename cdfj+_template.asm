@@ -62,11 +62,12 @@ _SND_MODE_SAMPLE	= 2
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ; C-code vector equates
-; Ordering/values important - see VectorToHandler in main.c
+; ignore --> Ordering/values important - see VectorToHandler in main.c
 
-_ARM_INIT		    = 0
-_ARM_UPPER_VBLANK	= 1
-_ARM_LOWER_VBLANK	= 2
+_RUN_NULL               = 0
+_RUN_ARM_INIT		    = 1
+_RUN_ARM_VBLANK	        = 2
+_RUN_ARM_LOWER_VBLANK	= 3
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -105,6 +106,9 @@ _TV_TYPE_SECAM           = 2
 	SEG.U VARS
 	org $80
 
+scanSK          ds 1
+
+
 kernel			ds 1		;<FRAMEWORK>
 tv_system		ds 1		;<FRAMEWORK>  see TV_TYPE_ definitions
 
@@ -119,13 +123,13 @@ audv1			ds 1		;<FRAMEWORK>
 audc1			ds 1		;<FRAMEWORK>
 audf1			ds 1		;<FRAMEWORK>
 
-sk_command		ds 1		;<SaveKey>	holds current command from ARM
-sk_detect		ds 1		;<SaveKey>	0- SaveKey not found; 1- SaveKey detected
-sk_addr_l		ds 1		;<SaveKey>	
-sk_addr_h		ds 1		;<SaveKey>
-sk_count		ds 1		;<SaveKey>	bytes to copy 1-64
-sk_offset		ds 1		;<SaveKey>	start offset into sk_RAM 0-63
-sk_RAM			ds 64		;<SaveKey>
+; sk_command		ds 1		;<SaveKey>	holds current command from ARM
+; saveKey_detected		ds 1		;<SaveKey>	0- SaveKey not found; 1- SaveKey detected
+; sk_addr_l		ds 1		;<SaveKey>	
+; sk_addr_h		ds 1		;<SaveKey>
+; sk_count		ds 1		;<SaveKey>	bytes to copy 1-64
+; sk_offset		ds 1		;<SaveKey>	start offset into sk_RAM 0-63
+; sk_RAM			ds 64		;<SaveKey>
 
 .jump_code_RAM		ds 1		;dedicated area of RAM for bank routine jumping/calling	<FRAMEWORK>
 .jump_code_RAM_t_bank	ds 3		;cmp SelectBankX					<FRAMEWORK>
@@ -134,6 +138,31 @@ sk_RAM			ds 64		;<SaveKey>
 .jump_code_RAM_r_bank	ds 3		;rts							<FRAMEWORK>
 
 test_position		ds 1		;only for demonstration of positioning method purposes
+
+SAVEKEY_SIZE = ((100+7)/8)
+
+    ; Local (zp) vars where SK is initially read to on startup
+    ; These are transferred to ARM/C via transfer to "RAM" variables via DSPTR setup and then DSWRITEs
+
+
+SK_START
+SAVEKEY_IDENT          ds 1
+SAVEKEY_PERFECT        ds SAVEKEY_SIZE
+SAVEKEY_UNLOCKED       ds SAVEKEY_SIZE
+SAVEKEY_SOLVED         ds SAVEKEY_SIZE
+SAVEKEY_LAST           ds 1
+SAVEKEY_USED_SOLVES    ds 1
+SAVEKEY_ENABLE_ICC     ds 1
+SAVEKEY_SEEN_TROPHY    ds 1
+SAVEKEY_TOTAL_SOLVES   ds 1
+SAVEKEY_COUNT          ds 2
+SK_END
+
+    ; following must be contiguous to above...
+
+SAVEKEY_RESET          ds 1            ; 0 = not reset, else SK was initialised
+
+
 
 	;Display Remaining RAM
 	echo "---- 2600 RAM", ($100 - *)d, "bytes free" 
@@ -145,6 +174,23 @@ test_position		ds 1		;only for demonstration of positioning method purposes
 
 	SEG.U DISPLAYDATA
 	org $0000				;@@@@@ 256 Bytes: 6502 <-> ARM @@@@@
+
+_DS_SK
+
+_SK_ID              ds 1
+_SK_PER             ds SAVEKEY_SIZE
+_SK_UNL             ds SAVEKEY_SIZE
+_SK_SLV             ds SAVEKEY_SIZE
+_SK_LAST            ds 1
+_SK_USED_SOLVES     ds 1
+_SK_ENABLE_ICC      ds 1
+_SK_SEEN_TROPHY     ds 1
+_SK_TOTAL_SOLVES    ds 1
+_SK_COUNT           ds 2
+
+_SK_RESET           ds 1
+
+
 _RUN_FUNC		ds 1			; <FRAMEWORK> (can now move as DSPTR hi=0 not assumed)
 _SWCHA			ds 1			; <FRAMEWORK>
 _SWCHB			ds 1			; <FRAMEWORK>

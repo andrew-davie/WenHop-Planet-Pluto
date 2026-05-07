@@ -64,6 +64,7 @@ SRCS = \
  custom.c \
  detectConsole.c \
  main.c \
+ savekey.c \
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
@@ -155,8 +156,9 @@ prep:
 .PHONY: bootstrap_defines
 bootstrap_defines:
 	@echo "// Auto-generated from DASM output and symbols" > $(BASE)/$(DASM_TO_C)
-	$(DASM) $(SOURCE).asm -f3 -v0 \
+	$(DASM) $(SOURCE).asm -p100 -f3 -v5 \
 		-s$(OUTPUT)/$(SOURCE).sym \
+		-l$(OUTPUT)/$(SOURCE).lst \
 		-o$(OUTPUT)/$(SOURCE).bin
 	@echo "" >> $(BASE)/$(DASM_TO_C)
 	awk '$$1 ~ /^_/ {printf "#define %-25s 0x%s\n", $$1, $$2}' \
@@ -189,7 +191,7 @@ $(CUSTOMBIN): $(CUSTOMELF)
 
 .PHONY: make_rom
 make_rom: prep bootstrap_defines arm 
-	$(DASM) $(SOURCE).asm -f3 -v0 \
+	$(DASM) $(SOURCE).asm -p100 -f3 -v5 \
 		-s$(OUTPUT)/$(CUSTOMNAME).sym \
 		-l$(OUTPUT)/$(CUSTOMNAME).lst \
 		-o$(OUTPUT)/$(CUSTOMNAME).bin
