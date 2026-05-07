@@ -5,62 +5,62 @@
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@ These routines put at beginning of each bank so all have access @@@@@@@@@@@@@@@@@@@@@
-.blank_scanlines
-	sta WSYNC
-	dex
-	bne .blank_scanlines			;can use .blank_scanlines in any bank
-	rts
+; .blank_scanlines
+; 	sta WSYNC
+; 	dex
+; 	bne .blank_scanlines			;can use .blank_scanlines in any bank
+; 	rts
 
-.blank_scanlines_aud				;can use .blank_scanlines_aud in any bank
-	sta WSYNC
-	lda #AMPLITUDE
-	sta AUDV0
-	dex
-	bne .blank_scanlines_aud
-	rts
+; .blank_scanlines_aud				;can use .blank_scanlines_aud in any bank
+; 	sta WSYNC
+; 	lda #AMPLITUDE
+; 	sta AUDV0
+; 	dex
+; 	bne .blank_scanlines_aud
+; 	rts
 ;@@@@@@@@@@@@@@@@@@@@@ These routines put at beginning of each bank so all have access @@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@ Code block that gets copied into RAM for bank routine dispatch @@@@@@@@@@@@@@@@@
-.jump_code
-	cmp BANK1
-	jsr .jump_code
-	cmp BANK0
-	rts
+
+JumpCode       	cmp BANK1
+                jsr JumpCode
+                cmp BANK0
+JumpCodeEnd
+                rts
+
 ;@@@@@@@@@@@@@@@@@ Code block that gets copied into RAM for bank routine dispatch @@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Cart Reset @@@@@@@@@@@@@@@@@@@@@@@@@@@@
-.start
-.clearmem			; Code written to minimise total ROM usage
-	sei			; uses weird 6502 knowledge
-	cld			;
-	ldx #0			; Not original source code.
-	txa			; Found on net, but does
-	tay			; actually save a few bytes
-.clear_stack			; of ROM
-	dex			; 
-	txs			; 
-	pha			; 
-	bne .clear_stack     	; SP`X = A = Y = 0
+
+CartReset
+
+    CLEAN_START
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@ Software Init @@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-	jsr .read_save_key		;<SaveKey> sets sk_detect with presence of SaveKey
+            	jsr .read_save_key		;<SaveKey> sets sk_detect with presence of SaveKey
 
-	ldx #9				;@ <FRAMEWORK>
-.loop_init_jump_code			;@
-	lda .jump_code,x		;@ Code needed for bank routine
-	sta .jump_code_RAM,x		;@ dispatch handler
-	dex				;@
-	bpl .loop_init_jump_code	;@
-	inx				;@
-	stx DSPTR			;@
-	stx DSPTR			;@
-	stx DSWRITE			;@
+    ; Copy jump dispatch handler to RAM
+
+	            ldx #(JumpCodeEnd-JumpCode)
+initJumpCode    lda JumpCode,x
+	            sta .jump_code_RAM,x
+	            dex
+	            bpl initJumpCode
+
+                ldx #>_RUN_FUNC
+                stx DSPTR
+                ldx #<_RUN_FUNC
+                stx DSPTR
+                ldx #0
+                stx DSWRITE
+
 	lda sk_detect			;<SaveKey>
 	sta DSWRITE			;<SaveKey>
 	stx SETMODE			;@ FastFetch ON
@@ -278,9 +278,9 @@ UpperBlankTimer
 .upper_vblank_ARM
 
 
-	ldx #>_C_routine
+	ldx #>_RUN_FUNC
 	stx DSPTR
-	ldx #<_C_routine
+	ldx #<_RUN_FUNC
 	stx DSPTR
 	ldx #_ARM_UPPER_VBLANK		;let ARM know we are lower VBlank
 	stx DSWRITE
@@ -319,9 +319,9 @@ UpperBlankTimer
 	stx COLUP1
 	stx COLUPF
 
-	ldx #>_C_routine
+	ldx #>_RUN_FUNC
 	stx DSPTR
-	ldx #<_C_routine
+	ldx #<_RUN_FUNC
 	stx DSPTR
     
 	ldx #_ARM_LOWER_VBLANK		;let ARM know we are lower VBlank
@@ -882,7 +882,7 @@ BANK0_CODE_SIZE = * - .BANK0;
 	DC.B 0, 0, 0, 0		;CDFJ Hotspots
 	DC.L C_STACK		;$F4	C Stack
 	DC.L C_CODE+1		;$F8	C Code (+1 for THUMB Mode)
-	DC.W .start		;$FC	Reset
-	DC.W .start		;$FE	BRK
+	DC.W CartReset		;$FC	Reset
+	DC.W CartReset		;$FE	BRK
 
 

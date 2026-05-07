@@ -175,7 +175,7 @@ unsigned short input_target[12];
 
 int main() {
 
-  switch (RAM[_C_routine]) {
+  switch (RAM[_RUN_FUNC]) {
   case _ARM_INIT:
     Initialize();
     break;
@@ -222,7 +222,7 @@ void Initialize() {
   RAM[_sound_mode] = sound_mode;
   setPointer(DS31PTR, _kernel); // pass initial state to Atari
 
-  RAM[_C_routine] -= 1; // function AWAY from 0
+  RAM[_RUN_FUNC] -= 1; // function AWAY from 0
 
   SilenceWaves(); // init DPC waveforms
 }

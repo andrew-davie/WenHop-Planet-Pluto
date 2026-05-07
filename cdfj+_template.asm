@@ -26,7 +26,8 @@ C_START			= $7800			;$1800, $2800, $3800, $4800, $5800, $6800, $7800
 
 	INCLUDE "cdfjplus.h"			;cdfjplus.h must come AFTER system constants for FF_OFFSET to apply
 	INCLUDE "vcs.h"
-	INCLUDE "macro.h"			;I personally do not use - but uncomment and use as you desire
+	INCLUDE "macro.h"
+
 						; <WARNING> fast fetch macros may not work properly
 ;	INCLUDE "tia_constants.h"
 
@@ -144,7 +145,7 @@ test_position		ds 1		;only for demonstration of positioning method purposes
 
 	SEG.U DISPLAYDATA
 	org $0000				;@@@@@ 256 Bytes: 6502 <-> ARM @@@@@
-_C_routine		ds 1			; <FRAMEWORK> (can now move as DSPTR hi=0 not assumed)
+_RUN_FUNC		ds 1			; <FRAMEWORK> (can now move as DSPTR hi=0 not assumed)
 _SWCHA			ds 1			; <FRAMEWORK>
 _SWCHB			ds 1			; <FRAMEWORK>
 _INPT4			ds 1			; <FRAMEWORK>
