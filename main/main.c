@@ -69,7 +69,7 @@ const unsigned char sample1[] __attribute__((aligned(4))) = {
 /******************************* Functions *******************************/
 void runARM_Initialise();
 void runARM_VerticalBlank();
-void runARM_LowerVBlank();
+void runARM_Overscan();
 
 void HandleControls();
 void SilenceWaves();
@@ -214,8 +214,8 @@ int main() {
 	case _RUN_ARM_VBLANK:
 		runARM_VerticalBlank();
 		break;
-	case _RUN_ARM_LOWER_VBLANK:
-		runARM_LowerVBlank();
+	case _RUN_ARM_OVERSCAN:
+		runARM_Overscan();
 		break;
 	default:
 		break;
@@ -259,7 +259,7 @@ void runARM_Initialise() {
 
 	SilenceWaves(); // init DPC waveforms
 
-	LoadSaveKey();
+	//	LoadSaveKey();
 }
 
 static void (*const upperFn[])() = {
@@ -296,13 +296,15 @@ static void (*const lowerFn[])() = {
 };
 
 // lower VBlank dispatcher - includes control handler and communication to Atari
-void runARM_LowerVBlank() {
+void runARM_Overscan() {
+
 	HandleControls();
 
 	(*lowerFn[game_state])();
 
 	Random(1);
-	frame += 1;
+
+	frame++;
 
 	RAM[_kernel] = kernel;
 	RAM[_tv_system] = tv_system;
@@ -313,15 +315,22 @@ void runARM_LowerVBlank() {
 // Controller Handler - converts raw input to debounced pulsed wait and repeat
 // timings
 void HandleControls() {
+
 	unsigned short SWCH_input = (unsigned short)RAM[_SWCHA];
-	if ((RAM[_INPT4] & 0b10000000) != 0)
-		SWCH_input |= 0x0100;
-	if ((RAM[_INPT5] & 0b10000000) != 0)
-		SWCH_input |= 0x0200;
-	if ((RAM[_SWCHB] & 0b00000001) != 0)
-		SWCH_input |= 0x0400;
-	if ((RAM[_SWCHB] & 0b00000010) != 0)
-		SWCH_input |= 0x0800;
+
+	// if ((RAM[_INPT4] & 0b10000000))
+	// 	SWCH_input |= 0x0100;
+	// if ((RAM[_INPT5] & 0b10000000))
+	// 	SWCH_input |= 0x0200;
+	// if ((RAM[_SWCHB] & 0b00000001))
+	// 	SWCH_input |= 0x0400;
+	// if ((RAM[_SWCHB] & 0b00000010))
+	// 	SWCH_input |= 0x0800;
+
+	SWCH_input |= ((RAM[_INPT4] >> 7) & 1) << 8	  //
+				  | ((RAM[_INPT5] >> 7) & 1) << 9 //
+				  | (RAM[_SWCHB] & 1) << 10		  //
+				  | ((RAM[_SWCHB] >> 1) & 1) << 11;
 
 	CBW_swch = ((RAM[_SWCHB] & 0b00001000) != 0);
 	P0_diff = ((RAM[_SWCHB] & 0b01000000) != 0);

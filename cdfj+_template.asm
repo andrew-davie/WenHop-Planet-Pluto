@@ -67,14 +67,7 @@ _SND_MODE_SAMPLE	= 2
 _RUN_NULL               = 0
 _RUN_ARM_INIT		    = 1
 _RUN_ARM_VBLANK	        = 2
-_RUN_ARM_LOWER_VBLANK	= 3
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
-_SAVE_KEY_NONE		= 0
-_SAVE_KEY_READ		= 1
-_SAVE_KEY_WRITE		= 128
+_RUN_ARM_OVERSCAN   	= 3
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -122,14 +115,6 @@ audf0			ds 1		;<FRAMEWORK>
 audv1			ds 1		;<FRAMEWORK>
 audc1			ds 1		;<FRAMEWORK>
 audf1			ds 1		;<FRAMEWORK>
-
-; sk_command		ds 1		;<SaveKey>	holds current command from ARM
-; saveKey_detected		ds 1		;<SaveKey>	0- SaveKey not found; 1- SaveKey detected
-; sk_addr_l		ds 1		;<SaveKey>	
-; sk_addr_h		ds 1		;<SaveKey>
-; sk_count		ds 1		;<SaveKey>	bytes to copy 1-64
-; sk_offset		ds 1		;<SaveKey>	start offset into sk_RAM 0-63
-; sk_RAM			ds 64		;<SaveKey>
 
 .jump_code_RAM		ds 1		;dedicated area of RAM for bank routine jumping/calling	<FRAMEWORK>
 .jump_code_RAM_t_bank	ds 3		;cmp SelectBankX					<FRAMEWORK>
@@ -202,6 +187,7 @@ _INPT5			ds 1			; <FRAMEWORK>
 _kernel			ds 1			; <FRAMEWORK>
 _tv_system		ds 1			; <FRAMEWORK>  see TV_TYPE_ definitions
 _sound_mode		ds 1			; <FRAMEWORK>
+
 _AUDV0			ds 1			; <FRAMEWORK>
 _AUDC0			ds 1			; <FRAMEWORK>
 _AUDF0			ds 1			; <FRAMEWORK>

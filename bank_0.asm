@@ -62,18 +62,6 @@ initJumpCode        lda jumpCode,x
                     cpx #SK_BYTES + 1
                     bcc .sendSK
  
-    ; Let the ARM do SK inits too
-
-                    ; ldx #>_RUN_FUNC
-                    ; stx DSPTR
-                    ; ldx #<_RUN_FUNC
-                    ; stx DSPTR
-                    ; ldx #_FN_LOAD_SAVEKEY
-                    ; stx DSWRITE
-
-                    ; ldx #$FF
-	                ; stx CALLFN          			; Initialise via ARM function
-
     ; Setup and call ARM Initialise
 
                     ldx #>_RUN_FUNC
@@ -82,8 +70,6 @@ initJumpCode        lda jumpCode,x
                     stx DSPTR
                     ldx #_RUN_ARM_INIT              ; routine to run in main()
                     stx DSWRITE
-                    ; lda saveKey_detected
-                    ; sta DSWRITE			            ; (== _SWCHA)
 
                     ldx #$FF
                     stx CALLFN          			; Initialise via ARM function
@@ -339,7 +325,7 @@ kernelVBlank_l	.byte <(k_prep_00-1)
 	ldx #<_RUN_FUNC
 	stx DSPTR
     
-	ldx #_RUN_ARM_LOWER_VBLANK		;let ARM know we are lower VBlank
+	ldx #_RUN_ARM_OVERSCAN		;let ARM know we are lower VBlank
 	stx DSWRITE
 
 	ldx SWCHA
@@ -360,6 +346,7 @@ kernelVBlank_l	.byte <(k_prep_00-1)
 	sta tv_system
 	lda #DS31DATA			;from the ARM each frame
 	sta sound_mode
+
 	lda #DS31DATA
 	sta audv0
 	lda #DS31DATA
@@ -373,74 +360,8 @@ kernelVBlank_l	.byte <(k_prep_00-1)
 	lda #DS31DATA
 	sta audf1
 
-	; lda sk_command			;<SaveKey> block of code
-	; bmi .write_to_save_key		;<SaveKey> preforms SaveKey operations one byte at a time each frame
-	; bne .read_from_save_key		;<SaveKey> to maintain the screen, sound will be slightly distorted
-
-	; lda #DS31DATA			;test for new save key operation
-	; beq .skip_save_key_operation
-	; sta sk_command
-	; tay
-	; lda #DS31DATA
-	; beq .acknowledge_save_command	;bail on count = 0
-	; cmp #65
-	; bcs .acknowledge_save_command	;bail on count > 64
-	; sta sk_count
-	; lda #DS31DATA
-	; sta sk_addr_l
-	; lda #DS31DATA
-	; sta sk_addr_h
-	; lda #DS31DATA
-	; and #63				;wrap offset into 0-63 sk_RAM buffer range
-	; sta sk_offset
-	; clc
-	; adc sk_count
-	; cmp #65
-	; bcs .acknowledge_save_command	;bail on access outside sk_RAM
-	; tya
-	; bpl .read_from_save_key
-
-; 	ldx #0
-; .loop_DD_to_sk_RAM			;load sk_RAM buffer with data from ARM
-; 	lda #DS31DATA
-; 	sta sk_RAM,x
-; 	inx
-; 	cpx #64
-; 	bne .loop_DD_to_sk_RAM
-; 	beq .skip_save_key_operation
-
-; .read_from_save_key
-; 	jsr .read_save_key
-; 	ldx #>_save_data
-; 	stx DSPTR
-; 	lda #<_save_data		;reads can update DD ARM after each byte
-; 	clc
-; 	adc sk_offset
-; 	sta DSPTR
-; 	ldx sk_offset
-; 	lda sk_RAM,x
-; 	sta DSWRITE
-; 	jmp .done_savekey_operation
-
-; .write_to_save_key
-; 	jsr .write_save_key
-
-; .done_savekey_operation
-; 	inc sk_offset
-; 	inc sk_addr_l
-; 	dec sk_count
-; 	bne .skip_save_key_operation
-; .acknowledge_save_command
-; 	ldx #0
-; 	stx sk_command
-; 	ldx #>_save_command		;X = 0 here, using this for DSWRITE
-; 	stx DSPTR			;<SaveKey>
-; 	ldy #<_save_command		;<SaveKey>
-; 	sty DSPTR			;<SaveKey>
-; 	stx DSWRITE			;<SaveKey> block of code
-
-; .skip_save_key_operation
 	rts
+    
 ;@@@@@@@@@@@@@@@@@@@@@@@@ Handle Lower VBlank ARM Call @@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -663,8 +584,9 @@ ReadSaveKey SUBROUTINE          ; total cycles = 2440 (for 3 bytes)
 ;-------------------------------------------------------------------------------
 ; setup SaveKey:
 
-    ; pre-cleer GridLock flags buffers
-    ; will exit with SAVEKEY_IDENT = _SK_GRIDLOCK_ID if valid
+
+    ; pre-cleer flags buffers
+    ; will exit with SAVEKEY_IDENT = _SK_WENHOP_ID if valid
 
 _WENHOP_SK_ID = 0xA7
 
