@@ -144,10 +144,9 @@ prep: tools
 	mkdir -p $(BIN) $(OUTPUT)
 	$(TOOLS_BIN)/$(CSTART) ./$(SOURCE).asm $(CUSTOM)/custom.boot.lds
 	@if [ ! -f "$(CUSTOMBIN)" ]; then \
-		echo "Creating dummy $(CUSTOMBIN)"; \
-		dd if=/dev/zero bs=1024 count=64 of="$(CUSTOMBIN)" 2>/dev/null; \
+		printf '\000' > "$(CUSTOMBIN)"; \
 	fi
-
+	
 # -----------------------------------------------------------------------------
 # Stage 2: bootstrap_defines
 # -----------------------------------------------------------------------------
