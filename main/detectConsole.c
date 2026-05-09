@@ -1,104 +1,112 @@
-#include "detectConsole.h"
+#include <stdbool.h>
+
 #include "defines_dasm.h"
+#include "detectConsole.h"
 
 #include "cdfjplus.h"
 #include "main.h"
 #include <limits.h>
 
-int tv_system = _TV_TYPE_NTSC;
+int tv_system;
 
 #define DETECT_FRAME_COUNT 10
-#define ENABLE_60MHZ_AUTODETECT 1
+#define ENABLE_60MHZ_AUTODETECT 0
 #define ENABLE_SECAM 1
 
-void detectConsoleType() {
+bool detectConsoleType() {
 
-  static unsigned int detectedPeriod;
+	bool finished = false;
+	static unsigned int detectedPeriod;
 
-  switch (frame) {
+	switch (frame) {
 
-  case 0:
+	case 0:
 
-    tv_system = _TV_TYPE_NTSC; // force NTSC frame for autodetect purposes
+		tv_system = _TV_SYSTEM_NTSC; // force NTSC frame for autodetect purposes
 
-    T1TC = 0;
-    T1TCR = 1;
-    break;
+		T1TC = 0;
+		T1TCR = 1;
+		break;
 
-  case DETECT_FRAME_COUNT: {
+	case DETECT_FRAME_COUNT: {
 
-    detectedPeriod = T1TC;
+		detectedPeriod = T1TC;
 
-    static const struct fmt {
+		finished = true;
 
-      int frequency;
-      unsigned char format;
+		static const struct fmt {
 
-    } mapTimeToFormat[] = {
+			int frequency;
+			unsigned char format;
+
+		} mapTimeToFormat[] = {
 
 #define NTSC_70MHZ (0xB240F6 * DETECT_FRAME_COUNT / 10)
 #define PAL_70MHZ (0xB3E40D * DETECT_FRAME_COUNT / 10)
 
-        {
-            NTSC_70MHZ,
-            _TV_TYPE_NTSC,
-        },
+			{
+				NTSC_70MHZ,
+				_TV_SYSTEM_NTSC,
+			},
 
 #if ENABLE_SECAM
 #define SECAM_70MHZ                                                            \
-  (((PAL_70MHZ - NTSC_70MHZ) / 2 + NTSC_70MHZ) * DETECT_FRAME_COUNT / 10)
-        {
-            SECAM_70MHZ,
-            _TV_TYPE_SECAM,
-        },
+	(((PAL_70MHZ - NTSC_70MHZ) / 2 + NTSC_70MHZ) * DETECT_FRAME_COUNT / 10)
+			{
+				SECAM_70MHZ,
+				_TV_SYSTEM_SECAM,
+			},
 #endif
-        {
-            PAL_70MHZ,
-            _TV_TYPE_PAL60,
-        },
+			{
+				PAL_70MHZ,
+				_TV_SYSTEM_PAL60,
+			},
 
 #if ENABLE_60MHZ_AUTODETECT
 
 #define NTSC_60MHZ (0x98EB2F * DETECT_FRAME_COUNT / 10)
 #define PAL_60MHZ (0x9A0EEF * DETECT_FRAME_COUNT / 10)
 #define SECAM_60MHZ                                                            \
-  (((PAL_60MHZ - NTSC_60MHZ) / 2 + NTSC_60MHZ) * DETECT_FRAME_COUNT / 10)
+	(((PAL_60MHZ - NTSC_60MHZ) / 2 + NTSC_60MHZ) * DETECT_FRAME_COUNT / 10)
 
-        {
-            NTSC_60MHZ,
-            _TV_TYPE_NTSC,
-        },
+			{
+				NTSC_60MHZ,
+				_TV_SYSTEM_NTSC,
+			},
 #if ENABLE_SECAM
-        {
-            SECAM_60MHZ,
-            _TV_TYPE_SECAM,
-        },
+			{
+				SECAM_60MHZ,
+				_TV_SYSTEM_SECAM,
+			},
 #endif
-        {
-            PAL_60MHZ,
-            _TV_TYPE_PAL60,
-        },
+			{
+				PAL_60MHZ,
+				_TV_SYSTEM_PAL60,
+			},
 #endif
-    };
+		};
 
-    int delta = INT_MAX;
-    for (unsigned int i = 0; i < sizeof(mapTimeToFormat) / sizeof(struct fmt);
-         i++) {
+		int delta = INT_MAX;
+		for (unsigned int i = 0;
+			 i < sizeof(mapTimeToFormat) / sizeof(struct fmt); i++) {
 
-      int dist = detectedPeriod - mapTimeToFormat[i].frequency;
-      if (dist < 0)
-        dist = -dist;
+			int dist = detectedPeriod - mapTimeToFormat[i].frequency;
+			if (dist < 0)
+				dist = -dist;
 
-      if (dist < delta) {
-        delta = dist;
-        tv_system = mapTimeToFormat[i].format;
-      }
-    }
+			if (dist < delta) {
+				delta = dist;
+				tv_system = mapTimeToFormat[i].format;
+				RAM[_tv_system] = tv_system;
+			}
+		}
 
-    break;
-  }
+		break;
+	}
 
-  default:
-    break;
-  }
+	default:
+		break;
+	}
+
+	return finished;
 }

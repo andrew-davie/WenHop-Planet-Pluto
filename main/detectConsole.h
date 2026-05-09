@@ -1,7 +1,7 @@
 
 #pragma once
 
-void detectConsoleType();
+bool detectConsoleType();
 
 extern int tv_system;
 

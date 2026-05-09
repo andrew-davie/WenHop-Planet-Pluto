@@ -45,10 +45,13 @@ initJumpCode        lda jumpCode,x
 	                bpl initJumpCode
 
 
-                    jsr ReadSaveKey             ; Load savekey and send to ARM/C
+                    jsr ReadSaveKey                 ; Load savekey to ZP SAVEKEY block
 
                     ldx #FASTON
                     stx SETMODE			            ; "Fast Fetch" enable
+
+    ; Send the SAVEKEY block to ARM-accessible shadow variables
+    ; A diff is (later) used to determine any changes that need to be written
 
                     ldx #>_DS_SK
                     stx DSPTR
@@ -62,7 +65,7 @@ initJumpCode        lda jumpCode,x
                     cpx #SK_BYTES + 1
                     bcc .sendSK
  
-    ; Setup and call ARM Initialise
+    ; Call ARM Initialise
 
                     ldx #>_RUN_FUNC
                     stx DSPTR
@@ -177,14 +180,16 @@ mainGameLoopStandard
 	jmp mainGameLoop
 
 LowerBlankTimer
- .byte LOWER_BLANK_TIMER_PAL60
  .byte LOWER_BLANK_TIMER_NTSC
+ .byte LOWER_BLANK_TIMER_PAL
  .byte LOWER_BLANK_TIMER_SECAM
+ .byte LOWER_BLANK_TIMER_PAL60
 
 UpperBlankTimer
- .byte UPPER_BLANK_TIMER_PAL60
  .byte UPPER_BLANK_TIMER_NTSC
+ .byte LOWER_BLANK_TIMER_PAL
  .byte UPPER_BLANK_TIMER_SECAM
+ .byte UPPER_BLANK_TIMER_PAL60
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Game Loop - Sampled Sounds @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -300,10 +305,12 @@ verticalBlank
                 rts
 
 
-kernelVBlank_h  .byte >(k_prep_00-1)
+kernelVBlank_h  ;.byte >(ChampKernel-1)
+                .byte >(k_prep_00-1)
                 .byte >(k_prep_01-1)
 
-kernelVBlank_l	.byte <(k_prep_00-1)
+kernelVBlank_l	;.byte <(ChampKernel-1)
+                .byte <(k_prep_00-1)
 	            .byte <(k_prep_01-1)
 
 

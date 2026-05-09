@@ -13,18 +13,29 @@ Gamax Software 2026 - Craig Daniels
 #include "cdfjplus.h" // <- contains references from defines_dasm.h
 #include "tia_constants_c.h"
 
+#include "colour.h"
 #include "detectConsole.h"
 #include "main.h"
 #include "savekey.h"
 
-extern unsigned char saveKeyEnableICC;
 int usedSolves;
 int whichLot;
 
 void LoadSaveKey();
 
-/******************************* Constants/Defines
- * *******************************/
+enum GAME_STATE {
+
+	// Controls which VB and OS are run
+
+	GS_DETECT_CONSOLE, // 0
+	GS_COPYRIGHT,	   // 1
+	GS_0,			   // 2
+	GS_1,			   // 3
+	GS_2,			   // 4
+	GS_3,			   // 5
+	GS_4			   // 6
+
+} game_state = GS_DETECT_CONSOLE;
 
 /******************************* Data/Includes *******************************/
 
@@ -79,23 +90,23 @@ void SilenceTIA();
 // void SaveKeyRead(unsigned short address, unsigned char offset,
 // 				 unsigned char count);
 
-void S00_Upper(void);
-void S00_Lower(void);
+void S00_VB(void);
+void S00_OS(void);
 
-void S01_Upper(void);
-void S01_Lower(void);
+void S01_VB(void);
+void S01_OS(void);
 
-void S02_Upper(void);
-void S02_Lower(void);
+void S02_VB(void);
+void S02_OS(void);
 
-void S03_Upper(void);
-void S03_Lower(void);
+void S03_VB(void);
+void S03_OS(void);
 
-void S04_Upper(void);
-void S04_Lower(void);
+void S04_VB(void);
+void S04_OS(void);
 
-void S05_Upper(void);
-void S05_Lower(void);
+void S05_VB(void);
+void S05_OS(void);
 
 /******************************* External Functions
  * *******************************/
@@ -109,9 +120,9 @@ extern void Random(unsigned int count);
 
 /******************************* Variables *******************************/
 // stay ARM-side
-unsigned int rand = 10531789;	// 32 bit LFSR random number
-unsigned int frame = 0;			// frame counter
-unsigned short game_state = 0;	// internal ARM game state
+unsigned int rand = 10531789; // 32 bit LFSR random number
+unsigned int frame = 0;		  // frame counter
+// unsigned short game_state = 0;	// internal ARM game state
 unsigned short sample_size = 0; // current digital sample size (bytes)
 bool saveKeyDetected = false;	// save key present flag
 // to Atari-side
@@ -193,8 +204,8 @@ void runARM_Null() {}
 /*void (*const runFunc[])() = {
 	runARM_Null,		// _RUN_ARM_NULL
 	runARM_Initialise,	// _RUN_ARM_INIT
-	runARM_VerticalBlank, // _RUN_ARM_UPPER_VBLANK
-	runARM_LowerVBlank, // _RUN_ARM_LOWER_VBLANK
+	runARM_VerticalBlank, // _RUN_ARM_VB_VBLANK
+	runARM_OSVBlank, // _RUN_ARM_OS_VBLANK
 };
 
 int main() { // <-- 6507/ARM interfaced here!
@@ -262,47 +273,75 @@ void runARM_Initialise() {
 	//	LoadSaveKey();
 }
 
-static void (*const upperFn[])() = {
-	S00_Upper, //
-	S01_Upper, //
-	S02_Upper, //
-	S03_Upper, //
-	S04_Upper, //
-	S05_Upper, //
-};
+// -----------------------------------------------------------------------------
+// Console detection displays black screen for DETECT_FRAME_COUNT (10) frames
 
-// upper VBlank dispatcher - includes sample end handler
-void runARM_VerticalBlank() {
-
-	detectConsoleType();
-
-	(*upperFn[game_state])();
-
-	if (sound_mode == _SND_MODE_SAMPLE) {
-		unsigned int size = (getWavePtr(0) >> 13);
-		if (size > (unsigned int)(sample_size - 64)) {
-			setNote(0, 0);
-		}
-	}
+void VB_DetectConsole() {
+	if (detectConsoleType())
+		game_state = GS_0;
 }
 
-static void (*const lowerFn[])() = {
-	S00_Lower, //
-	S01_Lower, //
-	S02_Lower, //
-	S03_Lower, //
-	S04_Lower, //
-	S05_Lower, //
+void OS_DetectConsole() {}
+
+// -----------------------------------------------------------------------------
+// Copyright screen
+
+void VB_Copyright() {}
+
+void OS_Copyright() {}
+
+// -----------------------------------------------------------------------------
+
+void (*const VectorVB[])() = {
+
+	// see GAME_STATE for ordering
+
+	VB_DetectConsole, // 0
+	VB_Copyright,	  // 1
+	S00_VB,			  // 2
+	S01_VB,			  // 3
+	S02_VB,			  // 4
+	S03_VB,			  // 5
+	S04_VB,			  // 6
+	S05_VB,			  // 7
+};
+
+void runARM_VerticalBlank() {
+
+	(*VectorVB[game_state])();
+
+	// if (sound_mode == _SND_MODE_SAMPLE) {
+	// 	unsigned int size = (getWavePtr(0) >> 13);
+	// 	if (size > (unsigned int)(sample_size - 64)) {
+	// 		setNote(0, 0);
+	// 	}
+	// }
+}
+
+// -----------------------------------------------------------------------------
+
+void (*const VectorOS[])() = {
+
+	// see GAME_STATE for ordering
+
+	OS_DetectConsole, // 0
+	OS_Copyright,	  // 1
+	S00_OS,			  // 2
+	S01_OS,			  // 3
+	S02_OS,			  // 4
+	S03_OS,			  // 5
+	S04_OS,			  // 6
+	S05_OS,			  // 7
 };
 
 // lower VBlank dispatcher - includes control handler and communication to Atari
 void runARM_Overscan() {
 
-	HandleControls();
+	//	HandleControls();
 
-	(*lowerFn[game_state])();
+	(*VectorOS[game_state])();
 
-	Random(1);
+	//	Random(1);
 
 	frame++;
 
@@ -311,6 +350,8 @@ void runARM_Overscan() {
 	RAM[_sound_mode] = sound_mode;
 	setPointer(DS31PTR, _kernel);
 }
+
+// -----------------------------------------------------------------------------
 
 // Controller Handler - converts raw input to debounced pulsed wait and repeat
 // timings
@@ -416,19 +457,22 @@ void LoadSaveKey() {
 
 /**************************** State 00 ****************************/
 // test game state 00 - TIA sound mode and SaveKey
-void S00_Upper(void) {
-	RAM[_buffer0] += 1;
-	for (int i = 1; i <= 191; i++) {
-		RAM[_buffer0 + i] = RAM[_buffer0 + i - 1] + 1;
-	}
+void S00_VB(void) {
+
+	static unsigned int col;
+	col++;
+
+	for (int i = 0; i <= 191; i++)
+		RAM[_buffer0 + i] = convertColour((col + (i >> 1)) & 0xFF);
+
 	setPointer(DS0PTR, _buffer0);
 }
 
-void S00_Lower(void) {
+void S00_OS(void) {
 	if (p0_r) // right to change to digital sample sound mode
 	{
 		kernel = 1;
-		game_state = 1;
+		game_state = GS_1;
 		sound_mode = _SND_MODE_SAMPLE;
 	}
 
@@ -453,7 +497,7 @@ void S00_Lower(void) {
 
 /**************************** State 01 ****************************/
 // test game state 01 - digital sample sound mode
-void S01_Upper(void) {
+void S01_VB(void) {
 	RAM[_buffer0] -= 1;
 	for (int i = 1; i <= 191; i++) {
 		RAM[_buffer0 + i] = RAM[_buffer0 + i - 1] - 1;
@@ -462,9 +506,9 @@ void S01_Upper(void) {
 	setPointer(DSJMP1PTR, _jump_table_1);
 }
 
-void S01_Lower(void) {
+void S01_OS(void) {
 	if (p0_l) { // left to change to TIA sound mode
-		game_state = 0;
+		game_state = GS_0;
 		kernel = 0;
 		sound_mode = _SND_MODE_TIA;
 		SilenceWaves();
@@ -472,7 +516,7 @@ void S01_Lower(void) {
 
 	if (p0_r) { // right to change to DPC sound mode
 		kernel = 1;
-		game_state = 2;
+		game_state = GS_2;
 		sound_mode = _SND_MODE_DPC;
 		SilenceWaves();
 	}
@@ -494,7 +538,7 @@ void S01_Lower(void) {
 
 /**************************** State 02 ****************************/
 // test game state 02 - DPC+ sound mode
-void S02_Upper(void) {
+void S02_VB(void) {
 	RAM[_buffer0 + 191] -= 1;
 	for (int i = 190; i >= 0; i--) {
 		RAM[_buffer0 + i] = RAM[_buffer0 + i + 1] - 1;
@@ -503,12 +547,12 @@ void S02_Upper(void) {
 	setPointer(DSJMP1PTR, _jump_table_1);
 }
 
-void S02_Lower(void) {
+void S02_OS(void) {
 
 	if (p0_l) // left to change to digital sample sound mode
 	{
 		kernel = 1;
-		game_state = 1;
+		game_state = GS_1;
 		sound_mode = _SND_MODE_SAMPLE;
 		SilenceWaves();
 	}
@@ -534,16 +578,16 @@ void S02_Lower(void) {
 }
 
 /**************************** State 03 ****************************/
-void S03_Upper(void) {}
+void S03_VB(void) {}
 
-void S03_Lower(void) {}
+void S03_OS(void) {}
 
 /**************************** State 04 ****************************/
-void S04_Upper(void) {}
+void S04_VB(void) {}
 
-void S04_Lower(void) {}
+void S04_OS(void) {}
 
 /**************************** State 05 ****************************/
-void S05_Upper(void) {}
+void S05_VB(void) {}
 
-void S05_Lower(void) {}
+void S05_OS(void) {}

@@ -75,7 +75,10 @@ _RUN_ARM_OVERSCAN   	= 3
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 UPPER_BLANK_TIMER_PAL60	= 43
-LOWER_BLANK_TIMER_PAL60	= 85
+LOWER_BLANK_TIMER_PAL60	= 35
+
+UPPER_BLANK_TIMER_PAL	= 50
+LOWER_BLANK_TIMER_PAL	= 45
 
 UPPER_BLANK_TIMER_NTSC	= 43
 LOWER_BLANK_TIMER_NTSC	= 35
@@ -87,10 +90,10 @@ LOWER_BLANK_TIMER_SECAM	= 35
 ;@ Auto-detect TV system types (also exported to C)
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-_TV_TYPE_PAL60           = 0
-_TV_TYPE_NTSC            = 1
-_TV_TYPE_SECAM           = 2
-
+_TV_SYSTEM_NTSC            = 0
+_TV_SYSTEM_PAL             = 1
+_TV_SYSTEM_SECAM           = 2
+_TV_SYSTEM_PAL60           = 3
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@ 2600 RIOT RAM - A mere 128 bytes
