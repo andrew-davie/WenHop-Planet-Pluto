@@ -68,6 +68,9 @@ SRCS = \
  detectConsole.c \
  main.c \
  savekey.c \
+ stateCopyright.c \
+ stateDetectConsole.c \
+ stateRainbow.c \
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
@@ -104,7 +107,7 @@ ifneq ($(EMULATOR),)
 	pkill -f $(GOPHERNAME) || true
 
 ifeq ($(EMULATOR), gopher)
-	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv SECAM -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
+	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv NTSC -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
 endif
 
 ifeq ($(EMULATOR), stella)

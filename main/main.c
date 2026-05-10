@@ -18,24 +18,14 @@ Gamax Software 2026 - Craig Daniels
 #include "main.h"
 #include "savekey.h"
 
+#include "state.h"
+
 int usedSolves;
 int whichLot;
 
 void LoadSaveKey();
 
-enum GAME_STATE {
-
-	// Controls which VB and OS are run
-
-	GS_DETECT_CONSOLE, // 0
-	GS_COPYRIGHT,	   // 1
-	GS_0,			   // 2
-	GS_1,			   // 3
-	GS_2,			   // 4
-	GS_3,			   // 5
-	GS_4			   // 6
-
-} game_state = GS_DETECT_CONSOLE;
+enum GAME_STATE game_state = GS_DETECT_CONSOLE;
 
 /******************************* Data/Includes *******************************/
 
@@ -90,24 +80,6 @@ void SilenceTIA();
 // void SaveKeyRead(unsigned short address, unsigned char offset,
 // 				 unsigned char count);
 
-void S00_VB(void);
-void S00_OS(void);
-
-void S01_VB(void);
-void S01_OS(void);
-
-void S02_VB(void);
-void S02_OS(void);
-
-void S03_VB(void);
-void S03_OS(void);
-
-void S04_VB(void);
-void S04_OS(void);
-
-void S05_VB(void);
-void S05_OS(void);
-
 /******************************* External Functions
  * *******************************/
 
@@ -128,13 +100,11 @@ bool saveKeyDetected = false;	// save key present flag
 // to Atari-side
 unsigned char kernel = 0; // drawing kernel used/passed Atari-side
 unsigned char sound_mode = _SND_MODE_TIA; // sound mode used/passed Atari-side
-unsigned short save_key_address =
-	0x2600; // replace with whatever address desired
 
 // Atari input direct access variables - joysticks and RESET/SELECT are
 // automatically wait/repeat handled
-bool input_flag[15] = {false, false, false, false, false, false, false, false,
-					   false, false, false, false, false, false, false};
+bool input_flag[15] = {false};
+
 #define p1_u input_flag[0]
 #define p1_d input_flag[1]
 #define p1_l input_flag[2]
@@ -199,7 +169,8 @@ void initNextLife();
 void SystemReset();
 void setupBoard();
 void processCharAnimations();
-void runARM_Null() {}
+void runARM_Null() {
+}
 
 /*void (*const runFunc[])() = {
 	runARM_Null,		// _RUN_ARM_NULL
@@ -274,23 +245,6 @@ void runARM_Initialise() {
 }
 
 // -----------------------------------------------------------------------------
-// Console detection displays black screen for DETECT_FRAME_COUNT (10) frames
-
-void VB_DetectConsole() {
-	if (detectConsoleType())
-		game_state = GS_0;
-}
-
-void OS_DetectConsole() {}
-
-// -----------------------------------------------------------------------------
-// Copyright screen
-
-void VB_Copyright() {}
-
-void OS_Copyright() {}
-
-// -----------------------------------------------------------------------------
 
 void (*const VectorVB[])() = {
 
@@ -298,12 +252,7 @@ void (*const VectorVB[])() = {
 
 	VB_DetectConsole, // 0
 	VB_Copyright,	  // 1
-	S00_VB,			  // 2
-	S01_VB,			  // 3
-	S02_VB,			  // 4
-	S03_VB,			  // 5
-	S04_VB,			  // 6
-	S05_VB,			  // 7
+	VB_Rainbow,		  // 2
 };
 
 void runARM_VerticalBlank() {
@@ -326,22 +275,23 @@ void (*const VectorOS[])() = {
 
 	OS_DetectConsole, // 0
 	OS_Copyright,	  // 1
-	S00_OS,			  // 2
-	S01_OS,			  // 3
-	S02_OS,			  // 4
-	S03_OS,			  // 5
-	S04_OS,			  // 6
-	S05_OS,			  // 7
+	OS_Rainbow,		  // 2
 };
 
-// lower VBlank dispatcher - includes control handler and communication to Atari
 void runARM_Overscan() {
+
+	// Overscan - includes control handler and communication to Atari
+	// By *convention*, kernel or gameState switching should be done in overscan
+	// so that any VB processing before display of next frame will be the new
+	// kernel/state
 
 	//	HandleControls();
 
 	(*VectorOS[game_state])();
 
 	//	Random(1);
+
+	// common to ALL OS routines...
 
 	frame++;
 
@@ -434,160 +384,3 @@ void LoadSaveKey() {
 	RAM[_SK_COUNT] = count;
 	RAM[_SK_COUNT + 1] = count >> 8;
 }
-
-// Write to SaveKey
-// void SaveKeyWrite(unsigned short address, unsigned char offset,
-// 				  unsigned char count) {
-// 	RAM_2B[_save_addr_l / 2] = address;
-// 	RAM[_save_count] = count;
-// 	RAM[_save_offset] = offset;
-// 	if (saveKeyDetected)
-// 		RAM[_save_command] = _SAVE_KEY_WRITE;
-// }
-
-// // Read from SaveKey
-// void SaveKeyRead(unsigned short address, unsigned char offset,
-// 				 unsigned char count) {
-// 	RAM_2B[_save_addr_l / 2] = address;
-// 	RAM[_save_count] = count;
-// 	RAM[_save_offset] = offset;
-// 	if (saveKeyDetected)
-// 		RAM[_save_command] = _SAVE_KEY_READ;
-// }
-
-/**************************** State 00 ****************************/
-// test game state 00 - TIA sound mode and SaveKey
-void S00_VB(void) {
-
-	static unsigned int col;
-	col++;
-
-	for (int i = 0; i <= 191; i++)
-		RAM[_buffer0 + i] = convertColour((col + (i >> 1)) & 0xFF);
-
-	setPointer(DS0PTR, _buffer0);
-}
-
-void S00_OS(void) {
-	if (p0_r) // right to change to digital sample sound mode
-	{
-		kernel = 1;
-		game_state = GS_1;
-		sound_mode = _SND_MODE_SAMPLE;
-	}
-
-	// if (p0_u) // up to write a single byte to EEPROM offset 6
-	// {
-	// 	RAM[_save_data + 6] = 5;
-	// 	SaveKeyWrite(save_key_address + 6, 6, 1);
-	// }
-
-	// if (p0_d) // down to write a pair of bytes to EEPROM offset 1
-	// {
-	// 	RAM[_save_data + 1] = 7;
-	// 	RAM[_save_data + 2] = 26;
-	// 	SaveKeyWrite(save_key_address + 1, 1, 2);
-	// }
-
-	// if (p0_b) // p0 button to read entire 64 byte block
-	// {
-	// 	SaveKeyRead(save_key_address, 0, 64);
-	// }
-}
-
-/**************************** State 01 ****************************/
-// test game state 01 - digital sample sound mode
-void S01_VB(void) {
-	RAM[_buffer0] -= 1;
-	for (int i = 1; i <= 191; i++) {
-		RAM[_buffer0 + i] = RAM[_buffer0 + i - 1] - 1;
-	}
-	setPointer(DS0PTR, _buffer0);
-	setPointer(DSJMP1PTR, _jump_table_1);
-}
-
-void S01_OS(void) {
-	if (p0_l) { // left to change to TIA sound mode
-		game_state = GS_0;
-		kernel = 0;
-		sound_mode = _SND_MODE_TIA;
-		SilenceWaves();
-	}
-
-	if (p0_r) { // right to change to DPC sound mode
-		kernel = 1;
-		game_state = GS_2;
-		sound_mode = _SND_MODE_DPC;
-		SilenceWaves();
-	}
-
-	if (p0_u) { // up for sample play from ROM
-		resetWave(0);
-		setNote(0, 1600);
-		setSamplePtr(_sample_steel);
-		sample_size = _sample_steel_size;
-	}
-
-	if (p0_d) { // down for sample play from buffer
-		resetWave(0);
-		setNote(0, 800);
-		setWaveform(0, RAM_SAMPLE);
-		sample_size = SAMPLE1_SIZE;
-	}
-}
-
-/**************************** State 02 ****************************/
-// test game state 02 - DPC+ sound mode
-void S02_VB(void) {
-	RAM[_buffer0 + 191] -= 1;
-	for (int i = 190; i >= 0; i--) {
-		RAM[_buffer0 + i] = RAM[_buffer0 + i + 1] - 1;
-	}
-	setPointer(DS0PTR, _buffer0);
-	setPointer(DSJMP1PTR, _jump_table_1);
-}
-
-void S02_OS(void) {
-
-	if (p0_l) // left to change to digital sample sound mode
-	{
-		kernel = 1;
-		game_state = GS_1;
-		sound_mode = _SND_MODE_SAMPLE;
-		SilenceWaves();
-	}
-	if (p0_u) // up to play wave channel 0
-	{
-		setWaveform(0, WAV_TRIANGLE);
-		setNote(0, getPitch(58));
-	}
-	if (p0_r) // right to play wave channel 1
-	{
-		setWaveform(1, WAV_SQUARE);
-		setNote(1, getPitch(60));
-	}
-	if (p0_d) // down to play wave channel 2
-	{
-		setWaveform(2, WAV_SAW);
-		setNote(2, getPitch(62));
-	}
-	if (p0_b) // p0 button to silence all wave channels
-	{
-		SilenceWaves();
-	}
-}
-
-/**************************** State 03 ****************************/
-void S03_VB(void) {}
-
-void S03_OS(void) {}
-
-/**************************** State 04 ****************************/
-void S04_VB(void) {}
-
-void S04_OS(void) {}
-
-/**************************** State 05 ****************************/
-void S05_VB(void) {}
-
-void S05_OS(void) {}
