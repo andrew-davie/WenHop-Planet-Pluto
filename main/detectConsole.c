@@ -7,7 +7,7 @@
 #include "main.h"
 #include <limits.h>
 
-int tv_system;
+int tvSystem;
 
 #define DETECT_FRAME_COUNT 10
 #define ENABLE_60MHZ_AUTODETECT 0
@@ -22,7 +22,7 @@ bool detectConsoleType() {
 
 	case 0:
 
-		tv_system = _TV_SYSTEM_NTSC; // force NTSC frame for autodetect purposes
+		tvSystem = _TV_SYSTEM_NTSC; // force NTSC frame for autodetect purposes
 
 		T1TC = 0;
 		T1TCR = 1;
@@ -96,8 +96,8 @@ bool detectConsoleType() {
 
 			if (dist < delta) {
 				delta = dist;
-				tv_system = mapTimeToFormat[i].format;
-				RAM[_tv_system] = tv_system;
+				tvSystem = mapTimeToFormat[i].format;
+				RAM[_tv_system] = tvSystem;
 			}
 		}
 
@@ -110,3 +110,5 @@ bool detectConsoleType() {
 
 	return finished;
 }
+
+// EOF

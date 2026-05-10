@@ -357,13 +357,13 @@ kernelVBlank_l	;.byte <(ChampKernel-1)
 	lda #DS31DATA
 	sta audv0
 	lda #DS31DATA
-	sta audc0
-	lda #DS31DATA
-	sta audf0
-	lda #DS31DATA
 	sta audv1
 	lda #DS31DATA
+	sta audc0
+	lda #DS31DATA
 	sta audc1
+	lda #DS31DATA
+	sta audf0
 	lda #DS31DATA
 	sta audf1
 

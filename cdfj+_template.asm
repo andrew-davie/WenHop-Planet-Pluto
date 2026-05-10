@@ -74,8 +74,8 @@ _RUN_ARM_OVERSCAN   	= 3
 ;@ User Constants
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-UPPER_BLANK_TIMER_PAL60	= 43
-LOWER_BLANK_TIMER_PAL60	= 35
+UPPER_BLANK_TIMER_PAL60	= (43+30)
+LOWER_BLANK_TIMER_PAL60	= (35+29)
 
 UPPER_BLANK_TIMER_PAL	= 50
 LOWER_BLANK_TIMER_PAL	= 45
@@ -190,13 +190,14 @@ _INPT5			ds 1			; <FRAMEWORK>
 _kernel			ds 1			; <FRAMEWORK>
 _tv_system		ds 1			; <FRAMEWORK>  see TV_TYPE_ definitions
 _sound_mode		ds 1			; <FRAMEWORK>
+_colubk         ds 1
 
-_AUDV0			ds 1			; <FRAMEWORK>
-_AUDC0			ds 1			; <FRAMEWORK>
-_AUDF0			ds 1			; <FRAMEWORK>
-_AUDV1			ds 1			; <FRAMEWORK>
-_AUDC1			ds 1			; <FRAMEWORK>
-_AUDF1			ds 1			; <FRAMEWORK>
+_AUDV0			ds 2			; <FRAMEWORK>
+_AUDC0			ds 2			; <FRAMEWORK>
+_AUDF0			ds 2			; <FRAMEWORK>
+; _AUDV1			ds 1			; <FRAMEWORK>
+; _AUDC1			ds 1			; <FRAMEWORK>
+; _AUDF1			ds 1			; <FRAMEWORK>
 
 _save_command		ds 1			; <SaveKey>
 _save_count		ds 1			; <SaveKey>
@@ -204,6 +205,9 @@ _save_addr_l		ds 1			; <SaveKey>
 _save_addr_h		ds 1			; <SaveKey>
 _save_offset		ds 1			; <SaveKey>
 _save_data		ds 64			; <SaveKey>
+
+
+
 
 			;173 bytes free for user data here
 			;things such as player positions,
@@ -216,38 +220,38 @@ _digital_sample		ds DS_SIZE		;@@@@@ 2048 Bytes: Digital Sound Sample (on RAM >= 
 						;@@@@@ playback access via waveform ID 8 @@@@@
 
 _buffer0		ds 192			;@@@@@ 16x 192 Byte DS Channels @@@@@
-_buffer1		ds 192
-_buffer2		ds 192
-_buffer3		ds 192
-_buffer4		ds 192
-_buffer5		ds 192
-_buffer6		ds 192
-_buffer7		ds 192
-_buffer8		ds 192
-_buffer9		ds 192
-_buffer10		ds 192
-_buffer11		ds 192
-_buffer12		ds 192
-_buffer13		ds 192
-_buffer14		ds 192
-_buffer15		ds 192
+; _buffer1		ds 192
+; _buffer2		ds 192
+; _buffer3		ds 192
+; _buffer4		ds 192
+; _buffer5		ds 192
+; _buffer6		ds 192
+; _buffer7		ds 192
+; _buffer8		ds 192
+; _buffer9		ds 192
+; _buffer10		ds 192
+; _buffer11		ds 192
+; _buffer12		ds 192
+; _buffer13		ds 192
+; _buffer14		ds 192
+; _buffer15		ds 192
 
-_buffer16		ds CH_SIZE		;@@@@@ 16x additional 192 Byte DS Channels (on RAM = 32k) @@@@@
-_buffer17		ds CH_SIZE
-_buffer18		ds CH_SIZE
-_buffer19		ds CH_SIZE
-_buffer20		ds CH_SIZE
-_buffer21		ds CH_SIZE
-_buffer22		ds CH_SIZE
-_buffer23		ds CH_SIZE
-_buffer24		ds CH_SIZE
-_buffer25		ds CH_SIZE
-_buffer26		ds CH_SIZE
-_buffer27		ds CH_SIZE
-_buffer28		ds CH_SIZE
-_buffer29		ds CH_SIZE
-_buffer30		ds CH_SIZE
-_buffer31		ds CH_SIZE
+; _buffer16		ds CH_SIZE		;@@@@@ 16x additional 192 Byte DS Channels (on RAM = 32k) @@@@@
+; _buffer17		ds CH_SIZE
+; _buffer18		ds CH_SIZE
+; _buffer19		ds CH_SIZE
+; _buffer20		ds CH_SIZE
+; _buffer21		ds CH_SIZE
+; _buffer22		ds CH_SIZE
+; _buffer23		ds CH_SIZE
+; _buffer24		ds CH_SIZE
+; _buffer25		ds CH_SIZE
+; _buffer26		ds CH_SIZE
+; _buffer27		ds CH_SIZE
+; _buffer28		ds CH_SIZE
+; _buffer29		ds CH_SIZE
+; _buffer30		ds CH_SIZE
+; _buffer31		ds CH_SIZE
 
 _jump_table_1		ds 384
 _jump_table_2		ds 384

@@ -18,6 +18,7 @@ Gamax Software 2026 - Craig Daniels
 #include "main.h"
 #include "savekey.h"
 
+#include "sound.h"
 #include "state.h"
 
 int usedSolves;
@@ -25,7 +26,7 @@ int whichLot;
 
 void LoadSaveKey();
 
-enum GAME_STATE game_state = GS_DETECT_CONSOLE;
+enum GAME_STATE gameState = GS_DETECT_CONSOLE;
 
 /******************************* Data/Includes *******************************/
 
@@ -99,7 +100,7 @@ unsigned short sample_size = 0; // current digital sample size (bytes)
 bool saveKeyDetected = false;	// save key present flag
 // to Atari-side
 unsigned char kernel = 0; // drawing kernel used/passed Atari-side
-unsigned char sound_mode = _SND_MODE_TIA; // sound mode used/passed Atari-side
+unsigned char soundMode = _SND_MODE_TIA; // sound mode used/passed Atari-side
 
 // Atari input direct access variables - joysticks and RESET/SELECT are
 // automatically wait/repeat handled
@@ -172,37 +173,16 @@ void processCharAnimations();
 void runARM_Null() {
 }
 
-/*void (*const runFunc[])() = {
-	runARM_Null,		// _RUN_ARM_NULL
-	runARM_Initialise,	// _RUN_ARM_INIT
+void (*const runFunc[])() = {
+	runARM_Null,		  // _RUN_ARM_NULL
+	runARM_Initialise,	  // _RUN_ARM_INIT
 	runARM_VerticalBlank, // _RUN_ARM_VB_VBLANK
-	runARM_OSVBlank, // _RUN_ARM_OS_VBLANK
+	runARM_Overscan,	  // _RUN_ARM_OS_VBLANK
 };
 
 int main() { // <-- 6507/ARM interfaced here!
 
-	if (_RUN_FUNC < sizeof(runFunc) / sizeof(runFunc[0]))
-		(*runFunc[_RUN_FUNC])();
-	return 0;
-}
-*/
-
-int main() {
-
-	switch (RAM[_RUN_FUNC]) {
-	case _RUN_ARM_INIT:
-		runARM_Initialise();
-		break;
-	case _RUN_ARM_VBLANK:
-		runARM_VerticalBlank();
-		break;
-	case _RUN_ARM_OVERSCAN:
-		runARM_Overscan();
-		break;
-	default:
-		break;
-	}
-
+	(*runFunc[RAM[_RUN_FUNC]])();
 	return 0;
 }
 
@@ -233,8 +213,8 @@ void runARM_Initialise() {
 	RAM_2B[(_jump_table_1 / 2) + 191] = _kernel_01_done;
 
 	RAM[_kernel] = kernel;
-	RAM[_tv_system] = tv_system;
-	RAM[_sound_mode] = sound_mode;
+	RAM[_tv_system] = tvSystem;
+	RAM[_sound_mode] = soundMode;
 	setPointer(DS31PTR, _kernel); // pass initial state to Atari
 
 	//	RAM[_RUN_FUNC] = _RUN_NULL;
@@ -242,40 +222,36 @@ void runARM_Initialise() {
 	SilenceWaves(); // init DPC waveforms
 
 	//	LoadSaveKey();
+
+	initAudio(true);
+	startMusic();
 }
 
 // -----------------------------------------------------------------------------
 
-void (*const VectorVB[])() = {
+void (*const VectorVB[GS_MAX])() = {
 
-	// see GAME_STATE for ordering
+	// see GAME_STATE enum
 
-	VB_DetectConsole, // 0
-	VB_Copyright,	  // 1
-	VB_Rainbow,		  // 2
+	VB_DetectConsole, // 0	GS_DETECT_CONSOLE
+	VB_Copyright,	  // 1  GS_COPYRIGHT
+	VB_Rainbow,		  // 2	GS_DEMO
 };
 
 void runARM_VerticalBlank() {
 
-	(*VectorVB[game_state])();
-
-	// if (sound_mode == _SND_MODE_SAMPLE) {
-	// 	unsigned int size = (getWavePtr(0) >> 13);
-	// 	if (size > (unsigned int)(sample_size - 64)) {
-	// 		setNote(0, 0);
-	// 	}
-	// }
+	(*VectorVB[gameState])();
 }
 
 // -----------------------------------------------------------------------------
 
-void (*const VectorOS[])() = {
+void (*const VectorOS[GS_MAX])() = {
 
-	// see GAME_STATE for ordering
+	// see GAME_STATE enum
 
-	OS_DetectConsole, // 0
-	OS_Copyright,	  // 1
-	OS_Rainbow,		  // 2
+	OS_DetectConsole, // 0	GS_DETECT_CONSOLE
+	OS_Copyright,	  // 1  GS_COPYRIGHT
+	OS_Rainbow,		  // 2	GS_DEMO
 };
 
 void runARM_Overscan() {
@@ -287,7 +263,7 @@ void runARM_Overscan() {
 
 	//	HandleControls();
 
-	(*VectorOS[game_state])();
+	(*VectorOS[gameState])();
 
 	//	Random(1);
 
@@ -296,8 +272,8 @@ void runARM_Overscan() {
 	frame++;
 
 	RAM[_kernel] = kernel;
-	RAM[_tv_system] = tv_system;
-	RAM[_sound_mode] = sound_mode;
+	RAM[_tv_system] = tvSystem;
+	RAM[_sound_mode] = soundMode;
 	setPointer(DS31PTR, _kernel);
 }
 
@@ -358,12 +334,12 @@ void SilenceWaves() {
 
 // Used to set TIA sound to all silent / no note
 void SilenceTIA() {
-	RAM[_AUDV0] = 0;
-	RAM[_AUDC0] = 0;
-	RAM[_AUDF0] = 0;
-	RAM[_AUDV1] = 0;
-	RAM[_AUDC1] = 0;
-	RAM[_AUDF1] = 0;
+
+	for (int i = 0; i < 2; i++) {
+		RAM[_AUDV0 + i] = 0;
+		RAM[_AUDC0 + i] = 0;
+		RAM[_AUDF0 + i] = 0;
+	}
 }
 
 void LoadSaveKey() {
@@ -384,3 +360,5 @@ void LoadSaveKey() {
 	RAM[_SK_COUNT] = count;
 	RAM[_SK_COUNT + 1] = count >> 8;
 }
+
+// EOF

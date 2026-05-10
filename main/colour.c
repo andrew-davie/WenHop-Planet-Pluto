@@ -7,7 +7,7 @@
 int flashTime = 1;
 int luminance = 0;
 
-static int lastBgCol;
+// static int lastBgCol;
 int openSlot;
 int roller;
 
@@ -44,7 +44,7 @@ unsigned char secamConvert(unsigned char col) {
 }
 
 unsigned char convertColour(unsigned char colour) {
-	switch (tv_system) {
+	switch (tvSystem) {
 
 	case _TV_SYSTEM_SECAM: {
 		colour = secamConvert(colour);
@@ -64,7 +64,7 @@ unsigned char convertColour(unsigned char colour) {
 	return colour; // adjustBrightness(colour);
 }
 
-void setFlash2(unsigned char colour, int time) {
+void setFlash2(unsigned char /*colour*/, int /*time*/) {
 	// TODO
 	//  ARENA_COLOUR = (colour & 0xF) | (convertColour(colour) & 0xF0);
 	//  flashTime = time;

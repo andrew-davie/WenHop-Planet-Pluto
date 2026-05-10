@@ -2,6 +2,7 @@
 #include "defines_dasm.h"
 
 #include "colour.h"
+#include "sound.h"
 #include "state.h"
 
 void VB_Rainbow() {
@@ -16,6 +17,8 @@ void VB_Rainbow() {
 }
 
 void OS_Rainbow() {
+
+	playAudio();
 }
 
 // EOF

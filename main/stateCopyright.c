@@ -5,7 +5,7 @@
 
 void VB_Copyright() {
 
-	game_state = GS_DEMO;
+	gameState = GS_DEMO;
 }
 
 void OS_Copyright() {

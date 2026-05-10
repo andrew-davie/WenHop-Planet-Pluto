@@ -9,7 +9,7 @@
 
 void VB_DetectConsole() {
 	if (detectConsoleType())
-		game_state = GS_COPYRIGHT;
+		gameState = GS_COPYRIGHT;
 }
 
 void OS_DetectConsole() {

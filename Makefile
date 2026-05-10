@@ -68,6 +68,7 @@ SRCS = \
  detectConsole.c \
  main.c \
  savekey.c \
+ sound.c \
  stateCopyright.c \
  stateDetectConsole.c \
  stateRainbow.c \
@@ -92,7 +93,7 @@ vpath %.S $(BASE) $(CUSTOM)
 
 .PHONY: all
 all: tools make_rom run_emulator
-
+	mv *.jpg screenshots 2>/dev/null || true
 
 ###############################################################################
 # EMULATOR = gopher|stella  -- or can be absent
