@@ -1,6 +1,8 @@
 #pragma once
 
-#include "main.h"
+#include <stdbool.h>
+
+// #include "main.h"
 
 #define AUDIO_LOCKED 0x80
 #define AUDIO_SINGLETON 0x40
