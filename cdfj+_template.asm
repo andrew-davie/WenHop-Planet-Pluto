@@ -20,9 +20,8 @@ ROM_SIZE		= 128			;in kB - 32, 64, 128, 256 or 512
 FF_LDX			= 1			;Fast Fetch for LDX: 0 = off, NZ = on
 FF_LDY			= 1			;Fast Fetch for LDY: 0 = off, NZ = on
 FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
-C_START			= $7800			;$1800, $2800, $3800, $4800, $5800, $6800, $7800
-						; With current examples, C_START=$1800 will error because Bank1 contains 6507 routines.
-						; Move/remove those routines to Bank0 before starting ARM C at $1800.
+
+
 
 	INCLUDE "cdfjplus.h"			;cdfjplus.h must come AFTER system constants for FF_OFFSET to apply
 	INCLUDE "vcs.h"
@@ -332,126 +331,79 @@ CDFJPLUS_DRIVER_SIZE = [* - CDFJPLUS_DRIVER]d
 
 
 
-; TODO: Check changes to CSTART rorg/org usage below
-;  instead of the conditional weirdness
+; Note: c_start.c assumes format exactly "ASM_BANKS = " and then the bank count in decimal
+ASM_BANKS = 7
+
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@ Bank 0 - Startup bank
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-CURRENT_BANK set $0800
-	ORG CURRENT_BANK
+CURRENT_BANK SET $0800
 
-	.include "bank_0.asm"
+	include "bank_0.asm"
 
-	; if C_START = $1800
-	; org $1800
-	; rorg $1800
+    ; --------------------------------------------------------------------------
+    ; Bank 0 Footer - needed for CDFJ+ to function
 
-	; else
+BANK0_HEADER = $17F0
 
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Bank 1
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    IF * >= $FFF0
+        ECHO "ERROR: Bank 0 overflow by", * - $FFF0 + 1, "bytes."
+        ERR
+    ENDIF
 
-CURRENT_BANK set $1800
-	ORG CURRENT_BANK
+	; ROM Pointers
+	org BANK0_HEADER		;This section is only needed in BANK 0
+	rorg $FFF0
 
-	.include "bank_1.asm"
+	DC.B 0, 0, 0, 0		;CDFJ Hotspots
+	DC.L C_STACK		;$F4	C Stack
+	DC.L C_CODE+1		;$F8	C Code (+1 for THUMB Mode)
+	DC.W CartReset		;$FC	Reset
+	DC.W CartReset		;$FE	BRK
 
-	; if C_START = $2800
-	; org $2800
-	; rorg $2800
-
-	; else
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Bank 2
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-CURRENT_BANK set $2800
-	ORG CURRENT_BANK
-
-	.include "bank_2.asm"
-
-	; if C_START = $3800
-	; org $3800
-	; rorg $3800
-
-	; else
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Bank 3
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+;@ Other banks...
+    
+    IF ASM_BANKS > 1
+CURRENT_BANK SET CURRENT_BANK + $1000
+	include "bank_1.asm"
+    ENDIF
 
-CURRENT_BANK set $3800
-	ORG CURRENT_BANK
+    IF ASM_BANKS > 2
+CURRENT_BANK SET CURRENT_BANK + $1000
+	include "bank_2.asm"
+    ENDIF
 
-	.include "bank_3.asm"
+    IF ASM_BANKS > 3
+CURRENT_BANK SET CURRENT_BANK + $1000
+	include "bank_3.asm"
+    ENDIF
 
-	; if C_START = $4800
-	; org $4800
-	; rorg $4800
+    IF ASM_BANKS > 4
+CURRENT_BANK SET CURRENT_BANK + $1000
+	include "bank_4.asm"
+    ENDIF
 
-	; else
+    IF ASM_BANKS > 5
+CURRENT_BANK SET CURRENT_BANK + $1000
+	include "bank_5.asm"
+    ENDIF
 
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Bank 4
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-CURRENT_BANK set $4800
-	ORG CURRENT_BANK
-
-	.include "bank_4.asm"
-
-	; if C_START = $5800
-	; org $5800
-	; rorg $5800
-
-	; else
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Bank 5
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-CURRENT_BANK set $5800
-	ORG CURRENT_BANK
-
-	.include "bank_5.asm"
-
-	; if C_START = $6800
-	; org $6800
-	; rorg $6800
-
-	; else
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Bank 6
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-CURRENT_BANK set $6800
-	ORG CURRENT_BANK
-
-	.include "bank_6.asm"
+    IF ASM_BANKS > 6
+CURRENT_BANK SET CURRENT_BANK + $1000
+	include "bank_6.asm"
+    ENDIF
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@ C-Code
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-	; org $7800
-	; rorg $7800
-
-	; endif
-	; endif
-	; endif
-	; endif
-	; endif
-	; endif
-
-
-    org C_START
-    rorg C_START
+    org CURRENT_BANK + $1000
+    rorg CURRENT_BANK + $1000
 
 
 C_CODE:

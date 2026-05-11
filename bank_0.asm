@@ -1028,14 +1028,14 @@ BANK0_CODE_SIZE = * - .BANK0
 	echo "---- BANK0", ($fff0 - *), "bytes free"
 
 
-;@@@@@@@@@@@@@@@ Bank 0 Footer - needed for CDFJ+ to function @@@@@@@@@@@@@@@
-	; ROM Pointers
-	org $17F0		;This section is only needed in BANK 0
-	rorg $FFF0
-	DC.B 0, 0, 0, 0		;CDFJ Hotspots
-	DC.L C_STACK		;$F4	C Stack
-	DC.L C_CODE+1		;$F8	C Code (+1 for THUMB Mode)
-	DC.W CartReset		;$FC	Reset
-	DC.W CartReset		;$FE	BRK
+; ;@@@@@@@@@@@@@@@ Bank 0 Footer - needed for CDFJ+ to function @@@@@@@@@@@@@@@
+; 	; ROM Pointers
+; 	org $17F0		;This section is only needed in BANK 0
+; 	rorg $FFF0
+; 	DC.B 0, 0, 0, 0		;CDFJ Hotspots
+; 	DC.L C_STACK		;$F4	C Stack
+; 	DC.L C_CODE+1		;$F8	C Code (+1 for THUMB Mode)
+; 	DC.W CartReset		;$FC	Reset
+; 	DC.W CartReset		;$FE	BRK
 
 

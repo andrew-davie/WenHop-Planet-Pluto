@@ -91,6 +91,11 @@ extern void ClearChannel(void *ptr);
 extern void MemCopy32(void *ptr1, void *ptr2, unsigned int count);
 extern void Random(unsigned int count);
 
+unsigned int rangeRandom(short int range) {
+	// generate a random between 0 and range-1 (16-bit)
+	return ((getRandom32() >> 16) * range) >> 16;
+}
+
 /******************************* Variables *******************************/
 // stay ARM-side
 unsigned int rand = 10531789; // 32 bit LFSR random number

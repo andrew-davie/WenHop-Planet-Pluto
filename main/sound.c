@@ -11,6 +11,8 @@
 //#include "joystick.h"
 //#include "random.h"
 
+#define ENABLE_SOUND 1
+
 // clang-format on
 
 void loadTrack(int priority, const unsigned char *tune, int volume, int dur,
@@ -701,7 +703,7 @@ void processSoundEffects() {
 			}
 		}
 
-		// #if ENABLE_SOUND
+#if ENABLE_SOUND
 
 		if (audC && audV >= volume[channel]) {
 			RAM[_AUDC0 + channel] = audC;
@@ -712,7 +714,7 @@ void processSoundEffects() {
 			// if (sound_volume < 0)
 			// 	sound_volume = 0;
 		}
-		// #endif
+#endif
 	}
 }
 

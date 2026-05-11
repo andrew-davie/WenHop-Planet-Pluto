@@ -147,7 +147,7 @@ endif
 .PHONY: prep
 prep: tools
 	mkdir -p $(BIN) $(OUTPUT)
-	$(TOOLS_BIN)/$(CSTART) ./$(SOURCE).asm $(CUSTOM)/custom.boot.lds
+# 	$(TOOLS_BIN)/$(CSTART) ./$(SOURCE).asm $(CUSTOM)/custom.boot.lds
 	@if [ ! -f "$(CUSTOMBIN)" ]; then \
 		printf '\000' > "$(CUSTOMBIN)"; \
 	fi
@@ -160,12 +160,15 @@ prep: tools
 
 .PHONY: bootstrap_defines
 bootstrap_defines:
+	echo "bootstrap_defines"
 	$(DASM) $(SOURCE).asm -p100 -f3 -v5 \
 		-s$(OUTPUT)/$(SOURCE).sym \
 		-l$(OUTPUT)/$(SOURCE).lst \
 		-o$(OUTPUT)/$(SOURCE).bin
 	@echo "// Auto-generated from DASM output and symbols" > $(BASE)/$(DASM_TO_C).tmp
 	@echo "" >> $(BASE)/$(DASM_TO_C).tmp
+	echo "cstartxxx"
+	$(TOOLS_BIN)/$(CSTART) ./$(SOURCE).asm $(CUSTOM)/custom.boot.lds
 	awk '$$1 ~ /^_/ {printf "#define %-25s 0x%s\n", $$1, $$2}' \
 		$(OUTPUT)/$(SOURCE).sym >> $(BASE)/$(DASM_TO_C).tmp
 	mv $(BASE)/$(DASM_TO_C).tmp $(BASE)/$(DASM_TO_C)
