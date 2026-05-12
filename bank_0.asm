@@ -1,7 +1,7 @@
 	org CURRENT_BANK
 	rorg $f000
 
-.BANK0
+BANK0_START
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@ These routines put at beginning of each bank so all have access @@@@@@@@@@@@@@@@@@@@@
@@ -1018,24 +1018,9 @@ k_prep_01
 	; .byte %10011010
 
 
-
-
-
-
-
-BANK0_CODE_SIZE = * - .BANK0
+BANK0_CODE_SIZE = * - BANK0_START
 	echo "---- BANK0", BANK0_CODE_SIZE, "bytes"
 	echo "---- BANK0", ($fff0 - *), "bytes free"
 
 
-; ;@@@@@@@@@@@@@@@ Bank 0 Footer - needed for CDFJ+ to function @@@@@@@@@@@@@@@
-; 	; ROM Pointers
-; 	org $17F0		;This section is only needed in BANK 0
-; 	rorg $FFF0
-; 	DC.B 0, 0, 0, 0		;CDFJ Hotspots
-; 	DC.L C_STACK		;$F4	C Stack
-; 	DC.L C_CODE+1		;$F8	C Code (+1 for THUMB Mode)
-; 	DC.W CartReset		;$FC	Reset
-; 	DC.W CartReset		;$FE	BRK
-
-
+CURRENT_BANK SET CURRENT_BANK + $1000

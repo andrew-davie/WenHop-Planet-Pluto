@@ -1,7 +1,7 @@
 	org CURRENT_BANK
 	rorg $f000
 
-.BANK3
+BANK3_START
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@ These routines put at beginning of each bank so all have access @@@@@@@@@@@@@@@@@@@@@
@@ -27,7 +27,7 @@
 
 
 
-BANK3_CODE_SIZE = * - .BANK3;
+BANK3_CODE_SIZE = * - BANK3_START
 	echo "---- BANK3", BANK3_CODE_SIZE, "bytes"
 	echo "---- BANK3", ($fff0 - *), "bytes free"
 
@@ -36,4 +36,6 @@ BANK3_CODE_SIZE = * - .BANK3;
 
 
 
+
+CURRENT_BANK SET CURRENT_BANK + $1000
 

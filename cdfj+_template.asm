@@ -16,9 +16,11 @@
 
 
 DISPLAY_SIZE		= 6400			;For current framework: 4352 for 32K ROM; 6400 for 64K and 128K; 9472 for 256K and 512K
-ROM_SIZE		= 128			;in kB - 32, 64, 128, 256 or 512
-FF_LDX			= 1			;Fast Fetch for LDX: 0 = off, NZ = on
-FF_LDY			= 1			;Fast Fetch for LDY: 0 = off, NZ = on
+ROM_SIZE		= 512			;in kB - 32, 64, 128, 256 or 512
+
+
+FF_LDX			= $A2			;Fast Fetch for LDX: $A9 = off, $A2 = on
+FF_LDY			= $A0			;Fast Fetch for LDY: $A9 = off, $A0 = on
 FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
 
 
@@ -26,6 +28,13 @@ FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
 	INCLUDE "cdfjplus.h"			;cdfjplus.h must come AFTER system constants for FF_OFFSET to apply
 	INCLUDE "vcs.h"
 	INCLUDE "macro.h"
+
+
+    MAC START_BANK ; {number}
+BANK_{1}
+BANK_START SET BANK_{1}
+    ENDM
+
 
 						; <WARNING> fast fetch macros may not work properly
 ;	INCLUDE "tia_constants.h"
@@ -298,31 +307,20 @@ _jump_table_2		ds 384
 ;@ CDF driver - The Harmony/Melody driver is located at Start of Cartridge ROM    
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+CURRENT_BANK SET 0
+
 	SEG CODE
-	org $0000
+	org CURRENT_BANK
     
-CDFJPLUS_DRIVER:
+
+CDFJPLUS_DRIVER
 
 	incbin "./cdfjplus48_p1.bin"
-
-	if FF_LDX = 0
-	.byte #$a9
-	else
-	.byte #$a2
-	endif
-
+    .byte FF_LDX
 	incbin "./cdfjplus48_p2.bin"
-
-	if FF_LDY = 0
-	.byte #$a9
-	else
-	.byte #$a0
-	endif
-
+    .byte FF_LDY
 	incbin "./cdfjplus48_p3.bin"
-
-	.byte #FF_OFFSET
-
+	.byte FF_OFFSET
 	incbin "./cdfjplus48_p4.bin"
 
 
@@ -330,16 +328,14 @@ CDFJPLUS_DRIVER_SIZE = [* - CDFJPLUS_DRIVER]d
 	echo "---- CDFJPLUS DRIVER SIZE", CDFJPLUS_DRIVER_SIZE, "bytes"
 
 
-
-; Note: c_start.c assumes format exactly "ASM_BANKS = " and then the bank count in decimal
-ASM_BANKS = 7
+CURRENT_BANK SET CURRENT_BANK + $800
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Bank 0 - Startup bank
+;@ Now we have 4K banks for 6502 code
+;@ Bank 0 is the startup bank
+;@ It requires a 'footer' for CDFJ+
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-CURRENT_BANK SET $0800
 
 	include "bank_0.asm"
 
@@ -353,8 +349,7 @@ BANK0_HEADER = $17F0
         ERR
     ENDIF
 
-	; ROM Pointers
-	org BANK0_HEADER		;This section is only needed in BANK 0
+	org BANK0_HEADER
 	rorg $FFF0
 
 	DC.B 0, 0, 0, 0		;CDFJ Hotspots
@@ -367,35 +362,12 @@ BANK0_HEADER = $17F0
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@ Other banks...
     
-    IF ASM_BANKS > 1
-CURRENT_BANK SET CURRENT_BANK + $1000
 	include "bank_1.asm"
-    ENDIF
-
-    IF ASM_BANKS > 2
-CURRENT_BANK SET CURRENT_BANK + $1000
 	include "bank_2.asm"
-    ENDIF
-
-    IF ASM_BANKS > 3
-CURRENT_BANK SET CURRENT_BANK + $1000
-	include "bank_3.asm"
-    ENDIF
-
-    IF ASM_BANKS > 4
-CURRENT_BANK SET CURRENT_BANK + $1000
-	include "bank_4.asm"
-    ENDIF
-
-    IF ASM_BANKS > 5
-CURRENT_BANK SET CURRENT_BANK + $1000
-	include "bank_5.asm"
-    ENDIF
-
-    IF ASM_BANKS > 6
-CURRENT_BANK SET CURRENT_BANK + $1000
-	include "bank_6.asm"
-    ENDIF
+; 	include "bank_3.asm"
+; 	include "bank_4.asm"
+; 	include "bank_5.asm"
+; 	include "bank_6.asm"
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -405,45 +377,17 @@ CURRENT_BANK SET CURRENT_BANK + $1000
     org CURRENT_BANK + $1000
     rorg CURRENT_BANK + $1000
 
+    ; Note: c_start tool parses the "bootstrap_defines"-generated symbol table/file
+    ; for the label C_CODE, which will hold the address to write to the LDS file
 
-C_CODE:
+C_CODE
 	INCBIN "main/bin/cdfj+.bin"
+	echo "---- C CODE uses", (* - C_CODE)d, "bytes"
 
 
-
-
-
-
-C_CODE_SIZE = * - C_CODE;
-	echo "---- C CODE uses", (C_CODE_SIZE)d, "bytes"
-
- 
-	IF ROM_SIZE = 32
-	echo "----",($8000 - *) , "C CODE bytes free"
-	org $7fff
-	ENDIF
-
-	IF ROM_SIZE = 64
-	echo "----",($10000 - *) , "C CODE bytes free"
-	org $ffff
-	ENDIF
-
-	IF ROM_SIZE = 128
-	echo "----",($20000 - *) , "C CODE bytes free"
-	org $1ffff
-	ENDIF
-
-	IF ROM_SIZE = 256
-	echo "----",($40000 - *) , "C CODE bytes free"
-	org $3ffff
-	ENDIF
-
-	IF ROM_SIZE = 512
-	echo "----",($80000 - *) , "C CODE bytes free"
-	org $7ffff
-	ENDIF
-
+ROM_BYTES = ROM_SIZE * 1024 
+	echo "----",ROM_BYTES - * , "C CODE bytes free"
+	org ROM_BYTES - 1
 	.byte 0
 
-
-    
+; EOF
