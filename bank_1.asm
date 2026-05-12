@@ -1,4 +1,4 @@
-	org CURRENT_BANK
+	org CURRENT_ORG
 	rorg $f000
 
 BANK1_START
@@ -105,4 +105,4 @@ BANK1_CODE_SIZE = * - BANK1_START
 	echo "---- BANK1", BANK1_CODE_SIZE, "bytes"
 	echo "---- BANK1", ($fff0 - *), "bytes free"
 
-CURRENT_BANK SET CURRENT_BANK + $1000
+CURRENT_ORG SET CURRENT_ORG + $1000

@@ -30,11 +30,6 @@ FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
 	INCLUDE "macro.h"
 
 
-    MAC START_BANK ; {number}
-BANK_{1}
-BANK_START SET BANK_{1}
-    ENDM
-
 
 						; <WARNING> fast fetch macros may not work properly
 ;	INCLUDE "tia_constants.h"
@@ -70,9 +65,9 @@ _SND_MODE_SAMPLE	= 2
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ; C-code vector equates
-; ignore --> Ordering/values important - see VectorToHandler in main.c
+; see runFunc[] in main.c
 
-_RUN_NULL               = 0
+_RUN_ARM_NULL           = 0
 _RUN_ARM_INIT		    = 1
 _RUN_ARM_VBLANK	        = 2
 _RUN_ARM_OVERSCAN   	= 3
@@ -307,10 +302,10 @@ _jump_table_2		ds 384
 ;@ CDF driver - The Harmony/Melody driver is located at Start of Cartridge ROM    
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-CURRENT_BANK SET 0
+CURRENT_ORG SET 0
 
 	SEG CODE
-	org CURRENT_BANK
+	org CURRENT_ORG
     
 
 CDFJPLUS_DRIVER
@@ -328,7 +323,7 @@ CDFJPLUS_DRIVER_SIZE = [* - CDFJPLUS_DRIVER]d
 	echo "---- CDFJPLUS DRIVER SIZE", CDFJPLUS_DRIVER_SIZE, "bytes"
 
 
-CURRENT_BANK SET CURRENT_BANK + $800
+CURRENT_ORG SET CURRENT_ORG + $800
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -369,13 +364,14 @@ BANK0_HEADER = $17F0
 ; 	include "bank_5.asm"
 ; 	include "bank_6.asm"
 
+;    include "champKernel.asm"
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@ C-Code
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-    org CURRENT_BANK + $1000
-    rorg CURRENT_BANK + $1000
+    org CURRENT_ORG
+    rorg CURRENT_ORG
 
     ; Note: c_start tool parses the "bootstrap_defines"-generated symbol table/file
     ; for the label C_CODE, which will hold the address to write to the LDS file
@@ -385,6 +381,7 @@ C_CODE
 	echo "---- C CODE uses", (* - C_CODE)d, "bytes"
 
 
+    ; Make ROM the correct size 
 ROM_BYTES = ROM_SIZE * 1024 
 	echo "----",ROM_BYTES - * , "C CODE bytes free"
 	org ROM_BYTES - 1

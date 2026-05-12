@@ -1,4 +1,4 @@
-	org CURRENT_BANK
+	org CURRENT_ORG
 	rorg $f000
 
 BANK0_START
@@ -541,8 +541,8 @@ ROUTINE_KERNEL_00 = * - .jump_table_target_routine_h	;use this method to create 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
-	org CURRENT_BANK+$0700			;org usage within each bank remains straightforward - use CURRENT_BANK + desired offset
-	rorg CURRENT_BANK+$0700			;samples need actual position within ROM, so rorg = org for those
+	org CURRENT_ORG + $0700			;org usage within each bank remains straightforward - use CURRENT_ + desired offset
+	rorg CURRENT_ORG + $0700			;samples need actual position within ROM, so rorg = org for those
 
 
 _sample_steel
@@ -550,7 +550,7 @@ _sample_steel
 _sample_steel_size = * - _sample_steel
 
 
-	org CURRENT_BANK+$0e00
+	org CURRENT_ORG + $0e00
 	rorg $f000+$0e00			;rorg also straightforward - use $f000 + desired offset
 
 
@@ -837,7 +837,7 @@ k_prep_01
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
-	; org CURRENT_BANK+$0f00
+	; org CURRENT_ORG+$0f00
 	; rorg $f000+$0f00
 
 
@@ -1023,4 +1023,4 @@ BANK0_CODE_SIZE = * - BANK0_START
 	echo "---- BANK0", ($fff0 - *), "bytes free"
 
 
-CURRENT_BANK SET CURRENT_BANK + $1000
+CURRENT_ORG SET CURRENT_ORG + $1000
