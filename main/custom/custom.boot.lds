@@ -9,8 +9,8 @@ MEMORY
 {
 /* CDFJ+          these values get auto adjusted and need to maintain their digit size */
     boot (RX)   : ORIGIN = 0x3800    , LENGTH = 0x60		/* C-runtime booter */
-    C_code (RX) : ORIGIN = 0x3860    , LENGTH = 0x7F7A0		/* C code size */
-    ram         : ORIGIN = 0x40002100, LENGTH = 0x5F00		/* free RAM */    
+    C_code (RX) : ORIGIN = 0x3860    , LENGTH = 0x0F7A0		/* C code size */
+    ram         : ORIGIN = 0x40002100, LENGTH = 0x1F00		/* free RAM */    
 }
 
 /* Global symbol _stack_end */

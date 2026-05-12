@@ -10,35 +10,21 @@
 
 	PROCESSOR 6502
 
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ CDFJ+ System Constants and Includes
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
 DISPLAY_SIZE		= 6400			;For current framework: 4352 for 32K ROM; 6400 for 64K and 128K; 9472 for 256K and 512K
-ROM_SIZE		= 512			;in kB - 32, 64, 128, 256 or 512
-
-
-FF_LDX			= $A2			;Fast Fetch for LDX: $A9 = off, $A2 = on
-FF_LDY			= $A0			;Fast Fetch for LDY: $A9 = off, $A0 = on
-FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
-
+ROM_SIZE		    = 64			;in kB - 32, 64, 128, 256 or 512
 
 
 	INCLUDE "cdfjplus.h"			;cdfjplus.h must come AFTER system constants for FF_OFFSET to apply
 	INCLUDE "vcs.h"
 	INCLUDE "macro.h"
 
-
-
 						; <WARNING> fast fetch macros may not work properly
 ;	INCLUDE "tia_constants.h"
 
 
-
-_DD_BASE		= $40000800		;DisplayData base exported into defines file and used in CDFJ routines
-_WAV_BASE		= _DD_BASE + _waveforms
-_RAM_BASE		= _DD_BASE + DISPLAY_SIZE
+_DD_BASE		    = $40000800		;DisplayData base exported into defines file and used in CDFJ routines
+_WAV_BASE		    = _DD_BASE + _waveforms
+_RAM_BASE		    = _DD_BASE + DISPLAY_SIZE
 _DISPLAY_SIZE32		= DISPLAY_SIZE / 4
 
 	;C Stack Pointer - leave space for IAR at top of memory
@@ -57,6 +43,12 @@ C_STACK = $40007FDC
 DS_SIZE = 2048
 CH_SIZE = 192
 	endif
+
+
+_ARENA_SCANLINES    = 198   ; number of scanlines for the arena
+_ICC_SCANLINES = _ARENA_SCANLINES/3
+ARENA_BUFFER_SIZE   = 198    ; PF buffer size for largest arena
+
 
 _SND_MODE_TIA		= 0
 _SND_MODE_DPC		= 1
@@ -209,6 +201,8 @@ _save_addr_h		ds 1			; <SaveKey>
 _save_offset		ds 1			; <SaveKey>
 _save_data		ds 64			; <SaveKey>
 
+_P1_X               ds 1        ; position of player 1
+_P0_X               ds 1        ; position of player 0
 
 
 
@@ -260,6 +254,71 @@ _jump_table_1		ds 384
 _jump_table_2		ds 384
 
 
+
+;------------------------------------------------------------------------------
+; BUFFERS MUST BE LAST
+; Reason: they share memory and anything after the shortest will be stomped
+
+    ALIGN 4
+_BUFFERS = *
+
+    SEG.U BUFFER1
+    ORG _BUFFERS
+
+BUFN SET 0
+    MAC DEFBUF ;name
+_BUF_{1}             ds ARENA_BUFFER_SIZE
+BUFN SET BUFN + 1
+    ENDM
+
+    DEFBUF COLUP0
+    DEFBUF COLUP1
+    DEFBUF COLUPF
+    DEFBUF COLUBK
+
+    ; Axiom: PF buffers contiguous (optimisation)
+    DEFBUF PF0_LEFT
+    DEFBUF PF1_LEFT
+    DEFBUF PF2_LEFT
+    DEFBUF PF0_RIGHT
+    DEFBUF PF1_RIGHT
+    DEFBUF PF2_RIGHT
+
+    DEFBUF GRP0A
+    DEFBUF GRP1A
+
+    DEFBUF COLUBK2
+    ds 4                ; extension of COLUBK2
+
+
+_BUFFER_BLOCK_SIZE = * - _BUFFERS
+
+
+
+
+
+;------------------------------------------------------------------------------
+
+    SEG.U BUFFER2
+    ORG _BUFFERS
+
+    DEFBUF MENU_COLUPF
+    DEFBUF MENU_COLUP0
+
+    ; Order of these 4 important...
+    DEFBUF MENU_PF1_LEFT
+    DEFBUF MENU_PF2_LEFT
+    DEFBUF MENU_PF1_RIGHT
+    DEFBUF MENU_PF2_RIGHT
+
+    DEFBUF MENU_GRP0A
+    DEFBUF MENU_GRP1A
+    DEFBUF MENU_GRP0B
+    DEFBUF MENU_GRP1B
+    DEFBUF MENU_GRP0C
+    DEFBUF MENU_GRP1C
+
+
 	IF (* <= DISPLAY_SIZE)
 	echo "------",(DISPLAY_SIZE - *)d , "bytes of Display Data RAM left"
 	ELSE
@@ -269,31 +328,13 @@ _jump_table_2		ds 384
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Cartridge Layout	(with C_START = $7800)
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ $0000 - $07ff CDF Driver
-;@ $0800 - $17ff Bank 0, 6507 code, cartridge always boots with this bank active
-;@ $1800 - $27ff Bank 1, 6507 code
-;@ $2800 - $37ff Bank 2, 6507 code
-;@ $3800 - $47ff Bank 3, 6507 code
-;@ $4800 - $57ff Bank 4, 6507 code
-;@ $5800 - $67ff Bank 5, 6507 code
-;@ $6800 - $77ff Bank 6, 6507 code
-;@ $7800 - $87ff Bank 7, Starting location of ARM C-code and data
+;@ Cartridge Layout
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Cartridge Layout	(with C_START = $1800)
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@ $0000 - $07ff CDF Driver
 ;@ $0800 - $17ff Bank 0, 6507 code, cartridge always boots with this bank active
-;@ $1800 - $27ff Bank 1, Starting location of ARM C-code and data
-;@ $2800 - $37ff Bank 2, ARM C-code and data
-;@ $3800 - $47ff Bank 3, ARM C-code and data
-;@ $4800 - $57ff Bank 4, ARM C-code and data
-;@ $5800 - $67ff Bank 5, ARM C-code and data
-;@ $6800 - $77ff Bank 6, ARM C-code and data
-;@ $7800 - $87ff Bank 7, ARM C-code and data
+;@ $1800 - $XXFF Bank 1-n, 6507 banks in blocks of 4K
+;@               immediately followed by ARM C-code and data
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 
@@ -309,6 +350,12 @@ CURRENT_ORG SET 0
     
 
 CDFJPLUS_DRIVER
+
+FF_LDX			= $A2			;Fast Fetch for LDX: $A9 = off, $A2 = on
+FF_LDY			= $A0			;Fast Fetch for LDY: $A9 = off, $A0 = on
+FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
+
+    ; 2K, located at start of ROM
 
 	incbin "./cdfjplus48_p1.bin"
     .byte FF_LDX
@@ -384,7 +431,9 @@ C_CODE
     ; Make ROM the correct size 
 ROM_BYTES = ROM_SIZE * 1024 
 	echo "----",ROM_BYTES - * , "C CODE bytes free"
-	org ROM_BYTES - 1
-	.byte 0
+    if * < ROM_BYTES
+	    org ROM_BYTES - 1
+    	.byte 0
+    endif
 
 ; EOF

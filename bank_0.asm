@@ -376,16 +376,7 @@ kernelVBlank_l	;.byte <(ChampKernel-1)
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Cross Bank Routine Handler @@@@@@@@@@@@@@@@@@@@@@@@@
-.call_bank_routine
-	lda .jump_table_target_bank,x
-	sta .jump_code_RAM_t_bank
-.call_bank_routine_sans_bank
-	lda .jump_table_target_routine_l,x
-	sta .jump_code_RAM_t_r_l
-	lda .jump_table_target_routine_h,x
-	sta .jump_code_RAM_t_r_h
-	jmp .jump_code_RAM
-;@@@@@@@@@@@@@@@@@@@@
+
 
 .jump_table_target_bank			;kernel routines can be located anywhere on any bank
 	.byte #<BANK1
@@ -396,9 +387,23 @@ kernelVBlank_l	;.byte <(ChampKernel-1)
 	.byte #<kernel_01
 
 .jump_table_target_routine_h
-ROUTINE_KERNEL_00 = * - .jump_table_target_routine_h	;use this method to create names for manual routine calling
+;ROUTINE_KERNEL_00 = * - .jump_table_target_routine_h	;use this method to create names for manual routine calling
 	.byte #>kernel_00
 	.byte #>kernel_01
+
+
+
+.call_bank_routine
+	lda .jump_table_target_bank,x
+	sta .jump_code_RAM_t_bank
+.call_bank_routine_sans_bank
+	lda .jump_table_target_routine_l,x
+	sta .jump_code_RAM_t_r_l
+	lda .jump_table_target_routine_h,x
+	sta .jump_code_RAM_t_r_h
+	jmp .jump_code_RAM
+
+
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Cross Bank Routine Handler @@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

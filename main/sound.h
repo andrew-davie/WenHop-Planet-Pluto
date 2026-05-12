@@ -91,7 +91,88 @@ void loadTrack(int priority, const unsigned char *tune, int volume, int dur,
 			   int instrument);
 void startMusic();
 void startFanfare();
-void startChampJingle();
 void startTrophyJingle();
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-macros"
+
+#define X(audc, audf) ((unsigned char)(((audc) << 6) | audf))
+#define DUR(note) X(note, 0)
+
+#pragma GCC diagnostic pop
+
+#define FULLNOTE 0b01000000,
+#define HALFNOTE 0b10000000,
+#define QUARTERNOTE 0b11000000,
+
+#define C1 (0)
+#define C4 (1)
+#define C6 (2)
+#define C12 (3)
+
+#define SNARE X(4, 17)
+
+#define a1_SHARP X(C6, 17),
+#define a2_SHARP X(C1, 17),
+#define a3 X(C12, 23),
+#define a3_SHARP X(C1, 8),
+#define a4 X(C12, 11),
+#define a4_SHARP X(C12, 10),
+#define b2 X(C6, 7),
+#define b3 X(C6, 3),
+#define c2 X(C1, 31),
+#define c2_SHARP X(C1, 29),
+#define c3 X(C1, 15),
+#define c3_SHARP X(C1, 14),
+#define c4 X(C12, 19),
+#define c4_SHARP X(C12, 18),
+#define c5 X(C4, 29),
+#define d2_SHARP X(C6, 12),
+#define d3 X(C1, 12),
+#define d3_SHARP X(C1, 12),
+#define d4_SHARP X(C12, 17),
+#define d5 X(C4, 26),
+#define d5_SHARP X(C4, 25),
+#define e3 X(C12, 31),
+#define e4 X(C12, 15),
+#define f2 X(C1, 23),
+#define f3 X(C12, 29),
+#define f4 X(C12, 14),
+#define f5 X(C4, 21),
+#define g3 X(C12, 26),
+#define g3_SHARP X(C12, 24),
+#define g4 X(C12, 12),
+#define g4_SHARP X(C1, 4),
+
+#define b4 X(C4, 31),
+#define c5_SHARP X(C4, 29),
+#define g5_SHARP X(C4, 18),
+#define f5_SHARP X(C4, 20),
+#define d4 X(C12, 17),
+#define b5 X(C4, 15),
+
+#define e5 X(C4, 23),
+#define g5 X(C4, 19),
+#define a5 X(C4, 17),
+#define c6_SHARP X(12, 4),
+#define d6 X(C4, 12),
+#define f4_SHARP X(12, 13),
+#define e6 X(C4, 11),
+#define f6_SHARP X(C4, 10),
+#define g6 X(C4, 9),
+#define a6 X(C4, 8),
+#define b6 X(C4, 7),
+#define c7 X(C1, 0),
+#define f6 X(C4, 10),
+#define c6 X(C4, 14),
+#define f6_SHARP X(C4, 10),
+#define d6_SHARP X(C4, 12),
+#define e7 X(C4, 5),
+
+#define TRIGGER_NEXT_NOTE 0x10000
+// #define NULL_TRACK 0xFF
+#define TRACK_END 1
+#define TRACK_LOOP 0
+#define TRACK_VOLUME 2
 
 // EOF

@@ -5,6 +5,9 @@
 #include "sound.h"
 #include "state.h"
 
+void initialise_GS_DEMO() {
+}
+
 void VB_Rainbow() {
 
 	static unsigned int col;

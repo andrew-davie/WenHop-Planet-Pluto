@@ -26,7 +26,7 @@ int whichLot;
 
 void LoadSaveKey();
 
-enum GAME_STATE gameState = GS_DETECT_CONSOLE;
+static enum GAME_STATE gameState, nextGameState;
 
 /******************************* Data/Includes *******************************/
 
@@ -57,8 +57,7 @@ const unsigned char waveforms[] __attribute__((aligned(4))) = {
 #define WAV_TRIANGLE 2
 #define WAV_SAW 3
 #define WAV_SIN 4
-#define RAM_SAMPLE                                                             \
-	8 // for 64k+ ROMs samples can be held in DD RAM - this assumes
+#define RAM_SAMPLE 8 // for 64k+ ROMs samples can be held in DD RAM - this assumes
 // it remains directly after the waveform RAM
 
 //	example code to include a file holding a digital sample
@@ -104,7 +103,7 @@ unsigned int frame = 0;		  // frame counter
 unsigned short sample_size = 0; // current digital sample size (bytes)
 bool saveKeyDetected = false;	// save key present flag
 // to Atari-side
-unsigned char kernel = 0; // drawing kernel used/passed Atari-side
+unsigned char kernel = 0;				 // drawing kernel used/passed Atari-side
 unsigned char soundMode = _SND_MODE_TIA; // sound mode used/passed Atari-side
 
 // Atari input direct access variables - joysticks and RESET/SELECT are
@@ -175,11 +174,12 @@ void initNextLife();
 void SystemReset();
 void setupBoard();
 void processCharAnimations();
-void runARM_Null() {
+
+void Null() {
 }
 
 void (*const runFunc[])() = {
-	runARM_Null,		  // _RUN_ARM_NULL
+	Null,				  // _RUN_ARM_NULL
 	runARM_Initialise,	  // _RUN_ARM_INIT
 	runARM_VerticalBlank, // _RUN_ARM_VB_VBLANK
 	runARM_Overscan,	  // _RUN_ARM_OS_VBLANK
@@ -191,13 +191,26 @@ int main() { // <-- 6507/ARM interfaced here!
 	return 0;
 }
 
+void (*const initialise[])() = {
+
+	0,							   // 0
+	initialise_GS_DETECT_CONSOLE,  // 1
+	initialise_GS_COPYRIGHT,	   // 2
+	initialise_GS_DEMO,			   // 3
+	initialise_GS_COUCH_COMPLIANT, // 4
+};
+
+void setNextGameState(enum GAME_STATE state) {
+	// actual change happens in OS
+	nextGameState = state;
+}
+
 void runARM_Initialise() {
 
 	saveKeyDetected = RAM[_SWCHA];
 
-	myMemsetInt(
-		(void *)_DD_BASE, 0,
-		_DISPLAY_SIZE32); // updates 4 bytes at a time for the entire DD area
+	myMemsetInt((void *)_DD_BASE, 0,
+				_DISPLAY_SIZE32); // updates 4 bytes at a time for the entire DD area
 
 	for (int i = 0; i < 34; i++)
 		setIncrement(i, 1, 0); // increments to 1
@@ -208,8 +221,7 @@ void runARM_Initialise() {
 	//   example code to copy digital sound sample from ARM ROM array
 	//   into the _digital_sample DD RAM location to then be played using
 	//   setWaveform (0, RAM_SAMPLE);
-	MemCopy32((void *)_DD_BASE + _digital_sample, (void *)sample1,
-			  SAMPLE1_SIZE / 4);
+	MemCopy32((void *)_DD_BASE + _digital_sample, (void *)sample1, SAMPLE1_SIZE / 4);
 
 	//  set up demo jump table 1 for kernel_01
 	for (int i = 0; i <= 190; i++) {
@@ -221,6 +233,9 @@ void runARM_Initialise() {
 	RAM[_tv_system] = tvSystem;
 	RAM[_sound_mode] = soundMode;
 	setPointer(DS31PTR, _kernel); // pass initial state to Atari
+
+	gameState = GS_NULL;
+	setNextGameState(GS_DETECT_CONSOLE);
 
 	//	RAM[_RUN_FUNC] = _RUN_NULL;
 
@@ -238,9 +253,12 @@ void (*const VectorVB[GS_MAX])() = {
 
 	// see GAME_STATE enum
 
-	VB_DetectConsole, // 0	GS_DETECT_CONSOLE
-	VB_Copyright,	  // 1  GS_COPYRIGHT
-	VB_Rainbow,		  // 2	GS_DEMO
+	Null,			   // 0  GS_NULL
+	VB_DetectConsole,  // 1	GS_DETECT_CONSOLE
+	VB_Copyright,	   // 3  GS_COPYRIGHT
+	VB_Rainbow,		   // 3	GS_DEMO
+	VB_CouchCompliant, // 4 GS_COUCH_COMPLIANT
+
 };
 
 void runARM_VerticalBlank() {
@@ -254,21 +272,24 @@ void (*const VectorOS[GS_MAX])() = {
 
 	// see GAME_STATE enum
 
-	OS_DetectConsole, // 0	GS_DETECT_CONSOLE
-	OS_Copyright,	  // 1  GS_COPYRIGHT
-	OS_Rainbow,		  // 2	GS_DEMO
+	Null,			   // 0  GS_NULL
+	OS_DetectConsole,  // 1	GS_DETECT_CONSOLE
+	OS_Copyright,	   // 2  GS_COPYRIGHT
+	OS_Rainbow,		   // 3	GS_DEMO
+	OS_CouchCompliant, // 4 GS_COUCH_COMPLIANT
 };
 
 void runARM_Overscan() {
 
-	// Overscan - includes control handler and communication to Atari
-	// By *convention*, kernel or gameState switching should be done in overscan
-	// so that any VB processing before display of next frame will be the new
-	// kernel/state
-
 	//	HandleControls();
 
 	(*VectorOS[gameState])();
+
+	// Handle game state switching at end of OS so we're consistent
+	if (nextGameState != gameState) {
+		gameState = nextGameState;
+		(*initialise[gameState])();
+	}
 
 	//	Random(1);
 

@@ -66,12 +66,16 @@ SRCS = \
  colour.c \
  custom.c \
  detectConsole.c \
+ draw.c \
  main.c \
  savekey.c \
  sound.c \
  stateCopyright.c \
+ stateCouchCompliant.c \
  stateDetectConsole.c \
  stateRainbow.c \
+ \
+ grid6.c
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
@@ -159,7 +163,7 @@ prep: tools
 # pass exists only to generate main/defines_dasm.h from DASM output/symbols.
 
 .PHONY: bootstrap_defines
-bootstrap_defines:
+bootstrap_defines: gfx
 	echo "bootstrap_defines"
 	$(DASM) $(SOURCE).asm -f3 -v5 \
 		-s$(OUTPUT)/$(SOURCE).sym \
@@ -241,6 +245,16 @@ $(TOOLS_BIN)/$(WAV2RAW): $(TOOLS_SRC)/$(WAV2RAW).c
 	mkdir -p $(TOOLS_BIN)
 	gcc -o $@ $<
 	strip $@
+
+###############################################################################
+# Graphics
+
+gfx: GRID6
+
+GRID6: gfx/grid/*.gif
+	(cd gfx/grid & python3 tools/1bpp.py -o grid6 gfx/grid/*.gif)
+	mv grid6.* main
+
 
 ###############################################################################
 # Cleaning
