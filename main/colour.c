@@ -1,7 +1,7 @@
 #include <stdbool.h>
 
 #include "colour.h"
-#include "detectConsole.h"
+#include "main.h"
 #include "savekey.h"
 
 int flashTime = 1;

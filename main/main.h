@@ -3,8 +3,11 @@
 #include "state.h"
 
 extern unsigned int frame;
+extern int tvSystem;
+extern unsigned int rand;
 
 unsigned int rangeRandom(short int range);
 void setNextGameState(enum GAME_STATE state);
+
 
 // EOF

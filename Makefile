@@ -65,7 +65,6 @@ SRCS = \
  cdfjplus.c \
  colour.c \
  custom.c \
- detectConsole.c \
  draw.c \
  main.c \
  savekey.c \

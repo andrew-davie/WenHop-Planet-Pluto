@@ -13,8 +13,6 @@ Gamax Software 2026 - Craig Daniels
 #include "cdfjplus.h" // <- contains references from defines_dasm.h
 #include "tia_constants_c.h"
 
-#include "colour.h"
-#include "detectConsole.h"
 #include "main.h"
 #include "savekey.h"
 
@@ -23,6 +21,7 @@ Gamax Software 2026 - Craig Daniels
 
 int usedSolves;
 int whichLot;
+int tvSystem;
 
 void LoadSaveKey();
 
@@ -296,7 +295,7 @@ void runARM_Overscan() {
         (*initialise[gameState])();
     }
 
-    Random(1);
+    // Random(1);
 
     // common to ALL OS routines...
 

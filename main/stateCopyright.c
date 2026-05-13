@@ -4,7 +4,6 @@
 #include "sound.h"
 
 #include "colour.h"
-#include "detectConsole.h"
 #include "draw.h"
 #include "grid6.h"
 #include "state.h"
