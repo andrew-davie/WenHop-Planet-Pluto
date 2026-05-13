@@ -15,6 +15,7 @@ ROM_SIZE		    = 64			;in kB - 32, 64, 128, 256 or 512
 
 ;**********************************************************************
 ; These must be BEFORE include of cdfjplus.h
+; Because that file checks if FF_OFFSET defined and if not sets it to 0
 
 FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
 FF_LDX			= $A2			;Fast Fetch for LDX: $A9 = off, $A2 = on
@@ -444,12 +445,10 @@ BANK0_HEADER = $17F0
 
 C_CODE
 	INCBIN "main/bin/cdfj+.bin"
-	echo "---- C CODE uses", (* - C_CODE)d, "bytes"
-
 
     ; Make ROM the correct size 
 ROM_BYTES = ROM_SIZE * 1024 
-	echo "----",ROM_BYTES - * , "C CODE bytes free"
+	echo "---- C CODE [", [ROM_BYTES]d, "] --> ", (* - C_CODE)d, "bytes used,", [ROM_BYTES - *]d , "bytes free"
     if * < ROM_BYTES
 	    org ROM_BYTES - 1
     	.byte 0

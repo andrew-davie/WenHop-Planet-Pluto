@@ -7,3 +7,6 @@ main/defines_dasm.h
 .DS_Store
 ROMs/
 screenshots/
+bin/cdfj+_template.asm.sym
+bin/cdfj+_template.asm.bin
+bin/cdfj+_template.asm.lst
