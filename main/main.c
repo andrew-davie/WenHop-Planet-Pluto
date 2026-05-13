@@ -191,15 +191,6 @@ int main() { // <-- 6507/ARM interfaced here!
     return 0;
 }
 
-void (*const initialise[])() = {
-
-    0,                            // 0
-    initialise_GS_DetectConsole,  // 1
-    initialise_GS_Copyright,      // 2
-    initialise_GS_Rainbow,        // 3
-    initialise_GS_CouchCompliant, // 4
-};
-
 void setNextGameState(enum GAME_STATE state) {
     // actual change happens in OS
     nextGameState = state;
@@ -230,8 +221,8 @@ void runARM_Initialise() {
     RAM_2B[(_jump_table_1 / 2) + 191] = _kernel_01_done;
 
     RAM[_kernel] = kernel;
-    RAM[_tv_system] = tvSystem;
-    RAM[_sound_mode] = soundMode;
+    RAM[_tvSystem] = tvSystem;
+    RAM[_soundMode] = soundMode;
     RAM[_colubk] = 0;
     setPointer(DS31PTR, _kernel); // pass initial state to Atari
 
@@ -281,6 +272,17 @@ void (*const overscan[GS_MAX])() = {
     OS_GS_CouchCompliant, // 4
 };
 
+
+void (*const initialise[GS_MAX])() = {
+
+    Null,                         // 0
+    initialise_GS_DetectConsole,  // 1
+    initialise_GS_Copyright,      // 2
+    initialise_GS_Rainbow,        // 3
+    initialise_GS_CouchCompliant, // 4
+};
+
+
 void runARM_Overscan() {
 
     //	HandleControls();
@@ -289,20 +291,20 @@ void runARM_Overscan() {
         (*overscan[gameState])();
 
     else {
-        // Handle game state switching at end of OS so we're consistent
+        // Handle game state switching at end of OS
         gameState = nextGameState;
         (*initialise[gameState])();
     }
 
-    //	Random(1);
+    Random(1);
 
     // common to ALL OS routines...
 
     frame++;
 
     RAM[_kernel] = kernel;
-    RAM[_tv_system] = tvSystem;
-    RAM[_sound_mode] = soundMode;
+    RAM[_tvSystem] = tvSystem; // should be one-off only
+    RAM[_soundMode] = soundMode;
     setPointer(DS31PTR, _kernel);
 }
 

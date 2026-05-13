@@ -10,6 +10,8 @@
 
 	PROCESSOR 6502
 
+
+
 DISPLAY_SIZE		= 6400			;For current framework: 4352 for 32K ROM; 6400 for 64K and 128K; 9472 for 256K and 512K
 ROM_SIZE		    = 64			;in kB - 32, 64, 128, 256 or 512
 
@@ -17,6 +19,20 @@ ROM_SIZE		    = 64			;in kB - 32, 64, 128, 256 or 512
 	INCLUDE "cdfjplus.h"			;cdfjplus.h must come AFTER system constants for FF_OFFSET to apply
 	INCLUDE "vcs.h"
 	INCLUDE "macro.h"
+
+    MAC CHECK_OVERFLOW ; {1} bank number, {2} bank size
+
+.BANK_SIZE{1} = * - BANK{1}_START
+.BANK_END{1} = *
+
+        IF .BANK_SIZE{1} > {2}
+            echo "Error: BANK", [{1}]d, "[", [{2}]d, "] --> overflow by", [* - BANK{1}_START - {2}]d, "bytes"
+            err
+        ELSE
+        	echo "---- BANK", [{1}]d, "[", [{2}]d, "] -->", [.BANK_SIZE{1}]d, "bytes used, ", [{2} - .BANK_SIZE{1}]d, "bytes free"
+        ENDIF
+    ENDM
+
 
 						; <WARNING> fast fetch macros may not work properly
 ;	INCLUDE "tia_constants.h"
@@ -101,10 +117,10 @@ scanSK          ds 1
 
 
 kernel			ds 1		;<FRAMEWORK>
-tv_system		ds 1		;<FRAMEWORK>  see TV_TYPE_ definitions
+tvSystem		ds 1		;<FRAMEWORK>  see TV_TYPE_ definitions
 
-sound_mode		ds 1		;<FRAMEWORK>
-sound_save		ds 1		;<FRAMEWORK>
+soundMode		ds 1		;<FRAMEWORK>
+soundSave		ds 1		;<FRAMEWORK>
 colubk          ds 1
 call_fn			ds 1		;<FRAMEWORK>
 
@@ -184,8 +200,8 @@ _INPT5			ds 1			; <FRAMEWORK>
 	align 2
 
 _kernel			ds 1			; <FRAMEWORK>
-_tv_system		ds 1			; <FRAMEWORK>  see TV_TYPE_ definitions
-_sound_mode		ds 1			; <FRAMEWORK>
+_tvSystem		ds 1			; <FRAMEWORK>  see TV_TYPE_ definitions
+_soundMode		ds 1			; <FRAMEWORK>
 _colubk         ds 1
 
 _AUDV0			ds 2			; <FRAMEWORK>
@@ -354,7 +370,7 @@ CDFJPLUS_DRIVER
 
 FF_LDX			= $A2			;Fast Fetch for LDX: $A9 = off, $A2 = on
 FF_LDY			= $A0			;Fast Fetch for LDY: $A9 = off, $A0 = on
-FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
+FF_OFFSET2		= 200			;Fast Fetch offset: 0 to 200
 
     ; 2K, located at start of ROM
 
@@ -363,7 +379,7 @@ FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
 	incbin "./cdfjplus48_p2.bin"
     .byte FF_LDY
 	incbin "./cdfjplus48_p3.bin"
-	.byte FF_OFFSET
+	.byte FF_OFFSET2
 	incbin "./cdfjplus48_p4.bin"
 
 
@@ -372,6 +388,7 @@ CDFJPLUS_DRIVER_SIZE = [* - CDFJPLUS_DRIVER]d
 
 
 CURRENT_ORG SET CURRENT_ORG + $800
+
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -386,11 +403,6 @@ CURRENT_ORG SET CURRENT_ORG + $800
     ; Bank 0 Footer - needed for CDFJ+ to function
 
 BANK0_HEADER = $17F0
-
-    IF * >= $FFF0
-        ECHO "ERROR: Bank 0 overflow by", * - $FFF0 + 1, "bytes."
-        ERR
-    ENDIF
 
 	org BANK0_HEADER
 	rorg $FFF0

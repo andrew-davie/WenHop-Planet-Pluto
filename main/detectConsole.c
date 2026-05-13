@@ -94,7 +94,7 @@ bool detectConsoleType() {
             if (dist < delta) {
                 delta = dist;
                 tvSystem = mapTimeToFormat[i].format;
-                RAM[_tv_system] = tvSystem;
+                RAM[_tvSystem] = tvSystem;
             }
         }
 

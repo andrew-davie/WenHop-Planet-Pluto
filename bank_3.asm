@@ -27,15 +27,7 @@ BANK3_START
 
 
 
-BANK3_CODE_SIZE = * - BANK3_START
-	echo "---- BANK3", BANK3_CODE_SIZE, "bytes"
-	echo "---- BANK3", ($fff0 - *), "bytes free"
-
-
-
-
-
-
+    CHECK_OVERFLOW 3, $1000
 
 CURRENT_ORG SET CURRENT_ORG + $1000
 

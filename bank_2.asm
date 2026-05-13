@@ -8,10 +8,9 @@ BANK2_START
 
 
 
-BANK2_CODE_SIZE = * - BANK2_START
-	echo "---- BANK2", BANK2_CODE_SIZE, "bytes"
-	echo "---- BANK2", ($fff0 - *), "bytes free"
 
+
+    CHECK_OVERFLOW 2, $1000
 
 CURRENT_ORG SET CURRENT_ORG + $1000
 

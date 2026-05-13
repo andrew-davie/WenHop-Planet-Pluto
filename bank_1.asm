@@ -94,15 +94,6 @@ _kernel_01_done
 	.byte #%11111111
 
 
-
-
-
-
-
-
-
-BANK1_CODE_SIZE = * - BANK1_START
-	echo "---- BANK1", BANK1_CODE_SIZE, "bytes"
-	echo "---- BANK1", ($fff0 - *), "bytes free"
+    CHECK_OVERFLOW 1, $1000
 
 CURRENT_ORG SET CURRENT_ORG + $1000

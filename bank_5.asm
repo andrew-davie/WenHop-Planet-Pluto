@@ -25,19 +25,7 @@ BANK5_START
 
 
 
-
-
-BANK5_CODE_SIZE = * - BANK5_START
-	echo "---- BANK5", BANK5_CODE_SIZE, "bytes"
-	echo "---- BANK5", ($fff0 - *), "bytes free"
-
-
-
-
-
-
-
-
+    CHECK_OVERFLOW 5, $1000
 
 
 CURRENT_ORG SET CURRENT_ORG + $1000

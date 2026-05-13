@@ -83,10 +83,10 @@ initJumpCode        lda jumpCode,x
                 lda #DS31DATA
                 sta kernel
                 lda #DS31DATA
-                sta tv_system
+                sta tvSystem
                 lda #DS31DATA
-                sta sound_mode
-                sta sound_save
+                sta soundMode
+                sta soundSave
                 lda #DS31DATA
                 sta colubk
 
@@ -106,10 +106,10 @@ mainGameLoop
 
     ; [???] what is this SETMODE stuff for sound?!!
 
-                lda sound_mode			        ; compare this frame's sound mode
-                cmp sound_save			        ; to last frame's
+                lda soundMode			        ; compare this frame's sound mode
+                cmp soundSave			        ; to last frame's
                 beq skipChangeModes
-                sta sound_save			        ; apply new mode if change
+                sta soundSave			        ; apply new mode if change
                 tax				                ; is detected
                 lda .sound_mode_table,x
                 sta SETMODE
@@ -129,7 +129,7 @@ mainGameLoopStandard
 	lsr 
 	bne .vertsync_std
 	
-    ldx tv_system
+    ldx tvSystem
     lda UpperBlankTimer,x
 	sta TIM64T
 ;@@@@@@@@@@@@@@@@@@@@
@@ -152,7 +152,7 @@ mainGameLoopStandard
 	sta WSYNC
 	sta VBLANK
 
-    ldx tv_system
+    ldx tvSystem
     lda LowerBlankTimer,x
 	sta TIM64T
 ;@@@@@@@@@@@@@@@@@@@@
@@ -213,7 +213,7 @@ mainGameLoopSampled
 	lda #AMPLITUDE
 	sta AUDV0
 	
-    ldx tv_system
+    ldx tvSystem
     lda UpperBlankTimer,x
 	sta TIM64T
 ;@@@@@@@@@@@@@@@@@@@@
@@ -240,7 +240,7 @@ mainGameLoopSampled
 	lda #AMPLITUDE
 	sta AUDV0
 
-    ldx tv_system
+    ldx tvSystem
     lda LowerBlankTimer,x
 	sta TIM64T
 ;@@@@@@@@@@@@@@@@@@@@
@@ -352,11 +352,11 @@ kernelVBlank_l	;.byte <(ChampKernel-1)
 	lda #DS31DATA
 	sta kernel			;kernel and sound_mode get refreshed
 	lda #DS31DATA
-	sta tv_system
+	sta tvSystem
 	lda #DS31DATA			;from the ARM each frame
-	sta sound_mode
+	sta soundMode
     lda #DS31DATA
-    sta _colubk
+    sta colubk
 
 	lda #DS31DATA
 	sta audv0
@@ -1027,9 +1027,7 @@ k_prep_01
 	; .byte %10011010
 
 
-BANK0_CODE_SIZE = * - BANK0_START
-	echo "---- BANK0", BANK0_CODE_SIZE, "bytes"
-	echo "---- BANK0", ($fff0 - *), "bytes free"
 
+    CHECK_OVERFLOW 0, $FF0
 
 CURRENT_ORG SET CURRENT_ORG + $1000

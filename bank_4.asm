@@ -26,17 +26,7 @@ BANK4_START
 
 
 
-
-BANK4_CODE_SIZE = * - BANK4_START
-	echo "---- BANK4", BANK4_CODE_SIZE, "bytes"
-	echo "---- BANK4", ($fff0 - *), "bytes free"
-
-
-
-
-
-
-
+    CHECK_OVERFLOW 4, $1000
 
 
 CURRENT_ORG SET CURRENT_ORG + $1000
