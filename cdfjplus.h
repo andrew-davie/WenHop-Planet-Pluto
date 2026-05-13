@@ -5,7 +5,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	ifnconst FF_OFFSET
-FF_OFFSET = 0
+FF_OFFSET SET 0
 	endif
 
 ; Fetcher Constants

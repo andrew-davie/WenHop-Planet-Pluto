@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "cdfjplus.h": "dasm",
+        "macro.h": "dasm",
+        "vcs.h": "dasm",
+        "tia_constants.h": "dasm",
+        "i2c_v2.3.inc": "dasm",
+        "ASM_routines.s": "asm",
+        "main/custom/custom.S": "asm",
+    }
+}

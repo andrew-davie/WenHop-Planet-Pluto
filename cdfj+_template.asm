@@ -10,13 +10,22 @@
 
 	PROCESSOR 6502
 
-
-
 DISPLAY_SIZE		= 6400			;For current framework: 4352 for 32K ROM; 6400 for 64K and 128K; 9472 for 256K and 512K
 ROM_SIZE		    = 64			;in kB - 32, 64, 128, 256 or 512
 
+;**********************************************************************
+; These must be BEFORE include of cdfjplus.h
 
-	INCLUDE "cdfjplus.h"			;cdfjplus.h must come AFTER system constants for FF_OFFSET to apply
+FF_OFFSET		= 200			;Fast Fetch offset: 0 to 200
+FF_LDX			= $A2			;Fast Fetch for LDX: $A9 = off, $A2 = on
+FF_LDY			= $A0			;Fast Fetch for LDY: $A9 = off, $A0 = on
+
+    ;cdfjplus.h must come AFTER system constants for FF_OFFSET to apply
+    INCLUDE "cdfjplus.h"
+
+;**********************************************************************
+
+
 	INCLUDE "vcs.h"
 	INCLUDE "macro.h"
 
@@ -368,9 +377,6 @@ CURRENT_ORG SET 0
 
 CDFJPLUS_DRIVER
 
-FF_LDX			= $A2			;Fast Fetch for LDX: $A9 = off, $A2 = on
-FF_LDY			= $A0			;Fast Fetch for LDY: $A9 = off, $A0 = on
-FF_OFFSET2		= 200			;Fast Fetch offset: 0 to 200
 
     ; 2K, located at start of ROM
 
@@ -379,7 +385,7 @@ FF_OFFSET2		= 200			;Fast Fetch offset: 0 to 200
 	incbin "./cdfjplus48_p2.bin"
     .byte FF_LDY
 	incbin "./cdfjplus48_p3.bin"
-	.byte FF_OFFSET2
+	.byte FF_OFFSET
 	incbin "./cdfjplus48_p4.bin"
 
 
