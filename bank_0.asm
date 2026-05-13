@@ -40,7 +40,7 @@ CartReset
 
 	                ldx #(jumpCodeEnd-jumpCode)
 initJumpCode        lda jumpCode,x
-	                sta .jump_code_RAM,x
+	                sta jumpCodeRAM,x
 	                dex
 	                bpl initJumpCode
 
@@ -119,45 +119,42 @@ skipChangeModes tax				                ; branch to proper frame handler
                 bne mainGameLoopSampled	        ; standard TIA or sampled sound
 
 
+;-----------------------------------------------------------
+
 mainGameLoopStandard
 
-;@@@@@@@@@@@@@@@@@@@@
-	lda #%1110
-.vertsync_std
-	sta WSYNC
-	sta VSYNC
-	lsr 
-	bne .vertsync_std
+	                lda #%1110
+.vertSync           sta WSYNC
+                    sta VSYNC                   ; vblank on
+                    lsr 
+	                bne .vertSync 
 	
-    ldx tvSystem
-    lda UpperBlankTimer,x
-	sta TIM64T
-;@@@@@@@@@@@@@@@@@@@@
+                    ldx tvSystem
+                    lda TimerVB,x
+                    sta TIM64T
 
-	jsr verticalBlank
+                	jsr verticalBlank           ; <---ARM and 6502 vertical blank calls
 
-;@@@@@@@@@@@@@@@@@@@@
-.wait_vblank_end_std
-	sta WSYNC
-	lda INTIM
-	bne .wait_vblank_end_std
-	sta VBLANK
-;@@@@@@@@@@@@@@@@@@@@
+.waitVB             sta WSYNC
+                    lda INTIM
+                    bne .waitVB
 
-	ldx kernel
-	jsr .call_bank_routine
+                    sta VBLANK                  ; scenen on
 
-;@@@@@@@@@@@@@@@@@@@@
+
+                    ldx kernel
+                    jsr runKernel         ; run 6502 kernel
+
+
 	lda #2
 	sta WSYNC
 	sta VBLANK
 
     ldx tvSystem
-    lda LowerBlankTimer,x
+    lda TimerOS,x
 	sta TIM64T
-;@@@@@@@@@@@@@@@@@@@@
 
-	jsr .lower_vblank_ARM
+	jsr ARM_Overscan       ; call ARM OS, transer vars
 
 	lda audc0
 	sta AUDC0
@@ -181,13 +178,13 @@ mainGameLoopStandard
 
 	jmp mainGameLoop
 
-LowerBlankTimer
+TimerOS
  .byte LOWER_BLANK_TIMER_NTSC
  .byte LOWER_BLANK_TIMER_PAL
  .byte LOWER_BLANK_TIMER_SECAM
  .byte LOWER_BLANK_TIMER_PAL60
 
-UpperBlankTimer
+TimerVB
  .byte UPPER_BLANK_TIMER_NTSC
  .byte LOWER_BLANK_TIMER_PAL
  .byte UPPER_BLANK_TIMER_SECAM
@@ -214,7 +211,7 @@ mainGameLoopSampled
 	sta AUDV0
 	
     ldx tvSystem
-    lda UpperBlankTimer,x
+    lda TimerVB,x
 	sta TIM64T
 ;@@@@@@@@@@@@@@@@@@@@
 
@@ -231,7 +228,7 @@ mainGameLoopSampled
 ;@@@@@@@@@@@@@@@@@@@@
 
 	ldx kernel
-	jsr .call_bank_routine
+	jsr runKernel
 
 ;@@@@@@@@@@@@@@@@@@@@
 	ldx #2
@@ -241,11 +238,11 @@ mainGameLoopSampled
 	sta AUDV0
 
     ldx tvSystem
-    lda LowerBlankTimer,x
+    lda TimerOS,x
 	sta TIM64T
 ;@@@@@@@@@@@@@@@@@@@@
 
-	jsr .lower_vblank_ARM
+	jsr ARM_Overscan
 
 	lda audc1
 	sta AUDC1
@@ -286,6 +283,7 @@ mainGameLoopSampled
 ;@@@@@@@@@@@@@@@@@@@@@@@@ Handle Vertical Blank ARM+6502 @@@@@@@@@@@@@@@@@@@@@@@@
 
 verticalBlank
+
                 ldx #>_RUN_FUNC
                 stx DSPTR
                 ldx #<_RUN_FUNC
@@ -320,8 +318,9 @@ kernelVBlank_l	;.byte <(ChampKernel-1)
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@@@@@@@@@@@@@@@@@@@@@@@@ Handle Lower VBlank ARM Call @@@@@@@@@@@@@@@@@@@@@@@@
-.lower_vblank_ARM
+;@@@@@@@@@@@@@@@@@@@@@@@@ Handle ARM Overscan Call @@@@@@@@@@@@@@@@@@@@@@@@
+
+ARM_Overscan
 
 	ldx #0
 	stx COLUBK			;clear color registers
@@ -382,31 +381,36 @@ kernelVBlank_l	;.byte <(ChampKernel-1)
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Cross Bank Routine Handler @@@@@@@@@@@@@@@@@@@@@@@@@
 
 
-.jump_table_target_bank			;kernel routines can be located anywhere on any bank
+kernelBank_L
 	.byte #<BANK1
 	.byte #<BANK1
 
-.jump_table_target_routine_l		;each routine gets an entry in the table set
+kernelRoutine_L
 	.byte #<kernel_00
 	.byte #<kernel_01
 
-.jump_table_target_routine_h
-;ROUTINE_KERNEL_00 = * - .jump_table_target_routine_h	;use this method to create names for manual routine calling
+kernelRoutine_H
 	.byte #>kernel_00
 	.byte #>kernel_01
 
+;-----------------------------------------------------------
 
+runKernel
 
-.call_bank_routine
-	lda .jump_table_target_bank,x
-	sta .jump_code_RAM_t_bank
-.call_bank_routine_sans_bank
-	lda .jump_table_target_routine_l,x
-	sta .jump_code_RAM_t_r_l
-	lda .jump_table_target_routine_h,x
-	sta .jump_code_RAM_t_r_h
-	jmp .jump_code_RAM
+    ; we sneakily self-modify the in-RAM routine to vector to correct kernel
+    ; the 'rts' from jumpCodeRAM will actually return to THIS routine's caller
 
+                	lda kernelBank_L,x
+                	sta SM_JumpBank_L
+
+	                lda kernelRoutine_L,x
+	                sta SM_JumpRoutine_L
+	                lda kernelRoutine_H,x
+	                sta SM_JumpRoutine_H
+
+	                jmp jumpCodeRAM
+
+;-----------------------------------------------------------
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Cross Bank Routine Handler @@@@@@@@@@@@@@@@@@@@@@@@@

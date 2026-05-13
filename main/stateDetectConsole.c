@@ -10,7 +10,6 @@
 #define DETECT_FRAME_COUNT 10
 
 
-unsigned int detectedPeriod;
 static int detectionFrame;
 
 
@@ -38,7 +37,6 @@ const struct fmt {
 
 void initialise_GS_DetectConsole() {
 
-    detectedPeriod = 0;
     detectionFrame = 0;
 }
 
@@ -55,9 +53,9 @@ void VB_GS_DetectConsole() {
         T1TCR = 1;
         break;
 
-    case 10: {
+    case DETECT_FRAME_COUNT: {
 
-        detectedPeriod = T1TC;
+        unsigned int detectedPeriod = T1TC;
 
         int delta = INT_MAX;
         for (unsigned int i = 0; i < sizeof(mapTimeToFormat) / sizeof(struct fmt); i++) {

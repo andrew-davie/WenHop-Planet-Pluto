@@ -141,11 +141,25 @@ audv1			ds 1		;<FRAMEWORK>
 audc1			ds 1		;<FRAMEWORK>
 audf1			ds 1		;<FRAMEWORK>
 
-.jump_code_RAM		ds 1		;dedicated area of RAM for bank routine jumping/calling	<FRAMEWORK>
-.jump_code_RAM_t_bank	ds 3		;cmp SelectBankX					<FRAMEWORK>
-.jump_code_RAM_t_r_l	ds 1		;jsr .called_bank_routine				<FRAMEWORK>
-.jump_code_RAM_t_r_h	ds 2		;cmp SelectBank0					<FRAMEWORK>
-.jump_code_RAM_r_bank	ds 3		;rts							<FRAMEWORK>
+
+;------------------------------------------------------------------------------
+
+jumpCodeRAM		    ds 10		    ; self-modifying bank routine call code
+
+  ;      Code                  bytes [] = modified
+  ; -----------------------------------------------------------------------
+  ; cmp SelectBankX           0 = cmp, [1=SM_JumpBank],      2=high bank
+  ; jsr .called_bank_routine  3 = jsr, [4=SM_JumpRoutine_L], [5=SM_JumpRoutine_H]
+  ; cmp SelectBank0           6 = cmp, 7=low bank,           8=high bank
+  ; rts                       9 = rts
+
+SM_JumpBank_L      = (jumpCodeRAM + 1)
+SM_JumpRoutine_L   = (jumpCodeRAM + 4)
+SM_JumpRoutine_H   = (jumpCodeRAM + 5)
+
+;------------------------------------------------------------------------------
+
+
 
 test_position		ds 1		;only for demonstration of positioning method purposes
 
