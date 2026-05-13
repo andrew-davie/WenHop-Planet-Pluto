@@ -193,11 +193,11 @@ int main() { // <-- 6507/ARM interfaced here!
 
 void (*const initialise[])() = {
 
-	0,							   // 0
-	initialise_GS_DETECT_CONSOLE,  // 1
-	initialise_GS_COPYRIGHT,	   // 2
-	initialise_GS_DEMO,			   // 3
-	initialise_GS_COUCH_COMPLIANT, // 4
+	0,							  // 0
+	initialise_GS_DetectConsole,  // 1
+	initialise_GS_Copyright,	  // 2
+	initialise_GS_Rainbow,		  // 3
+	initialise_GS_CouchCompliant, // 4
 };
 
 void setNextGameState(enum GAME_STATE state) {
@@ -232,6 +232,7 @@ void runARM_Initialise() {
 	RAM[_kernel] = kernel;
 	RAM[_tv_system] = tvSystem;
 	RAM[_sound_mode] = soundMode;
+	RAM[_colubk] = 0;
 	setPointer(DS31PTR, _kernel); // pass initial state to Atari
 
 	gameState = GS_NULL;
@@ -249,44 +250,46 @@ void runARM_Initialise() {
 
 // -----------------------------------------------------------------------------
 
-void (*const VectorVB[GS_MAX])() = {
+void (*const verticalBlank[GS_MAX])() = {
 
 	// see GAME_STATE enum
 
-	Null,			   // 0  GS_NULL
-	VB_DetectConsole,  // 1	GS_DETECT_CONSOLE
-	VB_Copyright,	   // 3  GS_COPYRIGHT
-	VB_Rainbow,		   // 3	GS_DEMO
-	VB_CouchCompliant, // 4 GS_COUCH_COMPLIANT
+	Null,				  // 0
+	VB_GS_DetectConsole,  // 1
+	VB_GS_Copyright,	  // 3
+	VB_GS_Rainbow,		  // 3
+	VB_GS_CouchCompliant, // 4
 
 };
 
 void runARM_VerticalBlank() {
 
-	(*VectorVB[gameState])();
+	if (gameState == nextGameState)
+		(*verticalBlank[gameState])();
 }
 
 // -----------------------------------------------------------------------------
 
-void (*const VectorOS[GS_MAX])() = {
+void (*const overscan[GS_MAX])() = {
 
 	// see GAME_STATE enum
 
-	Null,			   // 0  GS_NULL
-	OS_DetectConsole,  // 1	GS_DETECT_CONSOLE
-	OS_Copyright,	   // 2  GS_COPYRIGHT
-	OS_Rainbow,		   // 3	GS_DEMO
-	OS_CouchCompliant, // 4 GS_COUCH_COMPLIANT
+	Null,				  // 0
+	OS_GS_DetectConsole,  // 1
+	OS_GS_Copyright,	  // 2
+	OS_GS_Rainbow,		  // 3
+	OS_GS_CouchCompliant, // 4
 };
 
 void runARM_Overscan() {
 
 	//	HandleControls();
 
-	(*VectorOS[gameState])();
+	if (gameState == nextGameState)
+		(*overscan[gameState])();
 
-	// Handle game state switching at end of OS so we're consistent
-	if (nextGameState != gameState) {
+	else {
+		// Handle game state switching at end of OS so we're consistent
 		gameState = nextGameState;
 		(*initialise[gameState])();
 	}

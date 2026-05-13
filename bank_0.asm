@@ -87,6 +87,8 @@ initJumpCode        lda jumpCode,x
                 lda #DS31DATA
                 sta sound_mode
                 sta sound_save
+                lda #DS31DATA
+                sta colubk
 
                 tax
                 lda .sound_mode_table,x
@@ -353,6 +355,8 @@ kernelVBlank_l	;.byte <(ChampKernel-1)
 	sta tv_system
 	lda #DS31DATA			;from the ARM each frame
 	sta sound_mode
+    lda #DS31DATA
+    sta _colubk
 
 	lda #DS31DATA
 	sta audv0

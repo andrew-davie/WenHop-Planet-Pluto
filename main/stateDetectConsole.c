@@ -8,15 +8,15 @@
 // -----------------------------------------------------------------------------
 // Console detection displays black screen for DETECT_FRAME_COUNT (10) frames
 
-void initialise_GS_DETECT_CONSOLE() {
+void initialise_GS_DetectConsole() {
 }
 
-void VB_DetectConsole() {
+void VB_GS_DetectConsole() {
 	if (detectConsoleType())
 		setNextGameState(GS_COPYRIGHT);
 }
 
-void OS_DetectConsole() {
+void OS_GS_DetectConsole() {
 }
 
 // EOF

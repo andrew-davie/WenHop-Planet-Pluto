@@ -105,6 +105,7 @@ tv_system		ds 1		;<FRAMEWORK>  see TV_TYPE_ definitions
 
 sound_mode		ds 1		;<FRAMEWORK>
 sound_save		ds 1		;<FRAMEWORK>
+colubk          ds 1
 call_fn			ds 1		;<FRAMEWORK>
 
 audv0			ds 1		;<FRAMEWORK>

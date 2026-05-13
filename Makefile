@@ -85,7 +85,7 @@ HDRS = $(SRCS:.c=.h)
 vpath %.c $(BASE) $(CUSTOM)
 vpath %.S $(BASE) $(CUSTOM)
 
-%.o: %.c $(BASE)/$(DASM_TO_C)
+%.o: %.c %.h $(BASE)/$(DASM_TO_C)
 	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
 
 %.o: %.S

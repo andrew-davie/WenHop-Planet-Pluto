@@ -35,7 +35,7 @@ const unsigned char trackChamp2[] = {
 
 // clang-format on
 
-void initialise_GS_COPYRIGHT() {
+void initialise_GS_Copyright() {
 
 #define CC 4
 
@@ -49,10 +49,12 @@ void initialise_GS_COPYRIGHT() {
 	loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
 	loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
 
+	RAM[_colubk] = convertColour(0x94);
+
 	frame = 0;
 }
 
-void VB_Copyright() {
+void VB_GS_Copyright() {
 
 	if (frame < 250) {
 
@@ -124,18 +126,11 @@ void VB_Copyright() {
 
 	}
 
-	else {
-
+	else
 		setNextGameState(GS_COUCH_COMPLIANT);
-	}
-
-	// else {
-
-	// 	setNextGameState(GS_DEMO);
-	// }
 }
 
-void OS_Copyright() {
+void OS_GS_Copyright() {
 	playAudio();
 }
 

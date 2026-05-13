@@ -8,7 +8,7 @@
 #include "sound.h"
 #include "state.h"
 
-void initialise_GS_COUCH_COMPLIANT() {
+void initialise_GS_CouchCompliant() {
 
 	frame = 0;
 
@@ -18,7 +18,7 @@ void initialise_GS_COUCH_COMPLIANT() {
 	// ADDAUDIO(SFX_MAGIC);
 }
 
-void VB_CouchCompliant() {
+void VB_GS_CouchCompliant() {
 
 	// rainbow...
 	static unsigned int col;
@@ -67,7 +67,7 @@ void VB_CouchCompliant() {
 		setNextGameState(GS_DEMO);
 }
 
-void OS_CouchCompliant() {
+void OS_GS_CouchCompliant() {
 
 	playAudio();
 }

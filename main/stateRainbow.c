@@ -5,10 +5,10 @@
 #include "sound.h"
 #include "state.h"
 
-void initialise_GS_DEMO() {
+void initialise_GS_Rainbow() {
 }
 
-void VB_Rainbow() {
+void VB_GS_Rainbow() {
 
 	static unsigned int col;
 	col++;
@@ -19,7 +19,7 @@ void VB_Rainbow() {
 	setPointer(DS0PTR, _buffer0);
 }
 
-void OS_Rainbow() {
+void OS_GS_Rainbow() {
 
 	playAudio();
 }

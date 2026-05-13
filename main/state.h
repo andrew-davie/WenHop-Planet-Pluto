@@ -15,23 +15,20 @@ enum GAME_STATE {
 
 };
 
-// extern enum GAME_STATE gameState;
+void initialise_GS_Rainbow();
+void VB_GS_Rainbow();
+void OS_GS_Rainbow();
 
-void initialise_GS_DETECT_CONSOLE();
-void initialise_GS_COPYRIGHT();
-void initialise_GS_DEMO();
-void initialise_GS_COUCH_COMPLIANT();
+void initialise_GS_Copyright();
+void VB_GS_Copyright();
+void OS_GS_Copyright();
 
-void VB_Rainbow();
-void OS_Rainbow();
+void initialise_GS_DetectConsole();
+void VB_GS_DetectConsole();
+void OS_GS_DetectConsole();
 
-void VB_Copyright();
-void OS_Copyright();
-
-void VB_DetectConsole();
-void OS_DetectConsole();
-
-void VB_CouchCompliant();
-void OS_CouchCompliant();
+void initialise_GS_CouchCompliant();
+void VB_GS_CouchCompliant();
+void OS_GS_CouchCompliant();
 
 // EOF
