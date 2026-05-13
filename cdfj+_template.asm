@@ -95,17 +95,6 @@ _RUN_ARM_OVERSCAN   	= 3
 ;@ User Constants
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-UPPER_BLANK_TIMER_PAL60	= (43+30)
-LOWER_BLANK_TIMER_PAL60	= (35+29)
-
-UPPER_BLANK_TIMER_PAL	= 50
-LOWER_BLANK_TIMER_PAL	= 45
-
-UPPER_BLANK_TIMER_NTSC	= 43
-LOWER_BLANK_TIMER_NTSC	= 35
-
-UPPER_BLANK_TIMER_SECAM	= 43
-LOWER_BLANK_TIMER_SECAM	= 35
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@ Auto-detect TV system types (also exported to C)
@@ -148,7 +137,7 @@ jumpCodeRAM		    ds 10		    ; self-modifying bank routine call code
 
   ;      Code                  bytes [] = modified
   ; -----------------------------------------------------------------------
-  ; cmp SelectBankX           0 = cmp, [1=SM_JumpBank],      2=high bank
+  ; cmp SelectBankX           0 = cmp, [1=SM_JumpBank_L],    2=high bank
   ; jsr .called_bank_routine  3 = jsr, [4=SM_JumpRoutine_L], [5=SM_JumpRoutine_H]
   ; cmp SelectBank0           6 = cmp, 7=low bank,           8=high bank
   ; rts                       9 = rts

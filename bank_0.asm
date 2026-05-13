@@ -24,7 +24,7 @@ BANK0_START
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@ Code block that gets copied into RAM for bank routine dispatch @@@@@@@@@@@@@@@@@
 
-jumpCode       	cmp BANK1
+jumpCode       	cmp BANK1   
                 jsr jumpCode
                 cmp BANK0
 jumpCodeEnd
@@ -106,26 +106,26 @@ mainGameLoop
 
     ; [???] what is this SETMODE stuff for sound?!!
 
-                lda soundMode			        ; compare this frame's sound mode
-                cmp soundSave			        ; to last frame's
-                beq skipChangeModes
-                sta soundSave			        ; apply new mode if change
-                tax				                ; is detected
-                lda .sound_mode_table,x
-                sta SETMODE
-                lda .call_fn_table,x
-                sta call_fn
-skipChangeModes tax				                ; branch to proper frame handler
-                bne mainGameLoopSampled	        ; standard TIA or sampled sound
+;                 lda soundMode			        ; compare this frame's sound mode
+;                 cmp soundSave			        ; to last frame's
+;                 beq skipChangeModes
+;                 sta soundSave			        ; apply new mode if change
+;                 tax				                ; is detected
+;                 lda .sound_mode_table,x
+;                 sta SETMODE
+;                 lda .call_fn_table,x
+;                 sta call_fn
+; skipChangeModes tax				                ; branch to proper frame handler
+;                 bne mainGameLoopSampled	        ; standard TIA or sampled sound
 
 
 ;-----------------------------------------------------------
 
-mainGameLoopStandard
+;mainGameLoopStandard
 
 	                lda #%1110
 .vertSync           sta WSYNC
-                    sta VSYNC                   ; vblank on
+                    sta VSYNC                   ; indicate vblank
                     lsr 
 	                bne .vertSync 
 	
@@ -141,54 +141,50 @@ mainGameLoopStandard
 
                     sta VBLANK                  ; scenen on
 
-
                     ldx kernel
-                    jsr runKernel         ; run 6502 kernel
+                    jsr runKernel               ; run 6502 kernel
 
+                	lda #2
+                    sta WSYNC
+                    sta VBLANK                  ; overscan!
 
-	lda #2
-	sta WSYNC
-	sta VBLANK
+                    ldx tvSystem
+                    lda TimerOS,x
+                    sta TIM64T
 
-    ldx tvSystem
-    lda TimerOS,x
-	sta TIM64T
+	                jsr ARM_Overscan            ; call ARM OS, transer vars
 
-	jsr ARM_Overscan       ; call ARM OS, transer vars
+                    lda audc0
+                    sta AUDC0
+                    lda audf0
+                    sta AUDF0
+                    lda audv0
+                    sta AUDV0
+                    lda audc1
+                    sta AUDC1
+                    lda audf1
+                    sta AUDF1
+                    lda audv1
+                    sta AUDV1
 
-	lda audc0
-	sta AUDC0
-	lda audf0
-	sta AUDF0
-	lda audv0
-	sta AUDV0
-	lda audc1
-	sta AUDC1
-	lda audf1
-	sta AUDF1
-	lda audv1
-	sta AUDV1
+.waitOS             sta WSYNC
+                    lda INTIM	
+                    bne .waitOS
 
-;@@@@@@@@@@@@@@@@@@@@
-.wait_overscan_std
-	sta WSYNC
-	lda INTIM	
-	bne .wait_overscan_std
-;@@@@@@@@@@@@@@@@@@@@
+	                jmp mainGameLoop
 
-	jmp mainGameLoop
+;-------------------------------------------------------------------------------
 
-TimerOS
- .byte LOWER_BLANK_TIMER_NTSC
- .byte LOWER_BLANK_TIMER_PAL
- .byte LOWER_BLANK_TIMER_SECAM
- .byte LOWER_BLANK_TIMER_PAL60
+TimerOS             .byte 35           ; NTSC
+                    .byte 45           ; PAL
+                    .byte 35           ; SECAM
+                    .byte (35+29)      ; PAL60
 
 TimerVB
- .byte UPPER_BLANK_TIMER_NTSC
- .byte LOWER_BLANK_TIMER_PAL
- .byte UPPER_BLANK_TIMER_SECAM
- .byte UPPER_BLANK_TIMER_PAL60
+                    .byte 43           ; NTSC
+                    .byte 50           ; PAL
+                    .byte 43           ; SECAM
+                    .byte (43+30)      ; PAL60
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Game Loop - Sampled Sounds @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -290,6 +286,7 @@ verticalBlank
                 stx DSPTR
                 ldx #_RUN_ARM_VBLANK
                 stx DSWRITE
+                
                 ldx call_fn
 	            stx CALLFN                  ; call VerticalBlank in ARM
 
@@ -382,7 +379,7 @@ ARM_Overscan
 
 
 kernelBank_L
-	.byte #<BANK1
+	.byte #<BANK1           ; be VERY careful you get the correct bank for kernel!
 	.byte #<BANK1
 
 kernelRoutine_L
@@ -393,7 +390,7 @@ kernelRoutine_H
 	.byte #>kernel_00
 	.byte #>kernel_01
 
-;-----------------------------------------------------------
+;-------------------------------------------------------------------------------
 
 runKernel
 
@@ -410,7 +407,7 @@ runKernel
 
 	                jmp jumpCodeRAM
 
-;-----------------------------------------------------------
+;-------------------------------------------------------------------------------
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Cross Bank Routine Handler @@@@@@@@@@@@@@@@@@@@@@@@@
