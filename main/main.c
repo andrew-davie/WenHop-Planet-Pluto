@@ -34,22 +34,22 @@ static enum GAME_STATE gameState, nextGameState;
 // waveform
 const unsigned char waveforms[] __attribute__((aligned(4))) = {
 
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, // 0- wave silence
-	5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 1- square
-	3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 4, 4, 4, 4,
-	3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, // 2- triangle
-	5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3,
-	3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, // 3- saw
-	3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4,
-	3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, // 4- sin
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 5- user waveform 1
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 6- user waveform 2
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 7- user waveform 3
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, // 0- wave silence
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 1- square
+    3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 4, 4, 4, 4,
+    3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, // 2- triangle
+    5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3,
+    3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, // 3- saw
+    3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4,
+    3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, // 4- sin
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 5- user waveform 1
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 6- user waveform 2
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 7- user waveform 3
 };
 #define WAVEFORM_SIZE sizeof(waveforms)
 #define WAV_SILENCE 0
@@ -91,19 +91,19 @@ extern void MemCopy32(void *ptr1, void *ptr2, unsigned int count);
 extern void Random(unsigned int count);
 
 unsigned int rangeRandom(short int range) {
-	// generate a random between 0 and range-1 (16-bit)
-	return ((getRandom32() >> 16) * range) >> 16;
+    // generate a random between 0 and range-1 (16-bit)
+    return ((getRandom32() >> 16) * range) >> 16;
 }
 
 /******************************* Variables *******************************/
 // stay ARM-side
 unsigned int rand = 10531789; // 32 bit LFSR random number
-unsigned int frame = 0;		  // frame counter
+unsigned int frame = 0;       // frame counter
 // unsigned short game_state = 0;	// internal ARM game state
 unsigned short sample_size = 0; // current digital sample size (bytes)
-bool saveKeyDetected = false;	// save key present flag
+bool saveKeyDetected = false;   // save key present flag
 // to Atari-side
-unsigned char kernel = 0;				 // drawing kernel used/passed Atari-side
+unsigned char kernel = 0;                // drawing kernel used/passed Atari-side
 unsigned char soundMode = _SND_MODE_TIA; // sound mode used/passed Atari-side
 
 // Atari input direct access variables - joysticks and RESET/SELECT are
@@ -179,131 +179,131 @@ void Null() {
 }
 
 void (*const runFunc[])() = {
-	Null,				  // _RUN_ARM_NULL
-	runARM_Initialise,	  // _RUN_ARM_INIT
-	runARM_VerticalBlank, // _RUN_ARM_VB_VBLANK
-	runARM_Overscan,	  // _RUN_ARM_OS_VBLANK
+    Null,                 // _RUN_ARM_NULL
+    runARM_Initialise,    // _RUN_ARM_INIT
+    runARM_VerticalBlank, // _RUN_ARM_VB_VBLANK
+    runARM_Overscan,      // _RUN_ARM_OS_VBLANK
 };
 
 int main() { // <-- 6507/ARM interfaced here!
 
-	(*runFunc[RAM[_RUN_FUNC]])();
-	return 0;
+    (*runFunc[RAM[_RUN_FUNC]])();
+    return 0;
 }
 
 void (*const initialise[])() = {
 
-	0,							  // 0
-	initialise_GS_DetectConsole,  // 1
-	initialise_GS_Copyright,	  // 2
-	initialise_GS_Rainbow,		  // 3
-	initialise_GS_CouchCompliant, // 4
+    0,                            // 0
+    initialise_GS_DetectConsole,  // 1
+    initialise_GS_Copyright,      // 2
+    initialise_GS_Rainbow,        // 3
+    initialise_GS_CouchCompliant, // 4
 };
 
 void setNextGameState(enum GAME_STATE state) {
-	// actual change happens in OS
-	nextGameState = state;
+    // actual change happens in OS
+    nextGameState = state;
 }
 
 void runARM_Initialise() {
 
-	saveKeyDetected = RAM[_SWCHA];
+    saveKeyDetected = RAM[_SWCHA];
 
-	myMemsetInt((void *)_DD_BASE, 0,
-				_DISPLAY_SIZE32); // updates 4 bytes at a time for the entire DD area
+    myMemsetInt((void *)_DD_BASE, 0,
+                _DISPLAY_SIZE32); // updates 4 bytes at a time for the entire DD area
 
-	for (int i = 0; i < 34; i++)
-		setIncrement(i, 1, 0); // increments to 1
+    for (int i = 0; i < 34; i++)
+        setIncrement(i, 1, 0); // increments to 1
 
-	MemCopy32((void *)_WAV_BASE, (void *)waveforms,
-			  WAVEFORM_SIZE / 4); // waveforms to DD memory
+    MemCopy32((void *)_WAV_BASE, (void *)waveforms,
+              WAVEFORM_SIZE / 4); // waveforms to DD memory
 
-	//   example code to copy digital sound sample from ARM ROM array
-	//   into the _digital_sample DD RAM location to then be played using
-	//   setWaveform (0, RAM_SAMPLE);
-	MemCopy32((void *)_DD_BASE + _digital_sample, (void *)sample1, SAMPLE1_SIZE / 4);
+    //   example code to copy digital sound sample from ARM ROM array
+    //   into the _digital_sample DD RAM location to then be played using
+    //   setWaveform (0, RAM_SAMPLE);
+    MemCopy32((void *)_DD_BASE + _digital_sample, (void *)sample1, SAMPLE1_SIZE / 4);
 
-	//  set up demo jump table 1 for kernel_01
-	for (int i = 0; i <= 190; i++) {
-		RAM_2B[(_jump_table_1 / 2) + i] = _kernel_01_loop;
-	}
-	RAM_2B[(_jump_table_1 / 2) + 191] = _kernel_01_done;
+    //  set up demo jump table 1 for kernel_01
+    for (int i = 0; i <= 190; i++) {
+        RAM_2B[(_jump_table_1 / 2) + i] = _kernel_01_loop;
+    }
+    RAM_2B[(_jump_table_1 / 2) + 191] = _kernel_01_done;
 
-	RAM[_kernel] = kernel;
-	RAM[_tv_system] = tvSystem;
-	RAM[_sound_mode] = soundMode;
-	RAM[_colubk] = 0;
-	setPointer(DS31PTR, _kernel); // pass initial state to Atari
+    RAM[_kernel] = kernel;
+    RAM[_tv_system] = tvSystem;
+    RAM[_sound_mode] = soundMode;
+    RAM[_colubk] = 0;
+    setPointer(DS31PTR, _kernel); // pass initial state to Atari
 
-	gameState = GS_NULL;
-	setNextGameState(GS_DETECT_CONSOLE);
+    gameState = GS_NULL;
+    setNextGameState(GS_DETECT_CONSOLE);
 
-	//	RAM[_RUN_FUNC] = _RUN_NULL;
+    //	RAM[_RUN_FUNC] = _RUN_NULL;
 
-	SilenceWaves(); // init DPC waveforms
+    SilenceWaves(); // init DPC waveforms
 
-	//	LoadSaveKey();
+    //	LoadSaveKey();
 
-	initAudio(true);
-	startMusic();
+    initAudio(true);
+    startMusic();
 }
 
 // -----------------------------------------------------------------------------
 
 void (*const verticalBlank[GS_MAX])() = {
 
-	// see GAME_STATE enum
+    // see GAME_STATE enum
 
-	Null,				  // 0
-	VB_GS_DetectConsole,  // 1
-	VB_GS_Copyright,	  // 3
-	VB_GS_Rainbow,		  // 3
-	VB_GS_CouchCompliant, // 4
+    Null,                 // 0
+    VB_GS_DetectConsole,  // 1
+    VB_GS_Copyright,      // 3
+    VB_GS_Rainbow,        // 3
+    VB_GS_CouchCompliant, // 4
 
 };
 
 void runARM_VerticalBlank() {
 
-	if (gameState == nextGameState)
-		(*verticalBlank[gameState])();
+    if (gameState == nextGameState)
+        (*verticalBlank[gameState])();
 }
 
 // -----------------------------------------------------------------------------
 
 void (*const overscan[GS_MAX])() = {
 
-	// see GAME_STATE enum
+    // see GAME_STATE enum
 
-	Null,				  // 0
-	OS_GS_DetectConsole,  // 1
-	OS_GS_Copyright,	  // 2
-	OS_GS_Rainbow,		  // 3
-	OS_GS_CouchCompliant, // 4
+    Null,                 // 0
+    OS_GS_DetectConsole,  // 1
+    OS_GS_Copyright,      // 2
+    OS_GS_Rainbow,        // 3
+    OS_GS_CouchCompliant, // 4
 };
 
 void runARM_Overscan() {
 
-	//	HandleControls();
+    //	HandleControls();
 
-	if (gameState == nextGameState)
-		(*overscan[gameState])();
+    if (gameState == nextGameState)
+        (*overscan[gameState])();
 
-	else {
-		// Handle game state switching at end of OS so we're consistent
-		gameState = nextGameState;
-		(*initialise[gameState])();
-	}
+    else {
+        // Handle game state switching at end of OS so we're consistent
+        gameState = nextGameState;
+        (*initialise[gameState])();
+    }
 
-	//	Random(1);
+    //	Random(1);
 
-	// common to ALL OS routines...
+    // common to ALL OS routines...
 
-	frame++;
+    frame++;
 
-	RAM[_kernel] = kernel;
-	RAM[_tv_system] = tvSystem;
-	RAM[_sound_mode] = soundMode;
-	setPointer(DS31PTR, _kernel);
+    RAM[_kernel] = kernel;
+    RAM[_tv_system] = tvSystem;
+    RAM[_sound_mode] = soundMode;
+    setPointer(DS31PTR, _kernel);
 }
 
 // -----------------------------------------------------------------------------
@@ -312,82 +312,82 @@ void runARM_Overscan() {
 // timings
 void HandleControls() {
 
-	unsigned short SWCH_input = (unsigned short)RAM[_SWCHA];
+    unsigned short SWCH_input = (unsigned short)RAM[_SWCHA];
 
-	// if ((RAM[_INPT4] & 0b10000000))
-	// 	SWCH_input |= 0x0100;
-	// if ((RAM[_INPT5] & 0b10000000))
-	// 	SWCH_input |= 0x0200;
-	// if ((RAM[_SWCHB] & 0b00000001))
-	// 	SWCH_input |= 0x0400;
-	// if ((RAM[_SWCHB] & 0b00000010))
-	// 	SWCH_input |= 0x0800;
+    // if ((RAM[_INPT4] & 0b10000000))
+    // 	SWCH_input |= 0x0100;
+    // if ((RAM[_INPT5] & 0b10000000))
+    // 	SWCH_input |= 0x0200;
+    // if ((RAM[_SWCHB] & 0b00000001))
+    // 	SWCH_input |= 0x0400;
+    // if ((RAM[_SWCHB] & 0b00000010))
+    // 	SWCH_input |= 0x0800;
 
-	SWCH_input |= ((RAM[_INPT4] >> 7) & 1) << 8	  //
-				  | ((RAM[_INPT5] >> 7) & 1) << 9 //
-				  | (RAM[_SWCHB] & 1) << 10		  //
-				  | ((RAM[_SWCHB] >> 1) & 1) << 11;
+    SWCH_input |= ((RAM[_INPT4] >> 7) & 1) << 8   //
+                  | ((RAM[_INPT5] >> 7) & 1) << 9 //
+                  | (RAM[_SWCHB] & 1) << 10       //
+                  | ((RAM[_SWCHB] >> 1) & 1) << 11;
 
-	CBW_swch = ((RAM[_SWCHB] & 0b00001000) != 0);
-	P0_diff = ((RAM[_SWCHB] & 0b01000000) != 0);
-	P1_diff = ((RAM[_SWCHB] & 0b10000000) != 0);
+    CBW_swch = ((RAM[_SWCHB] & 0b00001000) != 0);
+    P0_diff = ((RAM[_SWCHB] & 0b01000000) != 0);
+    P1_diff = ((RAM[_SWCHB] & 0b10000000) != 0);
 
-	for (int i = 0; i <= 11; i++) {
-		input_flag[i] = false;
-		if ((SWCH_input & 1) == 0) {
-			input_counter[i]++;
-			if (input_counter[i] == 1) {
-				input_flag[i] = true;
-				input_target[i] = input_wait[i] + 1;
-			}
-			if (input_counter[i] == input_target[i]) {
-				input_flag[i] = true;
-				input_target[i] = input_target[i] + input_repeat[i] + 1;
-			}
-		} else {
-			input_counter[i] = 0;
-		}
-		SWCH_input = SWCH_input / 2;
-	}
+    for (int i = 0; i <= 11; i++) {
+        input_flag[i] = false;
+        if ((SWCH_input & 1) == 0) {
+            input_counter[i]++;
+            if (input_counter[i] == 1) {
+                input_flag[i] = true;
+                input_target[i] = input_wait[i] + 1;
+            }
+            if (input_counter[i] == input_target[i]) {
+                input_flag[i] = true;
+                input_target[i] = input_target[i] + input_repeat[i] + 1;
+            }
+        } else {
+            input_counter[i] = 0;
+        }
+        SWCH_input = SWCH_input / 2;
+    }
 }
 
 // Used to set waveforms to all silent / no note
 void SilenceWaves() {
-	setWaveform(0, WAV_SILENCE);
-	setWaveform(1, WAV_SILENCE);
-	setWaveform(2, WAV_SILENCE);
-	setNote(0, 0);
-	setNote(1, 0);
-	setNote(2, 0);
+    setWaveform(0, WAV_SILENCE);
+    setWaveform(1, WAV_SILENCE);
+    setWaveform(2, WAV_SILENCE);
+    setNote(0, 0);
+    setNote(1, 0);
+    setNote(2, 0);
 }
 
 // Used to set TIA sound to all silent / no note
 void SilenceTIA() {
 
-	for (int i = 0; i < 2; i++) {
-		RAM[_AUDV0 + i] = 0;
-		RAM[_AUDC0 + i] = 0;
-		RAM[_AUDF0 + i] = 0;
-	}
+    for (int i = 0; i < 2; i++) {
+        RAM[_AUDV0 + i] = 0;
+        RAM[_AUDC0 + i] = 0;
+        RAM[_AUDF0 + i] = 0;
+    }
 }
 
 void LoadSaveKey() {
 
-	saveKeyEnableICC = RAM[_SK_ENABLE_ICC];
-	usedSolves = RAM[_SK_USED_SOLVES];
-	whichLot = RAM[_SK_LAST];
+    saveKeyEnableICC = RAM[_SK_ENABLE_ICC];
+    usedSolves = RAM[_SK_USED_SOLVES];
+    whichLot = RAM[_SK_LAST];
 
-	for (int i = 0; i < SAVEKEY_SIZE; i++) {
-		saveKeyPerfect[i] = RAM[_SK_PER + i];
-		saveKeyUnlocked[i] = RAM[_SK_UNL + i];
-		saveKeySolved[i] = RAM[_SK_SLV + i];
-	}
+    for (int i = 0; i < SAVEKEY_SIZE; i++) {
+        saveKeyPerfect[i] = RAM[_SK_PER + i];
+        saveKeyUnlocked[i] = RAM[_SK_UNL + i];
+        saveKeySolved[i] = RAM[_SK_SLV + i];
+    }
 
-	// increment counter
+    // increment counter
 
-	int count = RAM[_SK_COUNT] + 256 * RAM[_SK_COUNT + 1] + 1;
-	RAM[_SK_COUNT] = count;
-	RAM[_SK_COUNT + 1] = count >> 8;
+    int count = RAM[_SK_COUNT] + 256 * RAM[_SK_COUNT + 1] + 1;
+    RAM[_SK_COUNT] = count;
+    RAM[_SK_COUNT + 1] = count >> 8;
 }
 
 // EOF

@@ -12,62 +12,60 @@ int openSlot;
 int roller;
 
 void interleaveColour(int *r) {
-	if (++*r > saveKeyEnableICC)
-		*r = 0;
+    if (++*r > saveKeyEnableICC)
+        *r = 0;
 }
 
 void adjustLuminance(int /*rateMask*/) {
 
-	if (luminance < 0)
-		luminance++;
-	if (luminance > 0)
-		luminance = 0; // MAJOR error
+    if (luminance < 0)
+        luminance++;
+    if (luminance > 0)
+        luminance = 0; // MAJOR error
 }
 
-unsigned char TranslateColour[] = {0x00, 0x20, 0x20, 0x40, 0x60, 0x80,
-								   0xA0, 0xC0, 0xD0, 0xB0, 0x90, 0x70,
-								   0x70, 0x50, 0x20, 0x40};
+unsigned char TranslateColour[] = {0x00, 0x20, 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0,
+                                   0xD0, 0xB0, 0x90, 0x70, 0x70, 0x50, 0x20, 0x40};
 
-unsigned char TranslateSecamColour[] = {0, 0xE, 0xC, 4, 4, 6, 6,   2,
-										2, 2,	8,	 8, 8, 8, 0xC, 0xC};
+unsigned char TranslateSecamColour[] = {0, 0xE, 0xC, 4, 4, 6, 6, 2, 2, 2, 8, 8, 8, 8, 0xC, 0xC};
 
 unsigned char secamConvert(unsigned char col) {
-	unsigned char c = TranslateSecamColour[col >> 4];
+    unsigned char c = TranslateSecamColour[col >> 4];
 
-	if ((col & 0xF) >= 4) {
-		if (!c) // black -> white
-			c = 0xE;
-		else if (c == 2) // blue -> aqua
-			c = 0xA;
-	}
-	return c;
+    if ((col & 0xF) >= 4) {
+        if (!c) // black -> white
+            c = 0xE;
+        else if (c == 2) // blue -> aqua
+            c = 0xA;
+    }
+    return c;
 }
 
 unsigned char convertColour(unsigned char colour) {
-	switch (tvSystem) {
+    switch (tvSystem) {
 
-	case _TV_SYSTEM_SECAM: {
-		colour = secamConvert(colour);
-		return colour;
-		break;
-	}
+    case _TV_SYSTEM_SECAM: {
+        colour = secamConvert(colour);
+        return colour;
+        break;
+    }
 
-	case _TV_SYSTEM_PAL:
-	case _TV_SYSTEM_PAL60:
-		colour = TranslateColour[colour >> 4] | (colour & 0xF);
-		break;
+    case _TV_SYSTEM_PAL:
+    case _TV_SYSTEM_PAL60:
+        colour = TranslateColour[colour >> 4] | (colour & 0xF);
+        break;
 
-	default:
-		break;
-	}
+    default:
+        break;
+    }
 
-	return colour; // adjustBrightness(colour);
+    return colour; // adjustBrightness(colour);
 }
 
 void setFlash2(unsigned char /*colour*/, int /*time*/) {
-	// TODO
-	//  ARENA_COLOUR = (colour & 0xF) | (convertColour(colour) & 0xF0);
-	//  flashTime = time;
+    // TODO
+    //  ARENA_COLOUR = (colour & 0xF) | (convertColour(colour) & 0xF0);
+    //  flashTime = time;
 }
 
 #if 0
@@ -103,23 +101,23 @@ void chooseBackgroundPalette() {
 
 unsigned char adjustBrightness(unsigned char colour) {
 
-	// Remember if iCC is operating, we will see blended colours (with black/no
-	// pixel) So even if we set all white, we WILL see shades of grey.  So we
-	// can fade to black OK But we cannot fade to white - only fade to bright.
+    // Remember if iCC is operating, we will see blended colours (with black/no
+    // pixel) So even if we set all white, we WILL see shades of grey.  So we
+    // can fade to black OK But we cannot fade to white - only fade to bright.
 
-	int lum = (colour & 0xF) + luminance;
+    int lum = (colour & 0xF) + luminance;
 
-	if (lum < 0) {
-		lum = 0;
-		colour = 0;
-	}
+    if (lum < 0) {
+        lum = 0;
+        colour = 0;
+    }
 
-	if (lum > 14) {
-		colour = 0;
-		lum = 14;
-	}
+    if (lum > 14) {
+        colour = 0;
+        lum = 14;
+    }
 
-	return (colour & 0xF0) | lum;
+    return (colour & 0xF0) | lum;
 }
 
 bool ignoreSelect = false;

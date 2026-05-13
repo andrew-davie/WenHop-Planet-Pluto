@@ -10,18 +10,18 @@ void initialise_GS_Rainbow() {
 
 void VB_GS_Rainbow() {
 
-	static unsigned int col;
-	col++;
+    static unsigned int col;
+    col++;
 
-	for (int i = 0; i <= 191; i++)
-		RAM[_buffer0 + i] = convertColour((col + (i >> 1)) & 0xFF);
+    for (int i = 0; i <= 191; i++)
+        RAM[_buffer0 + i] = convertColour((col + (i >> 1)) & 0xFF);
 
-	setPointer(DS0PTR, _buffer0);
+    setPointer(DS0PTR, _buffer0);
 }
 
 void OS_GS_Rainbow() {
 
-	playAudio();
+    playAudio();
 }
 
 // EOF

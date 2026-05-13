@@ -15,8 +15,7 @@
 
 // clang-format on
 
-void loadTrack(int priority, const unsigned char *tune, int volume, int dur,
-			   int instrument);
+void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument);
 void processMusic();
 
 // const unsigned char trackSimple[];
@@ -367,57 +366,56 @@ const unsigned char sampleX2[] = {
 // clang-format on
 
 const unsigned char sampleNone[] = {
-	CMD_STOP,
+    CMD_STOP,
 };
 
 const unsigned char sampleBlip[] = {
-	4, 18, 5, 1, 4, 18, 4, 2, 4, 18, 3, 4, CMD_STOP,
+    4, 18, 5, 1, 4, 18, 4, 2, 4, 18, 3, 4, CMD_STOP,
 };
 
 const unsigned char sampleSelectionBlip[] = {
-	12, 6, 4, 1, 12, 4, 4, 1, CMD_STOP,
+    12, 6, 4, 1, 12, 4, 4, 1, CMD_STOP,
 
 };
 
 const unsigned char sampleExit[] = {
-	12, 16, 1,	1, 12, 16, 4,  1, 12, 16, 10, 1, 12, 16,	   8,
-	4,	12, 16, 6, 1,  12, 16, 4, 1,  12, 16, 2, 1,	 CMD_STOP,
+    12, 16, 1, 1, 12, 16, 4, 1, 12, 16, 10, 1, 12, 16, 8, 4, 12, 16, 6, 1, 12, 16, 4, 1, 12, 16, 2, 1, CMD_STOP,
 };
 
 const unsigned char sampleMagic[] = {
-	0xC, 8, 3, 2, CMD_LOOP,
+    0xC, 8, 3, 2, CMD_LOOP,
 };
 
 const unsigned char sampleFireworks[] = {
-	8, 18, 10, 1, 8, 18, 9, 2, 8, 18, 8, 2, 8, 18, 7, 2, 8, 18, 4, 12, CMD_STOP,
+    8, 18, 10, 1, 8, 18, 9, 2, 8, 18, 8, 2, 8, 18, 7, 2, 8, 18, 4, 12, CMD_STOP,
 
 };
 
 const unsigned char sampleSpace[] = {
-	8, 2, 1, 2, CMD_STOP,
+    8, 2, 1, 2, CMD_STOP,
 
 };
 
 const struct AudioTable AudioSamples[] = {
 
-	{sampleNone, 0, 0}, // 0  PLACEHOLDER - NOT USED AS SOUND
+    {sampleNone, 0, 0}, // 0  PLACEHOLDER - NOT USED AS SOUND
 
-	// MUST correspond to AudioID enum ordering/number
-	// MUST be in priority order!
+    // MUST correspond to AudioID enum ordering/number
+    // MUST be in priority order!
 
-	{sampleAbort, 127, 0},						 // 01 SFX_ABORT
-	{sampleWhoosh, 127, 0},						 // 02 SFX_WHOOSH
-	{sampleBlip, 125, 0},						 // 03 SFX_BLIP
-	{sampleRev, 117, 0},						 // 04 SFX_REV
-	{sampleSelectionBlip, 115, 0},				 // 05 SFX_SELECTION
-	{sampleBeepHornTwice, 110, AUDIO_ATTENUATE}, // 06 SFX_BEEP2
-	{sampleFastBeep2, 100, AUDIO_ATTENUATE},	 // 07 SFX_FASTBEEP2
-	{sampleExit, 99, 0},						 // 08 SFX_EXIT
-	{sampleSpinWheel, 96, 0},					 // 09 SFX_SPINWHEEL
-	{sampleMagic, 91, AUDIO_KILL},				 // 10 SFX_MAGIC
-	{sampleFireworks, 90, 0},					 // 11 SFX_FIREWORKS
-	{sampleDirt, 9, 0},							 // 12 SFX_DIRT
-	{sampleSpace, 8, 0},						 // 13 SFX_SPACE
+    {sampleAbort, 127, 0},                       // 01 SFX_ABORT
+    {sampleWhoosh, 127, 0},                      // 02 SFX_WHOOSH
+    {sampleBlip, 125, 0},                        // 03 SFX_BLIP
+    {sampleRev, 117, 0},                         // 04 SFX_REV
+    {sampleSelectionBlip, 115, 0},               // 05 SFX_SELECTION
+    {sampleBeepHornTwice, 110, AUDIO_ATTENUATE}, // 06 SFX_BEEP2
+    {sampleFastBeep2, 100, AUDIO_ATTENUATE},     // 07 SFX_FASTBEEP2
+    {sampleExit, 99, 0},                         // 08 SFX_EXIT
+    {sampleSpinWheel, 96, 0},                    // 09 SFX_SPINWHEEL
+    {sampleMagic, 91, AUDIO_KILL},               // 10 SFX_MAGIC
+    {sampleFireworks, 90, 0},                    // 11 SFX_FIREWORKS
+    {sampleDirt, 9, 0},                          // 12 SFX_DIRT
+    {sampleSpace, 8, 0},                         // 13 SFX_SPACE
 
 };
 
@@ -494,219 +492,210 @@ __asm__(".section .rodata\n"
 // clang-format on
 
 extern const short int AudioSamples2[SFX_MAX];
-const struct AudioTable *AudioSamples =
-	(const struct AudioTable *)AudioSamples2;
+const struct AudioTable *AudioSamples = (const struct AudioTable *)AudioSamples2;
 #endif
 bool audioRequest[SFX_MAX];
 
 void killRepeatingAudio() {
 
-	for (int channel = 0; channel < 2; channel++) {
-		RAM[_AUDC0 + channel] = 0;
-		RAM[_AUDF0 + channel] = 0;
-		RAM[_AUDV0 + channel] = 0;
-	}
+    for (int channel = 0; channel < 2; channel++) {
+        RAM[_AUDC0 + channel] = 0;
+        RAM[_AUDF0 + channel] = 0;
+        RAM[_AUDV0 + channel] = 0;
+    }
 
-	for (int i = 0; i < CONCURRENT_SFX; i++)
-		if (AudioSamples[sfx[i].id].flags & AUDIO_KILL)
-			sfx[i].id = 0;
+    for (int i = 0; i < CONCURRENT_SFX; i++)
+        if (AudioSamples[sfx[i].id].flags & AUDIO_KILL)
+            sfx[i].id = 0;
 
-	for (int i = 0; i < SFX_MAX; i++)
-		if (AudioSamples[i].flags & AUDIO_KILL)
-			audioRequest[i] = false;
+    for (int i = 0; i < SFX_MAX; i++)
+        if (AudioSamples[i].flags & AUDIO_KILL)
+            audioRequest[i] = false;
 }
 
 void initAudio(bool killTracks) {
 
-	killRepeatingAudio();
+    killRepeatingAudio();
 
-	if (killTracks)
-		for (int i = 0; i < MUSIC_MAX; i++)
-			music[i].tune = 0;
+    if (killTracks)
+        for (int i = 0; i < MUSIC_MAX; i++)
+            music[i].tune = 0;
 
-	sound_max_volume = VOLUME_MAX;
+    sound_max_volume = VOLUME_MAX;
 }
 
 void startMusic() {
 
-	loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
-	loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
+    loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
+    loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
 }
 
 void startTrophyJingle() {
 
-	//	static int speed = 0x80;
+    //	static int speed = 0x80;
 
-	sound_volume = VOLUME_NONPLAYING;
-	loadTrack(100, trackTrophy2, 200, 0x80, 0);
-	loadTrack(100, trackTrophy1, 200, 0x80, 0);
+    sound_volume = VOLUME_NONPLAYING;
+    loadTrack(100, trackTrophy2, 200, 0x80, 0);
+    loadTrack(100, trackTrophy1, 200, 0x80, 0);
 
-	// 	if (speed < 256)
-	// 		speed++;
+    // 	if (speed < 256)
+    // 		speed++;
 }
 
 void killAudio(enum AudioID id) {
 
-	audioRequest[id] = false;
-	for (int i = 0; i < CONCURRENT_SFX; i++)
-		if (sfx[i].id == id)
-			sfx[i].id = 0;
+    audioRequest[id] = false;
+    for (int i = 0; i < CONCURRENT_SFX; i++)
+        if (sfx[i].id == id)
+            sfx[i].id = 0;
 }
 
 void processSoundEffects() {
 
-	for (unsigned int id = 0; id < SFX_MAX; id++) {
+    for (unsigned int id = 0; id < SFX_MAX; id++) {
 
-		if (audioRequest[id]) {
-
-#if ENABLE_SOUND
-
-			if (AudioSamples[id].flags & AUDIO_SINGLETON) {
-				bool dup = false;
-				for (int i = 0; i < CONCURRENT_SFX; i++)
-					if (sfx[i].id == id) {
-						dup = true;
-						break;
-					}
-				if (dup)
-					continue;
-			}
-
-			int lowest = -1;
-			for (int i = 0; i < CONCURRENT_SFX; i++) {
-
-				int idx = sfx[i].id;
-
-				if (!idx) { // empty slot
-					lowest = i;
-					break;
-				}
-
-				if ((!(AudioSamples[idx].flags &
-					   AUDIO_LOCKED) && // not locked, and...
-					 (lowest < 0 ||		// either we haven't found a lowest yet
-					  AudioSamples[idx].priority <
-						  AudioSamples[sfx[lowest].id].priority)
-					 // or the priority of this track is lower than the lowest
-					 // found so far...
-					 ))
-
-					lowest = i;
-			}
-
-			// we've now found the lowest priority sound in our current batch...
-			// if the lowest slot is lower priority than new sound, replace it
-			if (lowest >= 0) {
-				// && (!sfx[lowest].id || AudioSamples[id].priority >=
-				//                                         AudioSamples[sfx[lowest].id].priority))
-				//                                         {
-
-				sfx[lowest].index = 0;
-				sfx[lowest].id = id;
-				sfx[lowest].delay = AudioSamples[id].sample[3];
-
-				sfx[lowest].attenuation =
-					(AudioSamples[id].flags & AUDIO_ATTENUATE)
-						? rangeRandom(256)
-						: 255;
-
-				audioRequest[id] = false;
-			}
-
-			else
-				break; // sounds full or higher priority, ignore any more lower
-					   // priority sounds
-
-#endif
-		}
-	}
-
-	// process the sfx segments' commands
-
-	for (int i = 0; i < CONCURRENT_SFX; i++) {
-		struct Audio *sfxx = &sfx[i];
-		sfxx->handled = false;
-
-		if (sfxx->id && !--sfxx->delay) {
-
-			const struct AudioTable *s = &AudioSamples[sfxx->id];
-			sfxx->index += 4;
-			unsigned char cmd = s->sample[sfxx->index];
-
-			if (cmd == CMD_STOP)
-				sfxx->id = 0;
-
-			else {
-
-				if (cmd == CMD_LOOP) {
-					// FLASH(0x94, 4);
-					sfxx->index = 0;
-				}
-
-				sfxx->delay = s->sample[sfxx->index + 3];
-			}
-		}
-	}
-
-	for (int channel = 0; channel < 2; channel++) {
-
-		unsigned char audC = 0;
-		unsigned char audV = 0;
-		unsigned char audF = 0;
-
-		struct Audio *best = 0;
-		for (int i = 0; i < CONCURRENT_SFX; i++) {
-			if (sfx[i].id && !sfx[i].handled)
-				if (!best || AudioSamples[best->id].priority <
-								 AudioSamples[sfx[i].id].priority)
-					best = &sfx[i];
-		}
-
-		if (best) {
-
-			best->handled = true;
-
-			audC = AudioSamples[best->id].sample[best->index];
-			audF = AudioSamples[best->id].sample[(best->index) + 1];
-			audV = (AudioSamples[best->id].sample[(best->index) + 2] *
-					((int)best->attenuation + 1)) >>
-				   8;
-
-			switch (best->id) {
-			// case SFX_MAGIC2:
-			case SFX_MAGIC:
-				audF = getRandom32() & 0xF;
-				audV = 2;
-				break;
-
-				// case SFX_X: {
-				// 	audF = getRandom32() & 0xF;
-				// 	break;
-				// }
-			}
-		}
+        if (audioRequest[id]) {
 
 #if ENABLE_SOUND
 
-		if (audC && audV >= volume[channel]) {
-			RAM[_AUDC0 + channel] = audC;
-			RAM[_AUDF0 + channel] = audF;
-			RAM[_AUDV0 + channel] = audV;
+            if (AudioSamples[id].flags & AUDIO_SINGLETON) {
+                bool dup = false;
+                for (int i = 0; i < CONCURRENT_SFX; i++)
+                    if (sfx[i].id == id) {
+                        dup = true;
+                        break;
+                    }
+                if (dup)
+                    continue;
+            }
 
-			// sound_volume -= 5;
-			// if (sound_volume < 0)
-			// 	sound_volume = 0;
-		}
+            int lowest = -1;
+            for (int i = 0; i < CONCURRENT_SFX; i++) {
+
+                int idx = sfx[i].id;
+
+                if (!idx) { // empty slot
+                    lowest = i;
+                    break;
+                }
+
+                if ((!(AudioSamples[idx].flags & AUDIO_LOCKED) && // not locked, and...
+                     (lowest < 0 ||                               // either we haven't found a lowest yet
+                      AudioSamples[idx].priority < AudioSamples[sfx[lowest].id].priority)
+                     // or the priority of this track is lower than the lowest
+                     // found so far...
+                     ))
+
+                    lowest = i;
+            }
+
+            // we've now found the lowest priority sound in our current batch...
+            // if the lowest slot is lower priority than new sound, replace it
+            if (lowest >= 0) {
+                // && (!sfx[lowest].id || AudioSamples[id].priority >=
+                //                                         AudioSamples[sfx[lowest].id].priority))
+                //                                         {
+
+                sfx[lowest].index = 0;
+                sfx[lowest].id = id;
+                sfx[lowest].delay = AudioSamples[id].sample[3];
+
+                sfx[lowest].attenuation = (AudioSamples[id].flags & AUDIO_ATTENUATE) ? rangeRandom(256) : 255;
+
+                audioRequest[id] = false;
+            }
+
+            else
+                break; // sounds full or higher priority, ignore any more lower
+                       // priority sounds
+
 #endif
-	}
+        }
+    }
+
+    // process the sfx segments' commands
+
+    for (int i = 0; i < CONCURRENT_SFX; i++) {
+        struct Audio *sfxx = &sfx[i];
+        sfxx->handled = false;
+
+        if (sfxx->id && !--sfxx->delay) {
+
+            const struct AudioTable *s = &AudioSamples[sfxx->id];
+            sfxx->index += 4;
+            unsigned char cmd = s->sample[sfxx->index];
+
+            if (cmd == CMD_STOP)
+                sfxx->id = 0;
+
+            else {
+
+                if (cmd == CMD_LOOP) {
+                    // FLASH(0x94, 4);
+                    sfxx->index = 0;
+                }
+
+                sfxx->delay = s->sample[sfxx->index + 3];
+            }
+        }
+    }
+
+    for (int channel = 0; channel < 2; channel++) {
+
+        unsigned char audC = 0;
+        unsigned char audV = 0;
+        unsigned char audF = 0;
+
+        struct Audio *best = 0;
+        for (int i = 0; i < CONCURRENT_SFX; i++) {
+            if (sfx[i].id && !sfx[i].handled)
+                if (!best || AudioSamples[best->id].priority < AudioSamples[sfx[i].id].priority)
+                    best = &sfx[i];
+        }
+
+        if (best) {
+
+            best->handled = true;
+
+            audC = AudioSamples[best->id].sample[best->index];
+            audF = AudioSamples[best->id].sample[(best->index) + 1];
+            audV = (AudioSamples[best->id].sample[(best->index) + 2] * ((int)best->attenuation + 1)) >> 8;
+
+            switch (best->id) {
+            // case SFX_MAGIC2:
+            case SFX_MAGIC:
+                audF = getRandom32() & 0xF;
+                audV = 2;
+                break;
+
+                // case SFX_X: {
+                // 	audF = getRandom32() & 0xF;
+                // 	break;
+                // }
+            }
+        }
+
+#if ENABLE_SOUND
+
+        if (audC && audV >= volume[channel]) {
+            RAM[_AUDC0 + channel] = audC;
+            RAM[_AUDF0 + channel] = audF;
+            RAM[_AUDV0 + channel] = audV;
+
+            // sound_volume -= 5;
+            // if (sound_volume < 0)
+            // 	sound_volume = 0;
+        }
+#endif
+    }
 }
 
 void playAudio() {
 
-	volume[0] = volume[1] = 0;
+    volume[0] = volume[1] = 0;
 
-	processMusic();
-	processSoundEffects();
+    processMusic();
+    processSoundEffects();
 }
 
 #if 1
@@ -794,31 +783,29 @@ static const unsigned char *const instrument[] = {
 
 // clang-format on
 
-void loadTrack(int priority, const unsigned char *tune, int volume, int dur,
-			   int instrument) {
+void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument) {
 
-	int best = -1;
+    int best = -1;
 
-	for (int slot = 0; slot < MUSIC_MAX; slot++) {
+    for (int slot = 0; slot < MUSIC_MAX; slot++) {
 
-		if (!music[slot].tune) {
-			best = slot;
-			break;
-		}
+        if (!music[slot].tune) {
+            best = slot;
+            break;
+        }
 
-		if (best < 0 || music[slot].priority < music[best].priority)
-			best = slot;
-	}
+        if (best < 0 || music[slot].priority < music[best].priority)
+            best = slot;
+    }
 
-	music[best].priority = priority;
-	music[best].tune = tune;
-	music[best].index = -1;
-	music[best].progress = TRIGGER_NEXT_NOTE;
-	music[best].instrument = instrument;
-	music[best].volume = volume;
-	music[best].noteDurationMultiplier =
-		dur; // 0x80 = single note, 0x40 = half-note, etc
-	music[best].baseSpeed = dur;
+    music[best].priority = priority;
+    music[best].tune = tune;
+    music[best].index = -1;
+    music[best].progress = TRIGGER_NEXT_NOTE;
+    music[best].instrument = instrument;
+    music[best].volume = volume;
+    music[best].noteDurationMultiplier = dur; // 0x80 = single note, 0x40 = half-note, etc
+    music[best].baseSpeed = dur;
 }
 
 // // clang-format on
@@ -828,102 +815,98 @@ const unsigned char RENOTE[] = {1, 4, 6, 12};
 
 void processMusic() {
 
-	if (sound_volume < sound_max_volume)
-		sound_volume += 2;
+    if (sound_volume < sound_max_volume)
+        sound_volume += 2;
 
-	else {
-		sound_volume -= 3;
-		if (sound_volume < 0)
-			sound_volume = 0;
-	}
+    else {
+        sound_volume -= 3;
+        if (sound_volume < 0)
+            sound_volume = 0;
+    }
 
-	for (int i = 0; i < MUSIC_MAX; i++) {
+    for (int i = 0; i < MUSIC_MAX; i++) {
 
-		struct trackInfo *track = &music[i];
-		track->processed = false;
+        struct trackInfo *track = &music[i];
+        track->processed = false;
 
-		if (track->tune && track->progress >= TRIGGER_NEXT_NOTE) {
+        if (track->tune && track->progress >= TRIGGER_NEXT_NOTE) {
 
-			track->progress -= TRIGGER_NEXT_NOTE;
+            track->progress -= TRIGGER_NEXT_NOTE;
 
-			bool done;
+            bool done;
 
-			do {
+            do {
 
-				done = true;
-				unsigned char nextNote = track->tune[++track->index];
+                done = true;
+                unsigned char nextNote = track->tune[++track->index];
 
-				if (nextNote == TRACK_END)
-					track->tune = 0;
+                if (nextNote == TRACK_END)
+                    track->tune = 0;
 
-				else {
+                else {
 
-					if (nextNote == TRACK_LOOP) {
-						track->index = -1;
-						done = false;
-					}
+                    if (nextNote == TRACK_LOOP) {
+                        track->index = -1;
+                        done = false;
+                    }
 
-					else if (nextNote == TRACK_VOLUME) {
-						track->volume = track->tune[++track->index];
-						done = false;
-					}
+                    else if (nextNote == TRACK_VOLUME) {
+                        track->volume = track->tune[++track->index];
+                        done = false;
+                    }
 
-					else if (!(nextNote & 0b00111111)) {
-						track->noteDurationMultiplier =
-							(track->baseSpeed * multiplier[nextNote >> 6]) >> 8;
-						done = false;
-					}
-				}
+                    else if (!(nextNote & 0b00111111)) {
+                        track->noteDurationMultiplier = (track->baseSpeed * multiplier[nextNote >> 6]) >> 8;
+                        done = false;
+                    }
+                }
 
-			} while (!done);
-		}
-	}
+            } while (!done);
+        }
+    }
 
-	for (int channel = 0; channel < 2; channel++) {
+    for (int channel = 0; channel < 2; channel++) {
 
-		RAM[_AUDV0 + channel] = 0;
-		RAM[_AUDF0 + channel] = 0;
-		RAM[_AUDC0 + channel] = 0;
-	}
+        RAM[_AUDV0 + channel] = 0;
+        RAM[_AUDF0 + channel] = 0;
+        RAM[_AUDC0 + channel] = 0;
+    }
 
-	for (int channel = 0; channel < 2; channel++) {
+    for (int channel = 0; channel < 2; channel++) {
 
-		struct trackInfo *best = 0;
+        struct trackInfo *best = 0;
 
-		for (int i = 0; i < MUSIC_MAX; i++) {
-			struct trackInfo *track = &music[i];
-			if (track->tune && !track->processed)
-				if (!best || best->priority < track->priority)
-					best = track;
-		}
+        for (int i = 0; i < MUSIC_MAX; i++) {
+            struct trackInfo *track = &music[i];
+            if (track->tune && !track->processed)
+                if (!best || best->priority < track->priority)
+                    best = track;
+        }
 
-		if (best) {
+        if (best) {
 
-			best->processed = true;
+            best->processed = true;
 
-			unsigned char note = best->tune[best->index];
-			int envelope_ptr = (best->progress) >> 12;
+            unsigned char note = best->tune[best->index];
+            int envelope_ptr = (best->progress) >> 12;
 
-			RAM[_AUDV0 + channel] = volume[channel] =
-				(instrument[best->instrument][envelope_ptr] * sound_volume *
-				 best->volume) >>
-				(4 + 10 + 8);
+            RAM[_AUDV0 + channel] = volume[channel] =
+                (instrument[best->instrument][envelope_ptr] * sound_volume * best->volume) >> (4 + 10 + 8);
 
-			// if (note == 0xFF)
-			//     RAM[_BUF_AUDV + channel] = 0;
+            // if (note == 0xFF)
+            //     RAM[_BUF_AUDV + channel] = 0;
 
-			RAM[_AUDF0 + channel] = note;
-			RAM[_AUDC0 + channel] = RENOTE[note >> 6];
-		}
+            RAM[_AUDF0 + channel] = note;
+            RAM[_AUDC0 + channel] = RENOTE[note >> 6];
+        }
 
-		else
-			break;
-	}
+        else
+            break;
+    }
 
-	for (int i = 0; i < MUSIC_MAX; i++)
-		if (music[i].tune)
-			music[i].progress +=
-				(8273 * music[i].noteDurationMultiplier) >> 8; // WTF BOO?!
+    for (int i = 0; i < MUSIC_MAX; i++)
+        if (music[i].tune)
+            music[i].progress += (8273 * music[i].noteDurationMultiplier) >> 8; // WTF BOO?!
 }
 
 #endif

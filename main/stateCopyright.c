@@ -39,55 +39,55 @@ void initialise_GS_Copyright() {
 
 #define CC 4
 
-	//	setJumpVectors(_CHAMP_KERNEL, _EXIT_CHAMP_KERNEL, _ARENA_SCANLINES - 1);
+    //	setJumpVectors(_CHAMP_KERNEL, _EXIT_CHAMP_KERNEL, _ARENA_SCANLINES - 1);
 
-	// sets the menu sprites position
-	RAM[_P0_X] = 56;
-	RAM[_P1_X] = 64;
+    // sets the menu sprites position
+    RAM[_P0_X] = 56;
+    RAM[_P1_X] = 64;
 
-	sound_volume = VOLUME_NONPLAYING;
-	loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
-	loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
+    sound_volume = VOLUME_NONPLAYING;
+    loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
+    loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
 
-	RAM[_colubk] = convertColour(0x94);
+    RAM[_colubk] = convertColour(0x94);
 
-	frame = 0;
+    frame = 0;
 }
 
 void VB_GS_Copyright() {
 
-	if (frame < 250) {
+    if (frame < 250) {
 
 #define CGSPACER 4
 #define TOP (_ARENA_SCANLINES / 2 - BAND - 15)
 #define CGP (gfx_grid_champgames_champ_gif_HEIGHT)
 #define BAND (CGP + CGSPACER * 2)
 
-		unsigned char *l = RAM + _BUF_MENU_PF2_LEFT;
-		unsigned char *r = RAM + _BUF_MENU_PF2_RIGHT;
-		unsigned char *c = RAM + _BUF_MENU_COLUPF;
-		unsigned char *spc = RAM + _BUF_MENU_COLUP0;
+        unsigned char *l = RAM + _BUF_MENU_PF2_LEFT;
+        unsigned char *r = RAM + _BUF_MENU_PF2_RIGHT;
+        unsigned char *c = RAM + _BUF_MENU_COLUPF;
+        unsigned char *spc = RAM + _BUF_MENU_COLUP0;
 
-		for (int sl = 0; sl < TOP; sl++)
-			*l++ = *r++ = *c++ = *spc++ = 0;
+        for (int sl = 0; sl < TOP; sl++)
+            *l++ = *r++ = *c++ = *spc++ = 0;
 
-		for (int sl = TOP; sl < TOP + 2 * BAND; sl++) {
+        for (int sl = TOP; sl < TOP + 2 * BAND; sl++) {
 
-			*l++ = 255;
-			*r++ = 255;
-			*spc++ = 0x6;
+            *l++ = 255;
+            *r++ = 255;
+            *spc++ = 0x6;
 
-			if (tvSystem == _TV_SYSTEM_NTSC)
-				*c++ = convertColour(sl < TOP + BAND ? 0x90 : 0x40);
-			else
-				*c++ = convertColour(sl < TOP + BAND ? 0x92 : 0x42);
-		}
+            if (tvSystem == _TV_SYSTEM_NTSC)
+                *c++ = convertColour(sl < TOP + BAND ? 0x90 : 0x40);
+            else
+                *c++ = convertColour(sl < TOP + BAND ? 0x92 : 0x42);
+        }
 
-		for (int sl = TOP + 2 * BAND; sl < _ARENA_SCANLINES; sl++)
-			*l++ = *r++ = *c++ = *spc++ = 0;
+        for (int sl = TOP + 2 * BAND; sl < _ARENA_SCANLINES; sl++)
+            *l++ = *r++ = *c++ = *spc++ = 0;
 
-		draw6Bitmap(gfx_grid_champgames_champ_gif, gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 8);
-		draw6Bitmap(gfx_grid_champgames_games_gif, gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 8);
+        draw6Bitmap(gfx_grid_champgames_champ_gif, gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 8);
+        draw6Bitmap(gfx_grid_champgames_games_gif, gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 8);
 
 #if UNLIMITED_SOLVES
 //		_ARENA_COLOUR = 0x40;
@@ -95,28 +95,28 @@ void VB_GS_Copyright() {
 // gfx_grid_not_for_release_gif_HEIGHT, TOP - 50, 8);
 #endif
 
-		if (frame > 60)
+        if (frame > 60)
 
-			draw6Bitmap(gfx_grid_champgames_presents_gif, gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10,
-						8);
+            draw6Bitmap(gfx_grid_champgames_presents_gif, gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10,
+                        8);
 
 #ifndef RESTRICTED_DEMO
-		if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 100) {
+        if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 100) {
 
-			int col = convertColour(frame & 16 ? 0x16 : 0x12);
+            int col = convertColour(frame & 16 ? 0x16 : 0x12);
 
-			draw6Bitmap(gfx_grid_savekey_gif, gfx_grid_savekey_gif_HEIGHT,
-						_ARENA_SCANLINES - 1 - gfx_grid_savekey_gif_HEIGHT, col);
+            draw6Bitmap(gfx_grid_savekey_gif, gfx_grid_savekey_gif_HEIGHT,
+                        _ARENA_SCANLINES - 1 - gfx_grid_savekey_gif_HEIGHT, col);
 
-			if (RAM[_SK_RESET]) {
-				draw6Bitmap(gfx_grid_savekey_reset_gif, gfx_grid_savekey_reset_gif_HEIGHT,
-							_ARENA_SCANLINES - 6 - gfx_grid_savekey_gif_HEIGHT - gfx_grid_savekey_reset_gif_HEIGHT, 6);
-				//				            convertColour(frame & 16 ? 6 : 2));
+            if (RAM[_SK_RESET]) {
+                draw6Bitmap(gfx_grid_savekey_reset_gif, gfx_grid_savekey_reset_gif_HEIGHT,
+                            _ARENA_SCANLINES - 6 - gfx_grid_savekey_gif_HEIGHT - gfx_grid_savekey_reset_gif_HEIGHT, 6);
+                //				            convertColour(frame & 16 ? 6 : 2));
 
-				if (!(frame & 15))
-					ADDAUDIO(SFX_SELECTION);
-			}
-		}
+                if (!(frame & 15))
+                    ADDAUDIO(SFX_SELECTION);
+            }
+        }
 #endif
 
 #ifndef FINAL_VERSION
@@ -124,14 +124,14 @@ void VB_GS_Copyright() {
 
 #endif
 
-	}
+    }
 
-	else
-		setNextGameState(GS_COUCH_COMPLIANT);
+    else
+        setNextGameState(GS_COUCH_COMPLIANT);
 }
 
 void OS_GS_Copyright() {
-	playAudio();
+    playAudio();
 }
 
 // EOF

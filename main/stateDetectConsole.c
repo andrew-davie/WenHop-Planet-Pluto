@@ -12,8 +12,8 @@ void initialise_GS_DetectConsole() {
 }
 
 void VB_GS_DetectConsole() {
-	if (detectConsoleType())
-		setNextGameState(GS_COPYRIGHT);
+    if (detectConsoleType())
+        setNextGameState(GS_COPYRIGHT);
 }
 
 void OS_GS_DetectConsole() {
