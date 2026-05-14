@@ -109,19 +109,12 @@ DivideLoopC         sbc #15
                     rts
 
 ;-------------------------------------------------------------------------------
+#endif
 
 
-VB_Champ
+kernelCopyrightVB
 
-        ; TODO: put vb here
-                    rts
-
-
-kernelChampGames
-KernelCopyright
-
-
-    ; entry point for champ kernel
+#if 0
 
                     ldx #%00110011
                     stx NUSIZ0                      ; three copies close, missile x8
@@ -204,6 +197,17 @@ safeTimerWait3C     lda INTIM
                     stx PF2
 
 ;                    jmp FASTJMP1
+        ; TODO: put vb here
+                    rts
+
+#endif
+
+kernelChampGames
+kernelCopyright
+
+
+#if 0
+    ; entry point for champ kernel
 
                     ldx #_SCANLINES
                     stx scanline

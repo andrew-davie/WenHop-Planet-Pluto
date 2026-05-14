@@ -90,18 +90,12 @@ void VB_GS_Copyright() {
         draw6Bitmap(_BUF_COPYRIGHT_GRP0A, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_games_gif,
                     gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 8);
 
-#if UNLIMITED_SOLVES
-//		_ARENA_COLOUR = 0x40;
-//		draw6Bitmap(gfx_grid_not_for_release_gif,
-// gfx_grid_not_for_release_gif_HEIGHT, TOP - 50, 8);
-#endif
 
         if (frame > 60)
 
             draw6Bitmap(_BUF_COPYRIGHT_GRP0A, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
                         gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, 8);
 
-#ifndef RESTRICTED_DEMO
         if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 100) {
 
             int col = convertColour(frame & 16 ? 0x16 : 0x12);
@@ -113,18 +107,11 @@ void VB_GS_Copyright() {
                 draw6Bitmap(_BUF_COPYRIGHT_GRP0A, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_reset_gif,
                             gfx_grid_savekey_reset_gif_HEIGHT,
                             _SCANLINES - 6 - gfx_grid_savekey_gif_HEIGHT - gfx_grid_savekey_reset_gif_HEIGHT, 6);
-                //				            convertColour(frame & 16 ? 6 : 2));
 
                 if (!(frame & 15))
                     ADDAUDIO(SFX_SELECTION);
             }
         }
-#endif
-
-#ifndef FINAL_VERSION
-#define DBAS 110
-
-#endif
     }
 
     // else

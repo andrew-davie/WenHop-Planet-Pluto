@@ -129,7 +129,34 @@ mainGameLoop
                     lda TimerVB,x
                     sta TIM64T
 
-                	jsr verticalBlank           ; <---ARM and 6502 vertical blank calls
+
+;verticalblank
+
+                ldx #>_RUN_FUNC
+                stx DSPTR
+                ldx #<_RUN_FUNC
+                stx DSPTR
+                ldx #_RUN_ARM_VBLANK
+                stx DSWRITE
+
+                ldx call_fn
+	            stx CALLFN                  ; call VerticalBlank in ARM
+
+    ; Vector to appropriate 6502 Vertical Blank code
+    ; Currently this is just position sprites, and sound stuff
+    ; in other words, basic inits
+
+
+                lda kernel
+                clc
+                adc #8
+                tax
+                jsr runKernel               ; actually run 6502 kernel-specific VB
+
+;                	jsr verticalBlank           ; <---ARM and 6502 vertical blank calls
+
+; end vb
+
 
                     lda colubk                  ; retrieved/updated in OS
                     sta COLUBK
@@ -293,24 +320,32 @@ verticalBlank
     ; Currently this is just position sprites, and sound stuff
     ; in other words, basic inits
 
-	            ldx kernel
-                lda kernelVBlank_h,x
-                pha
-                lda kernelVBlank_l,x
-                pha
+
+                lda kernel
+                clc
+                adc #8
+                tax
+                jsr runKernel               ; actually run VB
+
+
+	            ; ldx kernel
+                ; lda kernelVBlank_h,x
+                ; pha
+                ; lda kernelVBlank_l,x
+                ; pha
                 rts
 
 
-kernelVBlank_h  ;.byte >(ChampKernel-1)
-                .byte >(k_prep_00-1)
-                .byte >(k_prep_01-1)
-
-kernelVBlank_l	;.byte <(ChampKernel-1)
-                .byte <(k_prep_00-1)
-	            .byte <(k_prep_01-1)
+; kernelVBlank_h  ;.byte >(ChampKernel-1)
+;                 .byte >(k_prep_00-1)
+;                 .byte >(k_prep_01-1)
+;                 .byte >(kernelCopyright - 1)
 
 
-
+; kernelVBlank_l	;.byte <(ChampKernel-1)
+;                 .byte <(k_prep_00-1)
+; 	            .byte <(k_prep_01-1)
+;                 .byte >(kernelCopyright - 1)
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -377,15 +412,77 @@ ARM_Overscan
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Cross Bank Routine Handler @@@@@@@@@@@@@@@@@@@@@@@@@
 
+    ; Note: each kernel needs to define...
+    ; 1) kernelBank_L table
+    ; 2) kernelRoutine_L table
+    ; 3) kernelRoutine_H table
+    ; 4) kernelVBlank_H table
+    ; 5) kernelVBlank_L table
 
-kernelBank_L        .byte #<BANK1           ; be VERY careful you get the correct bank for kernel!
-	                .byte #<BANK1
 
-kernelRoutine_L     .byte #<kernel_Rainbow
-	                .byte #<kernel_01
+kernelBank_L        .byte <BANK1           ; be VERY careful you get the correct bank for kernel!
+	                .byte <BANK1
+                    .byte <BANK1
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
 
-kernelRoutine_H 	.byte #>kernel_Rainbow
-	                .byte #>kernel_01
+    ; vblanks follow
+
+                    .byte <BANK0
+                    .byte <BANK0
+                    .byte <BANK1
+                    .byte <BANK1
+                    .byte <BANK1
+                    .byte <BANK1
+                    .byte <BANK1
+                    .byte <BANK1
+
+
+
+kernelRoutine_L     .byte <kernel_Rainbow
+	                .byte <kernel_01
+                    .byte <kernelCopyright
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
+
+    ; vblanks follow
+
+                    .byte <k_prep_00
+                    .byte <k_prep_01
+                    .byte <kernelCopyright
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
+    
+
+kernelRoutine_H 	.byte >kernel_Rainbow
+	                .byte >kernel_01
+                    .byte >kernelCopyright
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
+
+    ; vblanks follow
+
+                    .byte >k_prep_00
+                    .byte >k_prep_01
+                    .byte >kernelCopyrightVB
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
+                    .byte 0
+
 
 ;-------------------------------------------------------------------------------
 

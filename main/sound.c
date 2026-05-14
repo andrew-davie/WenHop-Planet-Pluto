@@ -526,20 +526,8 @@ void initAudio(bool killTracks) {
 
 void startMusic() {
 
-    loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
-    loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
-}
-
-void startTrophyJingle() {
-
-    //	static int speed = 0x80;
-
-    sound_volume = VOLUME_NONPLAYING;
-    loadTrack(100, trackTrophy2, 200, 0x80, 0);
-    loadTrack(100, trackTrophy1, 200, 0x80, 0);
-
-    // 	if (speed < 256)
-    // 		speed++;
+    // loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
+    // loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
 }
 
 void killAudio(enum AudioID id) {
