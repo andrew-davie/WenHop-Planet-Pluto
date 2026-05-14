@@ -163,14 +163,12 @@ prep: tools
 
 .PHONY: bootstrap_defines
 bootstrap_defines: gfx
-	echo "bootstrap_defines"
 	$(DASM) $(SOURCE).asm -f3 -v5 \
 		-s$(OUTPUT)/$(SOURCE).sym \
 		-l$(OUTPUT)/$(SOURCE).lst \
 		-o$(OUTPUT)/$(SOURCE).bin
 	@echo "// Auto-generated from DASM output and symbols" > $(BASE)/$(DASM_TO_C).tmp
 	@echo "" >> $(BASE)/$(DASM_TO_C).tmp
-	echo "cstartxxx"
 	$(TOOLS_BIN)/$(CSTART) ./$(SOURCE).asm $(CUSTOM)/custom.boot.lds
 	awk '$$1 ~ /^_/ {printf "#define %-25s 0x%s\n", $$1, $$2}' \
 		$(OUTPUT)/$(SOURCE).sym >> $(BASE)/$(DASM_TO_C).tmp
@@ -210,9 +208,7 @@ DATED_ROM := $(shell date +"$(CUSTOMNAME)_%Y%m%d@%H:%M:%S" | tr ' :' '__')
 make_rom: prep
 	$(MAKE) bootstrap_defines
 	$(MAKE) arm
-	@echo ">>> CUSTOMBIN after arm:"
 	@ls -la $(CUSTOMBIN)
-	@echo ">>> CUSTOMELF:"
 	@ls -la $(CUSTOMELF)
 	@echo ">>> ARM binary size: $$(ls -la $(CUSTOMBIN))"
 	$(DASM) $(SOURCE).asm -f3 -v5 \

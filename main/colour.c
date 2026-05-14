@@ -21,7 +21,7 @@ void adjustLuminance(int /*rateMask*/) {
     if (luminance < 0)
         luminance++;
     if (luminance > 0)
-        luminance = 0; // MAJOR error
+        luminance = 0;    // MAJOR error
 }
 
 unsigned char TranslateColour[] = {0x00, 0x20, 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0,
@@ -33,9 +33,9 @@ unsigned char secamConvert(unsigned char col) {
     unsigned char c = TranslateSecamColour[col >> 4];
 
     if ((col & 0xF) >= 4) {
-        if (!c) // black -> white
+        if (!c)    // black -> white
             c = 0xE;
-        else if (c == 2) // blue -> aqua
+        else if (c == 2)    // blue -> aqua
             c = 0xA;
     }
     return c;
@@ -59,36 +59,31 @@ unsigned char convertColour(unsigned char colour) {
         break;
     }
 
-    return colour; // adjustBrightness(colour);
+    return colour;    // adjustBrightness(colour);
 }
 
-void setFlash2(unsigned char /*colour*/, int /*time*/) {
-    // TODO
-    //  ARENA_COLOUR = (colour & 0xF) | (convertColour(colour) & 0xF0);
-    //  flashTime = time;
+void pulseBackgroundColour(unsigned char colour, int time) {
+    colubk = convertColour(colour);
+    flashTime = time;
 }
 
-#if 0
-void doFlash() {
 
-	if (!flashTime) {
-		return;
-	}
+void fadeBackgroundColour() {
 
-	if (flashTime < 0) {
-		if (!++flashTime) {
-			ARENA_COLOUR = 1;
-		}
-		return;
-	}
+    if (flashTime) {
+        if (!--flashTime) {
 
-	if (!--flashTime)
-		if (
-			tv_system == SECAM ||
-			(flashTime = ARENA_COLOUR-- & 0xF) == 1)
-			ARENA_COLOUR = 1;
+            if (!(colubk & 0xF) || tvSystem == _TV_SYSTEM_SECAM)
+                colubk = 0;
+            else {
+
+                colubk--;
+                flashTime = 1;
+            }
+        }
+    }
 }
-#endif
+
 
 #if 0
 void chooseBackgroundPalette() {

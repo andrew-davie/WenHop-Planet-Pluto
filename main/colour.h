@@ -14,7 +14,7 @@
 extern int flashTime;
 extern int openSlot;
 
-#define FLASH(a, b) setFlash2(a, b);
+#define FLASH(colour, time) pulseBackgroundColour(colour, time);
 
 #if RANDOM_CAR_COLOUR
 extern unsigned char bgPalette[__BOARD_DEPTH];
@@ -29,11 +29,11 @@ extern int carColour;
 
 extern const unsigned char carColours[][3];
 
-void doFlash();
+void fadeBackgroundColour();
 void setGamePalette();
 // void setBackgroundPalette(const unsigned char *c);
 void initColours();
-void setFlash2(unsigned char colour, int time);
+void pulseBackgroundColour(unsigned char colour, int time);
 
 void interleaveColour(int *r);
 unsigned char convertColour(unsigned char colour);

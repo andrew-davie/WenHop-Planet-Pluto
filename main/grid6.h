@@ -1,5 +1,7 @@
 #pragma once
 
+extern const unsigned char gfx_grid_andrew_gif[8][6];
+#define gfx_grid_andrew_gif_HEIGHT 8
 extern const unsigned char gfx_grid_champgames_champ_gif[8][6];
 #define gfx_grid_champgames_champ_gif_HEIGHT 8
 extern const unsigned char gfx_grid_champgames_games_gif[8][6];

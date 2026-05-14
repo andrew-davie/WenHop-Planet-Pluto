@@ -24,10 +24,10 @@ void VB_GS_CouchCompliant() {
     static unsigned int col;
     col++;
 
-    for (int i = 0; i <= 191; i++)
-        RAM[_buffer0 + i] = convertColour((col + ((191 - i) >> 2)) & 0xFF);
+    for (int i = 0; i < _SCANLINES; i++)
+        RAM[_BUF_COUCH_COMPLIANT_COLUP0 + i] = convertColour((col + ((_SCANLINES - 1 - i) >> 2)) & 0xFF);
 
-    setPointer(DS0PTR, _buffer0);
+    setPointer(DS0PTR, _BUF_COUCH_COMPLIANT_COLUP0);
 
     // couch
     if (frame < 375) {
@@ -44,17 +44,18 @@ void VB_GS_CouchCompliant() {
                     clr = 8;
                 clr = clr & 0xFE;
 
-                draw6Bitmap(gfx_grid_couch_compliant_gif, 2, COUCH_BASE + colx, (clr) ? 0x8E + clr : 0);
+                draw6Bitmap(_BUF_COUCH_COMPLIANT_GRP0A, _BUF_COUCH_COMPLIANT_COLUP0, gfx_grid_couch_compliant_gif, 2,
+                            COUCH_BASE + colx, (clr) ? 0x8E + clr : 0);
 
-                draw6Bitmap(gfx_grid_couch_compliant_gif, gfx_grid_couch_compliant_gif_HEIGHT, COUCH_BASE + 1 + colx,
-                            clr);
+                draw6Bitmap(_BUF_COUCH_COMPLIANT_GRP0A, _BUF_COUCH_COMPLIANT_COLUP0, gfx_grid_couch_compliant_gif,
+                            gfx_grid_couch_compliant_gif_HEIGHT, COUCH_BASE + 1 + colx, clr);
 
-                draw6Bitmap(gfx_grid_compliant_gif, gfx_grid_compliant_gif_HEIGHT, COUCH_BASE + 30 + colx,
-                            clr ? 0xCE + clr : 0);
+                draw6Bitmap(_BUF_COUCH_COMPLIANT_GRP0A, _BUF_COUCH_COMPLIANT_COLUP0, gfx_grid_compliant_gif,
+                            gfx_grid_compliant_gif_HEIGHT, COUCH_BASE + 30 + colx, clr ? 0xCE + clr : 0);
             }
 
             if (frame > 300 && !(frame & 3)) {
-                unsigned char *c = RAM + _BUF_MENU_COLUP0;
+                unsigned char *c = RAM + _BUF_COUCH_COMPLIANT_COLUP0;
                 for (int i = COUCH_BASE; i < COUCH_BASE + 39; i++) {
                     if (c[i] && (--c[i] & 0xF) == 0xF)
                         c[i] = 0;
@@ -64,7 +65,7 @@ void VB_GS_CouchCompliant() {
     }
 
     else
-        setNextGameState(GS_DEMO);
+        setNextGameState(GS_RAINBOW);
 }
 
 void OS_GS_CouchCompliant() {

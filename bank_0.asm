@@ -3,32 +3,33 @@
 
 BANK0_START
 
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@@@@@@@@@@@@@@@@@@@@@ These routines put at beginning of each bank so all have access @@@@@@@@@@@@@@@@@@@@@
-; .blank_scanlines
-; 	sta WSYNC
-; 	dex
-; 	bne .blank_scanlines			;can use .blank_scanlines in any bank
-; 	rts
-
-; .blank_scanlines_aud				;can use .blank_scanlines_aud in any bank
-; 	sta WSYNC
-; 	lda #AMPLITUDE
-; 	sta AUDV0
-; 	dex
-; 	bne .blank_scanlines_aud
-; 	rts
-
-
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@ Code block that gets copied into RAM for bank routine dispatch @@@@@@@@@@@@@@@@@
 
-jumpCode       	cmp BANK1   
-                jsr jumpCode
-                cmp BANK0
-jumpCodeEnd
-                rts
+; The code here is a 'template' copied into the RAM area and the bank and jump
+; address are modified before execution. The return will be to the caller of
+; the code that jumps to the RAM copy of this code.
+; DO NOT RUN *THIS* CODE AS IT WILL CRASH. JUMP TO THE RAM VERSION!
+
+jumpCode       	    cmp BANK1           ; hotspot bank-switch
+                    jsr jumpCode
+                    cmp BANK0           ; hotspot bank-switch
+jumpCodeEnd         rts
+
+
+
+fetchVarsFromARM
+                    lda #DS31DATA
+                    sta kernel
+                    lda #DS31DATA
+                    sta tvSystem
+                    lda #DS31DATA
+                    sta soundMode
+                    lda #DS31DATA
+                    sta colubk
+
+                    rts
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Cart Reset @@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -75,26 +76,21 @@ initJumpCode        lda jumpCode,x
                     stx DSWRITE
 
                     ldx #$FF
-                    stx CALLFN          			; Initialise via ARM function
+                    stx CALLFN          		    ; Initialise via ARM function
 
     ; At this point, the ARM function handler runs the Initialise function
     ; Retrive critical configuration variables from ARM
 
-                lda #DS31DATA
-                sta kernel
-                lda #DS31DATA
-                sta tvSystem
-                lda #DS31DATA
-                sta soundMode
-                sta soundSave
-                lda #DS31DATA
-                sta colubk
+                    jsr fetchVarsFromARM
 
-                tax
-                lda .sound_mode_table,x
-                sta SETMODE         			; set proper sound mode [???]
-                lda .call_fn_table,x
-                sta call_fn			            ; apply proper function caller
+                    lda soundMode
+                    sta soundSave
+
+                    tax
+                    lda .sound_mode_table,x
+                    sta SETMODE         			    ; set proper sound mode [???]
+                    lda .call_fn_table,x
+                    sta call_fn			                ; apply proper function caller
 
 
 	; lda #80				;only for demonstration of positioning method purposes
@@ -134,6 +130,9 @@ mainGameLoop
                     sta TIM64T
 
                 	jsr verticalBlank           ; <---ARM and 6502 vertical blank calls
+
+                    lda colubk                  ; retrieved/updated in OS
+                    sta COLUBK
 
 .waitVB             sta WSYNC
                     lda INTIM
@@ -189,74 +188,74 @@ TimerVB
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Game Loop - Sampled Sounds @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-mainGameLoopSampled
+; mainGameLoopSampled
 
-;@@@@@@@@@@@@@@@@@@@@
-	ldx #2
-	ldy #3
-.vertsync_samp
-	stx WSYNC
-	stx VSYNC
-	lda #AMPLITUDE
-	sta AUDV0
-	dey
-	bne .vertsync_samp
-	sty WSYNC
-	sty VSYNC
-	lda #AMPLITUDE
-	sta AUDV0
+; ;@@@@@@@@@@@@@@@@@@@@
+; 	ldx #2
+; 	ldy #3
+; .vertsync_samp
+; 	stx WSYNC
+; 	stx VSYNC
+; 	lda #AMPLITUDE
+; 	sta AUDV0
+; 	dey
+; 	bne .vertsync_samp
+; 	sty WSYNC
+; 	sty VSYNC
+; 	lda #AMPLITUDE
+; 	sta AUDV0
 	
-    ldx tvSystem
-    lda TimerVB,x
-	sta TIM64T
-;@@@@@@@@@@@@@@@@@@@@
+;     ldx tvSystem
+;     lda TimerVB,x
+; 	sta TIM64T
+; ;@@@@@@@@@@@@@@@@@@@@
 
-	jsr verticalBlank
+; 	jsr verticalBlank
 
-;@@@@@@@@@@@@@@@@@@@@
-.wait_vblank_end_samp
-	sta WSYNC
-	lda #AMPLITUDE
-	sta AUDV0
-	lda INTIM
-	bne .wait_vblank_end_samp
-	sta VBLANK
-;@@@@@@@@@@@@@@@@@@@@
+; ;@@@@@@@@@@@@@@@@@@@@
+; .wait_vblank_end_samp
+; 	sta WSYNC
+; 	lda #AMPLITUDE
+; 	sta AUDV0
+; 	lda INTIM
+; 	bne .wait_vblank_end_samp
+; 	sta VBLANK
+; ;@@@@@@@@@@@@@@@@@@@@
 
-	ldx kernel
-	jsr runKernel
+; 	ldx kernel
+; 	jsr runKernel
 
-;@@@@@@@@@@@@@@@@@@@@
-	ldx #2
-	stx WSYNC
-	stx VBLANK
-	lda #AMPLITUDE
-	sta AUDV0
+; ;@@@@@@@@@@@@@@@@@@@@
+; 	ldx #2
+; 	stx WSYNC
+; 	stx VBLANK
+; 	lda #AMPLITUDE
+; 	sta AUDV0
 
-    ldx tvSystem
-    lda TimerOS,x
-	sta TIM64T
-;@@@@@@@@@@@@@@@@@@@@
+;     ldx tvSystem
+;     lda TimerOS,x
+; 	sta TIM64T
+; ;@@@@@@@@@@@@@@@@@@@@
 
-	jsr ARM_Overscan
+; 	jsr ARM_Overscan
 
-	lda audc1
-	sta AUDC1
-	lda audf1
-	sta AUDF1
-	lda audv1
-	sta AUDV1
+; 	lda audc1
+; 	sta AUDC1
+; 	lda audf1
+; 	sta AUDF1
+; 	lda audv1
+; 	sta AUDV1
 
-;@@@@@@@@@@@@@@@@@@@@
-.wait_overscan_samp
-	sta WSYNC
-	lda #AMPLITUDE
-	sta AUDV0
-	lda INTIM	
-	bne .wait_overscan_samp
-;@@@@@@@@@@@@@@@@@@@@
+; ;@@@@@@@@@@@@@@@@@@@@
+; .wait_overscan_samp
+; 	sta WSYNC
+; 	lda #AMPLITUDE
+; 	sta AUDV0
+; 	lda INTIM	
+; 	bne .wait_overscan_samp
+; ;@@@@@@@@@@@@@@@@@@@@
 
-	jmp mainGameLoop
+; 	jmp mainGameLoop
 
 
 
@@ -286,7 +285,7 @@ verticalBlank
                 stx DSPTR
                 ldx #_RUN_ARM_VBLANK
                 stx DSWRITE
-                
+
                 ldx call_fn
 	            stx CALLFN                  ; call VerticalBlank in ARM
 
@@ -345,14 +344,15 @@ ARM_Overscan
 	ldx call_fn
 	stx CALLFN
 
-	lda #DS31DATA
-	sta kernel			;kernel and sound_mode get refreshed
-	lda #DS31DATA
-	sta tvSystem
-	lda #DS31DATA			;from the ARM each frame
-	sta soundMode
-    lda #DS31DATA
-    sta colubk
+    jsr fetchVarsFromARM
+	; lda #DS31DATA
+	; sta kernel			;kernel and sound_mode get refreshed
+	; lda #DS31DATA
+	; sta tvSystem
+	; lda #DS31DATA			;from the ARM each frame
+	; sta soundMode
+    ; lda #DS31DATA
+    ; sta colubk
 
 	lda #DS31DATA
 	sta audv0
@@ -378,17 +378,14 @@ ARM_Overscan
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Cross Bank Routine Handler @@@@@@@@@@@@@@@@@@@@@@@@@
 
 
-kernelBank_L
-	.byte #<BANK1           ; be VERY careful you get the correct bank for kernel!
-	.byte #<BANK1
+kernelBank_L        .byte #<BANK1           ; be VERY careful you get the correct bank for kernel!
+	                .byte #<BANK1
 
-kernelRoutine_L
-	.byte #<kernel_00
-	.byte #<kernel_01
+kernelRoutine_L     .byte #<kernel_Rainbow
+	                .byte #<kernel_01
 
-kernelRoutine_H
-	.byte #>kernel_00
-	.byte #>kernel_01
+kernelRoutine_H 	.byte #>kernel_Rainbow
+	                .byte #>kernel_01
 
 ;-------------------------------------------------------------------------------
 

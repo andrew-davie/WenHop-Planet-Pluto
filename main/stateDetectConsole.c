@@ -10,7 +10,7 @@
 #define DETECT_FRAME_COUNT 10
 
 
-static int detectionFrame;
+int detectionFrame;
 
 
 // clang-format off

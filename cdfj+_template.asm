@@ -53,6 +53,11 @@ _WAV_BASE		    = _DD_BASE + _waveforms
 _RAM_BASE		    = _DD_BASE + DISPLAY_SIZE
 _DISPLAY_SIZE32		= DISPLAY_SIZE / 4
 
+_SCANLINES    = 192   ; number of scanlines for the arena
+_ICC_SCANLINES = _SCANLINES/3
+ARENA_BUFFER_SIZE   =_SCANLINES    ; PF buffer size for largest arena
+
+
 	;C Stack Pointer - leave space for IAR at top of memory
 	if (ROM_SIZE == 32)
 C_STACK = $40001FDC
@@ -67,13 +72,10 @@ CH_SIZE = 0
 	if (ROM_SIZE == 256 || ROM_SIZE == 512)
 C_STACK = $40007FDC
 DS_SIZE = 2048
-CH_SIZE = 192
+CH_SIZE = _SCANLINES
 	endif
 
 
-_ARENA_SCANLINES    = 198   ; number of scanlines for the arena
-_ICC_SCANLINES = _ARENA_SCANLINES/3
-ARENA_BUFFER_SIZE   = 198    ; PF buffer size for largest arena
 
 
 _SND_MODE_TIA		= 0
@@ -175,10 +177,11 @@ SK_END
 
 SAVEKEY_RESET          ds 1            ; 0 = not reset, else SK was initialised
 
+scanline                ds 1
 
 
 	;Display Remaining RAM
-	echo "---- 2600 RAM", ($100 - *)d, "bytes free" 
+	echo "---- 2600 RAM [  128 ] -->", (* - $80)d, "bytes used", ($100 - *)d, "bytes free" 
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -212,7 +215,7 @@ _INPT5			ds 1			; <FRAMEWORK>
 
 	align 2
 
-_kernel			ds 1			; <FRAMEWORK>
+_kernel			ds 1			; <FRAMEWORK>   see GAME_KERNEL definitions
 _tvSystem		ds 1			; <FRAMEWORK>  see TV_TYPE_ definitions
 _soundMode		ds 1			; <FRAMEWORK>
 _colubk         ds 1
@@ -246,22 +249,22 @@ _waveforms		ds 256			;@@@@@ 256 Bytes: 8 Custom Waveforms (0-7) @@@@@
 _digital_sample		ds DS_SIZE		;@@@@@ 2048 Bytes: Digital Sound Sample (on RAM >= 16k) @@@@@
 						;@@@@@ playback access via waveform ID 8 @@@@@
 
-_buffer0		ds 192			;@@@@@ 16x 192 Byte DS Channels @@@@@
-; _buffer1		ds 192
-; _buffer2		ds 192
-; _buffer3		ds 192
-; _buffer4		ds 192
-; _buffer5		ds 192
-; _buffer6		ds 192
-; _buffer7		ds 192
-; _buffer8		ds 192
-; _buffer9		ds 192
-; _buffer10		ds 192
-; _buffer11		ds 192
-; _buffer12		ds 192
-; _buffer13		ds 192
-; _buffer14		ds 192
-; _buffer15		ds 192
+;_buffer0		ds _SCANLINES			;@@@@@ 16x 192 Byte DS Channels @@@@@
+; _buffer1		ds _SCANLINES
+; _buffer2		ds _SCANLINES
+; _buffer3		ds _SCANLINES
+; _buffer4		ds _SCANLINES
+; _buffer5		ds _SCANLINES
+; _buffer6		ds _SCANLINES
+; _buffer7		ds _SCANLINES
+; _buffer8		ds _SCANLINES
+; _buffer9		ds _SCANLINES
+; _buffer10		ds _SCANLINES
+; _buffer11		ds _SCANLINES
+; _buffer12		ds _SCANLINES
+; _buffer13		ds _SCANLINES
+; _buffer14		ds _SCANLINES
+; _buffer15		ds _SCANLINES
 
 ; _buffer16		ds CH_SIZE		;@@@@@ 16x additional 192 Byte DS Channels (on RAM = 32k) @@@@@
 ; _buffer17		ds CH_SIZE
@@ -289,72 +292,72 @@ _jump_table_2		ds 384
 ; BUFFERS MUST BE LAST
 ; Reason: they share memory and anything after the shortest will be stomped
 
-    ALIGN 4
-_BUFFERS = *
-
-    SEG.U BUFFER1
-    ORG _BUFFERS
-
 BUFN SET 0
     MAC DEFBUF ;name
-_BUF_{1}             ds ARENA_BUFFER_SIZE
+_BUF_{1}             ds _SCANLINES
 BUFN SET BUFN + 1
     ENDM
 
-    DEFBUF COLUP0
-    DEFBUF COLUP1
-    DEFBUF COLUPF
-    DEFBUF COLUBK
-
-    ; Axiom: PF buffers contiguous (optimisation)
-    DEFBUF PF0_LEFT
-    DEFBUF PF1_LEFT
-    DEFBUF PF2_LEFT
-    DEFBUF PF0_RIGHT
-    DEFBUF PF1_RIGHT
-    DEFBUF PF2_RIGHT
-
-    DEFBUF GRP0A
-    DEFBUF GRP1A
-
-    DEFBUF COLUBK2
-    ds 4                ; extension of COLUBK2
+_END_BUFFERS SET 0
 
 
-_BUFFER_BLOCK_SIZE = * - _BUFFERS
+    ALIGN 4         ; allowing 32-bit word access to clearing buffers in ARM
 
+_BUFFERS = *
 
+;-------------------------------------------------------------------------------
 
+    SEG.U GS_RAINBOW
+    ORG _BUFFERS
+    DEFBUF RAINBOW_COLUBK
 
+    if * > _END_BUFFERS
+_END_BUFFERS SET *
+    endif
+
+;-------------------------------------------------------------------------------
+
+    SEG.U GS_COUCH_COMPLIANT
+    ORG _BUFFERS
+
+    DEFBUF COUCH_COMPLIANT_COLUP0
+    DEFBUF COUCH_COMPLIANT_GRP0A
+
+    if * > _END_BUFFERS
+_END_BUFFERS SET *
+    endif
+
+;-------------------------------------------------------------------------------
+
+    SEG.U GS_COPYRIGHT
+    ORG _BUFFERS
+
+    DEFBUF COPYRIGHT_GRP0A
+    DEFBUF COPYRIGHT_PF2_LEFT;
+    DEFBUF COPYRIGHT_PF2_RIGHT;
+    DEFBUF COPYRIGHT_COLUPF;
+    DEFBUF COPYRIGHT_COLUP0;
+
+    if * > _END_BUFFERS
+_END_BUFFERS SET *
+    endif
 
 ;------------------------------------------------------------------------------
 
-    SEG.U BUFFER2
-    ORG _BUFFERS
+    org _END_BUFFERS
+    ; more vars here if required (but strange - put them before buffers!)
 
-    DEFBUF MENU_COLUPF
-    DEFBUF MENU_COLUP0
-
-    ; Order of these 4 important...
-    DEFBUF MENU_PF1_LEFT
-    DEFBUF MENU_PF2_LEFT
-    DEFBUF MENU_PF1_RIGHT
-    DEFBUF MENU_PF2_RIGHT
-
-    DEFBUF MENU_GRP0A
-    DEFBUF MENU_GRP1A
-    DEFBUF MENU_GRP0B
-    DEFBUF MENU_GRP1B
-    DEFBUF MENU_GRP0C
-    DEFBUF MENU_GRP1C
-
+;------------------------------------------------------------------------------
 
 	IF (* <= DISPLAY_SIZE)
-	echo "------",(DISPLAY_SIZE - *)d , "bytes of Display Data RAM left"
+    	echo "----- DISPLAY RAM [", (DISPLAY_SIZE)d, "] -->",(*)d, "bytes used,",(DISPLAY_SIZE - *)d , "bytes free"
 	ELSE
-	echo "FATAL ERROR - Display Data exceeds",(DISPLAY_SIZE)d ,"bytes"
-	err
+	    echo "FATAL ERROR - Display Data exceeds",(DISPLAY_SIZE)d ,"bytes"
+	    err
 	ENDIF  
+
+
+
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

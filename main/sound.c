@@ -398,24 +398,24 @@ const unsigned char sampleSpace[] = {
 
 const struct AudioTable AudioSamples[] = {
 
-    {sampleNone, 0, 0}, // 0  PLACEHOLDER - NOT USED AS SOUND
+    {sampleNone, 0, 0},    // 0  PLACEHOLDER - NOT USED AS SOUND
 
     // MUST correspond to AudioID enum ordering/number
     // MUST be in priority order!
 
-    {sampleAbort, 127, 0},                       // 01 SFX_ABORT
-    {sampleWhoosh, 127, 0},                      // 02 SFX_WHOOSH
-    {sampleBlip, 125, 0},                        // 03 SFX_BLIP
-    {sampleRev, 117, 0},                         // 04 SFX_REV
-    {sampleSelectionBlip, 115, 0},               // 05 SFX_SELECTION
-    {sampleBeepHornTwice, 110, AUDIO_ATTENUATE}, // 06 SFX_BEEP2
-    {sampleFastBeep2, 100, AUDIO_ATTENUATE},     // 07 SFX_FASTBEEP2
-    {sampleExit, 99, 0},                         // 08 SFX_EXIT
-    {sampleSpinWheel, 96, 0},                    // 09 SFX_SPINWHEEL
-    {sampleMagic, 91, AUDIO_KILL},               // 10 SFX_MAGIC
-    {sampleFireworks, 90, 0},                    // 11 SFX_FIREWORKS
-    {sampleDirt, 9, 0},                          // 12 SFX_DIRT
-    {sampleSpace, 8, 0},                         // 13 SFX_SPACE
+    {sampleAbort, 127, 0},                          // 01 SFX_ABORT
+    {sampleWhoosh, 127, 0},                         // 02 SFX_WHOOSH
+    {sampleBlip, 125, 0},                           // 03 SFX_BLIP
+    {sampleRev, 117, 0},                            // 04 SFX_REV
+    {sampleSelectionBlip, 115, 0},                  // 05 SFX_SELECTION
+    {sampleBeepHornTwice, 110, AUDIO_ATTENUATE},    // 06 SFX_BEEP2
+    {sampleFastBeep2, 100, AUDIO_ATTENUATE},        // 07 SFX_FASTBEEP2
+    {sampleExit, 99, 0},                            // 08 SFX_EXIT
+    {sampleSpinWheel, 96, 0},                       // 09 SFX_SPINWHEEL
+    {sampleMagic, 91, AUDIO_KILL},                  // 10 SFX_MAGIC
+    {sampleFireworks, 90, 0},                       // 11 SFX_FIREWORKS
+    {sampleDirt, 9, 0},                             // 12 SFX_DIRT
+    {sampleSpace, 8, 0},                            // 13 SFX_SPACE
 
 };
 
@@ -574,13 +574,13 @@ void processSoundEffects() {
 
                 int idx = sfx[i].id;
 
-                if (!idx) { // empty slot
+                if (!idx) {    // empty slot
                     lowest = i;
                     break;
                 }
 
-                if ((!(AudioSamples[idx].flags & AUDIO_LOCKED) && // not locked, and...
-                     (lowest < 0 ||                               // either we haven't found a lowest yet
+                if ((!(AudioSamples[idx].flags & AUDIO_LOCKED) &&    // not locked, and...
+                     (lowest < 0 ||                                  // either we haven't found a lowest yet
                       AudioSamples[idx].priority < AudioSamples[sfx[lowest].id].priority)
                      // or the priority of this track is lower than the lowest
                      // found so far...
@@ -606,8 +606,8 @@ void processSoundEffects() {
             }
 
             else
-                break; // sounds full or higher priority, ignore any more lower
-                       // priority sounds
+                break;    // sounds full or higher priority, ignore any more lower
+                          // priority sounds
 
 #endif
         }
@@ -762,7 +762,7 @@ const unsigned char trackGridLockBase[] = {
 
 // Instrument envelopes have 16 bytes defining the volume multipliers for each "audio tick"
 
-static const unsigned char adsr_Trombone[] = {
+const unsigned char adsr_Trombone[] = {
 
     0, 100, 200, 250,
     200, 160, 160, 160,
@@ -771,12 +771,12 @@ static const unsigned char adsr_Trombone[] = {
 
 };
 
-static const unsigned char adsr_Rage[] = {
+const unsigned char adsr_Rage[] = {
 
     100, 200, 255, 255, 255, 255, 255, 255, 255, 255, 125, 75, 50, 25, 0, 0};
 
 
-static const unsigned char *const instrument[] = {
+const unsigned char *const instrument[] = {
     adsr_Trombone,
     adsr_Rage,
 };
@@ -804,7 +804,7 @@ void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int
     music[best].progress = TRIGGER_NEXT_NOTE;
     music[best].instrument = instrument;
     music[best].volume = volume;
-    music[best].noteDurationMultiplier = dur; // 0x80 = single note, 0x40 = half-note, etc
+    music[best].noteDurationMultiplier = dur;    // 0x80 = single note, 0x40 = half-note, etc
     music[best].baseSpeed = dur;
 }
 
@@ -906,7 +906,7 @@ void processMusic() {
 
     for (int i = 0; i < MUSIC_MAX; i++)
         if (music[i].tune)
-            music[i].progress += (8273 * music[i].noteDurationMultiplier) >> 8; // WTF BOO?!
+            music[i].progress += (8273 * music[i].noteDurationMultiplier) >> 8;    // WTF BOO?!
 }
 
 #endif
