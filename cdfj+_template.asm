@@ -32,14 +32,14 @@ FF_LDY			= $A0			;Fast Fetch for LDY: $A9 = off, $A0 = on
 
     MAC CHECK_OVERFLOW ; {1} bank number, {2} bank size
 
-.BANK_SIZE{1} = * - BANK{1}_START
-.BANK_END{1} = *
+BANK_SIZE{1} = * - BANK{1}_START
+BANK_END{1} = *
 
-        IF .BANK_SIZE{1} > {2}
+        IF BANK_SIZE{1} > {2}
             echo "Error: BANK", [{1}]d, "[", [{2}]d, "] --> overflow by", [* - BANK{1}_START - {2}]d, "bytes"
             err
         ELSE
-        	echo "---- BANK", [{1}]d, "[", [{2}]d, "] -->", [.BANK_SIZE{1}]d, "bytes used, ", [{2} - .BANK_SIZE{1}]d, "bytes free"
+        	echo "---- BANK", [{1}]d, "[", [{2}]d, "] -->", [BANK_SIZE{1}]d, "bytes used, ", [{2} - BANK_SIZE{1}]d, "bytes free"
         ENDIF
     ENDM
 
@@ -122,7 +122,7 @@ tvSystem		ds 1		;<FRAMEWORK>  see TV_TYPE_ definitions
 
 soundMode		ds 1		;<FRAMEWORK>
 soundSave		ds 1		;<FRAMEWORK>
-colubk          ds 1
+; colubk          ds 1
 call_fn			ds 1		;<FRAMEWORK>
 
 audv0			ds 1		;<FRAMEWORK>

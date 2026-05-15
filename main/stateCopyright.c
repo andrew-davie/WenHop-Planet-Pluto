@@ -52,7 +52,7 @@ void initialise_GS_Copyright() {
 
 void VB_GS_Copyright() {
 
-    if (!rangeRandom(120))
+    if (!colubk && !rangeRandom(50))
         FLASH(convertColour(rangeRandom(256) & 0xF0 | 10), 20);
 
 

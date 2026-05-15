@@ -1,6 +1,8 @@
 	org CURRENT_ORG
 	rorg $f000
 
+.BANK SET BANK1
+
 BANK1_START
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -25,23 +27,32 @@ BANK1_START
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Kernel 00 Routine @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-kernel_Rainbow
+;    SEG KERNEL_RAINBOW
+
+BANK_kernelRainbow = .BANK
+
+VB_kernelRainbow
+OS_kernelRainbow        rts
 
 
-
+kernelRainbow
 	                ldx #_SCANLINES
-kernel_00_loop      sta WSYNC
+.loop               sta WSYNC
 
-	                ; txa ;lda #DS0DATA
-	                ; sta COLUBK
+	                txa ;lda #DS0DATA
+	                sta COLUBK
 
 	                dex
-	                bne kernel_00_loop
+	                bne .loop
                 	rts
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Kernel 01 Routine @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+BANK_kernel_01 = .BANK
+
 kernel_01
 
 _kernel_01_loop				;kernel_01 demontrates the FastJump streams
@@ -54,9 +65,9 @@ _kernel_01_loop				;kernel_01 demontrates the FastJump streams
 	lda #DS0DATA
 	sta COLUBK
 
-	lda .amp_table1,y
+	lda amp_table1,y
 	sta GRP0
-	lda .amp_table2,y
+	lda amp_table2,y
 	sta GRP1
 
 	jmp FASTJMP1
@@ -111,8 +122,10 @@ DivideLoopC         sbc #15
 ;-------------------------------------------------------------------------------
 #endif
 
+OS_kernelCopyright  rts
 
-kernelCopyrightVB
+
+VB_kernelCopyright
 
 #if 0
 
@@ -202,6 +215,8 @@ safeTimerWait3C     lda INTIM
 
 #endif
 
+BANK_kernelCopyright = .BANK
+
 kernelChampGames
 kernelCopyright
 
@@ -251,7 +266,7 @@ centered6Sprites    sta WSYNC                       ; @0
 ;-------------------------------------------------------------------------------
 
 
-.amp_table2
+amp_table2
 	.byte #%00000000
 	.byte #%00000000
 	.byte #%00000000
@@ -260,7 +275,7 @@ centered6Sprites    sta WSYNC                       ; @0
 	.byte #%00000000
 	.byte #%00000000
 	.byte #%00000000
-.amp_table1
+amp_table1
 	.byte #%00000000
 	.byte #%10000000
 	.byte #%11000000

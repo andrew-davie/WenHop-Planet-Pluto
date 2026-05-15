@@ -28,18 +28,18 @@ int tvSystem;
 void LoadSaveKey();
 
 
-enum KERNEL {
+// enum KERNEL {
 
-    KERNEL_0,
-    KERNEL_1,
-    KERNEL_2,
-    KERNEL_3,
-};
+//     KERNEL_0,
+//     KERNEL_1,
+//     KERNEL_2,
+//     KERNEL_3,
+// };
 
 
 enum GAME_STATE gameState, nextGameState;
-enum KERNEL kernel;
 
+unsigned char kernel;    // use _KERNEL_* values from 6502
 unsigned char colubk;
 
 
@@ -83,9 +83,9 @@ const unsigned char sample1[] __attribute__((aligned(4))) = {
 #define SAMPLE1_SIZE sizeof(sample1)
 
 /******************************* Functions *******************************/
-void runARM_Initialise();
-void runARM_VerticalBlank();
-void runARM_Overscan();
+void run_ARM_Initialise();
+void run_ARM_VerticalBlank();
+void run_ARM_Overscan();
 
 void HandleControls();
 void SilenceWaves();
@@ -191,10 +191,10 @@ void Null() {
 }
 
 void (*const runFunc[])() = {
-    Null,                    // _RUN_ARM_NULL
-    runARM_Initialise,       // _RUN_ARM_INIT
-    runARM_VerticalBlank,    // _RUN_ARM_VB_VBLANK
-    runARM_Overscan,         // _RUN_ARM_OS_VBLANK
+    Null,                     // _RUN_ARM_NULL
+    run_ARM_Initialise,       // _RUN_ARM_INIT
+    run_ARM_VerticalBlank,    // _RUN_ARM_VB_VBLANK
+    run_ARM_Overscan,         // _RUN_ARM_OS_VBLANK
 };
 
 int main() {    // <-- 6507/ARM interfaced here!
@@ -208,7 +208,7 @@ void setNextGameState(enum GAME_STATE state) {
     nextGameState = state;
 }
 
-void runARM_Initialise() {
+void run_ARM_Initialise() {
 
     saveKeyDetected = RAM[_SWCHA];
 
@@ -233,7 +233,7 @@ void runARM_Initialise() {
     RAM_2B[(_jump_table_1 / 2) + _SCANLINES - 1] = _kernel_01_done;
 
 
-    RAM[_kernel] = kernel = KERNEL_0;
+    RAM[_kernel] = kernel = _KERNEL_RAINBOW;
     RAM[_tvSystem] = tvSystem = _TV_SYSTEM_NTSC;
     RAM[_soundMode] = soundMode = _SND_MODE_TIA;
     RAM[_colubk] = colubk = 0x42;
@@ -267,7 +267,7 @@ void (*const verticalBlank[GS_MAX])() = {
 
 };
 
-void runARM_VerticalBlank() {
+void run_ARM_VerticalBlank() {
 
     if (gameState == nextGameState)
         (*verticalBlank[gameState])();
@@ -297,7 +297,7 @@ void (*const initialise[GS_MAX])() = {
 };
 
 
-void runARM_Overscan() {
+void run_ARM_Overscan() {
 
     //	HandleControls();
 

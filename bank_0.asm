@@ -1,6 +1,8 @@
 	org CURRENT_ORG
 	rorg $f000
 
+.BANK SET  BANK0
+
 BANK0_START
 
 
@@ -17,19 +19,6 @@ jumpCode       	    cmp BANK1           ; hotspot bank-switch
                     cmp BANK0           ; hotspot bank-switch
 jumpCodeEnd         rts
 
-
-
-fetchVarsFromARM
-                    lda #DS31DATA
-                    sta kernel
-                    lda #DS31DATA
-                    sta tvSystem
-                    lda #DS31DATA
-                    sta soundMode
-                    lda #DS31DATA
-                    sta colubk
-
-                    rts
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Cart Reset @@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -81,9 +70,13 @@ initJumpCode        lda jumpCode,x
     ; At this point, the ARM function handler runs the Initialise function
     ; Retrive critical configuration variables from ARM
 
-                    jsr fetchVarsFromARM
+                    lda #DS31DATA
+                    sta kernel
+                    lda #DS31DATA
+                    sta tvSystem                    ; <--- NTSC here
 
-                    lda soundMode
+                    lda #DS31DATA
+                    sta soundMode
                     sta soundSave
 
                     tax
@@ -92,83 +85,9 @@ initJumpCode        lda jumpCode,x
                     lda .call_fn_table,x
                     sta call_fn			                ; apply proper function caller
 
-
-	; lda #80				;only for demonstration of positioning method purposes
-	; sta test_position		;
-
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Game Loop @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 mainGameLoop
-
-    ; [???] what is this SETMODE stuff for sound?!!
-
-;                 lda soundMode			        ; compare this frame's sound mode
-;                 cmp soundSave			        ; to last frame's
-;                 beq skipChangeModes
-;                 sta soundSave			        ; apply new mode if change
-;                 tax				                ; is detected
-;                 lda .sound_mode_table,x
-;                 sta SETMODE
-;                 lda .call_fn_table,x
-;                 sta call_fn
-; skipChangeModes tax				                ; branch to proper frame handler
-;                 bne mainGameLoopSampled	        ; standard TIA or sampled sound
-
-
-;-----------------------------------------------------------
-
-;mainGameLoopStandard
-
-	                lda #%1110
-.vertSync           sta WSYNC
-                    sta VSYNC                   ; indicate vblank
-                    lsr 
-	                bne .vertSync 
-	
-                    ldx tvSystem
-                    lda TimerVB,x
-                    sta TIM64T
-
-
-;verticalblank
-
-                ldx #>_RUN_FUNC
-                stx DSPTR
-                ldx #<_RUN_FUNC
-                stx DSPTR
-                ldx #_RUN_ARM_VBLANK
-                stx DSWRITE
-
-                ldx call_fn
-	            stx CALLFN                  ; call VerticalBlank in ARM
-
-    ; Vector to appropriate 6502 Vertical Blank code
-    ; Currently this is just position sprites, and sound stuff
-    ; in other words, basic inits
-
-
-                lda kernel
-                clc
-                adc #8
-                tax
-                jsr runKernel               ; actually run 6502 kernel-specific VB
-
-;                	jsr verticalBlank           ; <---ARM and 6502 vertical blank calls
-
-; end vb
-
-
-                    lda colubk                  ; retrieved/updated in OS
-                    sta COLUBK
-
-.waitVB             sta WSYNC
-                    lda INTIM
-                    bne .waitVB
-
-                    sta VBLANK                  ; scenen on
-
-                    ldx kernel
-                    jsr runKernel               ; run 6502 kernel
 
                 	lda #2
                     sta WSYNC
@@ -178,111 +97,123 @@ mainGameLoop
                     lda TimerOS,x
                     sta TIM64T
 
-	                jsr ARM_Overscan            ; call ARM OS, transer vars
+    ; call ARM Overscan
 
-                    lda audc0
-                    sta AUDC0
-                    lda audf0
-                    sta AUDF0
-                    lda audv0
+                	ldx #>_RUN_FUNC
+                	stx DSPTR
+                	ldx #<_RUN_FUNC
+                	stx DSPTR
+
+                	ldx #_RUN_ARM_OVERSCAN
+                	stx DSWRITE
+
+    ; send controllers to ARM
+
+                	ldx SWCHA
+                	stx DSWRITE
+                	ldx SWCHB
+                	stx DSWRITE
+                	ldx INPT4
+                	stx DSWRITE
+                	ldx INPT5
+                	stx DSWRITE			    ; all Atari inputs to ARM
+
+                	ldx call_fn
+                	stx CALLFN              ; --> runARM_Overscan()
+
+    ; retrieve ARM 'system' variables
+
+                    lda #DS31DATA
+                    sta kernel
+                    lda #DS31DATA
+                    sta tvSystem
+                    lda #DS31DATA
+                    sta soundMode
+                    lda #DS31DATA
+                    sta COLUBK
+
+                    lda #DS31DATA
                     sta AUDV0
-                    lda audc1
-                    sta AUDC1
-                    lda audf1
-                    sta AUDF1
-                    lda audv1
+                    lda #DS31DATA
                     sta AUDV1
+                    lda #DS31DATA
+                    sta AUDC0
+                    lda #DS31DATA
+                    sta AUDC1
+                    lda #DS31DATA
+                    sta AUDF0
+                    lda #DS31DATA
+                    sta AUDF1
 
-.waitOS             sta WSYNC
-                    lda INTIM	
+    ; run kernel-specific 6502 Overscan code (OS_FN_OFFSET) 
+
+                    lda kernel
+                    clc
+                    adc #OS_FN_OFFSET
+                    tax
+                    jsr runVectoredCode               ; actually run 6502 kernel-specific VB
+
+.waitOS             lda INTIM	
                     bne .waitOS
 
-	                jmp mainGameLoop
+    ; vertical blank
+    ; any kernel switching will have just happened
+
+                    ldx #%1110
+                    txa
+.verticalSync       sta WSYNC
+                    sta VSYNC                   ; indicate vblank
+                    lsr 
+                    bne .verticalSync 
+
+
+                    ldx tvSystem
+                    lda TimerVB,x
+                    sta TIM64T
+
+    ; call ARM Vertical Blank
+
+                    ldx #>_RUN_FUNC
+                    stx DSPTR
+                    ldx #<_RUN_FUNC
+                    stx DSPTR
+                    ldx #_RUN_ARM_VBLANK
+                    stx DSWRITE
+
+                    ldx call_fn
+                    stx CALLFN                  ; call VerticalBlank in ARM
+
+    ; run kernel-specific 6502 Vertical Blank code (VB_FN_OFFSET)
+
+                    lda kernel
+                    clc
+                    adc #VB_FN_OFFSET
+                    tax
+                    jsr runVectoredCode               ; actually run 6502 kernel-specific VB
+
+.waitVB             lda INTIM
+                    bne .waitVB
+
+                    sta WSYNC
+                    sta VBLANK                  ; screen on
+
+                    ldx kernel
+                    jsr runVectoredCode               ; run 6502 kernel
+
+                    jmp mainGameLoop
 
 ;-------------------------------------------------------------------------------
 
-TimerOS             .byte 35           ; NTSC
-                    .byte 45           ; PAL
-                    .byte 35           ; SECAM
-                    .byte (35+29)      ; PAL60
+TimerOS             .byte 36           ; NTSC
+                    .byte 46           ; PAL
+                    .byte 36           ; SECAM
+                    .byte (36+29)      ; PAL60
 
 TimerVB
                     .byte 43           ; NTSC
                     .byte 50           ; PAL
                     .byte 43           ; SECAM
                     .byte (43+30)      ; PAL60
-
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Game Loop - Sampled Sounds @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-; mainGameLoopSampled
-
-; ;@@@@@@@@@@@@@@@@@@@@
-; 	ldx #2
-; 	ldy #3
-; .vertsync_samp
-; 	stx WSYNC
-; 	stx VSYNC
-; 	lda #AMPLITUDE
-; 	sta AUDV0
-; 	dey
-; 	bne .vertsync_samp
-; 	sty WSYNC
-; 	sty VSYNC
-; 	lda #AMPLITUDE
-; 	sta AUDV0
-	
-;     ldx tvSystem
-;     lda TimerVB,x
-; 	sta TIM64T
-; ;@@@@@@@@@@@@@@@@@@@@
-
-; 	jsr verticalBlank
-
-; ;@@@@@@@@@@@@@@@@@@@@
-; .wait_vblank_end_samp
-; 	sta WSYNC
-; 	lda #AMPLITUDE
-; 	sta AUDV0
-; 	lda INTIM
-; 	bne .wait_vblank_end_samp
-; 	sta VBLANK
-; ;@@@@@@@@@@@@@@@@@@@@
-
-; 	ldx kernel
-; 	jsr runKernel
-
-; ;@@@@@@@@@@@@@@@@@@@@
-; 	ldx #2
-; 	stx WSYNC
-; 	stx VBLANK
-; 	lda #AMPLITUDE
-; 	sta AUDV0
-
-;     ldx tvSystem
-;     lda TimerOS,x
-; 	sta TIM64T
-; ;@@@@@@@@@@@@@@@@@@@@
-
-; 	jsr ARM_Overscan
-
-; 	lda audc1
-; 	sta AUDC1
-; 	lda audf1
-; 	sta AUDF1
-; 	lda audv1
-; 	sta AUDV1
-
-; ;@@@@@@@@@@@@@@@@@@@@
-; .wait_overscan_samp
-; 	sta WSYNC
-; 	lda #AMPLITUDE
-; 	sta AUDV0
-; 	lda INTIM	
-; 	bne .wait_overscan_samp
-; ;@@@@@@@@@@@@@@@@@@@@
-
-; 	jmp mainGameLoop
 
 
 
@@ -301,194 +232,72 @@ TimerVB
 	.byte $fe
 
 
-
-;@@@@@@@@@@@@@@@@@@@@@@@@ Handle Vertical Blank ARM+6502 @@@@@@@@@@@@@@@@@@@@@@@@
-
-verticalBlank
-
-                ldx #>_RUN_FUNC
-                stx DSPTR
-                ldx #<_RUN_FUNC
-                stx DSPTR
-                ldx #_RUN_ARM_VBLANK
-                stx DSWRITE
-
-                ldx call_fn
-	            stx CALLFN                  ; call VerticalBlank in ARM
-
-    ; Vector to appropriate 6502 Vertical Blank code
-    ; Currently this is just position sprites, and sound stuff
-    ; in other words, basic inits
-
-
-                lda kernel
-                clc
-                adc #8
-                tax
-                jsr runKernel               ; actually run VB
-
-
-	            ; ldx kernel
-                ; lda kernelVBlank_h,x
-                ; pha
-                ; lda kernelVBlank_l,x
-                ; pha
-                rts
-
-
-; kernelVBlank_h  ;.byte >(ChampKernel-1)
-;                 .byte >(k_prep_00-1)
-;                 .byte >(k_prep_01-1)
-;                 .byte >(kernelCopyright - 1)
-
-
-; kernelVBlank_l	;.byte <(ChampKernel-1)
-;                 .byte <(k_prep_00-1)
-; 	            .byte <(k_prep_01-1)
-;                 .byte >(kernelCopyright - 1)
-
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@@@@@@@@@@@@@@@@@@@@@@@@ Handle ARM Overscan Call @@@@@@@@@@@@@@@@@@@@@@@@
-
-ARM_Overscan
-
-	ldx #0
-	stx COLUBK			;clear color registers
-    stx COLUP0
-	stx COLUP1
-	stx COLUPF
-
-	ldx #>_RUN_FUNC
-	stx DSPTR
-	ldx #<_RUN_FUNC
-	stx DSPTR
-    
-	ldx #_RUN_ARM_OVERSCAN		;let ARM know we are lower VBlank
-	stx DSWRITE
-
-	ldx SWCHA
-	stx DSWRITE
-	ldx SWCHB
-	stx DSWRITE
-	ldx INPT4
-	stx DSWRITE
-	ldx INPT5
-	stx DSWRITE			;all Atari inputs to ARM
-
-	ldx call_fn
-	stx CALLFN
-
-    jsr fetchVarsFromARM
-	; lda #DS31DATA
-	; sta kernel			;kernel and sound_mode get refreshed
-	; lda #DS31DATA
-	; sta tvSystem
-	; lda #DS31DATA			;from the ARM each frame
-	; sta soundMode
-    ; lda #DS31DATA
-    ; sta colubk
-
-	lda #DS31DATA
-	sta audv0
-	lda #DS31DATA
-	sta audv1
-	lda #DS31DATA
-	sta audc0
-	lda #DS31DATA
-	sta audc1
-	lda #DS31DATA
-	sta audf0
-	lda #DS31DATA
-	sta audf1
-
-	rts
-    
-;@@@@@@@@@@@@@@@@@@@@@@@@ Handle Lower VBlank ARM Call @@@@@@@@@@@@@@@@@@@@@@@@
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
-
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Cross Bank Routine Handler @@@@@@@@@@@@@@@@@@@@@@@@@
 
-    ; Note: each kernel needs to define...
-    ; 1) kernelBank_L table
-    ; 2) kernelRoutine_L table
-    ; 3) kernelRoutine_H table
-    ; 4) kernelVBlank_H table
-    ; 5) kernelVBlank_L table
+VB_FN_OFFSET = ((.END-.START)/3)
+OS_FN_OFFSET = (VB_FN_OFFSET * 2)
+
+; When adding entries, add a 'kernel;, a 'VB', and a 'OS' entry
+; the offset (above) auto-calculates
 
 
-kernelBank_L        .byte <BANK1           ; be VERY careful you get the correct bank for kernel!
-	                .byte <BANK1
-                    .byte <BANK1
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
+; equates for ARM usage
 
-    ; vblanks follow
-
-                    .byte <BANK0
-                    .byte <BANK0
-                    .byte <BANK1
-                    .byte <BANK1
-                    .byte <BANK1
-                    .byte <BANK1
-                    .byte <BANK1
-                    .byte <BANK1
+_KERNEL_RAINBOW     = 0
+_KERNEL_01          = 1
+_KERNEL_COPYRIGHT   = 2
 
 
+kernelBank_L
+.START
+                    ; >>> kernel
+                    .byte <BANK_kernelRainbow
+                    .byte <BANK_kernel_01
+                    .byte <BANK_kernelCopyright
 
-kernelRoutine_L     .byte <kernel_Rainbow
-	                .byte <kernel_01
+                    ; >>> VB
+                    .byte <BANK_kernelRainbow
+                    .byte <BANK_kernel_01
+                    .byte <BANK_kernelCopyright
+
+                    ; >>> OS
+                    .byte <BANK_kernelRainbow
+                    .byte <BANK_kernel_01
+                    .byte <BANK_kernelCopyright
+.END
+
+kernelRoutine_L
+                    .byte <kernelRainbow
+                    .byte <kernel_01
                     .byte <kernelCopyright
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
 
-    ; vblanks follow
+                    .byte <VB_kernelRainbow
+                    .byte <VB_kernel_01
+                    .byte <VB_kernelCopyright
 
-                    .byte <k_prep_00
-                    .byte <k_prep_01
-                    .byte <kernelCopyright
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
-    
+                    .byte <OS_kernelRainbow
+                    .byte <OS_kernel_01
+                    .byte <OS_kernelCopyright
 
-kernelRoutine_H 	.byte >kernel_Rainbow
-	                .byte >kernel_01
+kernelRoutine_H
+                    .byte >kernelRainbow
+                    .byte >kernel_01
                     .byte >kernelCopyright
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
 
-    ; vblanks follow
+                    .byte >VB_kernelRainbow
+                    .byte >VB_kernel_01
+                    .byte >VB_kernelCopyright
 
-                    .byte >k_prep_00
-                    .byte >k_prep_01
-                    .byte >kernelCopyrightVB
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
-                    .byte 0
-
+                    .byte >OS_kernelRainbow
+                    .byte >OS_kernel_01
+                    .byte >OS_kernelCopyright
 
 ;-------------------------------------------------------------------------------
 
-runKernel
+runVectoredCode
 
-    ; we sneakily self-modify the in-RAM routine to vector to correct kernel
+    ; we sneakily self-modify the in-RAM routine to vector to correct kernel/VB
     ; the 'rts' from jumpCodeRAM will actually return to THIS routine's caller
 
                 	lda kernelBank_L,x
@@ -864,50 +673,54 @@ writeSKandExit      sta SAVEKEY_IDENT,x
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Kernel 00 Prep @@@@@@@@@@@@@@@@@@@@@@@@@
 ; Let's make this the gamekernel
 
+; OS_kernel_00        rts
 
-k_prep_00
-k_prep_xx	;[example] kernels can share prep code when setup is identical but display handling differs
+; VB_kernel_00
 
 
-                    jsr scanAndUpdateSaveKey
+;                     jsr scanAndUpdateSaveKey
 
-	;each kernel also dispatches a "prep" routine to allow for object pre-positioning
+; 	;each kernel also dispatches a "prep" routine to allow for object pre-positioning
 
-                    sta WSYNC			        ;       direct table position method
-                    nop				            ; 2		load index with desired position 0-159
+;                     sta WSYNC			        ;       direct table position method
+;                     nop				            ; 2		load index with desired position 0-159
 
-                    ldx #72				        ;2,4	can be immediate value or from a datastream
-                    lda .calc_rpfp_table,x		;4,8	load data from .calc_rpfp_table
-                    sta HMP0			        ;3,11	apply to HMxx register
-                    and #$0f			        ;2,13	mask low nybble
-                    tax				            ;2,15	to index register
-.positionP0         dex				            ;2,17	dex register for loop
-                    bpl .positionP0		        ;2,19	on negative fall through
-                    sta RESP0			        ;3,22  	on smallest loop - RESxx register must fall on cycle 22
+;                     ldx #72				        ;2,4	can be immediate value or from a datastream
+;                     lda .calc_rpfp_table,x		;4,8	load data from .calc_rpfp_table
+;                     sta HMP0			        ;3,11	apply to HMxx register
+;                     and #$0f			        ;2,13	mask low nybble
+;                     tax				            ;2,15	to index register
+; .positionP0         dex				            ;2,17	dex register for loop
+;                     bpl .positionP0		        ;2,19	on negative fall through
+;                     sta RESP0			        ;3,22  	on smallest loop - RESxx register must fall on cycle 22
 
-                    sta WSYNC
+;                     sta WSYNC
 
-                    ldx test_position		    ;3		when in need to use a variable
-                    lda .calc_rpfp_table,x		;4,7
-                    sta HMP1			        ;3,10
-                    and #$0f			        ;2,12
-                    tax				            ;2,14
-.positionP1         dex				            ;2,16
-                    bpl .positionP1		        ;2,18
-                    sta.w RESP1			        ;4,22	use sta.w to use that extra cycle
+;                     ldx test_position		    ;3		when in need to use a variable
+;                     lda .calc_rpfp_table,x		;4,7
+;                     sta HMP1			        ;3,10
+;                     and #$0f			        ;2,12
+;                     tax				            ;2,14
+; .positionP1         dex				            ;2,16
+;                     bpl .positionP1		        ;2,18
+;                     sta.w RESP1			        ;4,22	use sta.w to use that extra cycle
 
-                    sta WSYNC
-                    sta HMOVE
+;                     sta WSYNC
+;                     sta HMOVE
 
-                    sta WSYNC
-                    sta HMCLR
+;                     sta WSYNC
+;                     sta HMCLR
 
-                    rts
+;                     rts
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@@@@@@@@@@@@@@@@@@@@@@@@@ Kernel 01 Prep @@@@@@@@@@@@@@@@@@@@@@@@@
-k_prep_01
+
+OS_kernel_01        rts
+
+
+VB_kernel_01
 
 	ldx test_position		;3		position in index and
 	lda .calc_rpfp_table,x		;4		table read must come before the WSYNC
