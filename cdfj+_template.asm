@@ -363,9 +363,6 @@ _END_BUFFERS SET *
 	ENDIF  
 
 
-
-
-
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;@ Cartridge Layout
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -374,12 +371,6 @@ _END_BUFFERS SET *
 ;@ $0800 - $17ff Bank 0, 6507 code, cartridge always boots with this bank active
 ;@ $1800 - $XXFF Bank 1-n, 6507 banks in blocks of 4K
 ;@               immediately followed by ARM C-code and data
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-
-        
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ CDF driver - The Harmony/Melody driver is located at Start of Cartridge ROM    
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 CURRENT_ORG SET 0
@@ -409,33 +400,10 @@ CDFJPLUS_DRIVER_SIZE = [* - CDFJPLUS_DRIVER]d
 CURRENT_ORG SET CURRENT_ORG + $800
 
 
+;-------------------------------------------------------------------------------
+; 4K banks for 6502 code
 
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Now we have 4K banks for 6502 code
-;@ Bank 0 is the startup bank
-;@ It requires a 'footer' for CDFJ+
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-	include "bank_0.asm"
-
-    ; --------------------------------------------------------------------------
-    ; Bank 0 Footer - needed for CDFJ+ to function
-
-BANK0_HEADER = $17F0
-
-	org BANK0_HEADER
-	rorg $FFF0
-
-	DC.B 0, 0, 0, 0		;CDFJ Hotspots
-	DC.L C_STACK		;$F4	C Stack
-	DC.L C_CODE+1		;$F8	C Code (+1 for THUMB Mode)
-	DC.W CartReset		;$FC	Reset
-	DC.W CartReset		;$FE	BRK
-
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ Other banks...
-    
+	include "bank_0.asm"        ; <-- startup bank + footer for CDFJ+
 	include "bank_1.asm"
 	include "bank_2.asm"
  	include "bank_3.asm"
@@ -443,22 +411,19 @@ BANK0_HEADER = $17F0
 ; 	include "bank_5.asm"
 ; 	include "bank_6.asm"
 
-;    include "champKernel.asm"
+;-------------------------------------------------------------------------------
 
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@ C-Code
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-    org CURRENT_ORG
+    org  CURRENT_ORG
     rorg CURRENT_ORG
 
-    ; Note: c_start tool parses the "bootstrap_defines"-generated symbol table/file
-    ; for the label C_CODE, which will hold the address to write to the LDS file
+C_CODE  ; <-- address placed in LDS by c_start tool
 
-C_CODE
-	INCBIN "main/bin/cdfj+.bin"
+    incbin "main/bin/cdfj+.bin"
+
+;-------------------------------------------------------------------------------
 
     ; Make ROM the correct size 
+
 ROM_BYTES = ROM_SIZE * 1024 
 	echo "---- C CODE [", [ROM_BYTES]d, "] --> ", (* - C_CODE)d, "bytes used,", [ROM_BYTES - *]d , "bytes free"
     if * < ROM_BYTES

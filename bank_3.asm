@@ -1,8 +1,7 @@
-	org CURRENT_ORG
+	org  CURRENT_ORG
 	rorg $f000
 
 .BANK SET  BANK3
-
 BANK3_START
 
 
