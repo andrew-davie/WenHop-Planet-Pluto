@@ -1,10 +1,13 @@
 	org CURRENT_ORG
 	rorg $f000
 
+.BANK SET  BANK2
+
 BANK2_START
 
 
 
+    include "kernelRainbow.asm"
 
 
 

@@ -432,7 +432,7 @@ BANK0_HEADER = $17F0
     
 	include "bank_1.asm"
 	include "bank_2.asm"
-; 	include "bank_3.asm"
+ 	include "bank_3.asm"
 ; 	include "bank_4.asm"
 ; 	include "bank_5.asm"
 ; 	include "bank_6.asm"

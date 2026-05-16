@@ -8,4 +8,9 @@
         "ASM_routines.s": "asm",
         "main/custom/custom.S": "asm",
     }
+
+    "[asm]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4
+    }
 }
