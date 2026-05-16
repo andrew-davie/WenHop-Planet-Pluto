@@ -11,11 +11,11 @@ SAVEKEY_ADR = $18c0             ; slot 99?
     i2c_subs                    ; this makes the i2c macros of the include file known to the code 
 
 ;-------------------------------------------------------------------------------
-WriteSaveKey SUBROUTINE         ; total cycles = 1923 (for 3 bytes)
+WriteSaveKey          ; total cycles = 1923 (for 3 bytes)
 ;-------------------------------------------------------------------------------
 ; setup SaveKey:
     jsr     SetupSaveKey        ; 6+927
-    bcc     .noSKfound          ; 2/3
+    bcc     noSKfound2         ; 2/3
  
 ; write high score:
     ldx     #0         ; 2 = 937   
@@ -28,11 +28,11 @@ WriteSaveKey SUBROUTINE         ; total cycles = 1923 (for 3 bytes)
 
 ; stop write:
     jsr     i2c_stopwrite       ; 6+42=48   terminate write and commit to memory
-.noSKfound
+noSKfound2
     rts                         ; 6
 
 ;-------------------------------------------------------------------------------
-ReadSaveKey SUBROUTINE          ; total cycles = 2440 (for 3 bytes)
+ReadSaveKey           ; total cycles = 2440 (for 3 bytes)
 ;-------------------------------------------------------------------------------
 ; setup SaveKey:
 
@@ -62,8 +62,8 @@ _WENHOP_SK_ID = 0xA7
                     sta SAVEKEY_TOTAL_SOLVES
                     sta SAVEKEY_ENABLE_ICC
 
-.verify             jsr SetupSaveKey
-                    bcc .noSKfound
+verify             jsr SetupSaveKey
+                    bcc noSKfound
 
                     jsr i2c_stopwrite
                     jsr i2c_startread
@@ -106,7 +106,7 @@ _WENHOP_SK_ID = 0xA7
                     cpx #SK_BYTES
                     bcc .loopReadSK
  
-.noSKfound          jsr i2c_stopread
+noSKfound          jsr i2c_stopread
  
     ; SK present IFF SAVEKEY_IDENT == _WENHOP_SK_ID
     ; 0 if not present
@@ -114,7 +114,7 @@ _WENHOP_SK_ID = 0xA7
                     rts
 
 ;------------------------------------------------------------------------------
-SetupSaveKey SUBROUTINE         ; = 927
+SetupSaveKey          ; = 927
 ;------------------------------------------------------------------------------
 
                     ; lda #0

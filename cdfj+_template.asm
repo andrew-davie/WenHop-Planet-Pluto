@@ -11,7 +11,7 @@
 	PROCESSOR 6502
 
 DISPLAY_SIZE		= 6400			;For current framework: 4352 for 32K ROM; 6400 for 64K and 128K; 9472 for 256K and 512K
-ROM_SIZE		    = 64			;in kB - 32, 64, 128, 256 or 512
+ROM_SIZE		    = 128			;in kB - 32, 64, 128, 256 or 512
 
 ;**********************************************************************
 ; These must be BEFORE include of cdfjplus.h
@@ -30,7 +30,11 @@ FF_LDY			= $A0			;Fast Fetch for LDY: $A9 = off, $A0 = on
 	INCLUDE "vcs.h"
 	INCLUDE "macro.h"
 
+;-------------------------------------------------------------------------------
+
     MAC CHECK_OVERFLOW ; {1} bank number, {2} bank size
+
+    ; requires BANK*_START label to be defined at start of each bank
 
 BANK_SIZE{1} = * - BANK{1}_START
 BANK_END{1} = *
@@ -42,6 +46,8 @@ BANK_END{1} = *
         	echo "---- BANK", [{1}]d, "[", [{2}]d, "] -->", [BANK_SIZE{1}]d, "bytes used, ", [{2} - BANK_SIZE{1}]d, "bytes free"
         ENDIF
     ENDM
+
+;-------------------------------------------------------------------------------
 
 
 						; <WARNING> fast fetch macros may not work properly

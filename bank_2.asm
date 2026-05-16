@@ -7,7 +7,6 @@ BANK2_START
 
 
 
-    include "kernelRainbow.asm"
 
 
 
