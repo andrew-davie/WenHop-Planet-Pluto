@@ -1,12 +1,12 @@
 
 ;███████████████████████████████████████████████████████████████████████████████
+; Note: must run with fast mode OFF
 
+_WENHOP_SK_ID       = 0x01
 
-skBuffer    = SK_ID            ; define the RAM address you want to store
-SK_BYTES    = (SK_END - SK_START)
-
-SK_SLOT = 99                   ; TODO: reserve slot!
-SK_ADDRESS = (SK_SLOT * 64)
+SK_SLOT             = 99                   ; TODO: reserve slot with Champ Games
+SK_ADDRESS          = (SK_SLOT * 64)
+SK_BYTES            = (SK_END - SK_START)
  
     include "i2c_v2.3.inc"      ; a highly optimized (for space) version   
     i2c_subs                    ; this makes the i2c macros of the include file known to the code 
@@ -20,7 +20,7 @@ WriteSaveKey
     ; write entire SaveKey buffer
 
                     ldx #0
-.loopWriteSK        lda skBuffer,x
+.loopWriteSK        lda SK_START,x
                     jsr i2c_txbyte
                     inx
                     cpx #SK_BYTES
@@ -34,12 +34,9 @@ noSKfound2          rts
 
 ReadSaveKey
 
-    ; pre-cleer flags buffers
     ; will exit with SK_ID = _SK_WENHOP_ID if valid
 
-_WENHOP_SK_ID = 0xAB
-
-                    ldx #SK_BYTES               ; (+1) to include _SK_RESET
+                    ldx #SK_BYTES               ; +1, includes _SK_RESET
                     lda #0
 .clearFlagsKey      sta SK_ID,x
                     dex
@@ -102,6 +99,7 @@ noSKfound           jsr i2c_stopread
                     rts
 
 ;------------------------------------------------------------------------------
+
 SetupSaveKey
 
                     jsr i2c_startwrite      ; detect SaveKey
