@@ -60,9 +60,9 @@ initJumpCode        lda jumpCode,x
     ; Send the SAVEKEY block to ARM-accessible shadow variables
     ; A diff is (later) used to determine any changes that need to be written
 
-                    ldx #>_DS_SK
+                    ldx #>_SK_START
                     stx DSPTR
-                    ldx #<_DS_SK
+                    ldx #<_SK_START
                     stx DSPTR
 
                     ldx #0

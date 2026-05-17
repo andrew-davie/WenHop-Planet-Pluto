@@ -2,6 +2,9 @@
 
 #include "state.h"
 
+#define _WENHOP_SK_ID _SK_GAME_ID
+
+
 extern unsigned int frame;
 extern int tvSystem;
 extern unsigned int rand;

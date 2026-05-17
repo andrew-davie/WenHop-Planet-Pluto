@@ -10,7 +10,7 @@
     ;---------------------------------------------
     ; SaveKey
     
-_DS_SK
+_SK_START
 
 _SK_ID              ds 1
 _SK_ENABLE_ICC      ds 1
