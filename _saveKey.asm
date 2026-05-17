@@ -1,15 +1,9 @@
-
-;███████████████████████████████████████████████████████████████████████████████
-; Note: must run with fast mode OFF
-
 _WENHOP_SK_ID       = 0x01
-
 SK_SLOT             = 99                   ; TODO: reserve slot with Champ Games
 SK_ADDRESS          = (SK_SLOT * 64)
-SK_BYTES            = (SK_END - SK_START)
- 
-    include "i2c_v2.3.inc"      ; a highly optimized (for space) version   
-    i2c_subs                    ; this makes the i2c macros of the include file known to the code 
+
+    include "i2c_v2.3.inc"
+    i2c_subs
 
 ;-------------------------------------------------------------------------------
 

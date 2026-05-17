@@ -55,7 +55,8 @@ SK_START
 SK_ID             ds 1
 SK_ENABLE_ICC     ds 1
 SK_ODOMETER       ds 2
-SK_END
+
+SK_BYTES          = (* - SK_START)
 
     ; following must be contiguous to above...
 
