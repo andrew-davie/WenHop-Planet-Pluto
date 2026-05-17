@@ -57,6 +57,10 @@ mainGameLoop
                     lda #DS31DATA
                     sta AUDF1
 
+
+                    jsr scanAndUpdateSaveKey            ; update ONE *CHANGED* SaveKey byte
+
+
     ; run kernel-specific 6502 Overscan code (OS_FN_OFFSET) 
 
                     lda kernel

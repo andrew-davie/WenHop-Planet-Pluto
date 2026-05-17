@@ -25,16 +25,7 @@ int usedSolves;
 int whichLot;
 int tvSystem;
 
-void LoadSaveKey();
-
-
-// enum KERNEL {
-
-//     KERNEL_0,
-//     KERNEL_1,
-//     KERNEL_2,
-//     KERNEL_3,
-// };
+void LoadShadowedSaveKey();
 
 
 enum GAME_STATE gameState, nextGameState;
@@ -42,47 +33,9 @@ enum GAME_STATE gameState, nextGameState;
 unsigned char kernel;    // use _KERNEL_* values from 6502
 unsigned char colubk;
 
+void Null();    // empty function, for any use
 
-/******************************* Data/Includes *******************************/
-
-// 32 byte DPC+ "waveforms" - each range from 1 to 5 with 3 being "center" of
-// waveform
-const unsigned char waveforms[] __attribute__((aligned(4))) = {
-
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,    // 0- wave silence
-    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,    // 1- square
-    3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 4, 4, 4, 4,
-    3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2,    // 2- triangle
-    5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3,
-    3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1,    // 3- saw
-    3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4,
-    3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2,    // 4- sin
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 5- user waveform 1
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 6- user waveform 2
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    // 7- user waveform 3
-};
-#define WAVEFORM_SIZE sizeof(waveforms)
-#define WAV_SILENCE 0
-#define WAV_SQUARE 1
-#define WAV_TRIANGLE 2
-#define WAV_SAW 3
-#define WAV_SIN 4
-#define RAM_SAMPLE 8    // for 64k+ ROMs samples can be held in DD RAM - this assumes
-// it remains directly after the waveform RAM
-
-//	example code to include a file holding a digital sample
-//	in the same directory as main.c
-const unsigned char sample1[] __attribute__((aligned(4))) = {
-#include "sd2.inc"
-};
-#define SAMPLE1_SIZE sizeof(sample1)
-
-/******************************* Functions *******************************/
+void run_ARM_SystemReset();
 void run_ARM_Initialise();
 void run_ARM_VerticalBlank();
 void run_ARM_Overscan();
@@ -90,13 +43,7 @@ void run_ARM_Overscan();
 void HandleControls();
 void SilenceWaves();
 void SilenceTIA();
-// void SaveKeyWrite(unsigned short address, unsigned char offset,
-// 				  unsigned char count);
-// void SaveKeyRead(unsigned short address, unsigned char offset,
-// 				 unsigned char count);
 
-/******************************* External Functions
- * *******************************/
 
 // function defines from ASM_routines.s
 // these use ASM with unrolled loops to make them FAST
@@ -109,13 +56,11 @@ unsigned int rangeRandom(short int range) {
 
 /******************************* Variables *******************************/
 // stay ARM-side
+
 unsigned int rand = 10531789;    // 32 bit LFSR random number
-unsigned int frame = 0;          // frame counter
-// unsigned short game_state = 0;	// internal ARM game state
-unsigned short sample_size = 0;    // current digital sample size (bytes)
-bool saveKeyDetected = false;      // save key present flag
-// to Atari-side
-// unsigned char kernel = 0;                   // drawing kernel used/passed Atari-side
+unsigned int frame;
+
+
 unsigned char soundMode = _SND_MODE_TIA;    // sound mode used/passed Atari-side
 
 // Atari input direct access variables - joysticks and RESET/SELECT are
@@ -176,22 +121,44 @@ unsigned char input_repeat[12] = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
 unsigned short input_counter[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 unsigned short input_target[12];
 
-/******************************* Entry Point *******************************/
 
-// Function Prototypes
+//------------------------------------------------------------------------------
 
-void GameOverscan();
-void GameVerticalBlank();
-void initNextLife();
-void SystemReset();
-void setupBoard();
-void processCharAnimations();
-
-void Null() {
+void setNextGameState(enum GAME_STATE state) {
+    // actual change happens in OS
+    nextGameState = state;
 }
 
+
+void setKernel(int newKernel) {
+
+    RAM[_kernel] = kernel = newKernel;
+
+    // inits for each kernel's CDFJ stuff...
+
+    switch (kernel) {
+
+    case _KERNEL_RAINBOW:
+
+        // TODO; this is really kernel_01's init with the fastmjmp
+        // todo: remove/fix
+        //  set up demo jump table 1 for kernel_01
+        for (int i = 0; i <= _SCANLINES - 2; i++) {
+            RAM_2B[(_jump_table_1 / 2) + i] = _kernel_01_loop;
+        }
+        RAM_2B[(_jump_table_1 / 2) + _SCANLINES - 1] = _kernel_01_done;
+
+        break;
+    }
+}
+
+
+//------------------------------------------------------------------------------
+
 void (*const runFunc[])() = {
+
     Null,                     // _RUN_ARM_NULL
+    run_ARM_SystemReset,      // _RUN_ARM_SYSTEM_RESET
     run_ARM_Initialise,       // _RUN_ARM_INIT
     run_ARM_VerticalBlank,    // _RUN_ARM_VB_VBLANK
     run_ARM_Overscan,         // _RUN_ARM_OS_VBLANK
@@ -203,55 +170,45 @@ int main() {    // <-- 6507/ARM interfaced here!
     return 0;
 }
 
-void setNextGameState(enum GAME_STATE state) {
-    // actual change happens in OS
-    nextGameState = state;
+
+void Null() {
 }
+
+
+void run_ARM_SystemReset() {
+
+    // Clear display memory before SaveKey is read/used
+
+    saveKeyEnableICC = 1;
+
+    myMemsetInt((void *)_DD_BASE, 0, _DISPLAY_SIZE / 4);
+}
+
 
 void run_ARM_Initialise() {
 
-    saveKeyDetected = RAM[_SWCHA];
-
-    myMemsetInt((void *)_DD_BASE, 0,
-                _DISPLAY_SIZE32);    // updates 4 bytes at a time for the entire DD area
+    // At this point, any SaveKey data is valid and local SK vars are defaulted
 
     for (int i = 0; i < 34; i++)
         setIncrement(i, 1, 0);    // increments to 1
 
-    MemCopy32((void *)_WAV_BASE, (void *)waveforms,
-              WAVEFORM_SIZE / 4);    // waveforms to DD memory
+    setKernel(_KERNEL_RAINBOW);
 
-    //   example code to copy digital sound sample from ARM ROM array
-    //   into the _digital_sample DD RAM location to then be played using
-    //   setWaveform (0, RAM_SAMPLE);
-    MemCopy32((void *)_DD_BASE + _digital_sample, (void *)sample1, SAMPLE1_SIZE / 4);
-
-    //  set up demo jump table 1 for kernel_01
-    for (int i = 0; i <= _SCANLINES - 2; i++) {
-        RAM_2B[(_jump_table_1 / 2) + i] = _kernel_01_loop;
-    }
-    RAM_2B[(_jump_table_1 / 2) + _SCANLINES - 1] = _kernel_01_done;
-
-
-    RAM[_kernel] = kernel = _KERNEL_RAINBOW;
     RAM[_tvSystem] = tvSystem = _TV_SYSTEM_NTSC;
     RAM[_soundMode] = soundMode = _SND_MODE_TIA;
-    RAM[_colubk] = colubk = 0x42;
+    RAM[_colubk] = colubk = 0;
 
     setPointer(DS31PTR, _kernel);    // pass initial state to Atari
 
     gameState = GS_NULL;
     setNextGameState(GS_DETECT_CONSOLE);
 
-    //	RAM[_RUN_FUNC] = _RUN_NULL;
-
-    SilenceWaves();    // init DPC waveforms
-
-    //	LoadSaveKey();
+    LoadShadowedSaveKey();
 
     initAudio(true);
     startMusic();
 }
+
 
 // -----------------------------------------------------------------------------
 
@@ -271,6 +228,9 @@ void run_ARM_VerticalBlank() {
 
     if (gameState == nextGameState)
         (*verticalBlank[gameState])();
+
+    // common to ALL VBs...
+    // insert code here
 }
 
 // -----------------------------------------------------------------------------
@@ -314,8 +274,6 @@ void run_ARM_Overscan() {
     // common to ALL OS routines...
 
     frame++;
-
-    // Random(1);
 
     fadeBackgroundColour();
     RAM[_colubk] = colubk;
@@ -375,12 +333,12 @@ void HandleControls() {
 // Used to set waveforms to all silent / no note
 void SilenceWaves() {
 
-    setWaveform(0, WAV_SILENCE);
-    setWaveform(1, WAV_SILENCE);
-    setWaveform(2, WAV_SILENCE);
-    setNote(0, 0);
-    setNote(1, 0);
-    setNote(2, 0);
+    // setWaveform(0, WAV_SILENCE);
+    // setWaveform(1, WAV_SILENCE);
+    // setWaveform(2, WAV_SILENCE);
+    // setNote(0, 0);
+    // setNote(1, 0);
+    // setNote(2, 0);
 }
 
 // Used to set TIA sound to all silent / no note
@@ -393,23 +351,17 @@ void SilenceTIA() {
     }
 }
 
-void LoadSaveKey() {
+void LoadShadowedSaveKey() {
 
-    saveKeyEnableICC = RAM[_SK_ENABLE_ICC];
-    usedSolves = RAM[_SK_USED_SOLVES];
-    whichLot = RAM[_SK_LAST];
+    if (RAM[_SK_ID] == _WENHOP_SK_ID) {
 
-    for (int i = 0; i < SAVEKEY_SIZE; i++) {
-        saveKeyPerfect[i] = RAM[_SK_PER + i];
-        saveKeyUnlocked[i] = RAM[_SK_UNL + i];
-        saveKeySolved[i] = RAM[_SK_SLV + i];
+        // Transfer 6502 SaveKey state to local variables
+
+        saveKeyEnableICC = RAM[_SK_ENABLE_ICC];
+
+        unsigned short *odometer = (unsigned short *)(RAM + _SK_ODOMETER);
+        (*odometer)++;
     }
-
-    // increment counter
-
-    int count = RAM[_SK_COUNT] + 256 * RAM[_SK_COUNT + 1] + 1;
-    RAM[_SK_COUNT] = count;
-    RAM[_SK_COUNT + 1] = count >> 8;
 }
 
 // EOF

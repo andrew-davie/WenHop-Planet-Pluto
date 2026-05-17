@@ -6,7 +6,9 @@ OS_kernelRainbow    rts
 
 
 kernelRainbow
-	                ldx #_SCANLINES
+
+
+              ldx #_SCANLINES
 .loop               
 
                     sta WSYNC

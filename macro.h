@@ -304,4 +304,23 @@ VERSION_MACRO         = 107  ; unoffical version
             endm
 
 
+;-------------------------------------------------------------------------------
+
+    MAC CHECK_OVERFLOW ; {1} bank number, {2} bank size
+
+    ; requires BANK*_START label to be defined at start of each bank
+
+BANK_SIZE{1} = * - BANK{1}_START
+BANK_END{1} = *
+
+        IF BANK_SIZE{1} > {2}
+            echo "Error: BANK", [{1}]d, "[", [{2}]d, "] --> overflow by", [* - BANK{1}_START - {2}]d, "bytes"
+            err
+        ELSE
+        	echo "---- BANK", [{1}]d, "[", [{2}]d, "] -->", [BANK_SIZE{1}]d, "bytes used, ", [{2} - BANK_SIZE{1}]d, "bytes free"
+        ENDIF
+    ENDM
+
+;-------------------------------------------------------------------------------
+
 ; EOF

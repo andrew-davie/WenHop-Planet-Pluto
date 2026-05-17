@@ -22,10 +22,10 @@ void setIncrement(const int fetcher, const unsigned char whole, const unsigned c
 }
 
 // Set waveform (32-byte offset in display data RAM)
-void setWaveform(int wave, unsigned char offset) {
-    _WAVEFORM[wave] = _WAV_BASE + (offset << 5);
-    //  _WAVEFORM[wave] = 0x40000800 + (offset << 5);
-}
+// void setWaveform(int wave, unsigned char offset) {
+//     _WAVEFORM[wave] = _WAV_BASE + (offset << 5);
+//     //  _WAVEFORM[wave] = 0x40000800 + (offset << 5);
+// }
 
 // Set DA sample address
 void setSamplePtr(unsigned int address) {
@@ -101,18 +101,18 @@ void setWaveSize(int wave, unsigned int size) {
 
 // Pitch table
 const unsigned int _pitchTable[12] = {
-    476196134, // C6s   77
-    504512230, // D6    78
-    534512088, // D6s   79
-    566295831, // E6    80
-    599969533, // F6    81
-    635645578, // F6s   82
-    673443031, // G6    83
-    713488038, // G6s   84
-    755914244, // A7    85
-    800863244, // A7s   86
-    848485051, // B7    87
-    898938597  // C7    88
+    476196134,    // C6s   77
+    504512230,    // D6    78
+    534512088,    // D6s   79
+    566295831,    // E6    80
+    599969533,    // F6    81
+    635645578,    // F6s   82
+    673443031,    // G6    83
+    713488038,    // G6s   84
+    755914244,    // A7    85
+    800863244,    // A7s   86
+    848485051,    // B7    87
+    898938597     // C7    88
 };
 
 // Calculate frequency for note

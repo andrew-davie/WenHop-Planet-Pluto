@@ -5,7 +5,7 @@
 /***************************************************/
 /* Will automatically read the following values    */
 /* from the <firstparam> ASM file                  */
-/*     DISPLAY_SIZE                                */
+/*     _DISPLAY_SIZE                                */
 /*     ROM_SIZE                                    */
 /*     C_START                                     */
 /* and update ORIGIN and LENGTH values in the      */
@@ -33,7 +33,7 @@ bool found_c_start = false;
 
 unsigned int display_size = 0;
 unsigned int rom_size = 0;
-unsigned char c_start = '0'; // default
+unsigned char c_start = '0';    // default
 
 int c_start_val = 0;
 int c_size = 0;
@@ -44,7 +44,7 @@ int ram_start = 0;
 const unsigned int BOOT_SIZE = 0x60;
 
 /***************************************************/
-bool verbose = false; // to control extra data output
+bool verbose = false;    // to control extra data output
 /***************************************************/
 
 /************************************************* Begin
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
             char *eq = strchr(p, '=');
 
             if (eq) {
-                eq++; // move past '='
+                eq++;    // move past '='
 
                 while (isspace((unsigned char)*eq))
                     eq++;
@@ -204,15 +204,15 @@ int main(int argc, char *argv[]) {
 
         /**************************** Read DISPLAY_SIZE
          * ****************************/
-        if ((strncmp(p, "DISPLAY_SIZE", 12) == 0) && (!found_display_size)) {
+        if ((strncmp(p, "_DISPLAY_SIZE", 12) == 0) && (!found_display_size)) {
             if (verbose)
-                printf("FOUND DISPLAY_SIZE LINE: %s", line);
+                printf("FOUND _DISPLAY_SIZE LINE: %s", line);
             found_display_size = true;
 
             char *eq = strchr(p, '=');
 
             if (eq) {
-                eq++; // move past '='
+                eq++;    // move past '='
 
                 // skip whitespace after '='
                 while (isspace((unsigned char)*eq))

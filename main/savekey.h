@@ -5,11 +5,11 @@
 
 #include <stdbool.h>
 
-#define SAVEKEY_SIZE ((100 + 7) / 8)
+#define SK_SIZE ((100 + 7) / 8)
 
-extern unsigned char saveKeyUnlocked[SAVEKEY_SIZE];
-extern unsigned char saveKeySolved[SAVEKEY_SIZE];
-extern unsigned char saveKeyPerfect[SAVEKEY_SIZE];
+extern unsigned char saveKeyUnlocked[SK_SIZE];
+extern unsigned char saveKeySolved[SK_SIZE];
+extern unsigned char saveKeyPerfect[SK_SIZE];
 extern unsigned char saveKeyEnableICC;
 
 void setUnlockStatus(int lot);

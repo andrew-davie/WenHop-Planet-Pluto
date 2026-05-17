@@ -1,19 +1,20 @@
 
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-;@@@@@@@@@@@@@@@@@ Code block that gets copied into RAM for bank routine dispatch @@@@@@@@@@@@@@@@@
+;-------------------------------------------------------------------------------
+; Code block that gets copied into RAM for bank routine dispatch
 
 ; The code here is a 'template' copied into the RAM area and the bank and jump
 ; address are modified before execution. The return will be to the caller of
 ; the code that jumps to the RAM copy of this code.
 ; DO NOT RUN *THIS* CODE AS IT WILL CRASH. JUMP TO THE RAM VERSION!
 
+JUMP_CODE_START
 jumpCode       	    cmp BANK1           ; hotspot bank-switch
-                    jsr jumpCode
+                    jsr 0               ; selfmod
                     cmp BANK0           ; hotspot bank-switch
-jumpCodeEnd         rts
+                    rts
+JUMP_CODE_END
 
-
-;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+;-------------------------------------------------------------------------------
 ;@@@@@@@@@@@@ Tables for Frame Dispatch @@@@@@@@@@@@
 
 .sound_mode_table		;for auto-adjust to SETMODE mirror
@@ -26,7 +27,7 @@ jumpCodeEnd         rts
 	.byte $fe
 	.byte $fe
 ;-------------------------------------------------------------------------------
-∫
+
 
 CartReset
 
@@ -34,17 +35,27 @@ CartReset
 
     ; Copy jump dispatch handler to RAM
 
-	                ldx #(jumpCodeEnd-jumpCode)
+	                ldx #(JUMP_CODE_END - JUMP_CODE_START) - 1
 initJumpCode        lda jumpCode,x
 	                sta jumpCodeRAM,x
 	                dex
 	                bpl initJumpCode
 
 
-                    jsr ReadSaveKey                 ; Load savekey to ZP SAVEKEY block
+    ; general system reset on ARM
+    ; before SaveKey load, so memory clears work!
 
-                    ldx #FASTON
-                    stx SETMODE			            ; "Fast Fetch" enable
+                    ldx #>_RUN_FUNC
+                    stx DSPTR
+                    ldx #<_RUN_FUNC
+                    stx DSPTR
+                    ldx #_RUN_ARM_SYSTEM_RESET
+                    stx DSWRITE
+
+                    ldx #$FF
+                    stx CALLFN          		    ; Initialise via ARM function
+
+                    jsr ReadSaveKey                 ; Load savekey to ZP SAVEKEY block (*fast mode OFF)
 
     ; Send the SAVEKEY block to ARM-accessible shadow variables
     ; A diff is (later) used to determine any changes that need to be written
@@ -55,7 +66,7 @@ initJumpCode        lda jumpCode,x
                     stx DSPTR
 
                     ldx #0
-.sendSK             lda SAVEKEY_IDENT,x
+.sendSK             lda SK_ID,x
                     sta DSWRITE
                     inx
                     cpx #SK_BYTES + 1
@@ -76,10 +87,15 @@ initJumpCode        lda jumpCode,x
     ; At this point, the ARM function handler runs the Initialise function
     ; Retrive critical configuration variables from ARM
 
+                    ldx #FASTON
+                    stx SETMODE
+
                     lda #DS31DATA
                     sta kernel
                     lda #DS31DATA
-                    sta tvSystem                    ; <--- NTSC here
+                    sta tvSystem                    ; <--- == NTSC
+
+    ; TODO: sound stuff yet to be fully convered
 
                     lda #DS31DATA
                     sta soundMode
@@ -91,7 +107,7 @@ initJumpCode        lda jumpCode,x
                     lda .call_fn_table,x
                     sta call_fn			                ; apply proper function caller
 
-    include "mainLoop.asm"
+    include "_mainLoop.asm"
 
 
 ; EOF

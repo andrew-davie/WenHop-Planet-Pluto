@@ -11,7 +11,7 @@ from pathlib import Path
 
 def parse_asm_file(asm_path: Path) -> dict[str, int]:
     """Extract DISPLAY_SIZE, ROM_SIZE, C_START from ASM file."""
-    required = {"DISPLAY_SIZE", "ROM_SIZE", "C_START"}
+    required = {"_DISPLAY_SIZE", "ROM_SIZE", "C_START"}
     values = {}
 
     # Matches:  LABEL   EQU   0x1234  (or decimal, or $1234)
@@ -38,7 +38,7 @@ def parse_asm_file(asm_path: Path) -> dict[str, int]:
 
 def update_lds_file(lds_path: Path, asm_values: dict[str, int]) -> None:
     """Update ORIGIN and LENGTH values in the linker script."""
-    display_size = asm_values["DISPLAY_SIZE"]
+    display_size = asm_values["_DISPLAY_SIZE"]
     rom_size     = asm_values["ROM_SIZE"]
     c_start      = asm_values["C_START"]
 

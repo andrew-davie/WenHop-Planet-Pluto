@@ -6,9 +6,14 @@ BANK0_START
 
 ;-------------------------------------------------------------------------------
 
-    include "startup.asm"
-    include "runVectoredCode.asm"
-    include "saveKey.asm"
+    ; bank-0-only code
+
+    include "_startup.asm"
+    include "_runVectoredCode.asm"
+    include "_saveKey.asm"
+
+    ; moveable to other banks... (called through runVectoredCode)
+
     include "kernel01.asm"
     include "kernelRainbow.asm"
 
@@ -17,7 +22,7 @@ BANK0_START
     CHECK_OVERFLOW 0, $FF0
 
 ; --------------------------------------------------------------------------
-; Bank 0 Footer - needed for CDFJ+ to function
+; CDFJ+ Footer (MUST BE *HERE*)
 
 BANK0_HEADER = $17F0
 
