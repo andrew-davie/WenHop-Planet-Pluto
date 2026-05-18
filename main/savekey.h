@@ -1,7 +1,8 @@
 #pragma once
 
-#include "cdfjplus.h"
 #include "defines_dasm.h"
+
+#include "cdfjplus.h"
 
 #include <stdbool.h>
 

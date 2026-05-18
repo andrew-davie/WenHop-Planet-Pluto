@@ -25,18 +25,16 @@ int usedSolves;
 int whichLot;
 int tvSystem;
 
-void LoadShadowedSaveKey();
-
 
 enum GAME_STATE gameState, nextGameState;
 
-unsigned char kernel;    // use _KERNEL_* values from 6502
+unsigned char kernel, nextKernel;    // use _KERNEL_* values from 6502
 unsigned char colubk;
 
 void Null();    // empty function, for any use
 
 void run_ARM_SystemReset();
-void run_ARM_Initialise();
+void run_ARM_Load_SaveKey();
 void run_ARM_VerticalBlank();
 void run_ARM_Overscan();
 
@@ -125,33 +123,55 @@ unsigned short input_target[12];
 //------------------------------------------------------------------------------
 
 void setNextGameState(enum GAME_STATE state) {
-    // actual change happens in OS
     nextGameState = state;
 }
 
+//------------------------------------------------------------------------------
+// Kernel Initialisation
 
-void setKernel(int newKernel) {
+void initKernel_DetectConsole();
+void initKernel_Rainbow();
+void initKernel_01();
+void initKernel_Copyright();
 
-    RAM[_kernel] = kernel = newKernel;
 
-    // inits for each kernel's CDFJ stuff...
+void (*const initialiseKernel[_KERNEL_MAX])() = {
 
-    switch (kernel) {
+    initKernel_DetectConsole,    // 0
+    initKernel_Rainbow,          // 1
+    initKernel_01,               // 2
+    initKernel_Copyright,        // 3
+};
 
-    case _KERNEL_RAINBOW:
 
-        // TODO; this is really kernel_01's init with the fastmjmp
-        // todo: remove/fix
-        //  set up demo jump table 1 for kernel_01
-        for (int i = 0; i <= _SCANLINES - 2; i++) {
-            RAM_2B[(_jump_table_1 / 2) + i] = _kernel_01_loop;
-        }
-        RAM_2B[(_jump_table_1 / 2) + _SCANLINES - 1] = _kernel_01_done;
+void (*const initialiseGameState[GS_MAX])() = {
 
-        break;
-    }
+    Null,                            // 0
+    initialise_GS_DetectConsole,     // 1
+    initialise_GS_Copyright,         // 2
+    initialise_GS_Rainbow,           // 3
+    initialise_GS_CouchCompliant,    // 4
+};
+
+
+void initKernel_DetectConsole() {
 }
 
+void initKernel_Rainbow() {
+
+    setJumpVectors(_BUF_RAINBOW_JUMP, _rainbowLoop, _rainbowExit, _SCANLINES);
+    setPointer(DSJMP1PTR, _BUF_RAINBOW_JUMP);
+}
+
+void initKernel_01() {
+
+    setJumpVectors(_jump_table_1, _rainbowLoop, _rainbowExit, _SCANLINES);
+}
+
+void initKernel_Copyright() {
+
+    setJumpVectors(_jump_table_1, _copyrightLoop, _copyrightExit, _SCANLINES);
+}
 
 //------------------------------------------------------------------------------
 
@@ -159,7 +179,7 @@ void (*const runFunc[])() = {
 
     Null,                     // _RUN_ARM_NULL
     run_ARM_SystemReset,      // _RUN_ARM_SYSTEM_RESET
-    run_ARM_Initialise,       // _RUN_ARM_INIT
+    run_ARM_Load_SaveKey,     // _RUN_ARM_LOAD_SAVEKEY
     run_ARM_VerticalBlank,    // _RUN_ARM_VB_VBLANK
     run_ARM_Overscan,         // _RUN_ARM_OS_VBLANK
 };
@@ -177,36 +197,41 @@ void Null() {
 
 void run_ARM_SystemReset() {
 
-    // Clear display memory before SaveKey is read/used
-
-    saveKeyEnableICC = 1;
-
     myMemsetInt((void *)_DD_BASE, 0, _DISPLAY_SIZE / 4);
-}
-
-
-void run_ARM_Initialise() {
-
-    // At this point, any SaveKey data is valid and local SK vars are defaulted
 
     for (int i = 0; i < 34; i++)
-        setIncrement(i, 1, 0);    // increments to 1
+        setIncrement(i, 1, 0);    // all fetcher increments to 1
 
-    setKernel(_KERNEL_RAINBOW);
+    gameState = GS_NULL;
+    setNextGameState(GS_DETECT_CONSOLE);
 
+    RAM[_kernel] = _KERNEL_DETECT_CONSOLE;    // TODO: detectConsole - does it have its own kernel
     RAM[_tvSystem] = tvSystem = _TV_SYSTEM_NTSC;
     RAM[_soundMode] = soundMode = _SND_MODE_TIA;
     RAM[_colubk] = colubk = 0;
 
     setPointer(DS31PTR, _kernel);    // pass initial state to Atari
 
-    gameState = GS_NULL;
-    setNextGameState(GS_DETECT_CONSOLE);
+    // setNextGameState(GS_DETECT_CONSOLE);
 
-    LoadShadowedSaveKey();
+    saveKeyEnableICC = 1;
 
     initAudio(true);
     startMusic();
+}
+
+
+void run_ARM_Load_SaveKey() {
+
+    if (RAM[_SK_ID] == _WENHOP_SK_ID) {
+
+        // Transfer 6502 SaveKey state to local variables
+
+        saveKeyEnableICC = RAM[_SK_ENABLE_ICC];
+
+        unsigned short *odometer = (unsigned short *)(RAM + _SK_ODOMETER);
+        (*odometer)++;
+    }
 }
 
 
@@ -247,13 +272,13 @@ void (*const overscan[GS_MAX])() = {
 };
 
 
-void (*const initialise[GS_MAX])() = {
+int kernelForState[GS_MAX] = {
 
-    Null,                            // 0
-    initialise_GS_DetectConsole,     // 1
-    initialise_GS_Copyright,         // 2
-    initialise_GS_Rainbow,           // 3
-    initialise_GS_CouchCompliant,    // 4
+    0,                         // hopefully not accessed
+    _KERNEL_DETECT_CONSOLE,    // 1
+    _KERNEL_COPYRIGHT,         // 2
+    _KERNEL_RAINBOW,           // 3
+    _KERNEL_RAINBOW,           // 4
 };
 
 
@@ -261,14 +286,18 @@ void run_ARM_Overscan() {
 
     //	HandleControls();
 
-    if (gameState == nextGameState)
-        (*overscan[gameState])();
+    if (gameState != nextGameState) {
 
-    else {
-        // Handle game state switching at end of OS
         gameState = nextGameState;
-        (*initialise[gameState])();
+        (*initialiseGameState[gameState])();
+
+        if (kernelForState[gameState] != kernel) {
+            kernel = kernelForState[gameState];
+            (*initialiseKernel[kernel])();
+        }
     }
+
+    (*overscan[gameState])();
 
 
     // common to ALL OS routines...
@@ -351,17 +380,19 @@ void SilenceTIA() {
     }
 }
 
-void LoadShadowedSaveKey() {
+void setJumpVectors(unsigned int buffer, short int startAddress, short int endAddress, int length) {
 
-    if (RAM[_SK_ID] == _WENHOP_SK_ID) {
+    //  set up demo jump table 1 for kernel_01
+    for (int i = 0; i <= length - 1; i++)
+        RAM_2B[(buffer / 2) + i] = startAddress;
+    RAM_2B[(buffer / 2) + length - 1] = endAddress;
 
-        // Transfer 6502 SaveKey state to local variables
 
-        saveKeyEnableICC = RAM[_SK_ENABLE_ICC];
-
-        unsigned short *odometer = (unsigned short *)(RAM + _SK_ODOMETER);
-        (*odometer)++;
-    }
+    // unsigned short int *p = (unsigned short int *)(RAM + buffer);
+    // for (int i = 0; i < length; i++)
+    //     RAM_2B[buffer + i] = startAddress;
+    // *p = endAddress;
 }
+
 
 // EOF

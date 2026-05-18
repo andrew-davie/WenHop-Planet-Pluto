@@ -39,7 +39,8 @@ VB_kernel_01
 
 kernel_01
 
-_kernel_01_loop				;kernel_01 demontrates the FastJump streams
+_kernel01Loop
+				;kernel_01 demontrates the FastJump streams
 
                     sta WSYNC
 
@@ -56,7 +57,9 @@ _kernel_01_loop				;kernel_01 demontrates the FastJump streams
                     sta GRP1
 
                     jmp FASTJMP1
-_kernel_01_done 	rts
+
+_kernel01Exit
+ 	rts
 
 
 

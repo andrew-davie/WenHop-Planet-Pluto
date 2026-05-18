@@ -111,7 +111,7 @@ ifneq ($(EMULATOR),)
 	pkill -f $(GOPHERNAME) || true
 
 ifeq ($(EMULATOR), gopher)
-	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv NTSC -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
+	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv PAL -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
 endif
 
 ifeq ($(EMULATOR), stella)

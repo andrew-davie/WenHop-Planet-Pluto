@@ -33,6 +33,9 @@ CartReset
 
                     CLEAN_START
 
+                    ldx #FASTON
+                    stx SETMODE
+
     ; Copy jump dispatch handler to RAM
 
 	                ldx #(JUMP_CODE_END - JUMP_CODE_START) - 1
@@ -57,7 +60,7 @@ initJumpCode        lda jumpCode,x
 
                     jsr ReadSaveKey                 ; Load savekey to ZP SAVEKEY block (*fast mode OFF)
 
-    ; Send the SAVEKEY block to ARM-accessible shadow variables
+    ; Send the SAVEKEY block to ARM-accessible shadow variables and then to ARM
     ; A diff is (later) used to determine any changes that need to be written
 
                     ldx #>_SK_START
@@ -71,24 +74,23 @@ initJumpCode        lda jumpCode,x
                     inx
                     cpx #SK_BYTES + 1
                     bcc .sendSK
- 
-    ; Call ARM Initialise
+
 
                     ldx #>_RUN_FUNC
                     stx DSPTR
                     ldx #<_RUN_FUNC
                     stx DSPTR
-                    ldx #_RUN_ARM_INIT              ; routine to run in main()
+                    ldx #_RUN_ARM_LOAD_SAVEKEY
                     stx DSWRITE
 
                     ldx #$FF
                     stx CALLFN          		    ; Initialise via ARM function
 
-    ; At this point, the ARM function handler runs the Initialise function
+.notRealSKData
+
+    ; At this point, the ARM function handler _RUN_ARM_SYSTEM_RESET has set some vars
     ; Retrive critical configuration variables from ARM
 
-                    ldx #FASTON
-                    stx SETMODE
 
                     lda #DS31DATA
                     sta kernel

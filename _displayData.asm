@@ -26,10 +26,15 @@ _SWCHB	            ds 1
 _INPT4              ds 1
 _INPT5              ds 1
 
+    ;---------------------------------------------
+    ; ordering assumed in transfer of vars from ARM...
+
 _kernel             ds 1        ; see GAME_KERNEL definitions
 _tvSystem           ds 1        ; see TV_TYPE_ definitions
 _soundMode          ds 1
 _colubk             ds 1
+
+    ;---------------------------------------------
 
 _AUDV0              ds 2
 _AUDC0              ds 2
@@ -54,18 +59,14 @@ _P0_X               ds 1        ; position of player 0
 _jump_table_1		ds _SCANLINES * 2
 _jump_table_2		ds _SCANLINES * 2
 
-
-
 ;------------------------------------------------------------------------------
 ; OVERLAID VARIABLES
 
 ; BUFFERS MUST BE LAST
 ; Reason: they share memory and anything after the shortest will be stomped
 
-BUFN SET 0
-    MAC DEFBUF ;name
-_BUF_{1}             ds _SCANLINES
-BUFN SET BUFN + 1
+    MAC DEFBUF ; {size}, {name}
+_BUF_{2}             ds {1} * _SCANLINES
     ENDM
 
 _END_BUFFERS SET 0
@@ -79,7 +80,9 @@ _BUFFERS = *
 
     SEG.U GS_RAINBOW
     ORG _BUFFERS
-    DEFBUF RAINBOW_COLUBK
+
+    DEFBUF 1, RAINBOW_COLUBK
+    DEFBUF 2, RAINBOW_JUMP
 
     if * > _END_BUFFERS
 _END_BUFFERS SET *
@@ -90,8 +93,8 @@ _END_BUFFERS SET *
     SEG.U GS_COUCH_COMPLIANT
     ORG _BUFFERS
 
-    DEFBUF COUCH_COMPLIANT_COLUP0
-    DEFBUF COUCH_COMPLIANT_GRP0A
+    DEFBUF 1, COUCH_COMPLIANT_COLUP0
+    DEFBUF 1, COUCH_COMPLIANT_GRP0A
 
     if * > _END_BUFFERS
 _END_BUFFERS SET *
@@ -102,11 +105,11 @@ _END_BUFFERS SET *
     SEG.U GS_COPYRIGHT
     ORG _BUFFERS
 
-    DEFBUF COPYRIGHT_GRP0A
-    DEFBUF COPYRIGHT_PF2_LEFT
-    DEFBUF COPYRIGHT_PF2_RIGHT
-    DEFBUF COPYRIGHT_COLUPF
-    DEFBUF COPYRIGHT_COLUP0
+    DEFBUF 2, COPYRIGHT_JUMP
+    DEFBUF 6, COPYRIGHT_GRP
+    DEFBUF 2, COPYRIGHT_PF
+    DEFBUF 1, COPYRIGHT_COLUPF
+    DEFBUF 1, COPYRIGHT_COLUP0
 
     if * > _END_BUFFERS
 _END_BUFFERS SET *

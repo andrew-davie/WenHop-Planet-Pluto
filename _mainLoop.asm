@@ -120,16 +120,16 @@ mainGameLoop
 
 ;-------------------------------------------------------------------------------
 
-TimerOS             .byte 36           ; NTSC
-                    .byte 46           ; PAL
-                    .byte 36           ; SECAM
-                    .byte (36+29)      ; PAL60
+TimerOS             .byte 36           ; NTSC           262
+                    .byte (36+29)      ; PAL            312
+                    .byte 36           ; SECAM          262
+                    .byte 36           ; PAL60          262
 
 TimerVB
-                    .byte 43           ; NTSC
-                    .byte 50           ; PAL
-                    .byte 43           ; SECAM
-                    .byte (43+30)      ; PAL60
+                    .byte 43           ; NTSC           262
+                    .byte (43+30)      ; PAL            312
+                    .byte 43           ; SECAM          262
+                    .byte 43           ; PAL60          262
 
 
 ; EOF

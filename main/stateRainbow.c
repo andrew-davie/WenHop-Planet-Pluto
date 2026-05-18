@@ -2,6 +2,7 @@
 #include "defines_dasm.h"
 
 #include "colour.h"
+#include "main.h"
 #include "sound.h"
 #include "state.h"
 
@@ -13,10 +14,15 @@ void VB_GS_Rainbow() {
     static unsigned int col;
     col++;
 
+    unsigned char *p = RAM + _BUF_RAINBOW_COLUBK;
     for (int i = 0; i < _SCANLINES; i++)
-        RAM[_BUF_RAINBOW_COLUBK + i] = convertColour((col + (i >> 1)) & 0xFF);
+        *p++ = convertColour((col + (i >> 1)) & 0xFF);
 
-    setPointer(DS0PTR, _BUF_RAINBOW_COLUBK);
+    setPointer(_DS_RBW_COLUBK, _BUF_RAINBOW_COLUBK);
+    setPointer(DSJMP1PTR, _BUF_RAINBOW_JUMP);
+
+    // if (frame > 100)
+    //     setGameState(GS_);
 }
 
 void OS_GS_Rainbow() {

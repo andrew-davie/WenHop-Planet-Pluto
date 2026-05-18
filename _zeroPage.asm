@@ -65,7 +65,32 @@ SK_RESET          ds 1            ; 0 = not reset, else SK was initialised
 scanline                ds 1
 
 
+    ; zero page overlays
+
+ZP_OVERLAY = *
+ZP_END SET *
+
+    ;-----------------------------------------------
+    
+    SEG.U ZP_COPYRIGHT
+    org ZP_OVERLAY
+
+CP_temp           ds 1
+
+    if (* > ZP_END)
+ZP_END SET *
+    endif
+
+    ;-----------------------------------------------
+
+    ORG ZP_END
+
+
+
+
+
+
 	;Display Remaining RAM
-	echo "---- 2600 RAM [  128 ] -->", (* - $80)d, "bytes used", ($100 - *)d, "bytes free" 
+	echo "---- 2600 RAM [  128 ] -->", (ZP_END - $80)d, "bytes used", ($100 - ZP_END)d, "bytes free" 
 
 ; EOF

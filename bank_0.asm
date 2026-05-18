@@ -14,8 +14,9 @@ BANK0_START
 
     ; moveable to other banks... (called through runVectoredCode)
 
-    include "kernel01.asm"
-    include "kernelRainbow.asm"
+    include "kernel/kernel_DetectConsole.asm"
+    include "kernel/kernel_01.asm"
+    include "kernel/kernel_rainbow.asm"
 
 ;-------------------------------------------------------------------------------
 

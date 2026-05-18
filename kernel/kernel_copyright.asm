@@ -1,5 +1,19 @@
 BANK_kernelCopyright = .BANK
 
+
+    DEFPTR CP_GRP0A, 0
+    DEFPTR CP_GRP0B, 1
+    DEFPTR CP_GRP0C, 2
+    DEFPTR CP_GRP1A, 3
+    DEFPTR CP_GRP1B, 4
+    DEFPTR CP_GRP1C, 5
+
+    DEFPTR CP_COLUPF, 6
+    DEFPTR CP_COLUP0, 7
+
+
+
+
 #if 0
 
 ;-------------------------------------------------------------------------------
@@ -139,50 +153,44 @@ safeTimerWait3C     lda INTIM
 
 #endif
 
-
-kernelChampGames
 kernelCopyright
 
 
-#if 0
-    ; entry point for champ kernel
+_copyrightLoop
 
-                    ldx #_SCANLINES
-                    stx scanline
-
-
-centered6Sprites    sta WSYNC                       ; @0
+                    sta WSYNC                       ; @0
 
                     sta.w COLUP1                    ; 3
-                    lda #_DS_GRP0a                  ; 2
+                    lda #_DS_CP_GRP0A_DATA          ; 2
                     sta GRP0                        ; 3
-                    lda #_DS_GRP1a                  ; 2
+                    lda #_DS_CP_GRP1A_DATA          ; 2
                     nop                             ; 2
                     sta GRP1                        ; 3
-                    lda #_DS_GRP0b                  ; 2
+                    lda #_DS_CP_GRP0B_DATA          ; 2
                     nop                             ; 2
                     sta GRP0                        ; 3
-                    lda #_DS_GRP1c                  ; 2
+                    lda #_DS_CP_GRP1C_DATA          ; 2
                     nop                             ; 2
-                    sta temp                        ; 3
-                    lda #_DS_GRP0c                  ; 2
+                    sta CP_temp                     ; 3
+                    lda #_DS_CP_GRP0C_DATA          ; 2
                     tax                             ; 2
-                    lda #_DS_GRP1b                  ; 2
+                    lda #_DS_CP_GRP1B_DATA          ; 2
                     nop                             ; 2
-                    ldy temp                        ; 3
+                    ldy CP_temp                     ; 3
                     sta GRP1                        ; 3
                     stx GRP0                        ; 3
                     sty GRP1                        ; 3
                     sta GRP0                        ; 3
     
-                    lda #_DS_COLUPF                 ; 2
+                    lda #_DS_CP_COLUPF_DATA         ; 2
                     sta COLUPF                      ; 3
-                    lda #_DS_COLUP0                 ; 2
+                    lda #_DS_CP_COLUP0_DATA         ; 2
                     sta COLUP0                      ; 3
 
-                    dec scanline                    ; 5
-                    bne centered6Sprites               ; 3(2)  --> 71 when branching
+                    jmp FASTJMP1
 
+
+_copyrightExit
                     rts
 
 #endif

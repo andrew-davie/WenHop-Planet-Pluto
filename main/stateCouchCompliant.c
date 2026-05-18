@@ -1,5 +1,6 @@
-#include "cdfjplus.h"
 #include "defines_dasm.h"
+
+#include "cdfjplus.h"
 
 #include "colour.h"
 #include "draw.h"

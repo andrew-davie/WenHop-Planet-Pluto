@@ -1,7 +1,7 @@
+#include "defines_dasm.h"
 #include <limits.h>
 
 #include "cdfjplus.h"
-#include "defines_dasm.h"
 
 #include "main.h"
 #include "state.h"
@@ -42,6 +42,7 @@ void initialise_GS_DetectConsole() {
 
 void VB_GS_DetectConsole() {
 
+    //    setPointer(DSJMP1PTR, _BUF_RAINBOW_JUMP);
 
     switch (detectionFrame) {
 
@@ -70,7 +71,9 @@ void VB_GS_DetectConsole() {
             }
         }
 
-        setNextGameState(GS_COPYRIGHT);
+
+        //        setNextGameState(GS_COPYRIGHT);
+        setNextGameState(GS_RAINBOW);
     }
     }
 

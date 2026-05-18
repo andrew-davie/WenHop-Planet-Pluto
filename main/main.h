@@ -14,8 +14,10 @@ extern void ClearChannel(void *ptr);
 extern void MemCopy32(void *ptr1, void *ptr2, unsigned int count);
 extern void Random(unsigned int count);
 
+void setJumpVectors(unsigned int buffer, short int startAddress, short int endAddress, int length);
 
 unsigned int rangeRandom(short int range);
+
 void setNextGameState(enum GAME_STATE state);
 
 

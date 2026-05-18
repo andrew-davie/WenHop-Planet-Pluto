@@ -1,5 +1,6 @@
-#include "cdfjplus.h"
 #include "defines_dasm.h"
+
+#include "cdfjplus.h"
 #include "main.h"
 #include "sound.h"
 
@@ -36,8 +37,7 @@ const unsigned char trackChamp2[] = {
 
 void initialise_GS_Copyright() {
 
-
-    //	setJumpVectors(_CHAMP_KERNEL, _EXIT_CHAMP_KERNEL, _ARENA_SCANLINES - 1);
+    setJumpVectors(_BUF_COPYRIGHT_JUMP, _copyrightLoop, _copyrightExit, _SCANLINES - 1);
 
     // sets the menu sprites position
     RAM[_P0_X] = 56;
@@ -49,6 +49,7 @@ void initialise_GS_Copyright() {
 
     frame = 0;
 }
+
 
 void VB_GS_Copyright() {
 
@@ -62,8 +63,8 @@ void VB_GS_Copyright() {
 #define TOP (_SCANLINES / 2 - BAND - 15)
 #define CGP (gfx_grid_champgames_champ_gif_HEIGHT)
 #define BAND (CGP + CGSPACER * 2)
-        unsigned char *l = RAM + _BUF_COPYRIGHT_PF2_LEFT;
-        unsigned char *r = RAM + _BUF_COPYRIGHT_PF2_RIGHT;
+        unsigned char *l = RAM + _BUF_COPYRIGHT_PF;
+        unsigned char *r = l + _SCANLINES;
         unsigned char *c = RAM + _BUF_COPYRIGHT_COLUPF;
         unsigned char *spc = RAM + _BUF_COPYRIGHT_COLUP0;
 
@@ -85,26 +86,26 @@ void VB_GS_Copyright() {
         for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++)
             *l++ = *r++ = *c++ = *spc++ = 0;
 
-        draw6Bitmap(_BUF_COPYRIGHT_GRP0A, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_champ_gif,
+        draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_champ_gif,
                     gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 8);
-        draw6Bitmap(_BUF_COPYRIGHT_GRP0A, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_games_gif,
+        draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_games_gif,
                     gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 8);
 
 
         if (frame > 60)
 
-            draw6Bitmap(_BUF_COPYRIGHT_GRP0A, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
+            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
                         gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, 8);
 
         if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 100) {
 
             int col = convertColour(frame & 16 ? 0x16 : 0x12);
 
-            draw6Bitmap(_BUF_COPYRIGHT_GRP0A, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_gif, gfx_grid_savekey_gif_HEIGHT,
+            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_gif, gfx_grid_savekey_gif_HEIGHT,
                         _SCANLINES - 1 - gfx_grid_savekey_gif_HEIGHT, col);
 
             if (RAM[_SK_RESET]) {
-                draw6Bitmap(_BUF_COPYRIGHT_GRP0A, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_reset_gif,
+                draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_reset_gif,
                             gfx_grid_savekey_reset_gif_HEIGHT,
                             _SCANLINES - 6 - gfx_grid_savekey_gif_HEIGHT - gfx_grid_savekey_reset_gif_HEIGHT, 6);
 
