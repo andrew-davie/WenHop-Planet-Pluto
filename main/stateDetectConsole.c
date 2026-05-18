@@ -32,17 +32,15 @@ const struct fmt {
 
 // clang-format on
 
-// ---------------------------------------
-// Console detection displays black screen
 
 void initialise_GS_DetectConsole() {
 
     detectionFrame = 0;
 }
 
+
 void VB_GS_DetectConsole() {
 
-    //    setPointer(DSJMP1PTR, _BUF_RAINBOW_JUMP);
 
     switch (detectionFrame) {
 

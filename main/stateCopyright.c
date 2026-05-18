@@ -34,6 +34,7 @@ const unsigned char trackChamp2[] = {
 };
 
 // clang-format on
+unsigned char presentsColour;
 
 void initialise_GS_Copyright() {
 
@@ -47,6 +48,7 @@ void initialise_GS_Copyright() {
 
     myMemsetInt((unsigned int *)(RAM + _BUF_COPYRIGHT_GRP), 0, 6 * _SCANLINES / 4);
 
+    presentsColour = 0;
 
     frame = 0;
 }
@@ -81,14 +83,9 @@ void VB_GS_Copyright() {
         unsigned char *c = RAM + _BUF_COPYRIGHT_COLUPF;
         unsigned char *spc = RAM + _BUF_COPYRIGHT_COLUP0;
 
-        // for (int i = 0; i < _SCANLINES; i++)
-        //     c[i] = 0xF;
-        // return;
-
 
         for (int sl = 0; sl < TOP; sl++) {
-            *l++ = *r++ = *spc++ = 0;
-            *c++ = convertColour(0);
+            *l++ = *c++ = *r++ = *spc++ = 0;
         }
 
         for (int sl = TOP; sl < TOP + 2 * BAND; sl++) {
@@ -104,8 +101,7 @@ void VB_GS_Copyright() {
         }
 
         for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++) {
-            *l++ = *r++ = *spc++ = 0;
-            *c++ = convertColour(0);
+            *l++ = *r++ = *c++ = *spc++ = 0;
         }
 
 
@@ -116,9 +112,11 @@ void VB_GS_Copyright() {
 
 
         if (frame > 60)
+            if (presentsColour < (8 << 2))
+                presentsColour++;
 
-            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
-                        gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, 8);
+        draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
+                    gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, presentsColour >> 2);
 
         if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 100) {
 

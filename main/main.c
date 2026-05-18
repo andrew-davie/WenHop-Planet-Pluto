@@ -285,8 +285,6 @@ int kernelForState[GS_MAX] = {
 
 void run_ARM_Overscan() {
 
-    //	HandleControls();
-
     if (gameState != nextGameState) {
 
         gameState = nextGameState;
