@@ -3,7 +3,7 @@
 enum GAME_STATE {
 
     // Controls which VB and OS are run
-    // Change through 'setNextGameState', change happens in OS
+    // Change through 'setGameState', change happens in OS
 
     GS_NULL,               // 0
     GS_DETECT_CONSOLE,     // 1

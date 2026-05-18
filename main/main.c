@@ -122,7 +122,7 @@ unsigned short input_target[12];
 
 //------------------------------------------------------------------------------
 
-void setNextGameState(enum GAME_STATE state) {
+void setGameState(enum GAME_STATE state) {
     nextGameState = state;
 }
 
@@ -170,7 +170,8 @@ void initKernel_01() {
 
 void initKernel_Copyright() {
 
-    setJumpVectors(_jump_table_1, _copyrightLoop, _copyrightExit, _SCANLINES);
+    setJumpVectors(_BUF_COPYRIGHT_JUMP, _kernelCopyright, _copyrightExit, _SCANLINES);
+    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
 }
 
 //------------------------------------------------------------------------------
@@ -203,7 +204,7 @@ void run_ARM_SystemReset() {
         setIncrement(i, 1, 0);    // all fetcher increments to 1
 
     gameState = GS_NULL;
-    setNextGameState(GS_DETECT_CONSOLE);
+    setGameState(GS_DETECT_CONSOLE);
 
     RAM[_kernel] = _KERNEL_DETECT_CONSOLE;    // TODO: detectConsole - does it have its own kernel
     RAM[_tvSystem] = tvSystem = _TV_SYSTEM_NTSC;
@@ -212,7 +213,7 @@ void run_ARM_SystemReset() {
 
     setPointer(DS31PTR, _kernel);    // pass initial state to Atari
 
-    // setNextGameState(GS_DETECT_CONSOLE);
+    // setGameState(GS_DETECT_CONSOLE);
 
     saveKeyEnableICC = 1;
 
@@ -243,7 +244,7 @@ void (*const verticalBlank[GS_MAX])() = {
 
     Null,                    // 0
     VB_GS_DetectConsole,     // 1
-    VB_GS_Copyright,         // 3
+    VB_GS_Copyright,         // 2
     VB_GS_Rainbow,           // 3
     VB_GS_CouchCompliant,    // 4
 
@@ -382,16 +383,9 @@ void SilenceTIA() {
 
 void setJumpVectors(unsigned int buffer, short int startAddress, short int endAddress, int length) {
 
-    //  set up demo jump table 1 for kernel_01
-    for (int i = 0; i <= length - 1; i++)
+    for (int i = 0; i < length - 1; i++)
         RAM_2B[(buffer / 2) + i] = startAddress;
     RAM_2B[(buffer / 2) + length - 1] = endAddress;
-
-
-    // unsigned short int *p = (unsigned short int *)(RAM + buffer);
-    // for (int i = 0; i < length; i++)
-    //     RAM_2B[buffer + i] = startAddress;
-    // *p = endAddress;
 }
 
 

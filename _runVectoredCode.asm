@@ -46,7 +46,7 @@ kernelRoutine_L
                     .byte <kernelDetectConsole
                     .byte <kernelRainbow
                     .byte <kernel_01
-                    .byte <kernelCopyright
+                    .byte <_kernelCopyright
 
                     .byte <VB_kernelDetectConsole
                     .byte <VB_kernelRainbow
@@ -62,7 +62,7 @@ kernelRoutine_H
                     .byte >kernelDetectConsole
                     .byte >kernelRainbow
                     .byte >kernel_01
-                    .byte >kernelCopyright
+                    .byte >_kernelCopyright
 
                     .byte >VB_kernelDetectConsole
                     .byte >VB_kernelRainbow

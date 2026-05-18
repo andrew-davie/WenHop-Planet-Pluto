@@ -7,6 +7,7 @@
 #include "state.h"
 
 void initialise_GS_Rainbow() {
+    frame = 0;
 }
 
 void VB_GS_Rainbow() {
@@ -21,8 +22,8 @@ void VB_GS_Rainbow() {
     setPointer(_DS_RBW_COLUBK, _BUF_RAINBOW_COLUBK);
     setPointer(DSJMP1PTR, _BUF_RAINBOW_JUMP);
 
-    // if (frame > 100)
-    //     setGameState(GS_);
+    if (frame > 200)
+        setGameState(GS_DETECT_CONSOLE);
 }
 
 void OS_GS_Rainbow() {

@@ -71,9 +71,7 @@ void VB_GS_DetectConsole() {
             }
         }
 
-
-        //        setNextGameState(GS_COPYRIGHT);
-        setNextGameState(GS_RAINBOW);
+        setGameState(GS_COPYRIGHT);
     }
     }
 

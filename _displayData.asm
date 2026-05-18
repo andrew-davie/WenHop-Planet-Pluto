@@ -69,7 +69,7 @@ _jump_table_2		ds _SCANLINES * 2
 _BUF_{2}             ds {1} * _SCANLINES
     ENDM
 
-_END_BUFFERS SET 0
+END_BUFFERS SET 0
 
 
     ALIGN 4         ; allowing 32-bit word access to clearing buffers in ARM
@@ -84,8 +84,8 @@ _BUFFERS = *
     DEFBUF 1, RAINBOW_COLUBK
     DEFBUF 2, RAINBOW_JUMP
 
-    if * > _END_BUFFERS
-_END_BUFFERS SET *
+    if * > END_BUFFERS
+END_BUFFERS SET *
     endif
 
 ;-------------------------------------------------------------------------------
@@ -96,8 +96,8 @@ _END_BUFFERS SET *
     DEFBUF 1, COUCH_COMPLIANT_COLUP0
     DEFBUF 1, COUCH_COMPLIANT_GRP0A
 
-    if * > _END_BUFFERS
-_END_BUFFERS SET *
+    if * > END_BUFFERS
+END_BUFFERS SET *
     endif
 
 ;-------------------------------------------------------------------------------
@@ -111,19 +111,19 @@ _END_BUFFERS SET *
     DEFBUF 1, COPYRIGHT_COLUPF
     DEFBUF 1, COPYRIGHT_COLUP0
 
-    if * > _END_BUFFERS
-_END_BUFFERS SET *
+    if * > END_BUFFERS
+END_BUFFERS SET *
     endif
 
 ;------------------------------------------------------------------------------
 
-    org _END_BUFFERS
+    org END_BUFFERS
     ; more vars here if required (but strange - put them before buffers!)
 
 ;------------------------------------------------------------------------------
 
-	IF (_END_BUFFERS <= _DISPLAY_SIZE)
-    	echo "----- DISPLAY RAM [", (_DISPLAY_SIZE)d, "] -->",(_END_BUFFERS)d, "bytes used,",(_DISPLAY_SIZE - _END_BUFFERS)d , "bytes free"
+	IF (END_BUFFERS <= _DISPLAY_SIZE)
+    	echo "----- DISPLAY RAM [", (_DISPLAY_SIZE)d, "] -->",(END_BUFFERS)d, "bytes used,",(_DISPLAY_SIZE - END_BUFFERS)d , "bytes free"
 	ELSE
 	    echo "FATAL ERROR - Display Data exceeds",(_DISPLAY_SIZE)d ,"bytes"
 	    err

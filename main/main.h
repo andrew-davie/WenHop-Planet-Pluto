@@ -18,7 +18,7 @@ void setJumpVectors(unsigned int buffer, short int startAddress, short int endAd
 
 unsigned int rangeRandom(short int range);
 
-void setNextGameState(enum GAME_STATE state);
+void setGameState(enum GAME_STATE state);
 
 
 // EOF

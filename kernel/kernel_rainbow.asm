@@ -2,43 +2,24 @@ BANK_kernelRainbow = .BANK
 
     DEFPTR RBW_COLUBK, 0
 
-
-VB_kernelRainbow
-OS_kernelRainbow    rts
-
-
 kernelRainbow
+_rainbowLoop        sta WSYNC
 
-
-
-
-              ldx #_SCANLINES
-
-
-
-
-
-
-_rainbowLoop
-.loop               
-
-                    sta WSYNC
-
-                    ; ldx #$42
-                    ; stx COLUBK
+                    lda #0
+                    sta PF0
+                    sta PF1
+                    sta PF2
+                    sta GRP0
+                    sta GRP1
 
                     lda #_DS_RBW_COLUBK_DATA
                     sta COLUBK
 
-
-                    dex
-
-;                    jmp FASTJMP1
-;
-                    bne .loop
+                    jmp FASTJMP1
 
 _rainbowExit
-
+VB_kernelRainbow
+OS_kernelRainbow
                     rts
 
 ; EOF

@@ -66,7 +66,7 @@ void VB_GS_CouchCompliant() {
     }
 
     else
-        setNextGameState(GS_RAINBOW);
+        setGameState(GS_RAINBOW);
 }
 
 void OS_GS_CouchCompliant() {

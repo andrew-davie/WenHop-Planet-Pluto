@@ -37,8 +37,6 @@ const unsigned char trackChamp2[] = {
 
 void initialise_GS_Copyright() {
 
-    setJumpVectors(_BUF_COPYRIGHT_JUMP, _copyrightLoop, _copyrightExit, _SCANLINES - 1);
-
     // sets the menu sprites position
     RAM[_P0_X] = 56;
     RAM[_P1_X] = 64;
@@ -47,15 +45,28 @@ void initialise_GS_Copyright() {
     loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
     loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
 
+    myMemsetInt((unsigned int *)(RAM + _BUF_COPYRIGHT_GRP), 0, 6 * _SCANLINES / 4);
+
+
     frame = 0;
 }
 
 
 void VB_GS_Copyright() {
 
-    // if (!colubk && !rangeRandom(50))
-    //     FLASH(convertColour(rangeRandom(256) & 0xF0 | 10), 20);
+    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
 
+    setPointer(_DS_CP_GRP0A, _BUF_COPYRIGHT_GRP + 0 * _SCANLINES);
+    setPointer(_DS_CP_GRP1A, _BUF_COPYRIGHT_GRP + 1 * _SCANLINES);
+    setPointer(_DS_CP_GRP0B, _BUF_COPYRIGHT_GRP + 2 * _SCANLINES);
+    setPointer(_DS_CP_GRP1B, _BUF_COPYRIGHT_GRP + 3 * _SCANLINES);
+    setPointer(_DS_CP_GRP0C, _BUF_COPYRIGHT_GRP + 4 * _SCANLINES);
+    setPointer(_DS_CP_GRP1C, _BUF_COPYRIGHT_GRP + 5 * _SCANLINES);
+
+    setPointer(_DS_CP_PF, _BUF_COPYRIGHT_PF);
+
+    setPointer(_DS_CP_COLUPF, _BUF_COPYRIGHT_COLUPF);
+    setPointer(_DS_CP_COLUP0, _BUF_COPYRIGHT_COLUP0);
 
     if (frame < 250) {
 
@@ -63,13 +74,22 @@ void VB_GS_Copyright() {
 #define TOP (_SCANLINES / 2 - BAND - 15)
 #define CGP (gfx_grid_champgames_champ_gif_HEIGHT)
 #define BAND (CGP + CGSPACER * 2)
+
+
         unsigned char *l = RAM + _BUF_COPYRIGHT_PF;
         unsigned char *r = l + _SCANLINES;
         unsigned char *c = RAM + _BUF_COPYRIGHT_COLUPF;
         unsigned char *spc = RAM + _BUF_COPYRIGHT_COLUP0;
 
-        for (int sl = 0; sl < TOP; sl++)
-            *l++ = *r++ = *c++ = *spc++ = 0;
+        // for (int i = 0; i < _SCANLINES; i++)
+        //     c[i] = 0xF;
+        // return;
+
+
+        for (int sl = 0; sl < TOP; sl++) {
+            *l++ = *r++ = *spc++ = 0;
+            *c++ = convertColour(0);
+        }
 
         for (int sl = TOP; sl < TOP + 2 * BAND; sl++) {
 
@@ -83,8 +103,11 @@ void VB_GS_Copyright() {
                 *c++ = convertColour(sl < TOP + BAND ? 0x92 : 0x42);
         }
 
-        for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++)
-            *l++ = *r++ = *c++ = *spc++ = 0;
+        for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++) {
+            *l++ = *r++ = *spc++ = 0;
+            *c++ = convertColour(0);
+        }
+
 
         draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_champ_gif,
                     gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 8);
@@ -102,12 +125,12 @@ void VB_GS_Copyright() {
             int col = convertColour(frame & 16 ? 0x16 : 0x12);
 
             draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_gif, gfx_grid_savekey_gif_HEIGHT,
-                        _SCANLINES - 1 - gfx_grid_savekey_gif_HEIGHT, col);
+                        _SCANLINES - 11 - gfx_grid_savekey_gif_HEIGHT, col);
 
             if (RAM[_SK_RESET]) {
                 draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_reset_gif,
                             gfx_grid_savekey_reset_gif_HEIGHT,
-                            _SCANLINES - 6 - gfx_grid_savekey_gif_HEIGHT - gfx_grid_savekey_reset_gif_HEIGHT, 6);
+                            _SCANLINES - 16 - gfx_grid_savekey_gif_HEIGHT - gfx_grid_savekey_reset_gif_HEIGHT, 6);
 
                 if (!(frame & 15))
                     ADDAUDIO(SFX_SELECTION);
@@ -115,8 +138,8 @@ void VB_GS_Copyright() {
         }
     }
 
-    // else
-    //     setNextGameState(GS_COUCH_COMPLIANT);
+    else
+        setGameState(GS_RAINBOW);    // GS_COUCH_COMPLIANT);
 }
 
 void OS_GS_Copyright() {
