@@ -139,10 +139,9 @@ void (*const initialiseGameState[GS_MAX])() = {
 
 void (*const initialiseKernel[_KERNEL_MAX])() = {
 
-    initKernel_DetectConsole,     // 0
-    initKernel_Rainbow,           // 1
-    initKernel_Copyright,         // 2
-    initKernel_CouchCompliant,    // 3
+    initKernel_DetectConsole,    // 0
+    initKernel_Rainbow,          // 1
+    initKernel_Copyright,        // 2
 };
 
 
@@ -272,6 +271,8 @@ void run_ARM_Overscan() {
 
 
     // common to ALL OS routines...
+
+    playAudio();
 
     frame++;
 

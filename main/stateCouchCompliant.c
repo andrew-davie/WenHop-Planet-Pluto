@@ -10,16 +10,27 @@
 #include "state.h"
 
 
-void initKernel_CouchCompliant() {
+int colx;
 
-    // re-uses KERNEL_COPYRIGHT
+// void initKernel_CouchCompliant() {
 
-    setJumpVectors(_BUF_COPYRIGHT_JUMP, _kernelCopyright, _copyrightExit, _SCANLINES);
-    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
-}
+//     // re-uses KERNEL_COPYRIGHT
+
+//     setJumpVectors(_BUF_COPYRIGHT_JUMP, _kernelCopyright, _copyrightExit, _SCANLINES);
+//     setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
+// }
 
 
 void initialise_GS_CouchCompliant() {
+
+    unsigned char *p = (unsigned char *)(RAM + _BUF_COPYRIGHT_COLUPF);
+    unsigned char *q = (unsigned char *)(RAM + _BUF_COPYRIGHT_COLUP0);
+    for (int i = 0; i < _SCANLINES; i++) {
+        *p++ = 0;
+        *q++ = 0;
+    }
+
+    colx = 0;
 
     frame = 0;
 }
@@ -37,36 +48,34 @@ void VB_GS_CouchCompliant() {
     setPointer(_DS_CP_COLUP0, _BUF_COPYRIGHT_COLUP0);
 
 
-    if (frame < 375) {
+    if (frame < 180) {
 
 #define COUCH_BASE 50
 
-        static int colx = -10;
-        if (++colx >= 0) {
+        if (++colx < 40) {
 
-            if (colx < 40) {
+            int clr = colx >> 2;
+            if (clr > 8)
+                clr = 8;
+            //            clr = clr & 0xFE;
 
-                int clr = colx >> 2;
-                if (clr > 8)
-                    clr = 8;
-                clr = clr & 0xFE;
+            // The blue 'shadow'
+            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_couch_compliant_gif, 1, COUCH_BASE + colx,
+                        (clr) ? 0x90 + clr : 0);
 
-                draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_couch_compliant_gif, 2,
-                            COUCH_BASE + colx, (clr) ? 0x8E + clr : 0);
+            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_couch_compliant_gif,
+                        gfx_grid_couch_compliant_gif_HEIGHT, COUCH_BASE + 1 + colx, clr);
 
-                draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_couch_compliant_gif,
-                            gfx_grid_couch_compliant_gif_HEIGHT, COUCH_BASE + 1 + colx, clr);
+            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_compliant_gif,
+                        gfx_grid_compliant_gif_HEIGHT, COUCH_BASE + 30 + colx, clr ? 0xD0 + (clr >> 1) : 0);
+        }
 
-                draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_compliant_gif,
-                            gfx_grid_compliant_gif_HEIGHT, COUCH_BASE + 30 + colx, clr ? 0xCE + clr : 0);
-            }
-
-            if (frame > 300 && !(frame & 3)) {
-                unsigned char *c = RAM + _BUF_COPYRIGHT_COLUP0;
-                for (int i = COUCH_BASE; i < COUCH_BASE + 39; i++) {
-                    if (c[i] && (--c[i] & 0xF) == 0xF)
-                        c[i] = 0;
-                }
+        // fade out shadow
+        if (frame > 70 && !(frame & 3)) {
+            unsigned char *c = RAM + _BUF_COPYRIGHT_COLUP0;
+            for (int i = COUCH_BASE; i < COUCH_BASE + 39; i++) {
+                if (c[i] && (--c[i] & 0xF) == 0xF)
+                    c[i] = 0;
             }
         }
     }
@@ -76,8 +85,6 @@ void VB_GS_CouchCompliant() {
 }
 
 void OS_GS_CouchCompliant() {
-
-    playAudio();
 }
 
 // EOF

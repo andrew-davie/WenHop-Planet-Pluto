@@ -39,6 +39,8 @@ unsigned int presentsColour;
 
 void initKernel_Copyright() {
 
+    // Note: kernel shared with GS_COUCH_COMPLIANT
+
     setJumpVectors(_BUF_COPYRIGHT_JUMP, _kernelCopyright, _copyrightExit, _SCANLINES);
     setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
 }
@@ -154,7 +156,6 @@ void VB_GS_Copyright() {
 }
 
 void OS_GS_Copyright() {
-    playAudio();
 }
 
 // EOF

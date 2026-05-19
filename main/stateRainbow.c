@@ -36,8 +36,6 @@ void VB_GS_Rainbow() {
 }
 
 void OS_GS_Rainbow() {
-
-    playAudio();
 }
 
 // EOF
