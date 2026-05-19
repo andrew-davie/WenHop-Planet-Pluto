@@ -169,7 +169,7 @@ void Null() {
 
 void run_ARM_SystemReset() {
 
-    myMemsetInt((void *)_DD_BASE, 0, _DISPLAY_SIZE / 4);
+    // myMemsetInt((void *)_DD_BASE, 0, _DISPLAY_SIZE / 4);
 
     for (int i = 0; i < 34; i++)
         setIncrement(i, 1, 0);    // all fetcher increments to 1

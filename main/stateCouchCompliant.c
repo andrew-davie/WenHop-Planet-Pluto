@@ -6,20 +6,10 @@
 #include "draw.h"
 #include "grid6.h"
 #include "main.h"
-#include "sound.h"
 #include "state.h"
 
 
 int colx;
-
-// void initKernel_CouchCompliant() {
-
-//     // re-uses KERNEL_COPYRIGHT
-
-//     setJumpVectors(_BUF_COPYRIGHT_JUMP, _kernelCopyright, _copyrightExit, _SCANLINES);
-//     setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
-// }
-
 
 void initialise_GS_CouchCompliant() {
 

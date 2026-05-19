@@ -52,7 +52,9 @@ void initialise_GS_Copyright() {
     loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
     loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
 
-    myMemsetInt((unsigned int *)(RAM + _BUF_COPYRIGHT_GRP), 0, 6 * _SCANLINES / 4);
+    unsigned char *p = (unsigned char *)(RAM + _BUF_COPYRIGHT_GRP);
+    for (int i = 0; i < _SCANLINES * 6; i++)
+        *p++ = 0;
 
     presentsColour = 0;
 
@@ -85,13 +87,8 @@ void VB_GS_Copyright() {
         unsigned char *c = RAM + _BUF_COPYRIGHT_COLUPF;
         unsigned char *spc = RAM + _BUF_COPYRIGHT_COLUP0;
 
-
-        myMemsetInt((unsigned int *)l, 0, _SCANLINES / 4);
-        myMemsetInt((unsigned int *)r, 0, _SCANLINES / 4);
-
-        // for (int sl = 0; sl < TOP; sl++) {
-        //     *l++ = *c++ = *r++ = *spc++ = 0;
-        // }
+        for (int i = 0; i < _SCANLINES; i++)
+            c[i] = 0;
 
         l += TOP;
         r += TOP;
