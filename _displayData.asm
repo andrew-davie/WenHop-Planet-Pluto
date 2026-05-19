@@ -40,25 +40,6 @@ _AUDV0              ds 2
 _AUDC0              ds 2
 _AUDF0              ds 2
 
-_P1_X               ds 1        ; position of player 1
-_P0_X               ds 1        ; position of player 0
-
-
-
-			; 173 bytes free for user data here
-			; things such as player positions,
-			; state, flags, etc.
-
-; 	org $0100
-; _waveforms		    ds 256			;@@@@@ 256 Bytes: 8 Custom Waveforms (0-7) @@@@@
-
-; _digital_sample		ds DS_SIZE		;@@@@@ 2048 Bytes: Digital Sound Sample (on RAM >= 16k) @@@@@
-						;@@@@@ playback access via waveform ID 8 @@@@@
-
-
-_jump_table_1		ds _SCANLINES * 2
-_jump_table_2		ds _SCANLINES * 2
-
 ;------------------------------------------------------------------------------
 ; OVERLAID VARIABLES
 
@@ -81,24 +62,13 @@ _BUFFERS = *
     SEG.U GS_RAINBOW
     ORG _BUFFERS
 
-    DEFBUF 1, RAINBOW_COLUBK
-    DEFBUF 2, RAINBOW_JUMP
+    DEFBUF 2, RB_JUMP
+    DEFBUF 1, RB_COLUBK
 
     if * > END_BUFFERS
 END_BUFFERS SET *
     endif
 
-;-------------------------------------------------------------------------------
-
-    SEG.U GS_COUCH_COMPLIANT
-    ORG _BUFFERS
-
-    DEFBUF 1, COUCH_COMPLIANT_COLUP0
-    DEFBUF 1, COUCH_COMPLIANT_GRP0A
-
-    if * > END_BUFFERS
-END_BUFFERS SET *
-    endif
 
 ;-------------------------------------------------------------------------------
 
@@ -110,6 +80,21 @@ END_BUFFERS SET *
     DEFBUF 2, COPYRIGHT_PF
     DEFBUF 1, COPYRIGHT_COLUPF
     DEFBUF 1, COPYRIGHT_COLUP0
+
+    if * > END_BUFFERS
+END_BUFFERS SET *
+    endif
+
+;------------------------------------------------------------------------------
+
+    SEG.U GS_COUCH_COMPLIANT
+    ORG _BUFFERS
+
+    DEFBUF 2, CC_JUMP
+    ; DEFBUF 6, COPYRIGHT_GRP
+    ; DEFBUF 2, COPYRIGHT_PF
+    ; DEFBUF 1, COPYRIGHT_COLUPF
+    ; DEFBUF 1, COPYRIGHT_COLUP0
 
     if * > END_BUFFERS
 END_BUFFERS SET *

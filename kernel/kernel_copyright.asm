@@ -1,42 +1,29 @@
 BANK_kernelCopyright = .BANK
 
     DEFPTR CP_GRP0A,  0
-    DEFPTR CP_GRP0B,  1
-    DEFPTR CP_GRP0C,  2
-    DEFPTR CP_GRP1A,  3
-    DEFPTR CP_GRP1B,  4
+    DEFPTR CP_GRP1A,  1
+    DEFPTR CP_GRP0B,  2
+    DEFPTR CP_GRP1B,  3
+    DEFPTR CP_GRP0C,  4
     DEFPTR CP_GRP1C,  5
     DEFPTR CP_PF,     6
     DEFPTR CP_COLUPF, 7
     DEFPTR CP_COLUP0, 8
 
-;-------------------------------------------------------------------------------
-
-grabAudio
-;                     ldx #1
-; audio               lda #_DS_AUDV0
-;                     sta AUDV0,x
-;                     lda #_DS_AUDC0
-;                     sta AUDC0,x
-;                     lda #_DS_AUDF0
-;                     sta AUDF0,x
-;                     dex
-;                     bpl audio
-                    rts
 
 ;-------------------------------------------------------------------------------
 
 posX .byte 56,64
 
-positionSprites
+positionSprites     SUBROUTINE
 
                     ldx #1
-vbSetInitialChamp   lda posX,x ;#DSCOMM                 ; P1_X, P0_X
+.loop               lda posX,x
 
                     sec
                     sta WSYNC
-DivideLoopC         sbc #15
-                    bcs DivideLoopC
+.divide             sbc #15
+                    bcs .divide
 
                     eor #7
                     asl
@@ -48,7 +35,7 @@ DivideLoopC         sbc #15
                     sta RESP0,x
 
                     dex
-                    bpl vbSetInitialChamp
+                    bpl .loop
 
                     rts
 
@@ -60,34 +47,29 @@ OS_kernelCopyright  rts
 
 VB_kernelCopyright
                     ldx #%00110011
-                    stx NUSIZ0                      ; three copies close, missile x8
-                    stx NUSIZ1                      ; three copies close, missile x8
-                    stx VDELP0                      ; vertical delay on
-                    stx VDELP1                      ; vertical delay on
+                    stx NUSIZ0
+                    stx NUSIZ1
+                    stx VDELP0
+                    stx VDELP1
 
                     ldx #0
                     stx ENAM0
                     stx ENAM1
+                    stx COLUBK
 
                     ldx #%00000001
                     stx CTRLPF              ; reflect PF
-
-
-                    jsr grabAudio
-
 
                     jsr positionSprites
                     sta WSYNC
                     sta HMOVE
 
-                    ldx #6 ; #_DS_COLUP0
+                    ldx #6
                     stx COLUP0
                     stx COLUP1
-                    ldx #$FC ;#_DS_PF1_RIGHT
+                    ldx #$FC
                     stx PF2
 
-                    lda #0
-                    sta COLUBK
                     rts
 
 

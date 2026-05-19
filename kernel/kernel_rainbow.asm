@@ -2,7 +2,7 @@ BANK_kernelRainbow = .BANK
 
     DEFPTR RBW_COLUBK, 0
 
-kernelRainbow
+_kernelRainbow
 _rainbowLoop        sta WSYNC
 
                     lda #0

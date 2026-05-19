@@ -33,9 +33,7 @@ _DD_BASE		    = $40000800		;DisplayData base exported into defines file and used
 _RAM_BASE		    = _DD_BASE + _DISPLAY_SIZE
 
 
-_SCANLINES    = 192   ; number of scanlines for the arena
-_ICC_SCANLINES = _SCANLINES/3
-ARENA_BUFFER_SIZE   =_SCANLINES    ; PF buffer size for largest arena
+_SCANLINES    = 198   ; number of scanlines for the arena
 
 
 	;C Stack Pointer - leave space for IAR at top of memory

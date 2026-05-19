@@ -17,6 +17,7 @@ Gamax Software 2026 - Craig Daniels
 #include "savekey.h"
 
 #include "colour.h"
+#include "kernels.h"
 #include "sound.h"
 #include "state.h"
 
@@ -126,23 +127,6 @@ void setGameState(enum GAME_STATE state) {
     nextGameState = state;
 }
 
-//------------------------------------------------------------------------------
-// Kernel Initialisation
-
-void initKernel_DetectConsole();
-void initKernel_Rainbow();
-void initKernel_01();
-void initKernel_Copyright();
-
-
-void (*const initialiseKernel[_KERNEL_MAX])() = {
-
-    initKernel_DetectConsole,    // 0
-    initKernel_Rainbow,          // 1
-    initKernel_01,               // 2
-    initKernel_Copyright,        // 3
-};
-
 
 void (*const initialiseGameState[GS_MAX])() = {
 
@@ -153,26 +137,14 @@ void (*const initialiseGameState[GS_MAX])() = {
     initialise_GS_CouchCompliant,    // 4
 };
 
+void (*const initialiseKernel[_KERNEL_MAX])() = {
 
-void initKernel_DetectConsole() {
-}
+    initKernel_DetectConsole,     // 0
+    initKernel_Rainbow,           // 1
+    initKernel_Copyright,         // 2
+    initKernel_CouchCompliant,    // 3
+};
 
-void initKernel_Rainbow() {
-
-    setJumpVectors(_BUF_RAINBOW_JUMP, _rainbowLoop, _rainbowExit, _SCANLINES);
-    setPointer(DSJMP1PTR, _BUF_RAINBOW_JUMP);
-}
-
-void initKernel_01() {
-
-    setJumpVectors(_jump_table_1, _rainbowLoop, _rainbowExit, _SCANLINES);
-}
-
-void initKernel_Copyright() {
-
-    setJumpVectors(_BUF_COPYRIGHT_JUMP, _kernelCopyright, _copyrightExit, _SCANLINES);
-    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
-}
 
 //------------------------------------------------------------------------------
 
@@ -279,7 +251,7 @@ int kernelForState[GS_MAX] = {
     _KERNEL_DETECT_CONSOLE,    // 1
     _KERNEL_COPYRIGHT,         // 2
     _KERNEL_RAINBOW,           // 3
-    _KERNEL_RAINBOW,           // 4
+    _KERNEL_COPYRIGHT,         // 4 (reused)
 };
 
 

@@ -32,6 +32,9 @@ const struct fmt {
 
 // clang-format on
 
+void initKernel_DetectConsole() {
+}
+
 
 void initialise_GS_DetectConsole() {
 

@@ -9,28 +9,34 @@
 #include "sound.h"
 #include "state.h"
 
+
+void initKernel_CouchCompliant() {
+
+    // re-uses KERNEL_COPYRIGHT
+
+    setJumpVectors(_BUF_COPYRIGHT_JUMP, _kernelCopyright, _copyrightExit, _SCANLINES);
+    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
+}
+
+
 void initialise_GS_CouchCompliant() {
 
     frame = 0;
-
-    // zeroBuffer((int *)(RAM + _BUF_MENU_GRP0A), (_ARENA_SCANLINES * 6) >> 2);
-    // zeroBuffer((int *)(RAM + _BUF_MENU_COLUPF), _ARENA_SCANLINES >> 2);
-
-    // ADDAUDIO(SFX_MAGIC);
 }
 
 void VB_GS_CouchCompliant() {
 
-    // rainbow...
-    static unsigned int col;
-    col++;
+    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
 
-    for (int i = 0; i < _SCANLINES; i++)
-        RAM[_BUF_COUCH_COMPLIANT_COLUP0 + i] = convertColour((col + ((_SCANLINES - 1 - i) >> 2)) & 0xFF);
+    for (int i = 0; i < 6; i++)
+        setPointer(_DS_CP_GRP0A + i, _BUF_COPYRIGHT_GRP + i * _SCANLINES);
 
-    setPointer(DS0PTR, _BUF_COUCH_COMPLIANT_COLUP0);
+    setPointer(_DS_CP_PF, _BUF_COPYRIGHT_PF);
 
-    // couch
+    setPointer(_DS_CP_COLUPF, _BUF_COPYRIGHT_COLUPF);
+    setPointer(_DS_CP_COLUP0, _BUF_COPYRIGHT_COLUP0);
+
+
     if (frame < 375) {
 
 #define COUCH_BASE 50
@@ -45,18 +51,18 @@ void VB_GS_CouchCompliant() {
                     clr = 8;
                 clr = clr & 0xFE;
 
-                draw6Bitmap(_BUF_COUCH_COMPLIANT_GRP0A, _BUF_COUCH_COMPLIANT_COLUP0, gfx_grid_couch_compliant_gif, 2,
+                draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_couch_compliant_gif, 2,
                             COUCH_BASE + colx, (clr) ? 0x8E + clr : 0);
 
-                draw6Bitmap(_BUF_COUCH_COMPLIANT_GRP0A, _BUF_COUCH_COMPLIANT_COLUP0, gfx_grid_couch_compliant_gif,
+                draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_couch_compliant_gif,
                             gfx_grid_couch_compliant_gif_HEIGHT, COUCH_BASE + 1 + colx, clr);
 
-                draw6Bitmap(_BUF_COUCH_COMPLIANT_GRP0A, _BUF_COUCH_COMPLIANT_COLUP0, gfx_grid_compliant_gif,
+                draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_compliant_gif,
                             gfx_grid_compliant_gif_HEIGHT, COUCH_BASE + 30 + colx, clr ? 0xCE + clr : 0);
             }
 
             if (frame > 300 && !(frame & 3)) {
-                unsigned char *c = RAM + _BUF_COUCH_COMPLIANT_COLUP0;
+                unsigned char *c = RAM + _BUF_COPYRIGHT_COLUP0;
                 for (int i = COUCH_BASE; i < COUCH_BASE + 39; i++) {
                     if (c[i] && (--c[i] & 0xF) == 0xF)
                         c[i] = 0;

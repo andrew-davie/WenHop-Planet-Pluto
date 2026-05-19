@@ -34,13 +34,17 @@ const unsigned char trackChamp2[] = {
 };
 
 // clang-format on
-unsigned char presentsColour;
+unsigned int presentsColour;
+
+
+void initKernel_Copyright() {
+
+    setJumpVectors(_BUF_COPYRIGHT_JUMP, _kernelCopyright, _copyrightExit, _SCANLINES);
+    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
+}
+
 
 void initialise_GS_Copyright() {
-
-    // sets the menu sprites position
-    RAM[_P0_X] = 56;
-    RAM[_P1_X] = 64;
 
     sound_volume = VOLUME_NONPLAYING;
     loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
@@ -58,12 +62,8 @@ void VB_GS_Copyright() {
 
     setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
 
-    setPointer(_DS_CP_GRP0A, _BUF_COPYRIGHT_GRP + 0 * _SCANLINES);
-    setPointer(_DS_CP_GRP1A, _BUF_COPYRIGHT_GRP + 1 * _SCANLINES);
-    setPointer(_DS_CP_GRP0B, _BUF_COPYRIGHT_GRP + 2 * _SCANLINES);
-    setPointer(_DS_CP_GRP1B, _BUF_COPYRIGHT_GRP + 3 * _SCANLINES);
-    setPointer(_DS_CP_GRP0C, _BUF_COPYRIGHT_GRP + 4 * _SCANLINES);
-    setPointer(_DS_CP_GRP1C, _BUF_COPYRIGHT_GRP + 5 * _SCANLINES);
+    for (int i = 0; i < 6; i++)
+        setPointer(_DS_CP_GRP0A + i, _BUF_COPYRIGHT_GRP + i * _SCANLINES);
 
     setPointer(_DS_CP_PF, _BUF_COPYRIGHT_PF);
 
@@ -84,9 +84,16 @@ void VB_GS_Copyright() {
         unsigned char *spc = RAM + _BUF_COPYRIGHT_COLUP0;
 
 
-        for (int sl = 0; sl < TOP; sl++) {
-            *l++ = *c++ = *r++ = *spc++ = 0;
-        }
+        myMemsetInt((unsigned int *)l, 0, _SCANLINES / 4);
+        myMemsetInt((unsigned int *)r, 0, _SCANLINES / 4);
+
+        // for (int sl = 0; sl < TOP; sl++) {
+        //     *l++ = *c++ = *r++ = *spc++ = 0;
+        // }
+
+        l += TOP;
+        r += TOP;
+        c += TOP;
 
         for (int sl = TOP; sl < TOP + 2 * BAND; sl++) {
 
@@ -100,9 +107,9 @@ void VB_GS_Copyright() {
                 *c++ = convertColour(sl < TOP + BAND ? 0x92 : 0x42);
         }
 
-        for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++) {
-            *l++ = *r++ = *c++ = *spc++ = 0;
-        }
+        // for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++) {
+        //     *l++ = *r++ = *c++ = *spc++ = 0;
+        // }
 
 
         draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_champ_gif,
@@ -111,15 +118,18 @@ void VB_GS_Copyright() {
                     gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 8);
 
 
+#define PRESENTS_LUM 8
+#define FADE_SPEED 17000
+#define FADE_SHIFT 16
+
         if (frame > 60)
-            if (presentsColour < (8 << 2))
-                presentsColour++;
+            if (presentsColour < (PRESENTS_LUM << FADE_SHIFT))
+                presentsColour += FADE_SPEED;
 
         draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
-                    gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, presentsColour >> 2);
+                    gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, (presentsColour >> FADE_SHIFT));
 
         if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 100) {
-
             int col = convertColour(frame & 16 ? 0x16 : 0x12);
 
             draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_gif, gfx_grid_savekey_gif_HEIGHT,
@@ -136,8 +146,11 @@ void VB_GS_Copyright() {
         }
     }
 
-    else
-        setGameState(GS_RAINBOW);    // GS_COUCH_COMPLIANT);
+    else {
+        setGameState(GS_COUCH_COMPLIANT);
+
+        RAM[_SK_RESET] = 0;    // superfluous when singleton
+    }
 }
 
 void OS_GS_Copyright() {
