@@ -8,13 +8,22 @@
 #include "main.h"
 #include "state.h"
 
+#define DURATION_COUCH 250
+
+
+// Re-using COPYRIGHT buffers, but alias just for readability
+#define _BUF_CC_JUMP _BUF_COPYRIGHT_JUMP
+#define _BUF_CC_COLUPF _BUF_COPYRIGHT_COLUPF
+#define _BUF_CC_COLUP0 _BUF_COPYRIGHT_COLUP0
+#define _BUF_CC_GRP _BUF_COPYRIGHT_GRP
+#define _BUF_CC_PF _BUF_COPYRIGHT_PF
 
 int colx;
 
 void initialise_GS_CouchCompliant() {
 
-    unsigned char *p = (unsigned char *)(RAM + _BUF_COPYRIGHT_COLUPF);
-    unsigned char *q = (unsigned char *)(RAM + _BUF_COPYRIGHT_COLUP0);
+    unsigned char *p = (unsigned char *)(RAM + _BUF_CC_COLUPF);
+    unsigned char *q = (unsigned char *)(RAM + _BUF_CC_COLUP0);
     for (int i = 0; i < _SCANLINES; i++) {
         *p++ = 0;
         *q++ = 0;
@@ -27,43 +36,41 @@ void initialise_GS_CouchCompliant() {
 
 void VB_GS_CouchCompliant() {
 
-    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
+    setPointer(DSJMP1PTR, _BUF_CC_JUMP);
 
     for (int i = 0; i < 6; i++)
-        setPointer(_DS_CP_GRP0A + i, _BUF_COPYRIGHT_GRP + i * _SCANLINES);
+        setPointer(_DS_CP_GRP0A + i, _BUF_CC_GRP + i * _SCANLINES);
 
-    setPointer(_DS_CP_PF, _BUF_COPYRIGHT_PF);
+    setPointer(_DS_CP_PF, _BUF_CC_PF);
 
-    setPointer(_DS_CP_COLUPF, _BUF_COPYRIGHT_COLUPF);
-    setPointer(_DS_CP_COLUP0, _BUF_COPYRIGHT_COLUP0);
+    setPointer(_DS_CP_COLUPF, _BUF_CC_COLUPF);
+    setPointer(_DS_CP_COLUP0, _BUF_CC_COLUP0);
 
 
-    if (frame < 180) {
+    if (frame < DURATION_COUCH) {
 
 #define COUCH_BASE 50
 
-        if (++colx < 40) {
+        if (colx < 40)
+            colx++;
 
-            int clr = colx >> 2;
-            if (clr > 8)
-                clr = 8;
-            //            clr = clr & 0xFE;
+        int clr = colx >> 2;
 
-            // The blue 'shadow'
-            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_couch_compliant_gif, 1, COUCH_BASE + colx,
-                        (clr) ? 0x90 + clr : 0);
+        unsigned char *p = (unsigned char *)(RAM + _BUF_CC_COLUP0);
+        p[COUCH_BASE + colx - 1] |= convertColour(0x90);
 
-            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_couch_compliant_gif,
-                        gfx_grid_couch_compliant_gif_HEIGHT, COUCH_BASE + 1 + colx, clr);
+        draw6Bitmap(_BUF_CC_GRP, _BUF_CC_COLUP0, gfx_grid_couch_compliant_gif, gfx_grid_couch_compliant_gif_HEIGHT,
+                    COUCH_BASE + 1 + colx, clr);
 
-            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_compliant_gif,
-                        gfx_grid_compliant_gif_HEIGHT, COUCH_BASE + 30 + colx, clr ? 0xD0 + (clr >> 1) : 0);
-        }
+        if (frame > 80)
+            draw6Bitmap(_BUF_CC_GRP, _BUF_CC_COLUP0, gfx_grid_compliant_gif, gfx_grid_compliant_gif_HEIGHT,
+                        COUCH_BASE + 30 + colx, clr ? (frame & 16) ? 0x22 : 0x26 : 0);
+
 
         // fade out shadow
-        if (frame > 70 && !(frame & 3)) {
-            unsigned char *c = RAM + _BUF_COPYRIGHT_COLUP0;
-            for (int i = COUCH_BASE; i < COUCH_BASE + 39; i++) {
+        if (frame > 50 && !(frame & 3)) {
+            unsigned char *c = RAM + _BUF_CC_COLUP0;
+            for (int i = COUCH_BASE; i < COUCH_BASE + 40; i++) {
                 if (c[i] && (--c[i] & 0xF) == 0xF)
                     c[i] = 0;
             }

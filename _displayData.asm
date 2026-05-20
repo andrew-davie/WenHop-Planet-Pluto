@@ -85,20 +85,6 @@ END_BUFFERS SET *
 END_BUFFERS SET *
     endif
 
-;------------------------------------------------------------------------------
-
-    SEG.U GS_COUCH_COMPLIANT
-    ORG _BUFFERS
-
-    DEFBUF 2, CC_JUMP
-    ; DEFBUF 6, COPYRIGHT_GRP
-    ; DEFBUF 2, COPYRIGHT_PF
-    ; DEFBUF 1, COPYRIGHT_COLUPF
-    ; DEFBUF 1, COPYRIGHT_COLUP0
-
-    if * > END_BUFFERS
-END_BUFFERS SET *
-    endif
 
 ;------------------------------------------------------------------------------
 

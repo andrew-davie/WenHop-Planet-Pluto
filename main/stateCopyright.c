@@ -10,6 +10,7 @@
 #include "state.h"
 
 #define CHAMP_VOL 100
+#define DURATION_COPYRIGHT 250
 
 // clang-format off
 
@@ -74,7 +75,7 @@ void VB_GS_Copyright() {
     setPointer(_DS_CP_COLUPF, _BUF_COPYRIGHT_COLUPF);
     setPointer(_DS_CP_COLUP0, _BUF_COPYRIGHT_COLUP0);
 
-    if (frame < 250) {
+    if (frame < DURATION_COPYRIGHT) {
 
 #define CGSPACER 4
 #define TOP (_SCANLINES / 2 - BAND - 15)
@@ -128,7 +129,7 @@ void VB_GS_Copyright() {
         draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
                     gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, (presentsColour >> FADE_SHIFT));
 
-        if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 100) {
+        if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 70) {
             int col = convertColour(frame & 16 ? 0x16 : 0x12);
 
             draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_gif, gfx_grid_savekey_gif_HEIGHT,
