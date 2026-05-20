@@ -266,7 +266,8 @@ TRANSIENTS = $(CUSTOMTARGETS) \
 			 $(BIN)/* \
 			 $(OUTPUT)/* \
 			 $(BASE)/$(DASM_TO_C) \
-			 $(TOOLS_BIN)/*
+			 $(TOOLS_BIN)/* \
+			 icc/*
 
 .PHONY: clean
 clean:

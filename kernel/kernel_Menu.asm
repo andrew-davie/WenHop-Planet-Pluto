@@ -10,12 +10,12 @@ START_MENU = *
     DEFPTR MENU_AUDF0,     7
     DEFPTR MENU_COLUPF,    8
     DEFPTR MENU_COLUP0,    9
-    DEFPTR MENU_GRP0a,     10
-    DEFPTR MENU_GRP1a,     11
-    DEFPTR MENU_GRP0b,     12
-    DEFPTR MENU_GRP1b,     13
-    DEFPTR MENU_GRP0c,     14
-    DEFPTR MENU_GRP1c,     15
+    DEFPTR MENU_GRP0A,     10
+    DEFPTR MENU_GRP1A,     11
+    DEFPTR MENU_GRP0B,     12
+    DEFPTR MENU_GRP1B,     13
+    DEFPTR MENU_GRP0C,     14
+    DEFPTR MENU_GRP1C,     15
 
 posXMenu .byte 80, 88
 
@@ -35,15 +35,13 @@ positionSpritesMenu
                     asl
                     asl
 
-                    sta.w HMP0,x
+                    sta.wx HMP0,x
                     sta RESP0,x
 
                     dex
                     bpl .loopMenu
 
                     rts
-
-
 
 
 kernelMenu
@@ -53,7 +51,7 @@ kernelMenu
                     sta COLUPF                      ; 3
 
                     sta WSYNC
-                    SLEEP 3
+                    jmp 0
 
 _menuLoop
 
@@ -63,20 +61,20 @@ _MENU_KERNEL
 
                     lda #_DS_MENU_PF1_LEFT_DATA
                     sta PF1                         ; 5
-                    lda #_DS_MENU_GRP0a_DATA
+                    lda #_DS_MENU_GRP0A_DATA
                     sta GRP0                        ; 5
-                    lda #_DS_MENU_GRP1a_DATA
+                    lda #_DS_MENU_GRP1A_DATA
                     sta GRP1                        ; 5
-                    lda #_DS_MENU_GRP0b_DATA
+                    lda #_DS_MENU_GRP0B_DATA
                     sta GRP0                        ; 5
 
-                    lda #_DS_MENU_GRP1c_DATA                  ; 2
+                    lda #_DS_MENU_GRP1C_DATA                  ; 2
                     tay                             ; 2
 
                     lda #_DS_MENU_PF2_LEFT_DATA
                     sta PF2                         ; 5
 
-                    lda #_DS_MENU_GRP0c_DATA                  ; 2
+                    lda #_DS_MENU_GRP0C_DATA                  ; 2
                     tax                             ; 2
                     lda #_DS_MENU_PF1_RIGHT_DATA
                     sta PF1                         ; 5
@@ -85,7 +83,7 @@ _MENU_KERNEL
                     nop                             ; 2
                     sta PF2                         ; 3
 
-                    lda #_DS_MENU_GRP1b_DATA                  ; 2
+                    lda #_DS_MENU_GRP1B_DATA                  ; 2
                     sta GRP1                        ; 3
                     stx GRP0                        ; 3
                     sty GRP1                        ; 3
@@ -108,9 +106,9 @@ _MENU_KERNEL
 
 _menuExit
 
-                    ldy #0
-                    sty PF1
-                    sty PF2
+                    ; ldy #0
+                    ; sty PF1
+                    ; sty PF2
                     rts
 
 
@@ -127,6 +125,7 @@ VB_kernelMenu
                     sta COLUPF
 
                     sta WSYNC
+                    sta HMOVE
 
                     rts
 
