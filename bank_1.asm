@@ -1,13 +1,17 @@
 	org  CURRENT_ORG
 	rorg $f000
 
-.BANK SET BANK1
 BANK1_START
-
 
 ;-------------------------------------------------------------------------------
 
-    include "kernel/kernel_copyright.asm"
+BANK_kernelCopyright = BANK1
+BANK_kernelCouchCompliant = BANK1
+BANK_kernelMenu = BANK1
+
+    include "kernel/kernel_Copyright.asm"
+    include "kernel/kernel_CouchCompliant.asm"
+    include "kernel/kernel_Menu.asm"
 
 ;-------------------------------------------------------------------------------
 

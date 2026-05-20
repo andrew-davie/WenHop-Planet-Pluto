@@ -1,4 +1,4 @@
-BANK_kernelCopyright = .BANK
+START_COPYRIGHT = *
 
     DEFPTR CP_GRP0A,  0
     DEFPTR CP_GRP1A,  1
@@ -73,9 +73,8 @@ VB_kernelCopyright
                     rts
 
 
-_kernelCopyright
-
-                    sta WSYNC                       ; @0
+kernelCopyright
+_copyrightLoop      sta WSYNC                       ; @0
                     sta.w COLUP1                    ; 4
 
                     lda #_DS_CP_GRP0A_DATA          ; 2
@@ -104,11 +103,13 @@ _kernelCopyright
                     lda #_DS_CP_COLUP0_DATA         ; 2
                     sta COLUP0                      ; 3
 
-                    jmp FASTJMP1                    ; 3
+                    jmp 0                           ; 3
 
 
 _copyrightExit
                     rts
 
+
+    echo "KERNEL COPYRIGHT [", (*-START_COPYRIGHT)d,"] bytes"
 ; EOF
 

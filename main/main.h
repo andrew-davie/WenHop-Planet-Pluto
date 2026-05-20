@@ -1,6 +1,6 @@
 #pragma once
 
-#include "state.h"
+#include "gameState.h"
 
 #define _WENHOP_SK_ID _SK_GAME_ID
 
@@ -14,7 +14,7 @@ extern void ClearChannel(void *ptr);
 extern void MemCopy32(void *ptr1, void *ptr2, unsigned int count);
 extern void Random(unsigned int count);
 
-void setJumpVectors(unsigned int buffer, short int startAddress, short int endAddress, int length);
+void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAddress, int length);
 
 unsigned int rangeRandom(short int range);
 

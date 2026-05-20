@@ -1,9 +1,9 @@
-START_RAINBOW = *
+START_MENU = *
 
-    DEFPTR RBW_COLUBK, 0
+    DEFPTR MENU_COLUBK, 0
 
-kernelRainbow
-_rainbowLoop        sta WSYNC
+kernelMenu
+_menuLoop           sta WSYNC
 
                     lda #0
                     sta PF0
@@ -12,16 +12,16 @@ _rainbowLoop        sta WSYNC
                     sta GRP0
                     sta GRP1
 
-                    lda #_DS_RBW_COLUBK_DATA
+                    lda #_DS_MENU_COLUBK_DATA
                     sta COLUBK
 
                     jmp 0
 
-_rainbowExit
-VB_kernelRainbow
-OS_kernelRainbow
+_menuExit
+VB_kernelMenu
+OS_kernelMenu
                     rts
 
-    echo "KERNEL RAINBOW [", (* - START_RAINBOW)d,"] bytes"
+    echo "KERNEL MENU [", (* - START_MENU)d,"] bytes"
 
 ; EOF

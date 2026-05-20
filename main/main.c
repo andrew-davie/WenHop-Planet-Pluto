@@ -17,9 +17,9 @@ Gamax Software 2026 - Craig Daniels
 #include "savekey.h"
 
 #include "colour.h"
+#include "gameState.h"
 #include "kernels.h"
 #include "sound.h"
-#include "state.h"
 
 
 int usedSolves;
@@ -34,10 +34,10 @@ unsigned char colubk;
 
 void Null();    // empty function, for any use
 
-void run_ARM_SystemReset();
-void run_ARM_Load_SaveKey();
-void run_ARM_VerticalBlank();
-void run_ARM_Overscan();
+void runARM_SystemReset();
+void runARM_Load_SaveKey();
+void runARM_VerticalBlank();
+void runARM_Overscan();
 
 void HandleControls();
 void SilenceWaves();
@@ -124,36 +124,39 @@ unsigned short input_target[12];
 //------------------------------------------------------------------------------
 
 void setGameState(enum GAME_STATE state) {
-    nextGameState = state;
+
+    nextGameState = state;    // actioned in OS
 }
 
 
 void (*const initialiseGameState[GS_MAX])() = {
 
     Null,                            // 0
-    initialise_GS_DetectConsole,     // 1
-    initialise_GS_Copyright,         // 2
-    initialise_GS_Rainbow,           // 3
-    initialise_GS_CouchCompliant,    // 4
+    initGameState_DetectConsole,     // 1
+    initGameState_Copyright,         // 2
+    initGameState_Rainbow,           // 3
+    initGameState_CouchCompliant,    // 4
+    initGameState_Menu,              // 5
 };
 
 void (*const initialiseKernel[_KERNEL_MAX])() = {
 
-    initKernel_DetectConsole,    // 0
-    initKernel_Rainbow,          // 1
-    initKernel_Copyright,        // 2
+    initKernel_DetectConsole,     // 0
+    initKernel_Rainbow,           // 1
+    initKernel_Copyright,         // 2
+    initKernel_CouchCompliant,    // 3
+    initKernel_Menu,              // 4
 };
-
 
 //------------------------------------------------------------------------------
 
 void (*const runFunc[])() = {
 
-    Null,                     // _RUN_ARM_NULL
-    run_ARM_SystemReset,      // _RUN_ARM_SYSTEM_RESET
-    run_ARM_Load_SaveKey,     // _RUN_ARM_LOAD_SAVEKEY
-    run_ARM_VerticalBlank,    // _RUN_ARM_VB_VBLANK
-    run_ARM_Overscan,         // _RUN_ARM_OS_VBLANK
+    Null,                    // _RUNARM_NULL
+    runARM_SystemReset,      // _RUNARM_SYSTEM_RESET
+    runARM_Load_SaveKey,     // _RUNARM_LOAD_SAVEKEY
+    runARM_VerticalBlank,    // _RUNARM_VB_VBLANK
+    runARM_Overscan,         // _RUNARM_OS_VBLANK
 };
 
 int main() {    // <-- 6507/ARM interfaced here!
@@ -167,7 +170,7 @@ void Null() {
 }
 
 
-void run_ARM_SystemReset() {
+void runARM_SystemReset() {
 
     // myMemsetInt((void *)_DD_BASE, 0, _DISPLAY_SIZE / 4);
 
@@ -184,8 +187,6 @@ void run_ARM_SystemReset() {
 
     setPointer(DS31PTR, _kernel);    // pass initial state to Atari
 
-    // setGameState(GS_DETECT_CONSOLE);
-
     saveKeyEnableICC = 1;
 
     initAudio(true);
@@ -193,7 +194,7 @@ void run_ARM_SystemReset() {
 }
 
 
-void run_ARM_Load_SaveKey() {
+void runARM_Load_SaveKey() {
 
     if (RAM[_SK_ID] == _WENHOP_SK_ID) {
 
@@ -211,17 +212,16 @@ void run_ARM_Load_SaveKey() {
 
 void (*const verticalBlank[GS_MAX])() = {
 
-    // see GAME_STATE enum
-
-    Null,                    // 0
-    VB_GS_DetectConsole,     // 1
-    VB_GS_Copyright,         // 2
-    VB_GS_Rainbow,           // 3
-    VB_GS_CouchCompliant,    // 4
+    Null,                 // 0
+    VB_DetectConsole,     // 1
+    VB_Copyright,         // 2
+    VB_Rainbow,           // 3
+    VB_CouchCompliant,    // 4
+    VB_Menu,              // 5
 
 };
 
-void run_ARM_VerticalBlank() {
+void runARM_VerticalBlank() {
 
     if (gameState == nextGameState)
         (*verticalBlank[gameState])();
@@ -234,35 +234,34 @@ void run_ARM_VerticalBlank() {
 
 void (*const overscan[GS_MAX])() = {
 
-    // see GAME_STATE enum
+    Null,                 // 0
+    OS_DetectConsole,     // 1  GS_DETECT_CONSOLE
+    OS_Copyright,         // 2  GS_COPYRIGHT
+    OS_Rainbow,           // 3  GS_RAINBOW
+    OS_CouchCompliant,    // 4  GS_COUCH_COMPLIANT
+    OS_Menu,              // 5  GS_MENU
+};
 
-    Null,                    // 0
-    OS_GS_DetectConsole,     // 1
-    OS_GS_Copyright,         // 2
-    OS_GS_Rainbow,           // 3
-    OS_GS_CouchCompliant,    // 4
+int whichKernel[GS_MAX] = {
+
+    0,                         // 0
+    _KERNEL_DETECT_CONSOLE,    // 1 GS_DETECT_CONSOLE
+    _KERNEL_COPYRIGHT,         // 2 GS_COPYRIGHT
+    _KERNEL_RAINBOW,           // 3 GS_RAINBOW
+    _KERNEL_COPYRIGHT,         // 4 GS_COUCH_COMPLIANT (re-used COPYRIGHT)
+    _KERNEL_MENU,              // 5 GS_MENU
 };
 
 
-int kernelForState[GS_MAX] = {
-
-    0,                         // hopefully not accessed
-    _KERNEL_DETECT_CONSOLE,    // 1
-    _KERNEL_COPYRIGHT,         // 2
-    _KERNEL_RAINBOW,           // 3
-    _KERNEL_COPYRIGHT,         // 4 (reused)
-};
-
-
-void run_ARM_Overscan() {
+void runARM_Overscan() {
 
     if (gameState != nextGameState) {
 
         gameState = nextGameState;
         (*initialiseGameState[gameState])();
 
-        if (kernelForState[gameState] != kernel) {
-            kernel = kernelForState[gameState];
+        if (whichKernel[gameState] != kernel) {
+            kernel = whichKernel[gameState];
             (*initialiseKernel[kernel])();
         }
     }
@@ -352,10 +351,10 @@ void SilenceTIA() {
     }
 }
 
-void setJumpVectors(unsigned int buffer, short int startAddress, short int endAddress, int length) {
+void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAddress, int length) {
 
     for (int i = 0; i < length - 1; i++)
-        RAM_2B[(buffer / 2) + i] = startAddress;
+        RAM_2B[(buffer / 2) + i] = loopAddress;
     RAM_2B[(buffer / 2) + length - 1] = endAddress;
 }
 

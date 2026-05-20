@@ -6,8 +6,8 @@
 
 #include "colour.h"
 #include "draw.h"
+#include "gameState.h"
 #include "grid6.h"
-#include "state.h"
 
 #define CHAMP_VOL 100
 #define DURATION_COPYRIGHT 250
@@ -42,12 +42,12 @@ void initKernel_Copyright() {
 
     // Note: kernel shared with GS_COUCH_COMPLIANT
 
-    setJumpVectors(_BUF_COPYRIGHT_JUMP, _kernelCopyright, _copyrightExit, _SCANLINES);
+    setJumpVectors(_BUF_COPYRIGHT_JUMP, _copyrightLoop, _copyrightExit, _SCANLINES);
     setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
 }
 
 
-void initialise_GS_Copyright() {
+void initGameState_Copyright() {
 
     sound_volume = VOLUME_NONPLAYING;
     loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
@@ -63,7 +63,7 @@ void initialise_GS_Copyright() {
 }
 
 
-void VB_GS_Copyright() {
+void VB_Copyright() {
 
     setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
 
@@ -147,13 +147,16 @@ void VB_GS_Copyright() {
     }
 
     else {
-        setGameState(GS_COUCH_COMPLIANT);
+
+
+        // setGameState(GS_COUCH_COMPLIANT);
+        setGameState(GS_MENU);
 
         RAM[_SK_RESET] = 0;    // superfluous when singleton
     }
 }
 
-void OS_GS_Copyright() {
+void OS_Copyright() {
 }
 
 // EOF

@@ -3,8 +3,8 @@
 
 #include "cdfjplus.h"
 
+#include "gameState.h"
 #include "main.h"
-#include "state.h"
 
 
 #define DETECT_FRAME_COUNT 10
@@ -36,13 +36,13 @@ void initKernel_DetectConsole() {
 }
 
 
-void initialise_GS_DetectConsole() {
+void initGameState_DetectConsole() {
 
     detectionFrame = 0;
 }
 
 
-void VB_GS_DetectConsole() {
+void VB_DetectConsole() {
 
 
     switch (detectionFrame) {
@@ -79,7 +79,7 @@ void VB_GS_DetectConsole() {
     detectionFrame++;
 }
 
-void OS_GS_DetectConsole() {
+void OS_DetectConsole() {
 }
 
 // EOF

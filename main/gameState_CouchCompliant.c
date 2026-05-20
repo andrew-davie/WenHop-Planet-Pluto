@@ -4,9 +4,10 @@
 
 #include "colour.h"
 #include "draw.h"
+#include "gameState.h"
 #include "grid6.h"
+#include "kernels.h"
 #include "main.h"
-#include "state.h"
 
 #define DURATION_COUCH 250
 
@@ -20,7 +21,11 @@
 
 int colx;
 
-void initialise_GS_CouchCompliant() {
+void initKernel_CouchCompliant() {
+    initKernel_Copyright();    // re-use
+}
+
+void initGameState_CouchCompliant() {
 
     unsigned char *p = (unsigned char *)(RAM + _BUF_CC_COLUPF);
     unsigned char *q = (unsigned char *)(RAM + _BUF_CC_COLUP0);
@@ -34,7 +39,7 @@ void initialise_GS_CouchCompliant() {
     frame = 0;
 }
 
-void VB_GS_CouchCompliant() {
+void VB_CouchCompliant() {
 
     setPointer(DSJMP1PTR, _BUF_CC_JUMP);
 
@@ -81,7 +86,7 @@ void VB_GS_CouchCompliant() {
         setGameState(GS_RAINBOW);
 }
 
-void OS_GS_CouchCompliant() {
+void OS_CouchCompliant() {
 }
 
 // EOF

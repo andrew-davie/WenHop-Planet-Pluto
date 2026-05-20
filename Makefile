@@ -69,10 +69,11 @@ SRCS = \
  main.c \
  savekey.c \
  sound.c \
- stateCopyright.c \
- stateCouchCompliant.c \
- stateDetectConsole.c \
- stateRainbow.c \
+ gameState_Copyright.c \
+ gameState_CouchCompliant.c \
+ gameState_DetectConsole.c \
+ gameState_Menu.c \
+ gameState_Rainbow.c \
  \
  grid6.c
 

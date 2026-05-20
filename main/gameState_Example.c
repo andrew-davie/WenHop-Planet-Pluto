@@ -10,12 +10,12 @@ void initKernel_Example() {
 }
 
 
-void initialise_GS_Example() {
+void initGameState_Example() {
 
     frame = 0;
 }
 
-void VB_GS_CouchCompliant() {
+void VB_CouchCompliant() {
 
     setPointer(DSJMP1PTR, _BUF_EXAMPLE_JUMP);
 
@@ -25,7 +25,7 @@ void VB_GS_CouchCompliant() {
     return;
 }
 
-void OS_GS_Example() {
+void OS_Example() {
 }
 
 // EOF

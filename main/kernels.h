@@ -4,10 +4,11 @@
 
 extern void (*const initialiseKernel[_KERNEL_MAX])();
 
-extern void initKernel_Copyright();
-extern void initKernel_Rainbow();
-extern void initKernel_DetectConsole();
-extern void initKernel_CouchCompliant();
+void initKernel_Copyright();
+void initKernel_Rainbow();
+void initKernel_DetectConsole();
+void initKernel_CouchCompliant();
+void initKernel_Menu();
 
 
 // EOF

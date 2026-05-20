@@ -1,11 +1,11 @@
 ; use this as a template for new game-state/kernels
 
-; add the new state in enum in state.h
+; add the new state in enum in gameState.h
 ;      GS_EXAMPLE,    // #
 ; prototype the functions
-;      void initialise_GS_Example();
-;      void VB_GS_Example();
-;      void OS_GS_Example();
+;      void initGameState_Example();
+;      void VB_Example();
+;      void OS_Example();
 
 ; make copies of stateExample.c, and kernel_example.asm
 ; remembering to use new kernel name instead of 'example' (per below)
@@ -14,20 +14,20 @@
 ; add the following to to initKernel_example()
 ;      SetJumpVectors(_BUF_EX_JUMP, _kernelExample, _exampleExit, _SCANLINES)
 ;      setPointer(DSJMP1PTR, _BUF_EX_JUMP);
-; add to VB_GS_Example()
+; add to VB_Example()
 ;      setPointer(DSJMP1PTR, _BUF_EX_JUMP);
 
 ; in main.c
 ; add the following to end of table (*const verticalBlank[GS_MAX])()
-;      VB_GS_Example,       // #
+;      VB_Example,       // #
 ; add the following to end of table  (*const overscan[GS_MAX])()
-;      OS_GS_Example,       // #
+;      OS_Example,       // #
 ; add the following to the end of table (*const initialiseKernel[_KERNEL_MAX])
 ;   initKernel_Example              // #
-; add the following to the end of table kernelForState[GS_MAX]
+; add the following to the end of table whichKernel[GS_MAX]
 ;   _KERNEL_EXAMPLE,            // #
 ; add the following to the end of table void (*const initialiseGameState[GS_MAX])()
-;   initialise_GS_Example, //#
+;   initGameState_Example, //#
 
 
 ; in kernels.h add
@@ -39,7 +39,8 @@
 ; use  _DS_NEW_COLUBK to set in ARM, and _DS_NEW_COLUBK_DATA to fetch in ASM
 
 ; add in one of the banks (e.g bank_0.asm)
-;      include "kernels/kernel_example.asm"
+;   BANK_kernelExample = BANK#
+;      include "kernel/kernel_example.asm"
 
 ; in runVectoredCode.asm
 ; add a new KERNEL defintion above KERNEL_MAX
@@ -60,15 +61,11 @@
 ; add 'stateExample.c' to the SRCS list in the Makefile
 
 
-
-
-
-
-BANK_kernelExample = .BANK
+START_EXAMPLE = *
 
     DEFPTR EX_COLUBK, 0
 
-_kernelExample
+kernelExample
 _exampleLoop        sta WSYNC
 
                     lda #0
@@ -81,11 +78,13 @@ _exampleLoop        sta WSYNC
                     lda #_DS_EX_COLUBK_DATA
                     sta COLUBK
 
-                    jmp FASTJMP1
+                    jmp 0
 
 _exampleExit
 VB_Example
 OS_Example
                     rts
+
+    echo "KERNEL EXAMPLE [", (* - START_EXAMPLE)d,"] bytes"
 
 ; EOF

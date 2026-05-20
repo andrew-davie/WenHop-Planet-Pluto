@@ -86,6 +86,19 @@ END_BUFFERS SET *
     endif
 
 
+;-------------------------------------------------------------------------------
+
+    SEG.U GS_MENU
+    ORG _BUFFERS
+
+    DEFBUF 2, MENU_JUMP
+    DEFBUF 1, MENU_COLUBK
+
+    if * > END_BUFFERS
+END_BUFFERS SET *
+    endif
+
+
 ;------------------------------------------------------------------------------
 
     org END_BUFFERS

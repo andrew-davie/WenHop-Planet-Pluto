@@ -1,7 +1,6 @@
 	org  CURRENT_ORG
 	rorg $f000
 
-.BANK SET  BANK0
 BANK0_START
 
 ;-------------------------------------------------------------------------------
@@ -14,8 +13,11 @@ BANK0_START
 
     ; moveable to other banks... (called through runVectoredCode)
 
-    include "kernel/kernel_detectConsole.asm"
-    include "kernel/kernel_rainbow.asm"
+BANK_kernelDetectConsole = BANK0
+BANK_kernelRainbow = BANK0
+
+    include "kernel/kernel_DetectConsole.asm"
+    include "kernel/kernel_Rainbow.asm"
 
 ;-------------------------------------------------------------------------------
 

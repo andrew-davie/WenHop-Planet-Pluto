@@ -1,7 +1,6 @@
 	org  CURRENT_ORG
 	rorg $f000
 
-.BANK SET  BANK5
 BANK5_START
 
 

@@ -1,9 +1,9 @@
-BANK_kernelCouchCompliant = .BANK
+START_COUCH_COMPLIANT = *
 
     DEFPTR CC_COLUP0, 0
 
 
-_kernelCouchCompliant
+kernelCouchCompliant
 _couchLoop          sta WSYNC
 
                     lda #0
@@ -17,7 +17,7 @@ _couchLoop          sta WSYNC
                    ; lda #_DS_CC_COLUP0__DATA
                     stx COLUBK
 
-                    jmp FASTJMP1
+                    jmp 0
 
 _couchCompliantExit
 VB_kernelCouchCompliant
@@ -26,129 +26,6 @@ OS_kernelCouchCompliant
 
 
 
-
-
-
-
-
-
-
-
-
-                    BANK_kernelCopyright = .BANK
-
-    DEFPTR CP_GRP0A,  0
-    DEFPTR CP_GRP1A,  1
-    DEFPTR CP_GRP0B,  2
-    DEFPTR CP_GRP1B,  3
-    DEFPTR CP_GRP0C,  4
-    DEFPTR CP_GRP1C,  5
-    DEFPTR CP_PF,     6
-    DEFPTR CP_COLUPF, 7
-    DEFPTR CP_COLUP0, 8
-
-
-;-------------------------------------------------------------------------------
-
-posX .byte 56,64
-
-positionSprites     SUBROUTINE
-
-                    ldx #1
-.loop               lda posX,x
-
-                    sec
-                    sta WSYNC
-.divide             sbc #15
-                    bcs .divide
-
-                    eor #7
-                    asl
-                    asl
-                    asl
-                    asl
-
-                    sta.w HMP0,x
-                    sta RESP0,x
-
-                    dex
-                    bpl .loop
-
-                    rts
-
-;-------------------------------------------------------------------------------
-
-
-OS_kernelCopyright  rts
-
-
-VB_kernelCopyright
-                    ldx #%00110011
-                    stx NUSIZ0
-                    stx NUSIZ1
-                    stx VDELP0
-                    stx VDELP1
-
-                    ldx #0
-                    stx ENAM0
-                    stx ENAM1
-                    stx COLUBK
-
-                    ldx #%00000001
-                    stx CTRLPF              ; reflect PF
-
-                    jsr positionSprites
-                    sta WSYNC
-                    sta HMOVE
-
-                    ldx #6
-                    stx COLUP0
-                    stx COLUP1
-                    ldx #$FC
-                    stx PF2
-
-                    rts
-
-
-_kernelCopyright
-
-                    sta WSYNC                       ; @0
-                    sta.w COLUP1                    ; 4
-
-                    lda #_DS_CP_GRP0A_DATA          ; 2
-                    sta GRP0                        ; 3
-                    lda #_DS_CP_GRP1A_DATA          ; 2
-                    nop                             ; 2
-                    sta GRP1                        ; 3
-                    lda #_DS_CP_GRP0B_DATA          ; 2
-                    nop                             ; 2
-                    sta GRP0                        ; 3
-                    lda #_DS_CP_GRP1C_DATA          ; 2
-                    nop                             ; 2
-                    sta CP_temp                     ; 3
-                    lda #_DS_CP_GRP0C_DATA          ; 2
-                    tax                             ; 2
-                    lda #_DS_CP_GRP1B_DATA          ; 2
-                    nop                             ; 2
-                    ldy CP_temp                     ; 3
-                    sta GRP1                        ; 3
-                    stx GRP0                        ; 3
-                    sty GRP1                        ; 3
-                    sta GRP0                        ; 3
-
-                    lda #_DS_CP_COLUPF_DATA         ; 2
-                    sta COLUPF                      ; 3
-                    lda #_DS_CP_COLUP0_DATA         ; 2
-                    sta COLUP0                      ; 3
-
-                    jmp FASTJMP1                    ; 3
-
-
-_copyrightExit
-                    rts
-
-; EOF
-
-
+    echo "KERNEL COUCH_COMPLIANT [", (* - START_COUCH_COMPLIANT)d,"] bytes"
 
 ; EOF

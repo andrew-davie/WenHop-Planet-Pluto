@@ -52,7 +52,7 @@ initJumpCode        lda jumpCode,x
                     stx DSPTR
                     ldx #<_RUN_FUNC
                     stx DSPTR
-                    ldx #_RUN_ARM_SYSTEM_RESET
+                    ldx #_RUNARM_SYSTEM_RESET
                     stx DSWRITE
 
                     ldx #$FF
@@ -80,7 +80,7 @@ initJumpCode        lda jumpCode,x
                     stx DSPTR
                     ldx #<_RUN_FUNC
                     stx DSPTR
-                    ldx #_RUN_ARM_LOAD_SAVEKEY
+                    ldx #_RUNARM_LOAD_SAVEKEY
                     stx DSWRITE
 
                     ldx #$FF
@@ -88,7 +88,7 @@ initJumpCode        lda jumpCode,x
 
 .notRealSKData
 
-    ; At this point, the ARM function handler _RUN_ARM_SYSTEM_RESET has set some vars
+    ; At this point, the ARM function handler _RUNARM_SYSTEM_RESET has set some vars
     ; Retrive critical configuration variables from ARM
 
 

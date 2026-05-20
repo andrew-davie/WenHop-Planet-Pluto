@@ -16,7 +16,7 @@ mainGameLoop
                 	ldx #<_RUN_FUNC
                 	stx DSPTR
 
-                	ldx #_RUN_ARM_OVERSCAN
+                	ldx #_RUNARM_OVERSCAN
                 	stx DSWRITE
 
     ; send controllers to ARM
@@ -93,7 +93,7 @@ mainGameLoop
                     stx DSPTR
                     ldx #<_RUN_FUNC
                     stx DSPTR
-                    ldx #_RUN_ARM_VBLANK
+                    ldx #_RUNARM_VBLANK
                     stx DSWRITE
 
                     ldx call_fn

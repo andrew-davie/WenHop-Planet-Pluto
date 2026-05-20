@@ -12,6 +12,7 @@ KNO                 SET KNO + 1
     KERNEL RAINBOW              ; 1
     KERNEL COPYRIGHT            ; 2
     KERNEL COUCH_COMPLIANT      ; 3
+    KERNEL MENU                 ; 4
 
     KERNEL MAX
 
@@ -27,52 +28,61 @@ kernelBank_L
                     .byte <BANK_kernelDetectConsole     ; 0 KERNEL_DETECT_CONSOLE
                     .byte <BANK_kernelRainbow           ; 1 KERNEL_RAINBOW
                     .byte <BANK_kernelCopyright         ; 2 KERNEL_COPYRIGHT
-                    .byte <BANK_kernelCopyright         ; 3 KERNEL_COUCH_COMPLIANT
+                    .byte <BANK_kernelCopyright         ; 3 KERNEL_COUCH_COMPLIANT (re-uses COPYRIGHT)
+                    .byte <BANK_kernelMenu              ; 4 KERNEL_MENU
 
                     ; >>> VB
                     .byte <BANK_kernelDetectConsole
                     .byte <BANK_kernelRainbow
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelCopyright
+                    .byte <BANK_kernelMenu
 
                     ; >>> OS
                     .byte <BANK_kernelDetectConsole
                     .byte <BANK_kernelRainbow
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelCopyright
+                    .byte <BANK_kernelMenu
 .END
 
 kernelRoutine_L
                     .byte <kernelDetectConsole
-                    .byte <_kernelRainbow
-                    .byte <_kernelCopyright
-                    .byte <_kernelCopyright
+                    .byte <kernelRainbow
+                    .byte <kernelCopyright
+                    .byte <kernelCopyright
+                    .byte <kernelMenu
 
                     .byte <VB_kernelDetectConsole
                     .byte <VB_kernelRainbow
                     .byte <VB_kernelCopyright
                     .byte <VB_kernelCopyright
+                    .byte <VB_kernelMenu
 
                     .byte <OS_kernelDetectConsole
                     .byte <OS_kernelRainbow
                     .byte <OS_kernelCopyright
                     .byte <OS_kernelCopyright
+                    .byte <OS_kernelMenu
 
 kernelRoutine_H
                     .byte >kernelDetectConsole
-                    .byte >_kernelRainbow
-                    .byte >_kernelCopyright
-                    .byte >_kernelCopyright
+                    .byte >kernelRainbow
+                    .byte >kernelCopyright
+                    .byte >kernelCopyright
+                    .byte >kernelMenu
 
                     .byte >VB_kernelDetectConsole
                     .byte >VB_kernelRainbow
                     .byte >VB_kernelCopyright
                     .byte >VB_kernelCopyright
+                    .byte >VB_kernelMenu
 
                     .byte >OS_kernelDetectConsole
                     .byte >OS_kernelRainbow
                     .byte >OS_kernelCopyright
                     .byte >OS_kernelCopyright
+                    .byte >OS_kernelMenu
 
 ;-------------------------------------------------------------------------------
 

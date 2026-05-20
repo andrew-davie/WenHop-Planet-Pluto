@@ -65,11 +65,11 @@ _SND_MODE_SAMPLE	= 2
 ; C-code vector equates
 ; see runFunc[] in main.c
 
-_RUN_ARM_NULL           = 0
-_RUN_ARM_SYSTEM_RESET   = 1
-_RUN_ARM_LOAD_SAVEKEY   = 2
-_RUN_ARM_VBLANK	        = 3
-_RUN_ARM_OVERSCAN   	= 4
+_RUNARM_NULL           = 0
+_RUNARM_SYSTEM_RESET   = 1
+_RUNARM_LOAD_SAVEKEY   = 2
+_RUNARM_VBLANK	        = 3
+_RUNARM_OVERSCAN   	= 4
 
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
