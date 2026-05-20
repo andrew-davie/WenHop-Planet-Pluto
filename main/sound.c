@@ -499,9 +499,9 @@ bool audioRequest[SFX_MAX];
 void killRepeatingAudio() {
 
     for (int channel = 0; channel < 2; channel++) {
-        RAM[_AUDC0 + channel] = 0;
-        RAM[_AUDF0 + channel] = 0;
-        RAM[_AUDV0 + channel] = 0;
+        RAM[_BUF_AUDC + channel] = 0;
+        RAM[_BUF_AUDF + channel] = 0;
+        RAM[_BUF_AUDV + channel] = 0;
     }
 
     for (int i = 0; i < CONCURRENT_SFX; i++)
@@ -666,9 +666,9 @@ void processSoundEffects() {
 #if ENABLE_SOUND
 
         if (audC && audV >= volume[channel]) {
-            RAM[_AUDC0 + channel] = audC;
-            RAM[_AUDF0 + channel] = audF;
-            RAM[_AUDV0 + channel] = audV;
+            RAM[_BUF_AUDC + channel] = audC;
+            RAM[_BUF_AUDF + channel] = audF;
+            RAM[_BUF_AUDV + channel] = audV;
 
             // sound_volume -= 5;
             // if (sound_volume < 0)
@@ -855,9 +855,9 @@ void processMusic() {
 
     for (int channel = 0; channel < 2; channel++) {
 
-        RAM[_AUDV0 + channel] = 0;
-        RAM[_AUDF0 + channel] = 0;
-        RAM[_AUDC0 + channel] = 0;
+        RAM[_BUF_AUDV + channel] = 0;
+        RAM[_BUF_AUDF + channel] = 0;
+        RAM[_BUF_AUDC + channel] = 0;
     }
 
     for (int channel = 0; channel < 2; channel++) {
@@ -878,14 +878,14 @@ void processMusic() {
             unsigned char note = best->tune[best->index];
             int envelope_ptr = (best->progress) >> 12;
 
-            RAM[_AUDV0 + channel] = volume[channel] =
+            RAM[_BUF_AUDV + channel] = volume[channel] =
                 (instrument[best->instrument][envelope_ptr] * sound_volume * best->volume) >> (4 + 10 + 8);
 
             // if (note == 0xFF)
             //     RAM[_BUF_AUDV + channel] = 0;
 
-            RAM[_AUDF0 + channel] = note;
-            RAM[_AUDC0 + channel] = RENOTE[note >> 6];
+            RAM[_BUF_AUDF + channel] = note;
+            RAM[_BUF_AUDC + channel] = RENOTE[note >> 6];
         }
 
         else

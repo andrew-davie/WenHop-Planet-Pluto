@@ -36,9 +36,9 @@ _colubk             ds 1
 
     ;---------------------------------------------
 
-_AUDV0              ds 2
-_AUDC0              ds 2
-_AUDF0              ds 2
+_BUF_AUDV               ds 2
+_BUF_AUDC               ds 2
+_BUF_AUDF               ds 2
 
 ;------------------------------------------------------------------------------
 ; OVERLAID VARIABLES
@@ -92,7 +92,28 @@ END_BUFFERS SET *
     ORG _BUFFERS
 
     DEFBUF 2, MENU_JUMP
+
     DEFBUF 1, MENU_COLUBK
+    DEFBUF 1, MENU_COLUPF
+    DEFBUF 1, MENU_COLUP0
+
+    ; grouping important due to clear in menu
+
+    ; Order of these 4 important...
+    ; TODO: combine to 4 long
+
+    DEFBUF 4, MENU_PF
+
+    ; TODO:  combine to 6-long
+
+    DEFBUF 1, MENU_GRP0A
+    DEFBUF 1, MENU_GRP1A
+    DEFBUF 1, MENU_GRP0B
+    DEFBUF 1, MENU_GRP1B
+    DEFBUF 1, MENU_GRP0C
+    DEFBUF 1, MENU_GRP1C
+
+    ; end of grouping (10)
 
     if * > END_BUFFERS
 END_BUFFERS SET *

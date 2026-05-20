@@ -74,12 +74,16 @@ SRCS = \
  gameState_DetectConsole.c \
  gameState_Menu.c \
  gameState_Rainbow.c \
+ menuCharacterSet.c \
  \
  grid6.c
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
 HDRS = $(SRCS:.c=.h)
+
+IMAGES = \
+	gfx/image/WenHop.png
 
 
 vpath %.c $(BASE) $(CUSTOM)
@@ -245,12 +249,15 @@ $(TOOLS_BIN)/$(WAV2RAW): $(TOOLS_SRC)/$(WAV2RAW).c
 ###############################################################################
 # Graphics
 
-gfx: GRID6
+gfx: GRID6 IMG
 
 GRID6: gfx/grid/*.gif
 	(cd gfx/grid & python3 tools/1bpp.py -o grid6 gfx/grid/*.gif)
 	mv grid6.* main
 
+.PHONY: IMG
+IMG:
+	python3 tools/pcc.py -o icc/icc $(IMAGES)
 
 ###############################################################################
 # Cleaning

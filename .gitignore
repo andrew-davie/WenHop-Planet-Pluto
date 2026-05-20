@@ -8,3 +8,5 @@ main/defines_dasm.h
 .DS_Store
 ROMs/
 screenshots/
+icc/icc.c
+icc/icc.h

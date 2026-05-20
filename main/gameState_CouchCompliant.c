@@ -83,7 +83,8 @@ void VB_CouchCompliant() {
     }
 
     else
-        setGameState(GS_RAINBOW);
+        //        setGameState(GS_RAINBOW);
+        setGameState(GS_MENU);
 }
 
 void OS_CouchCompliant() {

@@ -3,11 +3,66 @@
 #include "cdfjplus.h"
 #include "colour.h"
 #include "main.h"
+#include "menuCharacterSet.h"
+#include "savekey.h"
+#include "sound.h"
+
+int P0_X;
+int P1_X;
+int menuLine;
+int pushCount;
+int base2;
+int flashTime2;
+int cave;
+int level;
+int menuLineTVType;
+
+#define LETTER_HEIGHT 10
+
+enum MENU_OPTION {
+
+    MENU_OPTION_CAVE,
+    MENU_OPTION_LEVEL,
+    MENU_OPTION_TVSYSTEM,
+};
+
 
 void initKernel_Menu() {
 
     setJumpVectors(_BUF_MENU_JUMP, _menuLoop, _menuExit, _SCANLINES);
     setPointer(DSJMP1PTR, _BUF_MENU_JUMP);
+
+    killRepeatingAudio();
+
+    flashTime2 = 0;
+    cave = 0;
+    level = 0;
+    menuLineTVType = 0;
+
+    // ARENA_COLOUR = 0;
+
+    // if (rageQuit) {
+    //     rageQuit = false;
+    //     SAY(__WORD_RAGEQUIT);
+    //     FLASH(0x48, 8);
+    // }
+
+
+    //    bufferedSWCHA = 0xFF;
+    //    waitRelease = true;
+    sound_max_volume = VOLUME_MAX;
+
+
+    myMemset(RAM + _BUF_MENU_PF, 0, 4 * _SCANLINES);
+    myMemset(RAM + _BUF_MENU_GRP0A, 0, 6 * _SCANLINES);
+
+    menuLine = 0;
+    base2 = 0;
+    pushCount = 0;
+
+    //    chooseColourScheme();
+
+    //    mustWatchDelay = MUSTWATCH_MENU;
 }
 
 
@@ -16,10 +71,102 @@ void initGameState_Menu() {
     frame = 0;
 }
 
+
+const unsigned char pfColour[] = {0xF8, 0x46, 0xB6};
+
+void setPFColours() {
+
+    unsigned char *p = RAM + _BUF_MENU_COLUPF;
+
+    int roll = roller;
+
+    unsigned char pfConvertedColour[3];
+    for (int i = 0; i < 3; i++)
+        pfConvertedColour[i] = convertColour(pfColour[i]);
+
+    for (int i = 0; i < _SCANLINES; i++) {
+        if (++roll > 2)
+            roll -= 3;
+        p[i] = pfConvertedColour[roll];
+    }
+}
+
+
+void drawCharacter(int x, int y, int ch) {
+
+    if (ch == ' ')
+        ch = '0' + 11;
+
+    ch -= 'A';
+    if (ch < 0)
+        ch += 43;
+    const unsigned char *p = charAtoZ + ch * 10;
+    unsigned char *col = RAM + _BUF_MENU_GRP0A + _SCANLINES * x + y;
+
+    for (int i = 0; i < LETTER_HEIGHT; i++)
+        *col++ = *p++;
+}
+
+void drawString(int x, int y, const char *text, int colour) {
+
+    while (*text && x < 6)
+        drawCharacter(x++, y, *text++);
+
+    for (int i = 0; i < LETTER_HEIGHT; i++)
+        RAM[_BUF_MENU_COLUP0 + i + y - 1] = convertColour(colour);
+}
+
+void drawSmallString(int y, const char *smallText) {
+    static const unsigned char smallColour[] = {0x98, 0xB8, 0xB8, 0x0A};
+    int colour = smallColour[tvSystem];
+
+    for (int line = 0; line < 6; line++) {
+        RAM[_BUF_MENU_COLUP0 + y + line - 1] = colour;
+        for (int i = 0; i < 6; i++)
+            RAM[_BUF_MENU_GRP0A + _SCANLINES * i + y + line] = *smallText++;
+    }
+}
+
+void initMenuDataStreams() {
+
+    static const struct ptrs {
+
+        unsigned char dataStream;
+        unsigned short buffer;
+
+    } streamInits[] = {
+
+        {_DS_MENU_COLUBK, _BUF_MENU_COLUBK},
+
+        {_DS_MENU_PF1_LEFT, _BUF_MENU_PF},
+        {_DS_MENU_PF1_RIGHT, _BUF_MENU_PF + 3 * _SCANLINES},
+        {_DS_MENU_PF2_LEFT, _BUF_MENU_PF + 1 * _SCANLINES},
+        {_DS_MENU_PF2_RIGHT, _BUF_MENU_PF + 2 * _SCANLINES},
+
+        {_DS_MENU_AUDV0, _BUF_AUDV},
+        {_DS_MENU_AUDC0, _BUF_AUDC},
+        {_DS_MENU_AUDF0, _BUF_AUDF},
+        {_DS_MENU_COLUPF, _BUF_MENU_COLUPF},
+        {_DS_MENU_COLUP0, _BUF_MENU_COLUP0},
+        {_DS_MENU_GRP0a, _BUF_MENU_GRP0A},
+        {_DS_MENU_GRP1a, _BUF_MENU_GRP1A},
+        {_DS_MENU_GRP0b, _BUF_MENU_GRP0B},
+        {_DS_MENU_GRP1b, _BUF_MENU_GRP1B},
+        {_DS_MENU_GRP0c, _BUF_MENU_GRP0C},
+        {_DS_MENU_GRP1c, _BUF_MENU_GRP1C},
+
+        {DSJMP1PTR, _BUF_MENU_JUMP},
+
+    };
+
+    for (unsigned int i = 0; i < sizeof(streamInits) / sizeof(struct ptrs); i++)
+        setPointer(streamInits[i].dataStream, streamInits[i].buffer);
+}
+
+
 void VB_Menu() {
 
-    setPointer(DSJMP1PTR, _BUF_MENU_JUMP);
-
+    initMenuDataStreams();
 
     static unsigned int col;
     col--;
@@ -28,14 +175,897 @@ void VB_Menu() {
     for (int i = 0; i < _SCANLINES; i++)
         *p++ = convertColour((col + (i >> 1)) & 0xFF);
 
-    setPointer(_DS_MENU_COLUBK, _BUF_MENU_COLUBK);
-
-
-    if (frame > 200)
-        setGameState(GS_RAINBOW);
+    // if (frame > 200)
+    //     setGameState(GS_RAINBOW);
 }
+
+
+const char wordTvType0[] = {
+    ________, XXXXXX__, _X___XXX, X___X_XX, XXXXXXXX, XX_X___X, ________, XXXX_XX_, XX__XX__,
+    XX_XXXX_, _XXXX_XX, XX_XX_XX, ________, __X___X_, X____XXX, _XXX__XX, X__X__X_, ___XXXXX,
+    ________, __X___XX, X______X, X_X_____, XX_X__XX, X__X_X_X, ________, __X____X, ____XXXX,
+    X_X__XXX, XX_X__X_, ___X___X, ________, __X____X, ____XXXX, __X__XXX, X__X__XX, XX_X___X,
+};
+
+const char wordStartAt[] = {
+    ________, ________, ___XXX__, X____XX_, _X__X_XX, XX_XXXXX, ________, ________, ___X__X_,
+    X___XXXX, _XX_X_X_, ___XXXXX, ________, ________, ___X__X_, X___X__X, _XX_X_XX, X____X__,
+    ________, ________, ___XXX__, X___XXXX, _X_XX_X_, _____X__, ________, ________, ___X____,
+    X___X__X, _X_XX_XX, XX___X__, ________, ________, ___X____, XXX_X__X, _X__X_XX, XX___X__,
+};
+
+const char wordDifficulty[] = {
+
+    ________, _____XXX, ___XXX__, _XX__X__, X__XX__X, X____XX_, ________, _____X__, XX_XX_X_,
+    XXXX_X__, X_XXXX_X, _X__X__X, ________, _____XXX, ___X__X_, X__X_X__, X_X__X_X, __X_X__X,
+    ________, _____X__, XX_XXX__, XXXX_X__, X_XXXX_X, __X_X__X, ________, _____XXX, XX_X_X__,
+    X__X_XXX, __X__X_X, XXX_XXXX, ________, _____XXX, X__X__X_, X__X__X_, __X__X_X, XX___XX_,
+};
+
+
+const char *smallWord[] = {
+    wordStartAt,
+    wordDifficulty,
+    wordTvType0,
+};
+
+
+const char showCave[][6] = {
+    {";;MARS"},    //
+    {"URANUS"},    //
+    {"SATURN"},    //
+    {"FOUR  "},    //
+    {"FIVE  "},    //
+    {"SIX   "},    //
+    {"SEVEN "},    //
+    {"EIGHT "},    //
+    {"NINE  "},    //
+    {"X     "},    //
+};
+
+const char TV[][6] = {
+
+    {";;NTSC"},    //
+    {";;;PAL"},    //
+    {";PAL60"},    //
+    {";SECAM"},    //
+};
+
+const char Level[][6] = {
+
+    {";;WIMP"},    //
+    {";;BOZO"},    //
+    {";;HERO"},    //
+    {"TRAGIC"},    //
+    {"MANIAC"},    //
+};
+
+
+#include "../icc/icc.c"
+
 
 void OS_Menu() {
+
+    //    myMemset((unsigned char *)(RAM + _BUF_MENU_PF), 0, _SCANLINES);
+
+    base2++;
+
+    static int sline = 0;
+    sline++;
+    if (sline >= (int)(sizeof(smallWord) / sizeof(smallWord[0])))
+        sline = 0;
+
+    int y = sline * 24 + 93;
+
+    if (flashTime2)
+        --flashTime2;
+
+    const char *dLine = 0;
+
+    switch (sline) {
+
+    case MENU_OPTION_CAVE:
+        dLine = showCave[cave];
+        break;
+
+    case MENU_OPTION_LEVEL:
+        dLine = Level[level];
+        break;
+
+    case MENU_OPTION_TVSYSTEM:
+        dLine = TV[menuLineTVType];
+        break;
+    }
+
+    drawSmallString(y, smallWord[sline]);
+
+    int colour = sline == menuLine ? (flashTime2 & 4) ? 0x0A : ((base2 << 2) & 0xF0) | 0x16 : 0x26;
+
+    drawString(0, y + 8, dLine, colour);
+
+
+    //--------------------------------------------------------------------------
+    // Draw ICC menu PF background
+
+    interleaveChronoColour(&roller);
+    setPFColours();
+
+    unsigned char *pf = RAM + _BUF_MENU_PF;
+
+    int roll = roller;
+    for (int col = 0; col < 4; col++) {
+        for (int i = 0; i < 66; i++) {
+            for (int icc = 0; icc < 3; icc++) {
+                pf[col * _SCANLINES + i * 3 + icc] = gfx_image_WenHop_png[i][col][roll];
+                if (++roll > 2)
+                    roll = 0;
+            }
+        }
+    }
+
+    //--------------------------------------------------------------------------
+
+    static const char *registered = ":";
+    static int landing2 = (-5) * 256;
+    int landing = landing2 >> 8;
+
+    static int accel = 190;
+    if (accel)
+        accel -= 1;
+
+    int landing3 = landing + 8;
+
+    if (!rangeRandom(2) && accel)
+        drawString(5, landing + 8, "<", 0x4C);    //(R)
+    else
+        drawString(5, landing3, ";", 0x4C);    //(R)
+
+    drawString(5, landing, registered, 0x06);    //(R)
+
+    // drawString(5, landing + 11, ";", 0x9C);   //(R)
+
+    //    if (landing2 > -10 << 8)
+    landing2 += accel;
+    // drawString(5, 62, ":", 0x22); //(R)
 }
+
+
+#if 0
+
+
+#include <limits.h>
+
+#include "defines.h"
+#include "defines_cdfj.h"
+// #include "defines_from_dasm_for_c.h"
+
+#include "main.h"
+
+#include "menu.h"
+
+#include "animations.h"
+#include "atarivox.h"
+#include "bitpatterns.h"
+#include "cavedata.h"
+#include "characterset.h"
+#include "colour.h"
+#include "decodecaves.h"
+#include "drawscreen.h"
+#include "joystick.h"
+#include "mellon.h"
+#include "player.h"
+#include "random.h"
+#include "score.h"
+#include "sound.h"
+
+#if DEBUG_TIMER
+unsigned int debugDelay = 0;
+#endif
+
+#define LETTER_HEIGHT 10
+
+#define OPTION_SYSTEM 2
+
+void doubleSize(int x, int y, int letter);
+
+#define UNINITIALISED 255
+unsigned char enableICC = UNINITIALISED;
+int menuLineTVType;
+
+static int mustWatchDelay;
+static int pushFrame;
+static int frame = 0;
+static int base2;
+static int pushCount;
+static unsigned int menuLine;
+static int caveUnpackComplete;
+int detectedPeriod;
+
+int thumbnailSpeed;
+
+unsigned int sline = 0;
+
+#define DETECT_FRAME_COUNT 10
+
+
+#if ENABLE_ANIMATING_MAN
+const unsigned short toolIcon[][127] = {
+
+    {
+        126,
+
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000000000000,
+        0b0000000111110000,
+        0b0000000111100000,
+        0b0000000111100000,
+        0b0000000111100000,
+        0b0000001111111000,
+        0b0000001111110000,
+        0b0000001111110000,
+        0b0000001111110000,
+        0b0000011111111100,
+        0b0000011111111000,
+        0b0000011000111000,
+        0b0000011000111000,
+        0b0000011111111100,
+        0b0000011000011000,
+        0b0000010111101000,
+        0b0000010000001000,
+        0b0000111111111110,
+        0b0000110000011100,
+        0b0000111111101100,
+        0b0000110000001100,
+        0b0000111111111110,
+        0b0000110000011100,
+        0b0000101100000100,
+        0b0000100000000100,
+        0b0000111111111110,
+        0b0000110011111100,
+        0b0000101100000100,
+        0b0000100000000100,
+        0b0001111111111111,
+        0b0001110011111110,
+        0b0001100100000110,
+        0b0001100000000110,
+        0b0001111111111111,
+        0b0001110000011110,
+        0b0001001100000010,
+        0b0001000000000010,
+        0b0001111111111111,
+        0b0001110000111110,
+        0b0001000111000010,
+        0b0001000011000010,
+        0b0001111111111111,
+        0b0001110000111110,
+        0b0001001111000010,
+        0b0001000011000010,
+        0b0001111111111111,
+        0b0001100000111110,
+        0b0001011111000010,
+        0b0001011111000010,
+        0b0001111111111111,
+        0b0001100000111110,
+        0b0001010011000010,
+        0b0001011111000010,
+        0b0001111111111111,
+        0b0001100000111110,
+        0b0001010011000010,
+        0b0001011111000010,
+        0b0001111111111111,
+        0b0001100000111110,
+        0b0001011111000010,
+        0b0001011111000010,
+        0b0001111111111111,
+        0b0001110000111110,
+        0b0001000111000010,
+        0b0001000011000010,
+        0b0001111111111111,
+        0b0001110000111110,
+        0b0001001111000010,
+        0b0001000011000010,
+        0b0001111111111111,
+        0b0001110000111110,
+        0b0001000111000010,
+        0b0001000011000010,
+        0b0001111111111111,
+        0b0001110000111110,
+        0b0001101111000110,
+        0b0001100011000110,
+        0b0000111111111110,
+        0b0000111100111100,
+        0b0000100011000100,
+        0b0000100011000100,
+        0b0000111111111110,
+        0b0000111100111100,
+        0b0000100011000100,
+        0b0000100011001100,
+        0b0000111111111110,
+        0b0000111100111100,
+        0b0000110011001100,
+        0b0000110011001100,
+        0b0000011111111100,
+        0b0000011100111000,
+        0b0000010011001000,
+        0b0000011011011000,
+        0b0000011111111100,
+        0b0000011100111000,
+        0b0000011011011000,
+        0b0000011111111000,
+        0b0000001111111000,
+        0b0000001100110000,
+        0b0000001111110000,
+        0b0000001111110000,
+        0b0000000111110000,
+        0b0000000100100000,
+        0b0000000111100000,
+        0b0000000111100000,
+        0b0000000011000000,
+        0b0000000000000000,
+        0b0000000011000000,
+        0b0000000011000000,
+        0b0000000011000000,
+        0b0000000000000000,
+        0b0000000011000000,
+        0b0000000011000000,
+        0b0000000000000000,
+        0b0000000000000000,
+    },
+    // {
+    //     126,
+
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000111110000,
+    //     0b0000000111100000,
+    //     0b0000000111100000,
+    //     0b0000000111100000,
+    //     0b0000001111111000,
+    //     0b0000001111110000,
+    //     0b0000001111110000,
+    //     0b0000001111110000,
+    //     0b0000011111111100,
+    //     0b0000011111111000,
+    //     0b0000011000111000,
+    //     0b0000011000111000,
+    //     0b0000011111111100,
+    //     0b0000011000011000,
+    //     0b0000010111101000,
+    //     0b0000010000001000,
+    //     0b0000111111111110,
+    //     0b0000110000011100,
+    //     0b0000111111101100,
+    //     0b0000110000001100,
+    //     0b0000111111111110,
+    //     0b0000110000011100,
+    //     0b0000101100000100,
+    //     0b0000100000000100,
+    //     0b0000111111111110,
+    //     0b0000110011111100,
+    //     0b0000101100000100,
+    //     0b0000100000000100,
+    //     0b0001111111111111,
+    //     0b0001110011111110,
+    //     0b0001100100000110,
+    //     0b0001100000000110,
+    //     0b0001111111111111,
+    //     0b0001110000011110,
+    //     0b0001001100000010,
+    //     0b0001000000000010,
+    //     0b0001111111111111,
+    //     0b0001110000111110,
+    //     0b0001000111000010,
+    //     0b0001000011000010,
+    //     0b0001111111111111,
+    //     0b0001110000111110,
+    //     0b0001001111000010,
+    //     0b0001000011000010,
+    //     0b0001111111111111,
+    //     0b0001100000111110,
+    //     0b0001011111000010,
+    //     0b0001011111000010,
+    //     0b0001111111111111,
+    //     0b0001100000111110,
+    //     0b0001010011000010,
+    //     0b0001011111000010,
+    //     0b0001111111111111,
+    //     0b0001100000111110,
+    //     0b0001010011000010,
+    //     0b0001011111000010,
+    //     0b0001111111111111,
+    //     0b0001100000111110,
+    //     0b0001011111000010,
+    //     0b0001011111000010,
+    //     0b0001111111111111,
+    //     0b0001110000111110,
+    //     0b0001000111000010,
+    //     0b0001000011000010,
+    //     0b0001111111111111,
+    //     0b0001110000111110,
+    //     0b0001001111000010,
+    //     0b0001000011000010,
+    //     0b0001111111111111,
+    //     0b0001110000111110,
+    //     0b0001000111000010,
+    //     0b0001000011000010,
+    //     0b0001111111111111,
+    //     0b0001110000111110,
+    //     0b0001101111000110,
+    //     0b0001100011000110,
+    //     0b0000111111111110,
+    //     0b0000111100111100,
+    //     0b0000100011000100,
+    //     0b0000100011000100,
+    //     0b0000111111111110,
+    //     0b0000111100111100,
+    //     0b0000100011000100,
+    //     0b0000100011001100,
+    //     0b0000111111111110,
+    //     0b0000111100111100,
+    //     0b0000110011001100,
+    //     0b0000110011001100,
+    //     0b0000011111111100,
+    //     0b0000011100111000,
+    //     0b0000010011001000,
+    //     0b0000011011011000,
+    //     0b0000011111111100,
+    //     0b0000011100111000,
+    //     0b0000011011011000,
+    //     0b0000011111111000,
+    //     0b0000001111111000,
+    //     0b0000001100110000,
+    //     0b0000001111110000,
+    //     0b0000001111110000,
+    //     0b0000000111110000,
+    //     0b0000000100100000,
+    //     0b0000000111100000,
+    //     0b0000000111100000,
+    //     0b0000000011000000,
+    //     0b0000000000000000,ccd
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    //     0b0000000000000000,
+    // },
+};
+#endif
+
+#if ENABLE_TITLE_PULSE
+#define LUMINANCE_TITLE 6
+#else
+#define LUMINANCE_TITLE 0x6
+#endif
+
+// #define LUMINANCE 2
+
+char RGB[6];
+
+const unsigned char titleScreenImagePalette[] = {
+    0xB6, 0xF8, 0x46 // + LUMINANCE, 0x24 + LUMINANCE, 0x24 + LUMINANCE, // NTSC
+};
+
+void doDrawBitmap(const unsigned short *shape, int y) {
+
+    unsigned char *pf1R = RAM + _BUF_PF1_RIGHT;
+    unsigned char *pf2R = RAM + _BUF_PF2_RIGHT;
+
+    int size = shape[0];
+
+    // const unsigned short *bf = shape + 1;
+
+    int baseRoll = roller;
+
+    union g {
+        int bGraphic;
+        unsigned char g[4];
+    } gfx;
+
+    for (int i = 1; i < size + 1; i += 4) {
+
+        if (y >= _ARENA_SCANLINES - 3)
+            return;
+
+        static union masker {
+            int mask;
+            unsigned char mask2[4];
+        } mask;
+
+        mask.mask = shape[i] ^ 0xFFFFFFFF;
+
+        for (int line = 0; line < 3; line++) {
+
+            gfx.bGraphic = shape[i + baseRoll + 1];
+
+            // pf1L[y] = (pf1L[y] & mask.mask2[3]) | gfx.g[3];
+            pf1R[y] = (pf1R[y] & mask.mask2[1]) | gfx.g[1];
+            pf2R[y] = (pf2R[y] & reverseBits[mask.mask2[0]]) | reverseBits[gfx.g[0]];
+            // pf2L[y] = (pf2L[y] & reverseBits[mask.mask2[2]]) | reverseBits[gfx.g[2]];
+
+            if (++baseRoll > 2)
+                baseRoll = 0;
+
+            y++;
+        }
+    }
+}
+
+#if ENABLE_ANIMATING_MAN
+void doPlayer() {
+    return;
+
+    if (pushCount > 0) {
+        pushCount--;
+        pushFrame = 0;
+    } else
+        pushFrame = 1;
+
+    if (!pushCount && !(rndX & 0xFF)) {
+        pushFrame = 0; // ^= 1;
+        pushCount = ((rndX >> 8) & 31) | 32;
+    }
+
+    int jiggle = 0;
+    if (!pushFrame)
+        jiggle = -((base2 >> 2) & 1) * 3;
+
+    doDrawBitmap(toolIcon[pushFrame], 120 + jiggle);
+}
+#endif
+
+
+
+// const char wordProto[] = {
+//     _XXXX___, XXX___XX, __XXX__X, XX______, ________, ________,
+//     X_XX_X__, __XX_X__, X___XX__, _XX_____, ________, ________,
+//     X_X__X__, __X__X__, X___X___, XX______, ________, ________,
+//     X_XX_X__, _X___X__, X__X____, _XX_____, ________, ________,
+//     X____X__, XXXX_XXX, X_XXXX_X, XXX_____, ________, ________,
+//     _XXXX___, XXXX__XX, __XXXX_X, XX______, ________, ________,
+// };
+
+
+// const char wordProto2[] = {
+//     _XXX____, _XXXX___, ________, _XX_____, ________, ________,
+//     X__X____, _XX__X__, XXX_X_XX, _____XX_, ________, ________,
+//     XXXX____, _XX__X_X, _XX_X_XX, _XX_X__X, ________, ________,
+//     XXXX__XX, _XX__X_X, _XX_X_XX, _XX_XX__, ________, ________,
+//     X__X_X_X, _XXXXX_X, XXX__XX_, _XX_XXXX, ________, ________,
+//     X__X_XX_, _XXXX___, XXX__XX_, _XX__XXX, ________, ________,
+// };
+
+
+const char wordProto2[][36] = {
+
+{   ________, ________, ______XX, XXX__XXX, ___XX__X, XX__XXX_,
+    ________, ________, _____X__, XX_X___X, X_X__X__, _XX____X,
+    ________, ________, _____X_X, ___X___X, __X__X__, _X___XX_,
+    ________, ________, _____X__, XX_X__X_, __X__X__, X______X,
+    ________, ________, _____X__, ___X_XX_, __XXXX_X, X_____XX,
+    ________, ________, ______XX, XXX__XXX, X__XX__X, XXX_XXX_, },
+
+// {   ____XXX_, _XX__XX_, X_______, XXXX__XX, X___XX_X, XX__XXX_,
+//     ___X____, X__X_XXX, XX_____X, _XX_X___, XX_X__X_, _XX___XX,
+//     ___X____, X__X_X_X, _X_____X, _X__X___, X__X__X_, _X___XX_,
+//     ___X____, X__X_X_X, _X_____X, _XX_X__X, ___X__X_, X_____XX,
+//     XX_XXXX_, XXXX_X_X, _X_____X, ____X_XX, ___XXX_X, XXX__XXX,
+//     XX__XXX_, _XX__X_X, _X______, XXXX__XX, XX__XX_X, XXX_XXX_, },
+
+{   ___XX___, ____X___, ________, _____XX_, ________, ___X____,
+    __X_X_XX, ___XX__X, X_XX_X__, _X___X_X, ___XX_X_, X_____XX,
+    _X__X_X_, X_X_X_X_, _X_X_X_X, _X___X__, X_X_X_X_, X_X__X_X,
+    _XXXX_X_, X_X_X_X_, _XXX_X_X, _X___X__, X_X_X_X_, X_X__XXX,
+    _X__X_X_, X_X_X_X_, _X____XX, X____X_X, X_X_X_XX, X_X__X__,
+    _X__X_X_, X_XXX_X_, __XX__X_, X____XXX, ___XX__X, ___X__XX,
+
+},
+// {   __X___X_, _XX___XX, __XX____, XXX_XXX_, __XX__XX, X_XXX___,
+//     __X_X_X_, X__X_X__, X_X_X__X, ____X__X, _X__X__X, __XXXX__,
+//     __X_X_X_, X__X_X__, X_X__X_X, _XX_X__X, _X__X__X, __X__X__,
+//     __X_X_X_, X__X_X__, X_X__X_X, __X_XXX_, _XXXX__X, __X__X__,
+//     __XXXXX_, XXXX_XXX, X_XXXX_X, XXX_X_XX, _XXXX_XX, X_X__X__,
+//     ___XXX__, _XX___XX, __XXX___, XXX_X_XX, _X__X_XX, X_X__X__,},
+
+// {   ___XXX__, XX___XXX, __X___X_, XXXX__XX, X_XXX__X, X__XXX__,
+//     ___XXX_X, __X_X___, __X_X_X_, X____X__, ___X__X_, _X_XXXX_,
+//     ____X__X, XXX__XX_, __X_X_X_, XXX__X_X, X__X__X_, _X_X__X_,
+//     ____X__X, XXX____X, __X_X_X_, X____X__, X__X__XX, XX_X__X_,
+//     XX__X__X, __X_XXXX, X_XXXXX_, XXXX_XXX, X_XXX_XX, XX_X__X_,
+//     XX__X__X, __X_XXX_, ___XXX__, XXXX__XX, X_XXX_X_, _X_X__X_,},
+
+
+};
+
+// const char wordProto2z[] = {
+//     _XXX____, _XXXX___, ________, _XX_____, ________, ________,
+//     X__X____, _XX__X__, XXX_X_XX, _____XX_, ________, ________,
+//     XXXX____, _XX__X_X, _XX_X_XX, _XX_X__X, ________, ________,
+//     XXXX__XX, _XX__X_X, _XX_X_XX, _XX_XX__, ________, ________,
+//     X__X_X_X, _XXXXX_X, XXX__XX_, _XX_XXXX, ________, ________,
+//     X__X_XX_, _XXXX___, XXX__XX_, _XX__XXX, ________, ________,
+// };
+
+// clang-format on
+
+
+
+
+
+void SchedulerMenu() {}
+
+#if ENABLE_TITLE_PULSE
+extern const unsigned char sinoid[];
+#endif
+
+
+
+void setStatusBackgroundPalette() {
+
+    unsigned char *pal = (unsigned char *)(_COLOUR_POOL);
+    pal += (currentPalette & 15) << 2;
+
+    unsigned char *p = RAM + _BUF_MENU_COLUPF;
+
+    int baseRoller = roller + 1;
+
+    for (int i = 0; i < _ARENA_SCANLINES; i++) {
+        if (++baseRoller > 2)
+            baseRoller -= 3;
+
+        p[i] = convertColour(pal[baseRoller]);
+    }
+}
+
+int setBounds(int value, int max) {
+    if (value < 0)
+        value = max;
+    if (value > max)
+        value = 0;
+    return value;
+}
+
+void resetMode() {
+
+    flashTime2 = 16;
+    ADDAUDIO(SFX_DRIP);
+
+    mustWatchDelay = MUSTWATCH_MENU;
+    waitRelease = true;
+
+    pushFrame = 0;
+    pushCount = (rndX & 31) | 32;
+}
+
+const signed char xInc[] = {
+
+    // RLDU
+    0,     // 0000
+    0,     // 0001
+    0,     // 0010
+    0,     // 0011
+    -1,    // 0100
+    -1,    // 0101
+    -1,    // 0110
+    0,     // 0111
+    1,     // 1000
+    1,     // 1001
+    1,     // 1010
+    0,     // 1011
+    0,     // 1100
+    0,     // 1101
+    0,     // 1110
+    0,     // 1111
+};
+
+const signed char yInc[] = {
+
+    // RLDU
+    0,     // 0000
+    -1,    // 0001
+    1,     // 0010
+    0,     // 0011
+    0,     // 0100
+    -1,    // 0101
+    1,     // 0110
+    0,     // 0111
+    0,     // 1000
+    -1,    // 1001
+    1,     // 1010
+    0,     // 1011
+    0,     // 1100
+    0,     // 1101
+    0,     // 1110
+    0,     // 1111
+};
+
+void handleMenuVB() {
+
+    // #if _ENABLE_DEMO
+    // if (!--mustWatchDelay) {
+
+    //     initDemoMode(true);
+    //     initNewGame();
+    //     initKernel(KERNEL_GAME);
+    //     loadPalette();
+    //     return;
+    // }
+    // #endif
+
+    doFlash();
+
+#if ENABLE_ANIMATING_MAN
+    doPlayer();
+#endif
+
+    // for (int i = 0; i < 6; i++)
+    //     if (!RGB[i] || !rangeRandom(64))
+    //         RGB[i] = (mm_tv_type == SECAM) ? (rangeRandom(7) + 1) << 1
+    //                                        : LUMINANCE_TITLE | (getRandom32() << 4);
+
+    int negJoy = (SWCHA >> 4) ^ 0xF;
+
+    if (!waitRelease) {
+
+        if (!(INPT4 & 0x80)) {
+
+            initNewGame();
+            initKernel(KERNEL_STATS);
+            return;
+        }
+
+        int dir = yInc[negJoy];
+
+        if (dir)
+            menuLine = setBounds(menuLine + dir, 2);
+
+        else {
+
+            dir = xInc[negJoy];
+            if (dir) {
+
+                switch (menuLine) {
+                case 0:
+                    //                    do
+                    cave = setBounds(cave + dir, caveCount - 1);
+                    //                    while (!(canPlay[level] & (1 << cave)));
+                    break;
+
+                case 1:
+#if !_ENABLE_TRAINER
+                    level = setBounds(level + dir, 4);
+                    //                    while (!(canPlay[level] & (1 << cave)))
+                    cave--;
+#endif
+                    break;
+
+                case OPTION_SYSTEM:
+                    menuLineTVType = setBounds(menuLineTVType + dir, 3);
+                    mm_tv_type = TV_TYPE = menuLineTVType;
+                    break;
+                }
+            }
+        }
+
+        if (dir) {
+            resetMode();
+            ADDAUDIO(SFX_BLIP);
+        }
+    }
+
+    else if (!negJoy && (INPT4 & 0x80))
+        waitRelease = false;
+
+    if (menuLineTVType)
+        TV_TYPE = mm_tv_type;
+}
+
+void MenuVerticalBlank() {
+
+#if _ENABLE_ATARIVOX
+    processSpeech();
+#endif
+
+    switch (KERNEL) {
+
+    case KERNEL_STATS:    // VBlank
+
+        // tmp        setStatusBackgroundPalette();
+        // tmp        drawIconScreen(12, 22);
+
+        if (sound_volume && !caveUnpackComplete)
+            sound_volume--;
+
+        /*tmp
+                if (!JOY0_FIRE)
+                    waitRelease = false;
+
+                else if (!waitRelease) {
+                    */
+        waitRelease = true;
+        initKernel(KERNEL_GAME);
+        // tmop        }
+
+        handleSelectReset();
+        break;
+
+        // case KERNEL_COPYRIGHT: // VBlank
+
+        //     interleaveColour();
+        //     setStatusBackgroundPalette();
+        //     break;
+
+    case KERNEL_MENU:    // VBlank
+        handleMenuVB();
+        // setStatusBackgroundPalette();
+        break;
+    }
+
+    // doButterflies(0x0000, 0x1600, 0x1A00, 0x3000);
+
+    if (KERNEL == KERNEL_STATS) {
+        // clear behind the thumbnail
+        unsigned char *gfx = RAM + _BUF_MENU_PF2_RIGHT;
+        for (int line = 100; line < 100 + decodingRow * 3; line++) {
+            gfx[line] = 0;
+            gfx[line + (_BUF_MENU_PF1_RIGHT - _BUF_MENU_PF2_RIGHT)] &= 0xF0;
+        }
+    }
+}
+
+void doubleSize(int x, int y, int letter) {
+
+    int colour = convertColour(fgPalette[0] + 0x80);    // & 0xF0) | 4);
+
+    letter -= 'A';
+    if (letter < 0)
+        letter += 43;
+    const unsigned char *gfx = charAtoZ + letter * LETTER_HEIGHT;
+
+    unsigned char *col0 = RAM + _BUF_MENU_GRP0A + _ARENA_SCANLINES * x + y + _ARENA_SCANLINES;
+    unsigned char *p = RAM + _BUF_MENU_COLUP0 + y - 1;
+
+    int pattern = 0;
+
+    for (int line = 0; line < LETTER_HEIGHT; line++) {
+
+        for (int bit = 0b10000000; bit; bit >>= 1) {
+            pattern <<= 2;
+            if (gfx[line] & bit)
+                pattern |= 0b11;
+        }
+
+        for (int stretch = 0; stretch < 3; stretch++) {
+            *col0 = pattern >> 8;
+            *(col0++ + _ARENA_SCANLINES) = pattern;
+            *p++ = colour;
+        }
+    }
+}
+
+#endif
+
 
 // EOF

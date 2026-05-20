@@ -345,9 +345,9 @@ void SilenceWaves() {
 void SilenceTIA() {
 
     for (int i = 0; i < 2; i++) {
-        RAM[_AUDV0 + i] = 0;
-        RAM[_AUDC0 + i] = 0;
-        RAM[_AUDF0 + i] = 0;
+        RAM[_BUF_AUDV + i] = 0;
+        RAM[_BUF_AUDC + i] = 0;
+        RAM[_BUF_AUDF + i] = 0;
     }
 }
 

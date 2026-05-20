@@ -9,7 +9,7 @@ extern int roller;
 void fadeBackgroundColour();
 void pulseBackgroundColour(unsigned char colour, int time);
 
-void interleaveColour(int *r);
+void interleaveChronoColour(int *r);
 unsigned char convertColour(unsigned char colour);
 
 // EOF
