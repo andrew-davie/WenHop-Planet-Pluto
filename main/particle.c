@@ -159,4 +159,80 @@ void drawParticles() {
     }
 }
 
+int sphereDot(int dotX, int dotY, int type, unsigned char age) {
+
+    int whichDrop = -1;
+
+    int col = dotX - ((scrollX * 5) >> 16);
+    if (col >= 0 && col < 40 /*pixels*/) {
+
+        int line = dotY - (scrollY >> 16);
+        if (line >= 0 && line < (_SCANLINES / 3 - 1)) {
+
+            int oldest = 0;
+            while (++whichDrop < PARTICLE_COUNT && particle[whichDrop].age)
+                if (particle[whichDrop].age < particle[oldest].age)
+                    oldest = whichDrop;
+
+            if (whichDrop == PARTICLE_COUNT)
+                whichDrop = oldest;
+
+            particle[whichDrop].type = type;
+            particle[whichDrop].x = dotX << 8;
+
+            particle[whichDrop].y = dotY << 8;
+            particle[whichDrop].speed = 0;    // rangeRandom(15) + 16;
+            particle[whichDrop].age = age;
+
+            particle[whichDrop].direction = getRandom32();    // 16.16 angle
+            particle[whichDrop].distance = 96;                // 16.16 speed
+        }
+    }
+
+    return whichDrop;
+}
+
+
+void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed) {
+
+    if (gravity < 0)
+        offsetY = TRILINES - offsetY;
+
+    for (int i = 0; i < count; i++) {
+        int idx = sphereDot(dripX * 5 + offsetX, dripY * TRILINES + offsetY, type, age);
+        if (idx >= 0) {
+            particle[idx].speed = rangeRandom(speed >> 1);
+            if (type == PT_SPIRAL2)
+                particle[idx].distance = rangeRandom(200) + 50;
+        }
+    }
+}
+
+void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed) {
+
+    if (gravity < 0)
+        offsetY = TRILINES - offsetY;
+
+    for (int i = 0; i < count; i++) {
+        int idx = sphereDot(dripX * 5 + offsetX, dripY * TRILINES + offsetY, type, age);
+
+        // TODO vector
+        particle[idx].x += particle[idx].age * particle[idx].speed;
+        particle[idx].y += particle[idx].age * particle[idx].speed;
+
+        // particle.speedX[idx] = -particle.speedX[idx];
+        // particle.speedY[idx] = -particle.speedY[idx];
+    }
+}
+
+void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed) {
+
+    for (int i = 0; i < count; i++) {
+        int idx = sphereDot(dripX, dripY, PT_SPIRAL, age);
+        if (idx >= 0)
+            particle[idx].speed = speed;
+    }
+}
+
+
 // EOF

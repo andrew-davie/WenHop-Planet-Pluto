@@ -1,15 +1,16 @@
 START_COPYRIGHT = *
 
-    DEFPTR CP_GRP0A,  0
-    DEFPTR CP_GRP1A,  1
-    DEFPTR CP_GRP0B,  2
-    DEFPTR CP_GRP1B,  3
-    DEFPTR CP_GRP0C,  4
-    DEFPTR CP_GRP1C,  5
-    DEFPTR CP_PF,     6
-    DEFPTR CP_COLUPF, 7
-    DEFPTR CP_COLUP0, 8
+    DEF
 
+    DEFPTR CP_GRP0A
+    DEFPTR CP_GRP1A
+    DEFPTR CP_GRP0B
+    DEFPTR CP_GRP1B
+    DEFPTR CP_GRP0C
+    DEFPTR CP_GRP1C
+    DEFPTR CP_PF
+    DEFPTR CP_COLUPF
+    DEFPTR CP_COLUP0
 
 ;-------------------------------------------------------------------------------
 

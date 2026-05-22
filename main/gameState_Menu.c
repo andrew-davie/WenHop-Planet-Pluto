@@ -101,34 +101,6 @@ void initGameState_Menu() {
 }
 
 
-const unsigned char pfColour[] = {0x94, 0x22, 0xD4};
-
-void setPFColours() {
-
-    unsigned char *p = RAM + _BUF_MENU_COLUPF;
-
-    int roll = roller;
-
-    // static int c;
-    // if (!(frame & 255))
-    //     c = (getRandom32() & 0xF0) | 4;
-
-
-    unsigned char pfConvertedColour[3];
-    for (int i = 0; i < 3; i++)
-        pfConvertedColour[i] = convertColour(pfColour[i]);
-
-    //    pfConvertedColour[1] = c;
-
-
-    for (int i = 0; i < _SCANLINES; i++) {
-        if (++roll > 2)
-            roll -= 3;
-        p[i] = pfConvertedColour[roll];
-    }
-}
-
-
 void drawCharacter(int x, int y, int ch) {
 
     if (ch == ' ')
@@ -319,7 +291,7 @@ void OS_Menu() {
     // Draw ICC menu PF background
 
     interleaveChronoColour(&roller);
-    setPFColours();
+    setPFColours((unsigned char *)(RAM + _BUF_MENU_COLUPF));
 
     drawPF(_BUF_MENU_PF, gfx_image_WenHop_png);
 

@@ -72,8 +72,8 @@ void VB_DetectConsole() {
             }
         }
 
-        setGameState(GS_COPYRIGHT);
-        // setGameState(GS_COUCH_COMPLIANT);
+        // setGameState(GS_COPYRIGHT); // tmp
+        setGameState(GS_GAME);
     }
     }
 

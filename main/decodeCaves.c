@@ -50,7 +50,7 @@ int decodingRow;
 unsigned char caveMirrorXY;
 static int doorX, doorY;
 int processedLevel;
-extern int thumbnailSpeed;
+// extern int thumbnailSpeed;
 int totalDogePossible;
 
 enum DECODE_STATE decodeState;
@@ -217,7 +217,7 @@ int decodeExplicitData(int /*sfx*/) {
                     scrollY = ((6 * TRILINES - 3) << 16);
                 }
 
-                thumbnailSpeed = -1;
+                //                thumbnailSpeed = -1;
             }
 
             else {
@@ -250,7 +250,7 @@ int decodeExplicitData(int /*sfx*/) {
                 break;
 
             case DRAW_FILLED_RECT:
-                thumbnailSpeed = -2;
+                // thumbnailSpeed = -2;
                 DrawFilledRect(theObject, a, b, c, d, f);
                 // if (sfx)
                 //     ADDAUDIO(SFX_DIRT);
@@ -267,8 +267,8 @@ int decodeExplicitData(int /*sfx*/) {
                 break;
             }
 
-            if (d == e)
-                thumbnailSpeed = -10;
+            // if (d == e)
+            //     thumbnailSpeed = -10;
         }
 
         break;

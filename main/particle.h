@@ -30,4 +30,10 @@ extern struct Particle particle[PARTICLE_COUNT];
 void drawParticles();
 void drawRope();
 
+
+int sphereDot(int dotX, int dotY, int type, unsigned char age);
+void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
+void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
+void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed);
+
 // EOF

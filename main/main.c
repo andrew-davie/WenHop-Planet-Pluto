@@ -5,6 +5,7 @@ Gamax Software 2026 - Craig Daniels
 
 #include <stdbool.h>
 
+#include "decodecaves.h"
 #include "defines_dasm.h"    // defines_dasm.h MUST come before defines_cdfjplus.h
 
 // MUST have whitespace here, otherwise auto-code formatters will change
@@ -16,12 +17,13 @@ Gamax Software 2026 - Craig Daniels
 #include "main.h"
 #include "savekey.h"
 
+#include "animations.h"
 #include "attribute.h"
 #include "colour.h"
 #include "gameState.h"
 #include "kernels.h"
-#include "particle.h"
 #include "random.h"
+#include "schedule.h"
 #include "scroll.h"
 #include "sound.h"
 
@@ -64,6 +66,9 @@ int lives;
 unsigned int sparkleTimer;
 
 unsigned int idleTimer;
+unsigned int availableIdleTime;
+int pulsePlayerColour;
+
 
 const signed char xInc[] = {
 
@@ -128,6 +133,8 @@ void runARM_Overscan();
 void HandleControls();
 void SilenceWaves();
 void SilenceTIA();
+
+void initNextLife();
 
 
 // function defines from ASM_routines.s
@@ -452,81 +459,6 @@ void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAdd
 }
 
 
-void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed) {
-
-    for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX, dripY, PT_SPIRAL, age);
-        if (idx >= 0)
-            particle[idx].speed = speed;
-    }
-}
-
-int sphereDot(int dotX, int dotY, int type, unsigned char age) {
-
-    int whichDrop = -1;
-
-    int col = dotX - ((scrollX * 5) >> 16);
-    if (col >= 0 && col < 40 /*pixels*/) {
-
-        int line = dotY - (scrollY >> 16);
-        if (line >= 0 && line < (_SCANLINES / 3 - 1)) {
-
-            int oldest = 0;
-            while (++whichDrop < PARTICLE_COUNT && particle[whichDrop].age)
-                if (particle[whichDrop].age < particle[oldest].age)
-                    oldest = whichDrop;
-
-            if (whichDrop == PARTICLE_COUNT)
-                whichDrop = oldest;
-
-            particle[whichDrop].type = type;
-            particle[whichDrop].x = dotX << 8;
-
-            particle[whichDrop].y = dotY << 8;
-            particle[whichDrop].speed = 0;    // rangeRandom(15) + 16;
-            particle[whichDrop].age = age;
-
-            particle[whichDrop].direction = getRandom32();    // 16.16 angle
-            particle[whichDrop].distance = 96;                // 16.16 speed
-        }
-    }
-
-    return whichDrop;
-}
-
-
-void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed) {
-
-    if (gravity < 0)
-        offsetY = TRILINES - offsetY;
-
-    for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * 5 + offsetX, dripY * TRILINES + offsetY, type, age);
-        if (idx >= 0) {
-            particle[idx].speed = rangeRandom(speed >> 1);
-            if (type == PT_SPIRAL2)
-                particle[idx].distance = rangeRandom(200) + 50;
-        }
-    }
-}
-
-bool visible(int col, int row) {
-
-    int y = (scrollY /* + shakeY*/) >> 16;
-    int deltaY = row * TRILINES - y;
-
-    if (deltaY <= -TRILINES || deltaY >= _SCANLINES / 3)
-        return false;
-
-    int x = ((scrollX /* + shakeX*/) * 5) >> 16;
-    int deltaX = col * 5 - x;
-    if ((unsigned int)/*deltaX < -4 ||*/ deltaX >= 40)
-        return false;
-
-    return true;
-}
-
-
 void surroundingConglomerate(int col, int row) {
 
     if (visible(col, row)) {
@@ -566,5 +498,23 @@ int dirFromCoords(int x, int y, int prevX, int prevY) {
     return dir;
 }
 
+void initNewGame() {
+
+    actualScore = 0;
+    partialScore = 0;
+
+    lives = 3;
+
+    // invincible = false;
+
+    initNextLife();
+}
+
+
+void initNextLife() {
+
+
+    pulsePlayerColour = 0;
+}
 
 // EOF

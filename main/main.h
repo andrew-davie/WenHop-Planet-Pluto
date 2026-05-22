@@ -2,10 +2,22 @@
 
 #include <stdbool.h>
 
+#include "attribute.h"
+#include "board.h"
 #include "characterset.h"
+#include "colour.h"
+#include "decodeCaves.h"
 #include "gameState.h"
 #include "main.h"
+#include "mellon.h"
+#include "particle.h"
+#include "player.h"
+#include "random.h"
 #include "reverseBits.h"
+#include "schedule.h"
+#include "score.h"
+#include "scroll.h"
+#include "sound.h"
 
 #define _WENHOP_SK_ID _SK_GAME_ID
 
@@ -83,6 +95,9 @@ extern int gameFrame;
 extern const unsigned char joyDirectBit[4];
 extern const signed char xInc[];
 extern const signed char yInc[];
+extern unsigned int availableIdleTime;
+
+extern int pulsePlayerColour;
 
 
 void ClearChannel(void *ptr);
@@ -95,11 +110,13 @@ void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAdd
 
 void setGameState(enum GAME_STATE state);
 
-void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed);
 int sphereDot(int dotX, int dotY, int type, unsigned char age);
 void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
 void surroundingConglomerate(int col, int row);
 
 int dirFromCoords(int x, int y, int prevX, int prevY);
+void setupBoardScanner();
+void initNewGame();
+
 
 // EOF

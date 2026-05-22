@@ -14,7 +14,7 @@
 struct AudioTable {
     const unsigned char *sample;
     const unsigned char priority;
-    unsigned char flags; // locked;
+    unsigned char flags;    // locked;
 };
 
 enum AudioCommand {
@@ -26,24 +26,39 @@ enum AudioID {
 
     // Ordered by priority; see AudioSamples[]
 
-    SFX_NULL,       // 00
-    SFX_ABORT,      // 01
-    SFX_WHOOSH,     // 02
-    SFX_BLIP,       // 03
-    SFX_REV,        // 04 car revving and fading away
-    SFX_SELECTION,  // 05 short selection blip
-    SFX_BEEP2,      // 06 beep horn twice
-    SFX_FASTBEEP2,  // 07 beep horn twice (fast)
-    SFX_EXIT,       // 08
-    SFX_SPINWHEELS, // 09 wheel squealing... sorta
-    SFX_MAGIC,      // 10
-    SFX_FIREWORKS,  // 11 muffled fireworks for title screen
-    SFX_DIRT,       // 12
-    SFX_SPACE,      // 13
+    SFX_NULL,             // 00
+    SFX_UNCOVERED,        // 01
+    SFX_COUNTDOWN2,       // 02  time expiring
+    SFX_PICKAXE,          // 03
+    SFX_DOGE2,            // 04
+    SFX_WHOOSH,           // 05
+    SFX_BLIP,             // 06
+    SFX_EXTRA,            // 07
+    SFX_EXIT,             // 08
+    SFX_EXPLODE,          // 09
+    SFX_EXPLODE_QUIET,    // 10
+    SFX_MAGIC,            // 11
+    SFX_MAGIC2,           // 12
+    SFX_ROCK,             // 13
+    SFX_ROCK2,            // 14
+    SFX_SCORE,            // 15
+    SFX_DOGE,             // 16
+    SFX_DOGE3,            // 17
+    SFX_DIRT,             // 18
+    SFX_PUSH,             // 19
+    SFX_SPACE,            // 20
+    SFX_DRIP,             // 21
+    SFX_BUBBLER,          // 22
+    SFX_DRIP2,            // 23
+    SFX_UNCOVER,          // 24
 
-    SFX_MAX, // size only; not a sound
+#if _ENABLE_LAVA2
+    SFX_LAVA,    // 25
+#endif
 
+    SFX_MAX,    // size only; not a sound
 };
+
 
 extern bool audioRequest[SFX_MAX];
 
@@ -52,7 +67,7 @@ struct Audio {
     unsigned char delay;
     bool handled;
     unsigned int index;
-    unsigned char attenuation; // 255 = 1.0 - lesser reduces appropriately
+    unsigned char attenuation;    // 255 = 1.0 - lesser reduces appropriately
 };
 
 #define CONCURRENT_SFX 4

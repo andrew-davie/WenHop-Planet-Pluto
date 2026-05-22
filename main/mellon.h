@@ -4,6 +4,8 @@
 
 void movePlayer(unsigned char *mes);
 void initPlayer();
+void grabDoge();
+void bubbles(int count, int dripX, int dripY, int age, int /*speed*/);
 
 extern int frameAdjustX;
 extern int frameAdjustY;
@@ -25,8 +27,6 @@ extern bool playerDead;
 
 extern const signed char xInc[];
 extern const signed char yInc[];
-
-void grabDoge();
 
 
 // EOF

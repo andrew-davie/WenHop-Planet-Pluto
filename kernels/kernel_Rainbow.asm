@@ -1,6 +1,7 @@
 START_RAINBOW = *
 
-    DEFPTR RBW_COLUBK, 0
+    DEF
+    DEFPTR RBW_COLUBK
 
 kernelRainbow
 _rainbowLoop        sta WSYNC

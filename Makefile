@@ -64,6 +64,7 @@ CUSTOMOBJS    = ASM_routines.o
 SRCS = \
  animations.c \
  attribute.c \
+ board.c \
  caveData.c \
  cdfjplus.c \
  characterset.c \
@@ -87,6 +88,7 @@ SRCS = \
  menuCharacterSet.c \
  particle.c \
  reverseBits.c \
+ schedule.c \
  score.c \
  scroll.c \
  wyrm.c \

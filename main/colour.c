@@ -75,4 +75,31 @@ void fadeBackgroundColour() {
     }
 }
 
+const unsigned char pfColour[] = {0x94, 0x22, 0xD4};
+
+void setPFColours(unsigned char *colours) {
+
+
+    int roll = roller;
+
+    // static int c;
+    // if (!(frame & 255))
+    //     c = (getRandom32() & 0xF0) | 4;
+
+
+    unsigned char pfConvertedColour[3];
+    for (int i = 0; i < 3; i++)
+        pfConvertedColour[i] = convertColour(pfColour[i]);
+
+    //    pfConvertedColour[1] = c;
+
+
+    for (int i = 0; i < _SCANLINES; i++) {
+        if (++roll > 2)
+            roll -= 3;
+        colours[i] = pfConvertedColour[roll];
+    }
+}
+
+
 // EOF

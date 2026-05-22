@@ -392,13 +392,15 @@ void grabCharacters() {
 
     for (int col = 0; col < 5; col++) {
 
-        p2 = col;    // tmp GET(p[col]);
+        p2 = CH_GEODOGE;    // tmp GET(p[col]);
         type = CharToType[p2];
 
-        if (Animate[type])
-            img[col] = charSet[revectorChar[*Animate[type]]];
-        else
-            img[col] = charSet[revectorChar[p2]];
+        // if (Animate[type])
+        //     img[col] = charSet[revectorChar[*Animate[type]]];
+        // else
+        img[col] = charSet[revectorChar[p2]];
+
+        img[col] = charSet[p2];
 
         if (Attribute[type] & ATT_PAD) {
 

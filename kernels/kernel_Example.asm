@@ -63,6 +63,7 @@
 
 START_EXAMPLE = *
 
+    DEF                         ; init defptr block
     DEFPTR EX_COLUBK, 0
 
 kernelExample

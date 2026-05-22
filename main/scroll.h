@@ -1,5 +1,7 @@
-#ifndef __SCROLL_H
-#define __SCROLL_H
+#pragma once
+
+#include <stdbool.h>
+
 
 extern int scrollX;
 extern int scrollY;
@@ -7,6 +9,8 @@ extern int scrollY;
 void Scroll();
 void resetTracking();
 int isScrolling();
+bool visible(int col, int row);
+
 
 #define SCROLLSPEED_MAXIMUM_X (256)
 #define SCROLL_MAXIMUM_X (((_BOARD_COLS - 8) << 16))
@@ -16,5 +20,4 @@ int isScrolling();
 #define SCROLL_TRIGGEREDGE_HORIZONTAL 2
 #define SCROLL_TRIGGEREDGE_VERTICAL 10
 
-#endif
 // EOF

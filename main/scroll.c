@@ -175,4 +175,21 @@ void resetTracking() {
     scrollSpeedX = scrollSpeedY = targetScrollSpeed = targetYScrollSpeed = 0;
 }
 
+bool visible(int col, int row) {
+
+    int y = (scrollY /* + shakeY*/) >> 16;
+    int deltaY = row * TRILINES - y;
+
+    if (deltaY <= -TRILINES || deltaY >= _SCANLINES / 3)
+        return false;
+
+    int x = ((scrollX /* + shakeX*/) * 5) >> 16;
+    int deltaX = col * 5 - x;
+    if ((unsigned int)/*deltaX < -4 ||*/ deltaX >= 40)
+        return false;
+
+    return true;
+}
+
+
 // EOF

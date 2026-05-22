@@ -140,8 +140,8 @@ void VB_Copyright() {
                             gfx_grid_savekey_reset_gif_HEIGHT,
                             _SCANLINES - 16 - gfx_grid_savekey_gif_HEIGHT - gfx_grid_savekey_reset_gif_HEIGHT, 6);
 
-                if (!(frame & 15))
-                    ADDAUDIO(SFX_SELECTION);
+                // if (!(frame & 15))
+                //     ADDAUDIO(SFX_SELECTION);
             }
         }
     }

@@ -35,368 +35,190 @@ int volume[2];
 struct Audio sfx[CONCURRENT_SFX];
 struct trackInfo music[MUSIC_MAX];
 
-// clang-format off
 
-// const unsigned char sampleTick[] = {
-//     0xF, 0x1F, 1, 2,
-//     0, 0, 0, 6,
-//     0xF, 0x1F, 1, 1,
-//     0, 0, 0, 40,
-//     CMD_LOOP,
-// };
+const unsigned char sampleTick[] = {
+    0xF, 0x1F, 1, 2, 0, 0, 0, 6, 0xF, 0x1F, 1, 1, 0, 0, 0, 40, CMD_LOOP,
+};
 
-// const unsigned char sampleDrip[] = {
-//     12, 12, 4, 1,
-//     CMD_STOP,
-// };
+const unsigned char sampleDrip[] = {
+    12, 12, 4, 1, CMD_STOP,
+};
 
-// const unsigned char sampleUncover[] = {
-//     12, 6, 3, 1,
-//     12, 4, 3, 2,
-//     0, 0, 0, 1,
-//     CMD_LOOP,
-// };
+const unsigned char sampleUncover[] = {
+    12, 6, 3, 1, 12, 4, 3, 2, 0, 0, 0, 1, CMD_LOOP,
+};
 
-// const unsigned char sampleDrip2[] = {
-//     12, 6, 4, 1,
-//     12, 4, 4, 1,
-//     CMD_STOP,
-// };
+const unsigned char sampleDrip2[] = {
+    12, 6, 4, 1, 12, 4, 4, 1, CMD_STOP,
+};
 
-// const unsigned char sampleMagic[] = {
-//     0xC, 0x8, 3, 2,
-//     CMD_LOOP,
-// };
+const unsigned char sampleMagic[] = {
+    0xC, 0x8, 3, 2, CMD_LOOP,
+};
 
-// const unsigned char sampleMagic2[] = {
-//     0x5, 0x8, 5, 15,
-//     CMD_STOP,
-// };
+const unsigned char sampleMagic2[] = {
+    0x5, 0x8, 5, 15, CMD_STOP,
+};
 
-// const unsigned char samplePick[] = {
-//     9,
-//     12,
-//     8,
-//     1,
-//     9,
-//     20,
-//     15,
-//     1,
-//     9,
-//     31,
-//     12,
-//     1,
-//     CMD_STOP,
-// };
-
-// const unsigned char sampleRock[] = {
-//     8, 18, 5, 4,
-//     8, 18, 5, 3,
-//     8, 18, 4, 2,
-//     8, 18, 3, 1,
-//     CMD_STOP,
-// };
-
-// const unsigned char sampleRock2[] = {
-//     8, 18, 4, 4,
-//     8, 18, 3, 3,
-//     8, 18, 2, 3,
-//     CMD_STOP,
-// };
-
-__attribute__((used)) const unsigned char sampleDirt[] = {
-    8, 31, 3, 10,
+const unsigned char samplePick[] = {
+    9,
+    12,
+    8,
+    1,
+    9,
+    20,
+    15,
+    1,
+    9,
+    31,
+    12,
+    1,
+    // 8, 18, 9, 1,
+    // 8, 18, 6, 1,
     CMD_STOP,
 };
 
-// const unsigned char sampleSpace[] = {
-//     8, 2, 2, 2,
-//     CMD_STOP,
-// };
-
-// const unsigned char sampleBlip[] = {
-//     4, 18, 5, 1,
-//     4, 18, 4, 2,
-//     4, 18, 3, 4,
-//     CMD_STOP,
-// };
-
-// const unsigned char sampleX[] = {
-//     0xC, 0x8, 1, 2, CMD_LOOP,
-//     // 12,10,2,1,
-//     // CMD_LOOP,
-// };
-
-
-// const unsigned char sampleBubbler[] = {
-//     0xE, 0x8, 1, 30,
-//     CMD_STOP,
-// };
-
-__attribute__((used)) const unsigned char sampleBeepHornTwice[] = {
-    12, 12, 7, 20,
-    0,0,0,7,
-    12, 12, 7, 50,
-    CMD_STOP,
+const unsigned char sampleRock[] = {
+    8, 18, 5, 4, 8, 18, 5, 3, 8, 18, 4, 2, 8, 18, 3, 1, CMD_STOP,
 };
 
-__attribute__((used)) const unsigned char sampleFastBeep2[] = {
-    12, 12, 5, 10,
-    0,0,0,5,
-    12, 12, 5, 20,
-    CMD_STOP,
+const unsigned char sampleRock2[] = {
+    8, 18, 4, 4, 8, 18, 3, 3, 8, 18, 2, 3, CMD_STOP,
 };
 
-
-// const unsigned char sampleUncovered[] = {
-//     12, 5, 4, 3,
-//     12, 7, 4, 3,
-//     12, 5, 4, 3,
-//     12, 7, 4, 3,
-//     CMD_STOP,
-// };
-
-// const unsigned char samplePush[] = {
-//     8, 4, 4, 12,
-//     CMD_STOP,
-// };
-
-
-__attribute__((used)) const unsigned char sampleSpinWheel[] = {
-    8, 3, 3, 10,
-    8, 3, 3, 20,
-    8, 3, 2, 30,
-    8, 3, 1, 40,
-    CMD_STOP
+const unsigned char sampleDirt[] = {
+    8, 31, 3, 10, CMD_STOP,
 };
 
-__attribute__((used)) const unsigned char sampleRev[] = {
-
-    
-    // 7, 31, 15, 10,
-    // 7, 31, 12, 10,
-    // 7, 31, 8, 10,
-    // 7, 31, 6, 10,
-    // 7, 31, 4, 15,
-
-    // 7, 31, 15, 10,
-    // 7, 31, 12, 10,
-    // 7, 31, 8, 10,
-    // 7, 31, 6, 10,
-    // 7, 31, 4, 15,
-
-
-
-
-    // 7, 26, 10, 2,
-    // 7, 27, 10, 2,
-    // 7, 28, 10, 2,
-    // 7, 29, 10, 2,
-    // 7, 30, 10, 2,
-    // 7, 31, 10, 45,
-
-    // 7, 31, 10, 5,
-    // 7, 30, 10, 5,
-    // 7, 29, 10, 5,
-    // 7, 28, 10, 5,
-    // 7, 27, 10, 5,
-    // 7, 26, 10, 5,
-    // 7, 25, 10, 50,
-
-    // 0,0,0,20,
-
-    // 7, 26, 10, 2,
-    // 7, 27, 10, 2,
-    // 7, 28, 10, 2,
-    // 7, 29, 10, 2,
-    // 7, 30, 10, 2,
-    // 7, 31, 10, 45,
-
-
-
-    
-
-//    7, 30,  0, 12,
-//    7, 25,  1, 12,
-//    7, 20,  2, 12,
-//    7, 20,  3, 12,
-//    7, 21,  4, 12,
-//    7, 22,  5, 12,
-//    7, 23,  6, 12,
-
-   7, 31,  4, 12,
-   7, 31,  5, 12,
-   7, 31,  6, 12,
-
-
-   7, 31,  7, 12,
-   7, 30,  8, 12,
-   7, 29,  9, 12,
-   7, 28, 10, 12,
-   7, 27, 11, 12,
-   7, 26, 12, 12,
-   7, 25, 13, 12,
-   7, 24, 14, 12,
-
-   7, 23, 12, 12,
-   7, 22, 10, 12,
-   7, 21, 8, 12,
-   7, 20, 6, 12,
-   7, 19, 4, 12,
-   7, 18, 2, 12,
-   7, 17, 0, 12,
-
-
-    CMD_STOP,
-};
-
-
-
-
-
-const unsigned char sampleExplode[] = {
-    8, 7, 15, 3,
-//    8, 10, 14, 1,
-    8, 13, 10, 2,
-    8, 16, 6, 3,
-    8, 19, 5, 4,
-    8, 22, 4, 5,
-    8, 25, 3, 6,
-    // 8, 28, 2, 10,
-    // 8, 29, 1, 15,
-    // 8, 31, 1, 15,
-    CMD_STOP,
-};
-
-// const unsigned char sampleExplodeQuiet[] = {
-//     8, 7, 7, 2,
-//     8, 13, 5, 2,
-//     8, 19, 4, 4,
-//     8, 25, 2, 6,
-//     8, 29, 1, 15,
-//     CMD_STOP,
-// };
-
-__attribute__((used)) const unsigned char sampleWhoosh[] = {
-    15, 31, 1, 2*3,
-    15, 31, 2, 2*3,
-    15, 28, 3, 2*3,
-    15, 25, 4, 3*3,
-    15, 22, 5, 4*3,
-    15, 19, 6, 5*3,
-    15, 16, 7, 6*3,
-    15, 13, 7, 5*3,
-    15, 10, 4, 2,
-    15, 7, 2, 1,
-    CMD_STOP,
-};
-
-
-__attribute__((used)) const unsigned char sampleAbort[] = {
-
-
-    8, 18, 6, 5,
-    6, 5, 8, 3,
-    6, 7, 8, 3,
-    6, 5, 6, 3,
-    6, 7, 6, 3,
-    6, 5, 4, 3,
-    6, 7, 4, 3,
-    6, 5, 2, 3,
-    6, 7, 2, 3,
-    // dc CMD_STOP
-
-    // 15, 7, 2, 2,
-    // 15, 10, 4, 2,
-    // 15, 13, 7, 10,
-    // 15, 16, 7, 6,
-    // 15, 19, 6, 5,
-    // 15, 22, 5, 4,
-    // 15, 25, 4, 3,
-    // 15, 28, 3, 2,
-    // 15, 31, 2, 2,
-    // 15, 31, 1, 2,
-    CMD_STOP,
-};
-
-
-// const unsigned char sample10987654321[] = {
-
-//     4, 10, 1, 1,
-//     4, 10, 3, 1,
-//     4, 10, 5, 1,
-//     4, 10, 6, 1,
-//     4, 10, 5, 15,
-//     4, 10, 3, 3,
-//     4, 10, 2, 3,
-//     4, 10, 1, 3,
-//     CMD_STOP,
-// };
-
-// const unsigned char sampleNone[] = {
-//     CMD_STOP,
-// };
-
-const unsigned char sampleSFX[] = {
-    // C,F,V,LEN
-    5, 14, 4, 1,
-    5, 12, 6, 1,
-    5, 11, 7, 1,
-    5, 3, 10, 2,
-    5, 4, 8, 1,
-    5, 5, 6, 1,
-    5, 6, 4, 1,
-    5, 7, 1, 1,
-    CMD_STOP,
-};
-
-const unsigned char sampleX2[] = {
-    // C,F,V,LEN
-    5, 14, 1, 1,
-    5, 12, 2, 1,
-    5, 11, 3, 1,
-    5, 3, 4, 2,
-    5, 3, 4,2,
-    5,  4, 3, 1,
-    5,  5, 1, 1,
-    5,  4, 3, 1,
-    5, 5, 1, 1,
-    CMD_STOP,
-};
-
-#if 1
-// clang-format on
-
-const unsigned char sampleNone[] = {
-    CMD_STOP,
+const unsigned char sampleSpace[] = {
+    8, 2, 2, 4, CMD_STOP,
 };
 
 const unsigned char sampleBlip[] = {
     4, 18, 5, 1, 4, 18, 4, 2, 4, 18, 3, 4, CMD_STOP,
 };
 
-const unsigned char sampleSelectionBlip[] = {
-    12, 6, 4, 1, 12, 4, 4, 1, CMD_STOP,
+const unsigned char sampleBubbler[] = {
+    0xE, 0x8, 1, 30, CMD_STOP,
+    //    CMD_LOOP,
+    // 12,10,2,1,
+    // CMD_LOOP,
+};
 
+#if _ENABLE_LAVA2
+const unsigned char sampleLava[] = {
+    3, 10, 2, 2, CMD_LOOP,
+};
+#endif
+
+const unsigned char sampleExxtra[] = {
+    12, 5, 4, 10, 12, 7, 4, 10, 12, 5, 4, 10, 12, 7, 4, 10, 12, 5, 4, 10, 12, 7, 4, 10, CMD_STOP,
+};
+
+const unsigned char sampleUncovered[] = {
+    12, 5, 4, 3, 12, 7, 4, 3, 12, 5, 4, 3, 12, 7, 4, 3, CMD_STOP,
+};
+
+const unsigned char samplePush[] = {
+    8, 4, 4, 12, CMD_STOP,
+};
+
+const unsigned char sampleExplode[] = {
+    8,  7, 9, 2, 8,  10, 8, 2, 8,  13, 7,  2, 8,  16, 7,  3, 8,  19, 6,  4,        8,
+    22, 5, 5, 8, 25, 4,  6, 8, 28, 3,  10, 8, 29, 2,  15, 8, 31, 1,  15, CMD_STOP,
+};
+
+const unsigned char sampleExplodeQuiet[] = {
+    8,
+    7,
+    7,
+    2,
+    //    8, 10, 8, 2,
+    8,
+    13,
+    5,
+    2,
+    //   8, 16, 7, 3,
+    8,
+    19,
+    4,
+    4,
+    //   8, 22, 5, 5,
+    8,
+    25,
+    2,
+    6,
+    //   8, 28, 3,10,
+    8,
+    29,
+    1,
+    15,
+    //  8, 31, 1, 15,
+    CMD_STOP,
+};
+
+const unsigned char sampleWhoosh[] = {
+    15, 31, 1, 2,  15, 31, 2, 2,  15, 28, 3,  2,  15, 25, 4, 3,  15, 22, 5, 4,        15,
+    19, 6,  5, 15, 16, 7,  6, 15, 13, 7,  10, 15, 10, 4,  2, 15, 7,  2,  2, CMD_STOP,
+};
+
+// const unsigned char sampleSpin[] = {
+//     15, 31, 1, 1,
+//     15, 31, 2, 2,
+//     15, 28, 3, 3,
+//     15, 25, 4, 5,
+//     15, 22, 5, 6,
+//     15, 19, 6, 6,
+//     15, 16, 5, 6,
+//     15, 13, 4, 5,
+//     15, 10, 3, 3,
+//     15, 7,  2, 2,
+//     15, 7,  2, 1,
+//     CMD_STOP,
+// };
+
+const unsigned char sample10987654321[] = {
+
+    4, 10, 1, 1, 4, 10, 3, 1, 4, 10, 5, 1, 4, 10, 6, 1, 4, 10, 5, 15, 4, 10, 3, 3, 4, 10, 2, 3, 4, 10, 1, 3, CMD_STOP,
+};
+
+const unsigned char sampleNone[] = {
+    CMD_STOP,
+};
+
+const unsigned char sampleSFX[] = {
+    // C,F,V,LEN
+    5, 14, 4, 1, 5, 12, 6, 1, 5, 11, 7, 1, 5, 3, 10, 2, 5, 4, 8, 1, 5, 5, 6, 1, 5, 6, 4, 1, 5, 7, 1, 1, CMD_STOP,
+};
+
+const unsigned char sampleDoge2[] = {
+    // C,F,V,LEN
+    5, 14, 1, 1, 5, 12, 2, 1, 5, 11, 3, 1, 5, 3, 4, 2, 5, 3,        4,
+    2, 5,  4, 3, 1, 5,  5, 1, 1, 5,  4, 3, 1, 5, 5, 1, 1, CMD_STOP,
+};
+
+const unsigned char sampleDoge3[] = {
+    // C,F,V,LEN
+    5, 14, 1, 1, 5, 11, 3, 1, 5, 3, 4, 1, 5, 4, 3, 1, 5, 5, 1, 1, CMD_STOP,
 };
 
 const unsigned char sampleExit[] = {
     12, 16, 1, 1, 12, 16, 4, 1, 12, 16, 10, 1, 12, 16, 8, 4, 12, 16, 6, 1, 12, 16, 4, 1, 12, 16, 2, 1, CMD_STOP,
 };
 
-const unsigned char sampleMagic[] = {
-    0xC, 8, 3, 2, CMD_LOOP,
-};
+// const unsigned char sampleBirth[] = {
 
-const unsigned char sampleFireworks[] = {
-    8, 18, 10, 1, 8, 18, 9, 2, 8, 18, 8, 2, 8, 18, 7, 2, 8, 18, 4, 12, CMD_STOP,
-
-};
-
-const unsigned char sampleSpace[] = {
-    8, 2, 1, 2, CMD_STOP,
-
-};
+// //    8,4,1,1,
+// //    8,4,4,1,
+// //    8,4,8,1,
+//     8,4,14,8,
+//     8,4,10,4,
+//     8,4,8,4,
+//     8,4,6,4,
+//     8,4,4,4,
+//     8,4,2,4,
+//     CMD_STOP,
+// };
 
 const struct AudioTable AudioSamples[] = {
 
@@ -405,97 +227,110 @@ const struct AudioTable AudioSamples[] = {
     // MUST correspond to AudioID enum ordering/number
     // MUST be in priority order!
 
-    {sampleAbort, 127, 0},                          // 01 SFX_ABORT
-    {sampleWhoosh, 127, 0},                         // 02 SFX_WHOOSH
-    {sampleBlip, 125, 0},                           // 03 SFX_BLIP
-    {sampleRev, 117, 0},                            // 04 SFX_REV
-    {sampleSelectionBlip, 115, 0},                  // 05 SFX_SELECTION
-    {sampleBeepHornTwice, 110, AUDIO_ATTENUATE},    // 06 SFX_BEEP2
-    {sampleFastBeep2, 100, AUDIO_ATTENUATE},        // 07 SFX_FASTBEEP2
-    {sampleExit, 99, 0},                            // 08 SFX_EXIT
-    {sampleSpinWheel, 96, 0},                       // 09 SFX_SPINWHEEL
-    {sampleMagic, 91, AUDIO_KILL},                  // 10 SFX_MAGIC
-    {sampleFireworks, 90, 0},                       // 11 SFX_FIREWORKS
-    {sampleDirt, 9, 0},                             // 12 SFX_DIRT
-    {sampleSpace, 8, 0},                            // 13 SFX_SPACE
+    {sampleUncovered, 201, 0},                                          // 01 SFX_UNCOVERED
+    {sample10987654321, 200, AUDIO_LOCKED},                             // 02 SFX_COUNTDOWN2
+    {samplePick, 200, 0},                                               // 03 SFX_PICKAXE
+    {sampleSFX, 200, 0},                                                // 04 SFX_DOGE2
+    {sampleWhoosh, 127, 0},                                             // 05 SFX_WHOOSH
+    {sampleBlip, 125, 0},                                               // 06 SFX_BLIP
+    {sampleExxtra, 110, 0},                                             // 07 SFX_EXTRA
+    {sampleExit, 99, 0},                                                // 08 SFX_EXIT
+    {sampleExplode, 99, 0},                                             // 09 SFX_EXPLODE
+    {sampleExplodeQuiet, 99, 0},                                        // 10 SFX_EXPLODE_QUIET
+    {sampleMagic, 50, AUDIO_KILL},                                      // 11 SFX_MAGIC
+    {sampleMagic2, 50, 0},                                              // 12 SFX_MAGIC2
+    {sampleRock, 11, 0},                                                // 13 SFX_ROCK
+    {sampleRock2, 10, 0},                                               // 14 SFX_ROCK2
+    {sampleDrip2, 10, 0},                                               // 15 SFX_SCORE
+    {sampleDoge2, 9, 0},                                                // 16 SFX_DOGE
+    {sampleDoge3, 9, 0},                                                // 17 SFX_DOGE3
+    {sampleDirt, 9, 0},                                                 // 18 SFX_DIRT
+    {samplePush, 8, 0},                                                 // 19 SFX_PUSH
+    {sampleSpace, 8, 0},                                                // 20 SFX_SPACE
+    {sampleDrip2, 8, 0},                                                // 21 SFX_DRIP
+    {sampleBubbler, 7, AUDIO_LOCKED | AUDIO_SINGLETON | AUDIO_KILL},    // 22 SFX_BUBBLER
+    {sampleDrip, 5, 0},                                                 // 23 SFX_DRIP2
+    {sampleUncover, 2, AUDIO_LOCKED | AUDIO_KILL},                      // 24 SFX_UNCOVER
 
+#if _ENABLE_LAVA2
+    {sampleLava, 2, true},    // 25 SFX_LAVA
+#endif
 };
 
 // clang-format off
-#else
 
-#define STRINGIFY2(x) #x
-#define STRINGIFY(x) STRINGIFY2(x)
+// #define STRINGIFY2(x) #x
+// #define STRINGIFY(x) STRINGIFY2(x)
 
-__asm__(".section .rodata\n"
-        ".global AudioSamples2\n"
-        "AudioSamples2:\n"
+// __asm__(".section .rodata\n"
+//         ".global AudioSamples2\n"
+//         "AudioSamples2:\n"
 
-        ".hword " STRINGIFY(__sampleNone) "\n"
-        ".byte 0\n"
-        ".byte 0\n"
-
-
-        ".hword sampleAbort\n"
-        ".byte 127\n"
-        ".byte 0\n"
-
-        ".hword sampleWhoosh\n"
-        ".byte 127\n"
-        ".byte 0\n"
-
-        ".hword " STRINGIFY(__sampleBlip) "\n"
-        ".byte 125\n"
-        ".byte 0\n"
-
-        ".hword sampleRev\n"
-        ".byte 117\n"
-        ".byte 0\n"
-
-        ".hword " STRINGIFY(__sampleSelectionBlip) "\n"
-        ".byte 92\n"
-        ".byte 0\n"
-
-        ".hword sampleBeepHornTwice\n"
-        ".byte 110\n"
-        ".byte " STRINGIFY(AUDIO_ATTENUATE) "\n"
-
-        ".hword sampleFastBeep2\n"
-        ".byte 100\n"
-        ".byte " STRINGIFY(AUDIO_ATTENUATE) "\n"
-
-        ".hword " STRINGIFY(__sampleExit) "\n"
-        ".byte 99\n"
-        ".byte 0\n"
-
-        ".hword sampleSpinWheel\n"
-        ".byte 96\n"
-        ".byte 0\n"
+//         ".hword " STRINGIFY(__sampleNone) "\n"
+//         ".byte 0\n"
+//         ".byte 0\n"
 
 
-        ".hword " STRINGIFY(__sampleMagic) "\n"
-        ".byte 91\n"
-        ".byte " STRINGIFY(AUDIO_KILL) "\n"
+//         ".hword sampleAbort\n"
+//         ".byte 127\n"
+//         ".byte 0\n"
 
-        ".hword " STRINGIFY(__sampleFireworks) "\n"
-        ".byte 90\n"
-        ".byte 0\n"
+//         ".hword sampleWhoosh\n"
+//         ".byte 127\n"
+//         ".byte 0\n"
 
-        ".hword sampleDirt\n"
-        ".byte 9\n"
-        ".byte 0\n"
+//         ".hword " STRINGIFY(__sampleBlip) "\n"
+//         ".byte 125\n"
+//         ".byte 0\n"
 
-        ".hword " STRINGIFY(__sampleSpace) "\n"
-        ".byte 8\n"
-        ".byte 0\n"
+//         ".hword sampleRev\n"
+//         ".byte 117\n"
+//         ".byte 0\n"
 
-);
+//         ".hword " STRINGIFY(__sampleSelectionBlip) "\n"
+//         ".byte 92\n"
+//         ".byte 0\n"
+
+//         ".hword sampleBeepHornTwice\n"
+//         ".byte 110\n"
+//         ".byte " STRINGIFY(AUDIO_ATTENUATE) "\n"
+
+//         ".hword sampleFastBeep2\n"
+//         ".byte 100\n"
+//         ".byte " STRINGIFY(AUDIO_ATTENUATE) "\n"
+
+//         ".hword " STRINGIFY(__sampleExit) "\n"
+//         ".byte 99\n"
+//         ".byte 0\n"
+
+//         ".hword sampleSpinWheel\n"
+//         ".byte 96\n"
+//         ".byte 0\n"
+
+
+//         ".hword " STRINGIFY(__sampleMagic) "\n"
+//         ".byte 91\n"
+//         ".byte " STRINGIFY(AUDIO_KILL) "\n"
+
+//         ".hword " STRINGIFY(__sampleFireworks) "\n"
+//         ".byte 90\n"
+//         ".byte 0\n"
+
+//         ".hword sampleDirt\n"
+//         ".byte 9\n"
+//         ".byte 0\n"
+
+//         ".hword " STRINGIFY(__sampleSpace) "\n"
+//         ".byte 8\n"
+//         ".byte 0\n"
+
+// );
 
 // clang-format on
 
-extern const short int AudioSamples2[SFX_MAX];
-const struct AudioTable *AudioSamples = (const struct AudioTable *)AudioSamples2;
-#endif
+// extern const short int AudioSamples2[SFX_MAX];
+// const struct AudioTable *AudioSamples = (const struct AudioTable *)AudioSamples2;
+// #endif
 bool audioRequest[SFX_MAX];
 
 void killRepeatingAudio() {

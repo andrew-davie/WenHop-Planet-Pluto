@@ -9,17 +9,17 @@
 #include "mellon.h"
 
 #include "animations.h"
-// #include "atarivox.h"
-#include "attribute.h"
-#include "colour.h"
-#include "decodeCaves.h"
-// #include "joystick.h"
-#include "particle.h"
-#include "player.h"
-#include "random.h"
-#include "score.h"
-#include "scroll.h"
-#include "sound.h"
+// // #include "atarivox.h"
+// #include "attribute.h"
+// #include "colour.h"
+// #include "decodeCaves.h"
+// // #include "joystick.h"
+// #include "particle.h"
+// #include "player.h"
+// #include "random.h"
+// #include "score.h"
+// #include "scroll.h"
+// #include "sound.h"
 
 int playerX;    // char pos 0-39 (use *5 for pixel)
 int playerY;    // char pos 0-21 (use *10 for pixel and then *3 for scanline)

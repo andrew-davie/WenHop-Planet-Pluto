@@ -324,10 +324,20 @@ BANK_END{1} = *
 ;-------------------------------------------------------------------------------
 
 
-    MAC DEFPTR ; {name}, {pointer number}
-_DS_{1} = {2}
-_DS_{1}_DATA = _DS_{1} + FF_OFFSET
+;     MAC DEFPTR ; {name}, {pointer number}
+; _DS_{1} = {2}
+; _DS_{1}_DATA = _DS_{1} + FF_OFFSET
+;     ENDM
+
+
+    MAC DEF
+DNO SET 0
     ENDM
 
+    MAC DEFPTR ; {name}
+_DS_{1} = DNO
+_DS_{1}_DATA = _DS_{1} + FF_OFFSET
+DNO SET DNO+1
+    ENDM
 
 ; EOF
