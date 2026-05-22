@@ -75,6 +75,10 @@ VB_kernelCopyright
 
 
 kernelCopyright
+
+    ; runVectoredCode[kernel] comes here
+
+
 _copyrightLoop      sta WSYNC                       ; @0
                     sta.w COLUP1                    ; 4
 

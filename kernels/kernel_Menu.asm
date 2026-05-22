@@ -47,13 +47,8 @@ positionSpritesMenu
 
 
 kernelMenu
-                    lda #_DS_MENU_COLUPF_DATA       ; 2
-                    sta COLUPF                      ; 3
 
-                    lda #0
-                    sta PF0
-                    sta PF1
-                    sta PF2
+    ; runVectoredCode[kernel] comes here
 
                     sta WSYNC
                     jmp 0
@@ -119,6 +114,14 @@ VB_kernelMenu
 
                     sta WSYNC
                     sta HMOVE
+
+                    lda #_DS_MENU_COLUPF_DATA       ; 2
+                    sta COLUPF                      ; 3
+
+                    lda #0
+                    sta PF0
+                    sta PF1
+                    sta PF2
 
                     rts
 

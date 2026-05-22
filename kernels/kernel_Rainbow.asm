@@ -4,6 +4,9 @@ START_RAINBOW = *
     DEFPTR RBW_COLUBK
 
 kernelRainbow
+
+    ; runVectoredCode[kernel] comes here
+
 _rainbowLoop        sta WSYNC
 
                     lda #0

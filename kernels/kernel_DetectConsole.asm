@@ -4,7 +4,9 @@ START_DETECT_CONSOLE = *
 
 kernelDetectConsole
 
-                    ldx #_SCANLINES
+    ; runVectoredCode[kernel] comes here
+
+                    ldx #_SCANLINES + 1
 _detectConsoleLoop  sta WSYNC
                     dex
                     bne _detectConsoleLoop

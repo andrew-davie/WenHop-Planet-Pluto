@@ -67,6 +67,10 @@ START_EXAMPLE = *
     DEFPTR EX_COLUBK, 0
 
 kernelExample
+
+    ; runVectoredCode[kernel] comes here
+
+
 _exampleLoop        sta WSYNC
 
                     lda #0

@@ -100,16 +100,16 @@ mainGameLoop
                     stx CALLFN                  ; call VerticalBlank in ARM
 
 
-    lda #0
-    sta COLUBK
-    sta COLUPF
-    sta COLUP0
-    sta COLUP1
-    sta GRP0
-    sta GRP1
-    sta PF0
-    sta PF1
-    sta PF2
+    ; lda #0
+    ; sta COLUBK
+    ; sta COLUPF
+    ; sta COLUP0
+    ; sta COLUP1
+    ; sta GRP0
+    ; sta GRP1
+    ; sta PF0
+    ; sta PF1
+    ; sta PF2
 
     ; run kernel-specific 6502 Vertical Blank code (VB_FN_OFFSET)
 
@@ -141,10 +141,10 @@ TimerOS             .byte 36-KO           ; NTSC           262
                     .byte 36-KO           ; PAL60          262
 
 TimerVB
-                    .byte 43           ; NTSC           262
-                    .byte (43+30)      ; PAL            312
-                    .byte 43           ; SECAM          262
-                    .byte 43           ; PAL60          262
+                    .byte 41           ; NTSC           262
+                    .byte (41+30)      ; PAL            312
+                    .byte 41           ; SECAM          262
+                    .byte 41           ; PAL60          262
 
 
 ; EOF

@@ -1,3 +1,4 @@
+#include "animations.h"
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
@@ -24,6 +25,8 @@ void initGameState_Game() {
 
     initBoard();
     initNewGame();
+    initCharVector();
+    initCharAnimations();
 
 
 #if 0    // original initnextlife()
@@ -138,6 +141,9 @@ void VB_Game() {
     setPointer(_DS_GAME_PF1_RIGHT, _BUF_GAME_PF1_RIGHT);
     setPointer(_DS_GAME_PF2_RIGHT, _BUF_GAME_PF2_RIGHT);
 
+    setPointer(_DS_GAME_GRP0A, _BUF_GAME_GRP0);
+    setPointer(_DS_GAME_GRP1A, _BUF_GAME_GRP1);
+
 
     static unsigned int col;
     col++;
@@ -153,9 +159,10 @@ void VB_Game() {
 
     setPointer(_DS_GAME_COLUBK, _BUF_GAME_COLUBK);
 
-    // if (frame > 500)
-    //     setGameState(GS_RAINBOW);
+    if (frame > 500)
+        setGameState(GS_RAINBOW);
 
+    processCharAnimations();
     scheduledTasks();
 }
 

@@ -178,7 +178,7 @@ void VB_Menu() {
     initMenuDataStreams();
 
     if (frame > 500)
-        setGameState(GS_RAINBOW);
+        setGameState(GS_GAME);
 }
 
 

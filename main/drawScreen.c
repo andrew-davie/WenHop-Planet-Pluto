@@ -5,6 +5,7 @@
 
 #include "cdfjplus.h"
 
+#include "animations.h"
 #include "attribute.h"
 #include "characterset.h"
 #include "colour.h"
@@ -373,6 +374,8 @@ const unsigned char *const roundedCorner[] = {
     _CHAR_INNER_CORNER_15,    // 15 LURD
 };
 
+int tempBase = 0;
+
 void grabCharacters() {
 
     unsigned char p2;
@@ -381,15 +384,14 @@ void grabCharacters() {
 
     for (int col = 0; col < 5; col++) {
 
-        p2 = CH_GEODOGE;    // tmp GET(p[col]);
+        p2 = tempBase++ & 31;    // CH_GEODOGE;    // tmp GET(p[col]);
         type = CharToType[p2];
 
-        // if (Animate[type])
-        //     img[col] = charSet[revectorChar[*Animate[type]]];
-        // else
-        img[col] = charSet[revectorChar[p2]];
+        if (Animate[type])
+            img[col] = charSet[revectorChar[*Animate[type]]];
+        else
+            img[col] = charSet[revectorChar[p2]];
 
-        img[col] = charSet[p2];
 
         if (Attribute[type] & ATT_PAD) {
 
@@ -424,7 +426,7 @@ const unsigned int arenas[] = {
 };
 
 void drawScreen() {    // --> cycles 62870 (@20230616)
-
+    tempBase = 0;
 
 #if ENABLE_SHAKE
     extern int shakeX, shakeY;
