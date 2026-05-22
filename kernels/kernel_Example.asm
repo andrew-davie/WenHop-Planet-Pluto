@@ -40,7 +40,7 @@
 
 ; add in one of the banks (e.g bank_0.asm)
 ;   BANK_kernelExample = BANK#
-;      include "kernel/kernel_example.asm"
+;      include "kernels/kernel_example.asm"
 
 ; in runVectoredCode.asm
 ; add a new KERNEL defintion above KERNEL_MAX

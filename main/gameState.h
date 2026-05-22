@@ -11,6 +11,7 @@ enum GAME_STATE {
     GS_RAINBOW,            // 3
     GS_COUCH_COMPLIANT,    // 4
     GS_MENU,               // 5
+    GS_GAME,               // 6
 
     GS_MAX
 
@@ -35,5 +36,10 @@ void OS_CouchCompliant();
 void initGameState_Menu();
 void VB_Menu();
 void OS_Menu();
+
+void initGameState_Game();
+void VB_Game();
+void OS_Game();
+
 
 // EOF

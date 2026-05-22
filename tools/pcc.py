@@ -114,21 +114,7 @@ def chrono_colour(file_name):
 
     return c_header, c_code
 
-#    return (Red_Lines, Green_Lines, Blue_Lines, mask_Lines)
 
-
-# for bytepos in [0,1,3,2]:
-#     f.write('__COL' + str(bytepos) + '\n')
-#     for line in range(im.size[1]-1, -1, -1):
-#         f.write(' .byte ' + str(RedLines[line][bytepos]) + ' ;R (' + str(line) + ')\n')
-#         f.write(' .byte ' + str(GreenLines[line][bytepos]) + ' ;G\n')
-#         f.write(' .byte ' + str(BlueLines[line][bytepos]) + ' ;B\n')
-#
-# f.close()
-
-
-
-# Example usage
 if __name__ == "__main__":
 
     import argparse

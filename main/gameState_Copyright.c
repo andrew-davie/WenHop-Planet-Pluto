@@ -148,8 +148,8 @@ void VB_Copyright() {
 
     else {
 
-
-        setGameState(GS_COUCH_COMPLIANT);
+        setGameState(GS_GAME);
+        //        setGameState(GS_COUCH_COMPLIANT);
 
         RAM[_SK_RESET] = 0;    // superfluous when singleton
     }

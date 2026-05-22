@@ -62,19 +62,34 @@ CUSTOMOBJS    = ASM_routines.o
 # append new .c files to SRCS
 
 SRCS = \
+ animations.c \
+ attribute.c \
+ caveData.c \
  cdfjplus.c \
+ characterset.c \
  colour.c \
  custom.c \
+ decodeCaves.c \
  draw.c \
+ drawScreen.c \
  main.c \
+ mellon.c \
+ player.c \
+ random.c \
  savekey.c \
  sound.c \
  gameState_Copyright.c \
  gameState_CouchCompliant.c \
  gameState_DetectConsole.c \
+ gameState_Game.c \
  gameState_Menu.c \
  gameState_Rainbow.c \
  menuCharacterSet.c \
+ particle.c \
+ reverseBits.c \
+ score.c \
+ scroll.c \
+ wyrm.c \
  \
  grid6.c
 
@@ -116,7 +131,7 @@ ifneq ($(EMULATOR),)
 	pkill -f $(GOPHERNAME) || true
 
 ifeq ($(EMULATOR), gopher)
-	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv PAL60 -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
+	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv NTSC -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
 endif
 
 ifeq ($(EMULATOR), stella)

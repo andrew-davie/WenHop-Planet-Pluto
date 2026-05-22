@@ -13,6 +13,7 @@ KNO                 SET KNO + 1
     KERNEL COPYRIGHT            ; 2
     KERNEL COUCH_COMPLIANT      ; 3
     KERNEL MENU                 ; 4
+    KERNEL GAME                 ; 5
 
     KERNEL MAX
 
@@ -30,6 +31,7 @@ kernelBank_L
                     .byte <BANK_kernelCopyright         ; 2 KERNEL_COPYRIGHT
                     .byte <BANK_kernelCopyright         ; 3 KERNEL_COUCH_COMPLIANT (re-uses COPYRIGHT)
                     .byte <BANK_kernelMenu              ; 4 KERNEL_MENU
+                    .byte <BANK_kernelGame              ; 4 KERNEL_GAME
 
                     ; >>> VB
                     .byte <BANK_kernelDetectConsole
@@ -37,6 +39,7 @@ kernelBank_L
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelMenu
+                    .byte <BANK_kernelGame
 
                     ; >>> OS
                     .byte <BANK_kernelDetectConsole
@@ -44,6 +47,7 @@ kernelBank_L
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelMenu
+                    .byte <BANK_kernelGame
 .END
 
 kernelRoutine_L
@@ -52,18 +56,21 @@ kernelRoutine_L
                     .byte <kernelCopyright
                     .byte <kernelCopyright
                     .byte <kernelMenu
+                    .byte <kernelGame
 
                     .byte <VB_kernelDetectConsole
                     .byte <VB_kernelRainbow
                     .byte <VB_kernelCopyright
                     .byte <VB_kernelCopyright
                     .byte <VB_kernelMenu
+                    .byte <VB_kernelGame
 
                     .byte <OS_kernelDetectConsole
                     .byte <OS_kernelRainbow
                     .byte <OS_kernelCopyright
                     .byte <OS_kernelCopyright
                     .byte <OS_kernelMenu
+                    .byte <OS_kernelGame
 
 kernelRoutine_H
                     .byte >kernelDetectConsole
@@ -71,18 +78,21 @@ kernelRoutine_H
                     .byte >kernelCopyright
                     .byte >kernelCopyright
                     .byte >kernelMenu
+                    .byte >kernelGame
 
                     .byte >VB_kernelDetectConsole
                     .byte >VB_kernelRainbow
                     .byte >VB_kernelCopyright
                     .byte >VB_kernelCopyright
                     .byte >VB_kernelMenu
+                    .byte >VB_kernelGame
 
                     .byte >OS_kernelDetectConsole
                     .byte >OS_kernelRainbow
                     .byte >OS_kernelCopyright
                     .byte >OS_kernelCopyright
                     .byte >OS_kernelMenu
+                    .byte >VB_kernelGame
 
 ;-------------------------------------------------------------------------------
 

@@ -1,6 +1,7 @@
 	org  CURRENT_ORG
 	rorg $f000
 
+
 BANK0_START
 
 ;-------------------------------------------------------------------------------
@@ -11,19 +12,19 @@ BANK0_START
     include "_runVectoredCode.asm"
     include "_saveKey.asm"
 
-    ; moveable to other banks... (called through runVectoredCode)
+    ; kernels are moveable to other banks...
 
 BANK_kernelDetectConsole = BANK0
-BANK_kernelRainbow = BANK0
+    include "kernels/kernel_DetectConsole.asm"
 
-    include "kernel/kernel_DetectConsole.asm"
-    include "kernel/kernel_Rainbow.asm"
+BANK_kernelRainbow = BANK0
+    include "kernels/kernel_Rainbow.asm"
 
 ;-------------------------------------------------------------------------------
 
     CHECK_OVERFLOW 0, $FF0
 
-; --------------------------------------------------------------------------
+; ------------------------------------------------------------------------------
 ; CDFJ+ Footer (MUST BE *HERE*)
 
 BANK0_HEADER = $17F0

@@ -7,6 +7,8 @@
 #include "main.h"
 #include "colour.h"
 #include "sound.h"
+#include "random.h"
+
 
 //#include "joystick.h"
 //#include "random.h"

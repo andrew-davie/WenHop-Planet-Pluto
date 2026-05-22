@@ -1,20 +1,23 @@
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
+
 #include "colour.h"
+#include "draw.h"
 #include "main.h"
 #include "menuCharacterSet.h"
+#include "random.h"
 #include "savekey.h"
 #include "sound.h"
 
-int P0_X;
-int P1_X;
+#include "grid6.h"
+
 int menuLine;
 int pushCount;
 int base2;
 int flashTime2;
-int cave;
-int level;
+// int cave;
+// int level;
 int menuLineTVType;
 
 #define LETTER_HEIGHT 10
@@ -23,7 +26,7 @@ enum MENU_OPTION {
 
     MENU_OPTION_CAVE,
     MENU_OPTION_LEVEL,
-    MENU_OPTION_TVSYSTEM,
+    // MENU_OPTION_TVSYSTEM,
 };
 
 
@@ -56,6 +59,13 @@ void initKernel_Menu() {
     myMemset(RAM + _BUF_MENU_PF, 0, 4 * _SCANLINES);
     myMemset(RAM + _BUF_MENU_GRP0A, 0, 6 * _SCANLINES);
 
+
+    draw6Bitmap(_BUF_MENU_GRP0A, _BUF_MENU_COLUP0,    //
+                gfx_grid_menu_planet_gif, gfx_grid_menu_planet_gif_HEIGHT, 94 + 30, 6);
+
+    draw6Bitmap(_BUF_MENU_GRP0A, _BUF_MENU_COLUP0,    //
+                gfx_grid_menu_bravado_gif, gfx_grid_menu_bravado_gif_HEIGHT, 120 + 30, 6);
+
     menuLine = 0;
     base2 = 0;
     pushCount = 0;
@@ -86,11 +96,12 @@ void drawPF(int buffer, const unsigned char image[66][4][3]) {
 
 void initGameState_Menu() {
 
+
     frame = 0;
 }
 
 
-const unsigned char pfColour[] = {0xF8, 0x46, 0xB6};
+const unsigned char pfColour[] = {0x94, 0x22, 0xD4};
 
 void setPFColours() {
 
@@ -98,9 +109,17 @@ void setPFColours() {
 
     int roll = roller;
 
+    // static int c;
+    // if (!(frame & 255))
+    //     c = (getRandom32() & 0xF0) | 4;
+
+
     unsigned char pfConvertedColour[3];
     for (int i = 0; i < 3; i++)
         pfConvertedColour[i] = convertColour(pfColour[i]);
+
+    //    pfConvertedColour[1] = c;
+
 
     for (int i = 0; i < _SCANLINES; i++) {
         if (++roll > 2)
@@ -135,8 +154,8 @@ void drawString(int x, int y, const char *text, int colour) {
 }
 
 void drawSmallString(int y, const char *smallText) {
-    static const unsigned char smallColour[] = {0x98, 0xB8, 0xB8, 0x0A};
-    int colour = smallColour[tvSystem];
+
+    int colour = convertColour(0x98);
 
     for (int line = 0; line < 6; line++) {
         RAM[_BUF_MENU_COLUP0 + y + line - 1] = colour;
@@ -187,46 +206,39 @@ void VB_Menu() {
 
     initMenuDataStreams();
 
-    static unsigned int col;
-    col--;
-
-    unsigned char *p = RAM + _BUF_RB_COLUBK;
-    for (int i = 0; i < _SCANLINES; i++)
-        *p++ = convertColour((col + (i >> 1)) & 0xFF);
-
-    // if (frame > 200)
-    //     setGameState(GS_RAINBOW);
+    if (frame > 500)
+        setGameState(GS_RAINBOW);
 }
 
 
-const char wordTvType0[] = {
-    ________, XXXXXX__, _X___XXX, X___X_XX, XXXXXXXX, XX_X___X, ________, XXXX_XX_, XX__XX__,
-    XX_XXXX_, _XXXX_XX, XX_XX_XX, ________, __X___X_, X____XXX, _XXX__XX, X__X__X_, ___XXXXX,
-    ________, __X___XX, X______X, X_X_____, XX_X__XX, X__X_X_X, ________, __X____X, ____XXXX,
-    X_X__XXX, XX_X__X_, ___X___X, ________, __X____X, ____XXXX, __X__XXX, X__X__XX, XX_X___X,
-};
+// const char wordTvType0[] = {
+//     ________, XXXXXX__, _X___XXX, X___X_XX, XXXXXXXX, XX_X___X, ________, XXXX_XX_, XX__XX__,
+//     XX_XXXX_, _XXXX_XX, XX_XX_XX, ________, __X___X_, X____XXX, _XXX__XX, X__X__X_, ___XXXXX,
+//     ________, __X___XX, X______X, X_X_____, XX_X__XX, X__X_X_X, ________, __X____X, ____XXXX,
+//     X_X__XXX, XX_X__X_, ___X___X, ________, __X____X, ____XXXX, __X__XXX, X__X__XX, XX_X___X,
+// };
 
-const char wordStartAt[] = {
-    ________, ________, ___XXX__, X____XX_, _X__X_XX, XX_XXXXX, ________, ________, ___X__X_,
-    X___XXXX, _XX_X_X_, ___XXXXX, ________, ________, ___X__X_, X___X__X, _XX_X_XX, X____X__,
-    ________, ________, ___XXX__, X___XXXX, _X_XX_X_, _____X__, ________, ________, ___X____,
-    X___X__X, _X_XX_XX, XX___X__, ________, ________, ___X____, XXX_X__X, _X__X_XX, XX___X__,
-};
+// const char wordStartAt[] = {
+//     ________, ________, ___XXX__, X____XX_, _X__X_XX, XX_XXXXX, ________, ________, ___X__X_,
+//     X___XXXX, _XX_X_X_, ___XXXXX, ________, ________, ___X__X_, X___X__X, _XX_X_XX, X____X__,
+//     ________, ________, ___XXX__, X___XXXX, _X_XX_X_, _____X__, ________, ________, ___X____,
+//     X___X__X, _X_XX_XX, XX___X__, ________, ________, ___X____, XXX_X__X, _X__X_XX, XX___X__,
+// };
 
-const char wordDifficulty[] = {
+// const char wordDifficulty[] = {
 
-    ________, _____XXX, ___XXX__, _XX__X__, X__XX__X, X____XX_, ________, _____X__, XX_XX_X_,
-    XXXX_X__, X_XXXX_X, _X__X__X, ________, _____XXX, ___X__X_, X__X_X__, X_X__X_X, __X_X__X,
-    ________, _____X__, XX_XXX__, XXXX_X__, X_XXXX_X, __X_X__X, ________, _____XXX, XX_X_X__,
-    X__X_XXX, __X__X_X, XXX_XXXX, ________, _____XXX, X__X__X_, X__X__X_, __X__X_X, XX___XX_,
-};
+//     ________, _____XXX, ___XXX__, _XX__X__, X__XX__X, X____XX_, ________, _____X__, XX_XX_X_,
+//     XXXX_X__, X_XXXX_X, _X__X__X, ________, _____XXX, ___X__X_, X__X_X__, X_X__X_X, __X_X__X,
+//     ________, _____X__, XX_XXX__, XXXX_X__, X_XXXX_X, __X_X__X, ________, _____XXX, XX_X_X__,
+//     X__X_XXX, __X__X_X, XXX_XXXX, ________, _____XXX, X__X__X_, X__X__X_, __X__X_X, XX___XX_,
+// };
 
 
-const char *smallWord[] = {
-    wordStartAt,
-    wordDifficulty,
-    wordTvType0,
-};
+// const char *smallWord[] = {
+//     wordStartAt,
+//     wordDifficulty,
+//     //    wordTvType0,
+// };
 
 
 const char showCave[][6] = {
@@ -242,13 +254,13 @@ const char showCave[][6] = {
     {"X     "},    //
 };
 
-const char TV[][6] = {
+// const char TV[][6] = {
 
-    {";;NTSC"},    //
-    {";;;PAL"},    //
-    {";PAL60"},    //
-    {";SECAM"},    //
-};
+//     {";;NTSC"},    //
+//     {";;;PAL"},    //
+//     {";PAL60"},    //
+//     {";SECAM"},    //
+// };
 
 const char Level[][6] = {
 
@@ -271,10 +283,10 @@ void OS_Menu() {
 
     static int sline = 0;
     sline++;
-    if (sline >= (int)(sizeof(smallWord) / sizeof(smallWord[0])))
+    if (sline >= 2)    //(int)(sizeof(smallWord) / sizeof(smallWord[0])))
         sline = 0;
 
-    int y = sline * 24 + 93;
+    int y = sline * 28 + 96;
 
     if (flashTime2)
         --flashTime2;
@@ -291,16 +303,16 @@ void OS_Menu() {
         dLine = Level[level];
         break;
 
-    case MENU_OPTION_TVSYSTEM:
-        dLine = TV[menuLineTVType];
-        break;
+        // case MENU_OPTION_TVSYSTEM:
+        //     dLine = TV[menuLineTVType];
+        //     break;
     }
 
-    drawSmallString(y, smallWord[sline]);
+    //    drawSmallString(y, smallWord[sline]);
 
     int colour = sline == menuLine ? (flashTime2 & 4) ? 0x0A : ((base2 << 2) & 0xF0) | 0x16 : 0x26;
 
-    drawString(0, y + 8, dLine, colour);
+    drawString(0, y + 8 + 30, dLine, colour);
 
 
     //--------------------------------------------------------------------------
@@ -313,28 +325,43 @@ void OS_Menu() {
 
     //--------------------------------------------------------------------------
 
-    static const char *registered = ":";
-    static int landing2 = (-5) * 256;
-    int landing = landing2 >> 8;
+    // static int shake = 0;
+    // static int shakeTime = 0;
 
-    static int accel = 190;
-    if (accel)
-        accel -= 1;
+    // if (!shakeTime && !(getRandom32() & 31))
+    //     shakeTime = 20;
 
-    int landing3 = landing + 8;
+    // if (shakeTime && !(frame & 3)) {
+    //     shakeTime--;
+    //     shake = getRandom32() & 3;
+    // }
 
-    if (!rangeRandom(2) && accel)
-        drawString(5, landing + 8, "<", 0x4C);    //(R)
-    else
-        drawString(5, landing3, ";", 0x4C);    //(R)
+    draw6Bitmap(_BUF_MENU_GRP0A, _BUF_MENU_COLUP0,    //
+                gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 62, 0x96);
 
-    drawString(5, landing, registered, 0x06);    //(R)
 
-    // drawString(5, landing + 11, ";", 0x9C);   //(R)
+    // static const char *registered = ":";
+    // static int landing2 = (-5) * 256;
+    // int landing = landing2 >> 8;
 
-    //    if (landing2 > -10 << 8)
-    landing2 += accel;
-    // drawString(5, 62, ":", 0x22); //(R)
+    // static int accel = 190;
+    // if (accel)
+    //     accel -= 1;
+
+    // int landing3 = landing + 8;
+
+    // if (!rangeRandom(2) && accel)
+    //     drawString(5, landing + 8, "<", 0x4C);    //(R)
+    // else
+    //     drawString(5, landing3, ";", 0x4C);    //(R)
+
+    // drawString(5, landing, registered, 0x06);    //(R)
+
+    // // drawString(5, landing + 11, ";", 0x9C);   //(R)
+
+    // //    if (landing2 > -10 << 8)
+    // landing2 += accel;
+    // // drawString(5, 62, ":", 0x22); //(R)
 }
 
 

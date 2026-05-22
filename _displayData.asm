@@ -40,6 +40,16 @@ _BUF_AUDV               ds 2
 _BUF_AUDC               ds 2
 _BUF_AUDF               ds 2
 
+
+_BOARD_COLS = 40
+_BOARD_ROWS = 22
+_1ROW = _BOARD_COLS
+
+_BOARD              ds _BOARD_COLS * _BOARD_ROWS + 4    ; extra for grab+1 in drawscreen "bug"
+
+
+
+
 ;------------------------------------------------------------------------------
 ; OVERLAID VARIABLES
 
@@ -119,6 +129,29 @@ END_BUFFERS SET *
 END_BUFFERS SET *
     endif
 
+;-------------------------------------------------------------------------------
+
+    SEG.U GS_GAME
+    ORG _BUFFERS
+
+    DEFBUF 2, GAME_JUMP
+    
+    DEFBUF 1, GAME_PF0_LEFT
+    DEFBUF 1, GAME_PF0_RIGHT
+    DEFBUF 1, GAME_PF1_LEFT
+    DEFBUF 1, GAME_PF1_RIGHT
+    DEFBUF 1, GAME_PF2_LEFT
+    DEFBUF 1, GAME_PF2_RIGHT
+
+    DEFBUF 1, GAME_COLUBK
+    DEFBUF 1, GAME_COLUPF
+    DEFBUF 1, GAME_COLUP0
+    DEFBUF 1, GAME_COLUP1
+
+
+    if * > END_BUFFERS
+END_BUFFERS SET *
+    endif
 
 ;------------------------------------------------------------------------------
 

@@ -123,7 +123,7 @@ unsigned int getPitch(unsigned int note);
 
 
 // Generate random number
-unsigned int getRandom32();
+; unsigned int getRandom32();
 
 
 // Set memory area to fill value

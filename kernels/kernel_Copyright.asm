@@ -56,6 +56,9 @@ VB_kernelCopyright
                     stx ENAM0
                     stx ENAM1
                     stx COLUBK
+                    ; stx COLUP0
+                    ; stx COLUP1
+                    stx COLUPF
 
                     ldx #%00000001
                     stx CTRLPF              ; reflect PF
@@ -64,11 +67,8 @@ VB_kernelCopyright
                     sta WSYNC
                     sta HMOVE
 
-                    ldx #6
-                    stx COLUP0
-                    stx COLUP1
                     ldx #$FC
-                    stx PF2
+                    stx PF2                    
 
                     rts
 

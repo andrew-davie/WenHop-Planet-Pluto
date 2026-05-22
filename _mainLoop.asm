@@ -99,6 +99,18 @@ mainGameLoop
                     ldx call_fn
                     stx CALLFN                  ; call VerticalBlank in ARM
 
+
+    lda #0
+    sta COLUBK
+    sta COLUPF
+    sta COLUP0
+    sta COLUP1
+    sta GRP0
+    sta GRP1
+    sta PF0
+    sta PF1
+    sta PF2
+
     ; run kernel-specific 6502 Vertical Blank code (VB_FN_OFFSET)
 
                     lda kernel

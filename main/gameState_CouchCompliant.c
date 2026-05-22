@@ -69,7 +69,7 @@ void VB_CouchCompliant() {
 
         if (frame > 80)
             draw6Bitmap(_BUF_CC_GRP, _BUF_CC_COLUP0, gfx_grid_compliant_gif, gfx_grid_compliant_gif_HEIGHT,
-                        COUCH_BASE + 30 + colx, clr ? (frame & 16) ? 0x22 : 0x26 : 0);
+                        COUCH_BASE + 30 + colx, (frame & 16) ? 0x26 : 0x2A);
 
 
         // fade out shadow

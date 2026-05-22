@@ -6,12 +6,16 @@ BANK1_START
 ;-------------------------------------------------------------------------------
 
 BANK_kernelCopyright = BANK1
-BANK_kernelCouchCompliant = BANK1
-BANK_kernelMenu = BANK1
+    include "kernels/kernel_Copyright.asm"
 
-    include "kernel/kernel_Copyright.asm"
-    include "kernel/kernel_CouchCompliant.asm"
-    include "kernel/kernel_Menu.asm"
+BANK_kernelCouchCompliant = BANK1
+    include "kernels/kernel_CouchCompliant.asm"
+
+BANK_kernelMenu = BANK1
+    include "kernels/kernel_Menu.asm"
+
+BANK_kernelGame = BANK1
+    include "kernels/kernel_game.asm"
 
 ;-------------------------------------------------------------------------------
 

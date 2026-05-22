@@ -127,13 +127,13 @@ unsigned int getPitch(unsigned int note) {
     return (_pitchTable[note - 77]) >> scale;
 }
 
-// Generate random number
-unsigned int getRandom32() {
-    // using a 32-bit Galois LFSR as a psuedo random number generator.
-    // http://en.wikipedia.org/wiki/Linear_feedback_shift_register#Galois_LFSRs
-    static unsigned int random = 0x02468ace;
-    return random = (random >> 1) ^ (unsigned int)(-(random & 1u) & 0xd0000001u);
-}
+// // Generate random number
+// unsigned int getRandom32() {
+//     // using a 32-bit Galois LFSR as a psuedo random number generator.
+//     // http://en.wikipedia.org/wiki/Linear_feedback_shift_register#Galois_LFSRs
+//     static unsigned int random = 0x02468ace;
+//     return random = (random >> 1) ^ (unsigned int)(-(random & 1u) & 0xd0000001u);
+// }
 
 // Set memory area to fill value
 void myMemset(unsigned char *destination, unsigned int fill, unsigned int count) {

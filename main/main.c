@@ -16,15 +16,101 @@ Gamax Software 2026 - Craig Daniels
 #include "main.h"
 #include "savekey.h"
 
+#include "attribute.h"
 #include "colour.h"
 #include "gameState.h"
 #include "kernels.h"
+#include "particle.h"
+#include "random.h"
+#include "scroll.h"
 #include "sound.h"
-
 
 int usedSolves;
 int whichLot;
 int tvSystem;
+
+int level;
+bool lockDisplay;
+int millingTime;    // negative = expired
+int doges;
+int time;
+int lavaSurfaceTrixel;
+bool showWater;
+bool showLava;
+bool exitTrigger;
+
+unsigned int cave;
+bool caveCompleted;
+unsigned char bufferedSWCHA;
+unsigned int usableSWCHA;
+unsigned int inhibitSWCHA;
+
+unsigned char *me;
+int exitMode;
+bool waitRelease;
+bool showTool;
+
+int gravity;
+int nextGravity;
+
+unsigned char inpt4;
+unsigned char swcha;
+int gameSpeed;
+int gameFrame;
+
+int boardRow;
+int boardCol;
+int lives;
+unsigned int sparkleTimer;
+
+unsigned int idleTimer;
+
+const signed char xInc[] = {
+
+    // RLDU
+    0,     // 0000
+    0,     // 0001
+    0,     // 0010
+    0,     // 0011
+    -1,    // 0100
+    -1,    // 0101
+    -1,    // 0110
+    0,     // 0111
+    1,     // 1000
+    1,     // 1001
+    1,     // 1010
+    0,     // 1011
+    0,     // 1100
+    0,     // 1101
+    0,     // 1110
+    0,     // 1111
+};
+
+const signed char yInc[] = {
+
+    // RLDU
+    0,     // 0000
+    -1,    // 0001
+    1,     // 0010
+    0,     // 0011
+    0,     // 0100
+    -1,    // 0101
+    1,     // 0110
+    0,     // 0111
+    0,     // 1000
+    -1,    // 1001
+    1,     // 1010
+    0,     // 1011
+    0,     // 1100
+    0,     // 1101
+    0,     // 1110
+    0,     // 1111
+};
+
+
+const signed char dirOffset[] = {-_1ROW, 1, _1ROW, -1, 0};
+const signed char xdir[] = {0, 1, 0, -1, 0};
+const signed char ydir[] = {-1, 0, 1, 0, 0};
 
 
 enum GAME_STATE gameState, nextGameState;
@@ -48,10 +134,10 @@ void SilenceTIA();
 // these use ASM with unrolled loops to make them FAST
 // use/remove as desired
 
-unsigned int rangeRandom(short int range) {
-    // generate a random between 0 and range-1 (16-bit)
-    return ((getRandom32() >> 16) * range) >> 16;
-}
+// unsigned int rangeRandom(short int range) {
+//     // generate a random between 0 and range-1 (16-bit)
+//     return ((getRandom32() >> 16) * range) >> 16;
+// }
 
 /******************************* Variables *******************************/
 // stay ARM-side
@@ -137,6 +223,7 @@ void (*const initialiseGameState[GS_MAX])() = {
     initGameState_Rainbow,           // 3
     initGameState_CouchCompliant,    // 4
     initGameState_Menu,              // 5
+    initGameState_Game,              // 6
 };
 
 void (*const initialiseKernel[_KERNEL_MAX])() = {
@@ -146,6 +233,7 @@ void (*const initialiseKernel[_KERNEL_MAX])() = {
     initKernel_Copyright,         // 2
     initKernel_CouchCompliant,    // 3
     initKernel_Menu,              // 4
+    initKernel_Game,              // 5
 };
 
 //------------------------------------------------------------------------------
@@ -205,6 +293,8 @@ void runARM_Load_SaveKey() {
         unsigned short *odometer = (unsigned short *)(RAM + _SK_ODOMETER);
         (*odometer)++;
     }
+
+    initRandom();
 }
 
 
@@ -218,6 +308,7 @@ void (*const verticalBlank[GS_MAX])() = {
     VB_Rainbow,           // 3
     VB_CouchCompliant,    // 4
     VB_Menu,              // 5
+    VB_Game,              // 6
 
 };
 
@@ -240,6 +331,7 @@ void (*const overscan[GS_MAX])() = {
     OS_Rainbow,           // 3  GS_RAINBOW
     OS_CouchCompliant,    // 4  GS_COUCH_COMPLIANT
     OS_Menu,              // 5  GS_MENU
+    OS_Game,              // 6  GS_GAME
 };
 
 int whichKernel[GS_MAX] = {
@@ -250,6 +342,7 @@ int whichKernel[GS_MAX] = {
     _KERNEL_RAINBOW,           // 3 GS_RAINBOW
     _KERNEL_COPYRIGHT,         // 4 GS_COUCH_COMPLIANT (re-used COPYRIGHT)
     _KERNEL_MENU,              // 5 GS_MENU
+    _KERNEL_GAME,              // 6 GS_GAME
 };
 
 
@@ -356,6 +449,121 @@ void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAdd
     for (int i = 0; i < length - 1; i++)
         RAM_2B[(buffer / 2) + i] = loopAddress;
     RAM_2B[(buffer / 2) + length - 1] = endAddress;
+}
+
+
+void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed) {
+
+    for (int i = 0; i < count; i++) {
+        int idx = sphereDot(dripX, dripY, PT_SPIRAL, age);
+        if (idx >= 0)
+            particle[idx].speed = speed;
+    }
+}
+
+int sphereDot(int dotX, int dotY, int type, unsigned char age) {
+
+    int whichDrop = -1;
+
+    int col = dotX - ((scrollX * 5) >> 16);
+    if (col >= 0 && col < 40 /*pixels*/) {
+
+        int line = dotY - (scrollY >> 16);
+        if (line >= 0 && line < (_SCANLINES / 3 - 1)) {
+
+            int oldest = 0;
+            while (++whichDrop < PARTICLE_COUNT && particle[whichDrop].age)
+                if (particle[whichDrop].age < particle[oldest].age)
+                    oldest = whichDrop;
+
+            if (whichDrop == PARTICLE_COUNT)
+                whichDrop = oldest;
+
+            particle[whichDrop].type = type;
+            particle[whichDrop].x = dotX << 8;
+
+            particle[whichDrop].y = dotY << 8;
+            particle[whichDrop].speed = 0;    // rangeRandom(15) + 16;
+            particle[whichDrop].age = age;
+
+            particle[whichDrop].direction = getRandom32();    // 16.16 angle
+            particle[whichDrop].distance = 96;                // 16.16 speed
+        }
+    }
+
+    return whichDrop;
+}
+
+
+void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed) {
+
+    if (gravity < 0)
+        offsetY = TRILINES - offsetY;
+
+    for (int i = 0; i < count; i++) {
+        int idx = sphereDot(dripX * 5 + offsetX, dripY * TRILINES + offsetY, type, age);
+        if (idx >= 0) {
+            particle[idx].speed = rangeRandom(speed >> 1);
+            if (type == PT_SPIRAL2)
+                particle[idx].distance = rangeRandom(200) + 50;
+        }
+    }
+}
+
+bool visible(int col, int row) {
+
+    int y = (scrollY /* + shakeY*/) >> 16;
+    int deltaY = row * TRILINES - y;
+
+    if (deltaY <= -TRILINES || deltaY >= _SCANLINES / 3)
+        return false;
+
+    int x = ((scrollX /* + shakeX*/) * 5) >> 16;
+    int deltaX = col * 5 - x;
+    if ((unsigned int)/*deltaX < -4 ||*/ deltaX >= 40)
+        return false;
+
+    return true;
+}
+
+
+void surroundingConglomerate(int col, int row) {
+
+    if (visible(col, row)) {
+
+        unsigned char *pos = RAM + _BOARD + row * _1ROW + col;
+        for (int i = 0; i < 5; i++) {
+
+            unsigned char *offsetPos = pos + dirOffset[i];
+            if (Attribute[CharToType[GET(*offsetPos)]] & ATT_GEODOGE) {
+
+                int cong = CH_GEODOGE;
+
+                for (int j = 0; j < 4; j++)
+                    if (Attribute[CharToType[GET(*(offsetPos + dirOffset[j]))]] & ATT_GEODOGE)
+                        cong += 1 << j;
+
+                *offsetPos = cong;
+            }
+        }
+    }
+}
+
+
+int dirFromCoords(int x, int y, int prevX, int prevY) {
+
+    int dir = 0;
+    if (x < prevX)
+        dir |= DIR_L;
+    if (x > prevX)
+        dir |= DIR_R;
+
+    if (y < prevY)
+        dir |= DIR_U;
+    if (y > prevY)
+        dir |= DIR_D;
+
+    return dir;
 }
 
 

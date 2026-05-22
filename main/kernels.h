@@ -9,6 +9,6 @@ void initKernel_Rainbow();
 void initKernel_DetectConsole();
 void initKernel_CouchCompliant();
 void initKernel_Menu();
-
+void initKernel_Game();
 
 // EOF
