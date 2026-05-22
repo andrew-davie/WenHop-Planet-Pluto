@@ -2,22 +2,8 @@
 
 #include <stdbool.h>
 
-#include "attribute.h"
-#include "board.h"
-#include "characterset.h"
-#include "colour.h"
-#include "decodeCaves.h"
 #include "gameState.h"
-#include "main.h"
-#include "mellon.h"
-#include "particle.h"
-#include "player.h"
-#include "random.h"
-#include "reverseBits.h"
-#include "schedule.h"
-#include "score.h"
-#include "scroll.h"
-#include "sound.h"
+
 
 #define _WENHOP_SK_ID _SK_GAME_ID
 
@@ -27,7 +13,6 @@
 #define HALFWAYX 20
 #define HALFWAYY 32
 
-#define TRILINES (PIECE_DEPTH / 3)
 
 #define GET(a) (((unsigned char)((a) << 1)) >> 1)
 
@@ -115,7 +100,6 @@ void nDots(int count, int dripX, int dripY, int type, unsigned char age, int off
 void surroundingConglomerate(int col, int row);
 
 int dirFromCoords(int x, int y, int prevX, int prevY);
-void setupBoardScanner();
 void initNewGame();
 
 

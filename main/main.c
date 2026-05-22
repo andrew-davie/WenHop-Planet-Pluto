@@ -12,18 +12,19 @@ Gamax Software 2026 - Craig Daniels
 // the order of the includes, causing a symbol not defined error.
 
 #include "cdfjplus.h"    // <- contains references from defines_dasm.h
-#include "tia_constants_c.h"
+// #include "tia_constants_c.h"
 
 #include "main.h"
-#include "savekey.h"
 
-#include "animations.h"
 #include "attribute.h"
 #include "colour.h"
 #include "gameState.h"
 #include "kernels.h"
+#include "main.h"
+#include "mellon.h"
 #include "random.h"
-#include "schedule.h"
+#include "savekey.h"
+#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 

@@ -2,7 +2,6 @@
 
 #include "characterset.h"
 #include "attribute.h"
-#include "sound.h"
 
 
 #define L(N) L_HEX(0x##N)

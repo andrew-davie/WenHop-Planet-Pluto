@@ -1,21 +1,15 @@
-// clang-format off
+#include "defines_dasm.h"
 
 #include "cdfjplus.h"
 
 #include <stdbool.h>
 
-#include "main.h"
-#include "colour.h"
-#include "sound.h"
 #include "random.h"
+#include "sound.h"
 
-
-//#include "joystick.h"
-//#include "random.h"
 
 #define ENABLE_SOUND 1
 
-// clang-format on
 
 void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument);
 void processMusic();

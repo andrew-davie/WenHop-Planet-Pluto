@@ -1,5 +1,4 @@
-#ifndef __DECODECAVES_H
-#define __DECODECAVES_H
+#pragma once
 
 struct CAVE_DEFINITION {
 
@@ -12,7 +11,7 @@ struct CAVE_DEFINITION {
     unsigned char dogeRequired[5];
     unsigned char timeToComplete[5];
 
-    unsigned char flags; // CAVEDEF_...
+    unsigned char flags;    // CAVEDEF_...
 
     unsigned char borderCharacter;
     unsigned char interiorCharacter;
@@ -41,5 +40,4 @@ extern int decodingRow;
 extern const unsigned char *theCaveData;
 extern int totalDogePossible;
 
-#endif
 // EOF

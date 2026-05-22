@@ -1,17 +1,11 @@
 
 #include "defines_dasm.h"
 
-#include "cdfjplus.h"
-
-
+#include "characterset.h"
 #include "main.h"
-
-#include "scroll.h"
-
-// #include "cavedata.h"
-// #include "decodecaves.h"
 #include "mellon.h"
 #include "player.h"
+#include "scroll.h"
 
 int scrollX, scrollY;
 

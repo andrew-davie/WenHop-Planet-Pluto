@@ -1,22 +1,18 @@
+#include <stdbool.h>
 
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
 
-
-#include <stdbool.h>
-
-#include "main.h"
-#include "particle.h"
-
 #include "attribute.h"
-#include "colour.h"
+#include "characterset.h"
 #include "drawscreen.h"
+#include "main.h"
 #include "mellon.h"
+#include "particle.h"
 #include "player.h"
 #include "random.h"
-#include "score.h"
-#include "sound.h"
+#include "scroll.h"
 
 unsigned int ropeLength;
 unsigned char ropeDirection[ROPE_PARTICLE_COUNT];

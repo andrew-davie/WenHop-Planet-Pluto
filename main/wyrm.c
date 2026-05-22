@@ -1,12 +1,15 @@
+#include "defines_dasm.h"
+
 #include "cdfjplus.h"
 
 #include "main.h"
 #include "wyrm.h"
 
 #include "attribute.h"
-#include "colour.h"
+#include "characterset.h"
 #include "particle.h"
 #include "random.h"
+
 
 const unsigned char wyrmChar[] = {
 

@@ -2,9 +2,7 @@
 
 #include "main.h"
 
-// #include "atarivox.h"
 #include "bitpatterns.h"
-#include "colour.h"
 #include "mellon.h"
 #include "particle.h"
 #include "player.h"

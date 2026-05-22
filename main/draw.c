@@ -5,7 +5,7 @@
 #include "cdfjplus.h"    // <- contains references from defines_dasm.h
 #include "colour.h"
 #include "draw.h"
-#include "main.h"
+
 
 void draw6Bitmap(unsigned int grpOffset, unsigned int colup0Offset,    //
                  const unsigned char bitmap6[][6],                     //

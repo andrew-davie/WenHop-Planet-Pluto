@@ -5,20 +5,12 @@
 
 #include "cdfjplus.h"
 
-
-#include "main.h"
-
-#include "score.h"
-
-#include "cavedata.h"
 #include "colour.h"
 #include "decodecaves.h"
+#include "main.h"
 #include "mellon.h"
-// #include "menu.h"
-#include "player.h"
-#include "random.h"
-#include "sound.h"
-// #include "swipeCircle.h"
+#include "reverseBits.h"
+#include "score.h"
 
 // #define RGB_BLACK       0
 #define RGB_RED 1

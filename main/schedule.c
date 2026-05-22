@@ -4,8 +4,8 @@
 
 #include "cdfjplus.h"
 
+#include "board.h"
 #include "decodeCaves.h"
-#include "main.h"
 #include "schedule.h"
 
 enum SCHEDULE gameSchedule;

@@ -4,8 +4,6 @@
 #define ANIM_LOOP 255
 #define ANIM_JUMP 254
 
-// #define ANIM_RNDSPEED 254
-
 extern const unsigned char *const AnimateBase[];
 extern const unsigned char *Animate[];
 extern char AnimCount[];

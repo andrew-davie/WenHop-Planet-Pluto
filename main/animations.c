@@ -1,6 +1,6 @@
 #include "animations.h"
 #include "attribute.h"
-#include "random.h"
+
 
 const unsigned char *Animate[TYPE_MAX];
 char AnimCount[TYPE_MAX];
@@ -158,49 +158,49 @@ const unsigned char *const AnimateBase[TYPE_MAX] = {
     // Note that the type number is an ID, not ordinal. That's because the continuity may
     // be compromised by the conditional compilation. Beware.
 
-    0,              // 00 TYPE_SPACE
-    0,              // 01 TYPE_DIRT
-    0,              // 02 TYPE_BRICKWALL
-    0,              // 03 TYPE_OUTBOX_PRE
-    AnimFlashOut,   // 04 TYPE_OUTBOX
-    0,              // 05 TYPE_STEELWALL
-    0,              // 06 TYPE_ROCK
-    AnimPulseDoge,  // 07 TYPE_DOGE
-    0,              // 08 TYPE_MELLON_HUSK_PRE
-    AnimMellonHusk, // 09 TYPE_MELLON_HUSK
-    0,              // 10 TYPE_PEBBLE1
-    0,              // 11 TYPE_DUST_0
-    0,              // 12 TYPE_DOGE_FALLING
-    0,              // 13 TYPE_ROCK_FALLING
-    0,              // 14 TYPE_DUST_ROCK
-    0,              // 15 TYPE_CONVERT_GEODE_TO_DOGE
+    0,                 // 00 TYPE_SPACE
+    0,                 // 01 TYPE_DIRT
+    0,                 // 02 TYPE_BRICKWALL
+    0,                 // 03 TYPE_OUTBOX_PRE
+    AnimFlashOut,      // 04 TYPE_OUTBOX
+    0,                 // 05 TYPE_STEELWALL
+    0,                 // 06 TYPE_ROCK
+    AnimPulseDoge,     // 07 TYPE_DOGE
+    0,                 // 08 TYPE_MELLON_HUSK_PRE
+    AnimMellonHusk,    // 09 TYPE_MELLON_HUSK
+    0,                 // 10 TYPE_PEBBLE1
+    0,                 // 11 TYPE_DUST_0
+    0,                 // 12 TYPE_DOGE_FALLING
+    0,                 // 13 TYPE_ROCK_FALLING
+    0,                 // 14 TYPE_DUST_ROCK
+    0,                 // 15 TYPE_CONVERT_GEODE_TO_DOGE
 #ifdef ENABLE_SWITCH
-    AnimSwitch, // 16 TYPE_SWITCH
+    AnimSwitch,    // 16 TYPE_SWITCH
 #endif
-    0,                 // 17 TYPE_PUSHER
-    0,                 // 18 TYPE_PUSHER_VERT
-    0,                 // 19 TYPE_WYRM
-    0,                 // 20 TYPE_GEODOGE
-    0,                 // 21 TYPE_GEODOGE_FALLING
-    0,                 // 22 TYPE_LAVA
-    0,                 // 23 TYPE_PEBBLE_ROCK
-    AnimateGravity,    // 24 TYPE_FLIP_GRAVITY
-    0,                 // 25 TYPE_BLOCK
-    AnimateGrinder,    // 26 TYPE_GRINDER
-    0,                 // 27 TYPE_HUB
-    0,                 // 28 TYPE_WATER
-    AnimateWaterFlow0, // 29 TYPE_WATERFLOW0
-    AnimateWaterFlow1, // 30 TYPE_WATERFLOW1
-    AnimateWaterFlow2, // 31 TYPE_WATERFLOW2
-    AnimateWaterFlow3, // 32 TYPE_WATERFLOW3
-    AnimateWaterFlow4, // 33 TYPE_WATERFLOW4
-    0,                 // 34 TYPE_TAP
-    0,                 // 35 TYPE_OUTLET
-    AnimateGrinder1,   // 36 TYPE_GRINDER1
-    AnimateBelt,       // 37 TYPE_BELT
-    AnimateBelt1,      // 38 TYPE_BELT1
-    0,                 // 39 TYPE_CONVERT_PIPE
-    0,                 // 40 TYPE_DOGE_FALLING2
+    0,                    // 17 TYPE_PUSHER
+    0,                    // 18 TYPE_PUSHER_VERT
+    0,                    // 19 TYPE_WYRM
+    0,                    // 20 TYPE_GEODOGE
+    0,                    // 21 TYPE_GEODOGE_FALLING
+    0,                    // 22 TYPE_LAVA
+    0,                    // 23 TYPE_PEBBLE_ROCK
+    AnimateGravity,       // 24 TYPE_FLIP_GRAVITY
+    0,                    // 25 TYPE_BLOCK
+    AnimateGrinder,       // 26 TYPE_GRINDER
+    0,                    // 27 TYPE_HUB
+    0,                    // 28 TYPE_WATER
+    AnimateWaterFlow0,    // 29 TYPE_WATERFLOW0
+    AnimateWaterFlow1,    // 30 TYPE_WATERFLOW1
+    AnimateWaterFlow2,    // 31 TYPE_WATERFLOW2
+    AnimateWaterFlow3,    // 32 TYPE_WATERFLOW3
+    AnimateWaterFlow4,    // 33 TYPE_WATERFLOW4
+    0,                    // 34 TYPE_TAP
+    0,                    // 35 TYPE_OUTLET
+    AnimateGrinder1,      // 36 TYPE_GRINDER1
+    AnimateBelt,          // 37 TYPE_BELT
+    AnimateBelt1,         // 38 TYPE_BELT1
+    0,                    // 39 TYPE_CONVERT_PIPE
+    0,                    // 40 TYPE_DOGE_FALLING2
 };
 
 void initCharAnimations() {

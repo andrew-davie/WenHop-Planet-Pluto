@@ -6,7 +6,6 @@
 #include "draw.h"
 #include "main.h"
 #include "menuCharacterSet.h"
-#include "random.h"
 #include "savekey.h"
 #include "sound.h"
 

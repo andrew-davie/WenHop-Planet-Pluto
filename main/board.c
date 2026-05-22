@@ -2,7 +2,19 @@
 
 #include "cdfjplus.h"
 
+#include "attribute.h"
+#include "board.h"
+#include "characterset.h"
+#include "colour.h"
+#include "decodeCaves.h"
 #include "main.h"
+#include "mellon.h"
+#include "particle.h"
+#include "player.h"
+#include "random.h"
+#include "schedule.h"
+#include "scroll.h"
+#include "sound.h"
 #include "wyrm.h"
 
 #define PARTICLE_GRAVITY_FLAG 0x80

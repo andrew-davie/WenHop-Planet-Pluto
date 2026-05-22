@@ -1,8 +1,11 @@
 #include <stdbool.h>
 
+#include "defines_dasm.h"
+
 #include "colour.h"
 #include "main.h"
 #include "savekey.h"
+
 
 int flashTime = 1;
 

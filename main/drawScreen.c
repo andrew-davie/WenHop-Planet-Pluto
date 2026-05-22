@@ -5,23 +5,12 @@
 
 #include "cdfjplus.h"
 
-// #include "main.h"
-
-#include "animations.h"
 #include "attribute.h"
-// #include "cavedata.h"
 #include "characterset.h"
-// #include "colour.h"
-// #include "decodecaves.h"
-// #include "drawplayer.h"
-// #include "drawscreen.h"
-// #include "mellon.h"
-// #include "menu.h"
-// #include "player.h"
-// #include "random.h"
-// #include "score.h"
+#include "colour.h"
+#include "main.h"
+#include "reverseBits.h"
 #include "scroll.h"
-// #include "sound.h"
 
 
 extern int roller;

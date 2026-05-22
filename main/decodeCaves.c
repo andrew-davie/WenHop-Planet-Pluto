@@ -1,18 +1,15 @@
+#include "defines_dasm.h"
+
 #include "cdfjplus.h"
-
-// #include "defines_from_dasm_for_c.h"
-
-#include "decodecaves.h"
 
 #include "attribute.h"
 #include "caveData.h"
 #include "characterset.h"
-#include "colour.h"
+#include "decodecaves.h"
 #include "main.h"
 #include "mellon.h"
 #include "random.h"
 #include "scroll.h"
-#include "sound.h"
 #include "wyrm.h"
 
 #define DRAW_LINE 0b01000000

@@ -1,6 +1,8 @@
+#include "defines_dasm.h"
+
+#include "cdfjplus.h"
+
 #include "random.h"
-#include "main.h"
-#include "savekey.h"
 
 
 unsigned int prng_b;

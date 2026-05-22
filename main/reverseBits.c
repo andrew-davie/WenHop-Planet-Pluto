@@ -1,3 +1,5 @@
+#include "reverseBits.h"
+
 // COMPILE-TIME REVERSE BITS IN BYTE
 #define RVS(a)                                                                                                         \
     (((((a) >> 0) & 1) << 7) | ((((a) >> 1) & 1) << 6) | ((((a) >> 2) & 1) << 5) | ((((a) >> 3) & 1) << 4) |           \
