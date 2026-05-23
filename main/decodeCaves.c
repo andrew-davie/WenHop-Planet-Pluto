@@ -139,6 +139,7 @@ int decodeExplicitData(int /*sfx*/) {
 
         else {
 
+
             d = e = 0;
             // theCaveData = caveList[cave].cavePtr + sizeof(struct CAVE_DEFINITION);
             decodeState = DECODE_STOP;
@@ -273,7 +274,7 @@ int decodeExplicitData(int /*sfx*/) {
 
     case DECODE_FLASH:
 
-        DrawRect(theCave->borderCharacter & ((decodeFlasher & 4) ? 0 : 0xFF), 0, 0, _BOARD_COLS, _BOARD_ROWS);
+        DrawRect(theCave->borderCharacter /*& ((decodeFlasher & 4) ? 0 : 0xFF)*/, 0, 0, _BOARD_COLS, _BOARD_ROWS);
 
         if (!(decodeFlasher & 0b11))
             // if (sfx)
@@ -353,11 +354,12 @@ void StoreObject(int x, int y, objectType anObject) {
 
 void DrawLine(objectType anObject, int x, int y, int aLength, int aDirection) {
 
-    for (int counter = 0; counter < aLength; counter++) {
-        StoreObject(x, y, anObject);
-        x += ldxy[aDirection + 2];
-        y += ldxy[aDirection];
-    }
+    if (y < _BOARD_ROWS)
+        for (int counter = 0; counter < aLength; counter++) {
+            StoreObject(x, y, anObject);
+            x += ldxy[aDirection + 2];
+            y += ldxy[aDirection];
+        }
 }
 
 void DrawRect(objectType anObject, int x, int y, int aWidth, int aHeight) {

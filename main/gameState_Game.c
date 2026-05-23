@@ -5,6 +5,7 @@
 
 #include "board.h"
 #include "colour.h"
+#include "decodeCaves.h"
 #include "drawScreen.h"
 #include "gameState.h"
 #include "kernels.h"
@@ -21,13 +22,16 @@ void initKernel_Game() {
 
 void initGameState_Game() {
 
-    setSchedule(SCHEDULE_UNPACK_CAVE);
 
     initBoard();
     initNewGame();
     initCharVector();
     initCharAnimations();
 
+    cave = 1;
+    decodeCave(cave);    // TODO: in initNextLife instead
+
+    setSchedule(SCHEDULE_UNPACK_CAVE);
 
 #if 0    // original initnextlife()
 

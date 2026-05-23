@@ -22,6 +22,8 @@ _rainbowLoop        sta WSYNC
                     jmp 0
 
 _rainbowExit
+                    sta WSYNC
+
 VB_kernelRainbow
 OS_kernelRainbow
                     rts

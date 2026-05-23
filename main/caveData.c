@@ -659,14 +659,13 @@ const unsigned char caveA4[] = {
 
 const unsigned char *caveList[] = {
 
-//    caveFast,
+    caveFast,
 
     caveA,
     caveA2,
-    // caveA5, //caveA4,
-
-    // caveA3,
-    // caveA2,
+    caveA5,
+    caveA4,
+    caveA3,
 };
 
 const unsigned int caveCount = sizeof(caveList) / sizeof(unsigned char *);

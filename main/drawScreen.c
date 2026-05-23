@@ -374,7 +374,6 @@ const unsigned char *const roundedCorner[] = {
     _CHAR_INNER_CORNER_15,    // 15 LURD
 };
 
-int tempBase = 0;
 
 void grabCharacters() {
 
@@ -384,7 +383,7 @@ void grabCharacters() {
 
     for (int col = 0; col < 5; col++) {
 
-        p2 = tempBase++ & 31;    // CH_GEODOGE;    // tmp GET(p[col]);
+        p2 = GET(p[col]);
         type = CharToType[p2];
 
         if (Animate[type])
@@ -426,7 +425,6 @@ const unsigned int arenas[] = {
 };
 
 void drawScreen() {    // --> cycles 62870 (@20230616)
-    tempBase = 0;
 
 #if ENABLE_SHAKE
     extern int shakeX, shakeY;

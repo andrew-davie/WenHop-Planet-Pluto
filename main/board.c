@@ -69,10 +69,16 @@ void initBoard() {
     waterDir = 0;
     explodeCount = 0;
     conveyorDirection = -1;    // ?
+
+    // tmp
+    // for (int y = 0; y < _BOARD_ROWS; y++)
+    //     for (int x = 0; x < _BOARD_COLS; x++)
+    //         RAM[_BOARD + y * _1ROW + x] = CH_GEODOGE;
 }
 
 
 void setupBoardScanner() {
+    return;    // tmp
 
     if (frameCounter >= gameSpeed) {
 

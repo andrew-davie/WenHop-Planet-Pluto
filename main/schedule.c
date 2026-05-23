@@ -25,7 +25,7 @@ void scheduleUnpackCave() {
             if (!totalDogePossible)
                 totalDogePossible = -1;    // indicates "perfect" not possible
 
-            setSchedule(SCHEDULE_START);
+            // tmp setSchedule(SCHEDULE_PROCESSBOARD);
             break;
         }
 }
