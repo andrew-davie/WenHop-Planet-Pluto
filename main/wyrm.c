@@ -38,7 +38,7 @@ void initWyrms() {
         wyrms[i].head = -1;
 }
 
-void newWyrm(int x, int y) {
+bool newWyrm(int x, int y) {
 
     for (int i = 0; i < WYRM_POP; i++) {
         if (wyrms[i].head < 0) {
@@ -50,14 +50,16 @@ void newWyrm(int x, int y) {
             thisWyrm->y[0] = y;
             thisWyrm->length = 2;
 
-            break;
+            return true;
         }
     }
+    return false;
 }
 
 void processWyrms() {
 
-    for (int i = gameFrame & 1; i < WYRM_POP; i += 2) {
+
+    for (int i = 0; i < WYRM_POP; i++) {
         // for (int i = 0; i < WYRM_POP; i++) {
 
         // if (rangeRandom(110))
@@ -77,7 +79,7 @@ void processWyrms() {
         int candidateX = x + xdir[wyrm->dir];
         int candidateY = y + ydir[wyrm->dir];
 
-        unsigned char *newHead = RAM + _BOARD + candidateY * 40 + candidateX;
+        unsigned char *newHead = RAM + _BOARD + candidateY * _1ROW + candidateX;
 
         int mask = ATT_BLANK | ATT_GRAB;
         int whatsThere = CharToType[GET(*newHead)];
@@ -92,7 +94,7 @@ void processWyrms() {
                 candidateX = x + xdir[rdir];
                 candidateY = y + ydir[rdir];
 
-                newHead = RAM + _BOARD + candidateY * 40 + candidateX;
+                newHead = RAM + _BOARD + candidateY * _1ROW + candidateX;
                 whatsThere = CharToType[GET(*newHead)];
                 if (Attribute[whatsThere] & mask) {
                     wyrm->dir = rdir;
@@ -194,6 +196,7 @@ void processWyrms() {
         }
 
         if (headPos) {
+
             unsigned char *tailPos = RAM + _BOARD + wyrm->y[0] * _1ROW + wyrm->x[0];
 
             unsigned char tail = CH_WYRM_TAIL_R;

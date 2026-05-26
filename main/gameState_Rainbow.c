@@ -32,7 +32,8 @@ void VB_Rainbow() {
     setPointer(_DS_RBW_COLUBK, _BUF_RB_COLUBK);
 
     if (frame > 200)
-        setGameState(GS_DETECT_CONSOLE);
+        //        setGameState(GS_DETECT_CONSOLE);
+        setGameState(GS_COUCH_COMPLIANT);
 }
 
 void OS_Rainbow() {

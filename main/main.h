@@ -56,7 +56,8 @@ extern unsigned int inhibitSWCHA;
 extern unsigned char inpt4;
 extern unsigned char swcha;
 extern bool showTool;
-extern int gameSpeed;
+
+extern int gameFrame, gameSpeed;
 
 extern unsigned char *me;
 
@@ -102,5 +103,12 @@ void surroundingConglomerate(int col, int row);
 int dirFromCoords(int x, int y, int prevX, int prevY);
 void initNewGame();
 
+struct dataStreams {
+    unsigned char dataStream;
+    unsigned short buffer;
+};
+
+
+void initDataStreams(const struct dataStreams *streams, int streamCount);
 
 // EOF

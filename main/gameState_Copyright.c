@@ -39,12 +39,40 @@ const unsigned char trackChamp2[] = {
 unsigned int presentsColour;
 
 
+void initDataStreams_Copyright() {
+
+    static const struct dataStreams streams[] = {
+
+        {DSJMP1PTR, _BUF_COPYRIGHT_JUMP},
+
+        {_DS_CP_GRP0A + 0, _BUF_COPYRIGHT_GRP + 0 * _SCANLINES},
+        {_DS_CP_GRP0A + 1, _BUF_COPYRIGHT_GRP + 1 * _SCANLINES},
+        {_DS_CP_GRP0A + 2, _BUF_COPYRIGHT_GRP + 2 * _SCANLINES},
+        {_DS_CP_GRP0A + 3, _BUF_COPYRIGHT_GRP + 3 * _SCANLINES},
+        {_DS_CP_GRP0A + 4, _BUF_COPYRIGHT_GRP + 4 * _SCANLINES},
+        {_DS_CP_GRP0A + 5, _BUF_COPYRIGHT_GRP + 5 * _SCANLINES},
+
+        {_DS_CP_PF, _BUF_COPYRIGHT_PF},
+
+        {_DS_CP_COLUPF, _BUF_GAME_COLUPF},
+        {_DS_CP_COLUP0, _BUF_GAME_COLUP0},
+        {_DS_CP_COLUP0, _BUF_GAME_COLUP0},
+
+        {_DS_CP_COLUP0, _BUF_GAME_COLUP0},
+
+        {_DS_CP_COLUPF, _BUF_COPYRIGHT_COLUPF},
+        {_DS_CP_COLUP0, _BUF_COPYRIGHT_COLUP0},
+    };
+
+
+    initDataStreams(streams, sizeof(streams) / sizeof(struct dataStreams));
+}
+
 void initKernel_Copyright() {
 
     // Note: kernel shared with GS_COUCH_COMPLIANT
-
     setJumpVectors(_BUF_COPYRIGHT_JUMP, _copyrightLoop, _copyrightExit, _SCANLINES);
-    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
+    initDataStreams_Copyright();
 }
 
 
@@ -66,15 +94,8 @@ void initGameState_Copyright() {
 
 void VB_Copyright() {
 
-    setPointer(DSJMP1PTR, _BUF_COPYRIGHT_JUMP);
+    initDataStreams_Copyright();
 
-    for (int i = 0; i < 6; i++)
-        setPointer(_DS_CP_GRP0A + i, _BUF_COPYRIGHT_GRP + i * _SCANLINES);
-
-    setPointer(_DS_CP_PF, _BUF_COPYRIGHT_PF);
-
-    setPointer(_DS_CP_COLUPF, _BUF_COPYRIGHT_COLUPF);
-    setPointer(_DS_CP_COLUP0, _BUF_COPYRIGHT_COLUP0);
 
     if (frame < DURATION_COPYRIGHT) {
 

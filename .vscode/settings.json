@@ -13,4 +13,7 @@
         "editor.insertSpaces": true,
         "editor.tabSize": 4
     }
+
+    "workbench.editor.limit.enabled": true,
+    "workbench.editor.limit.value": 6
 }

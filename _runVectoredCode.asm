@@ -109,7 +109,8 @@ runVectoredCode
 	                lda kernelRoutine_H,x
 	                sta SM_JumpRoutine_H
 
-	                jmp jumpCodeRAM
+	                sta WSYNC
+                    jmp jumpCodeRAM
 
 ;-------------------------------------------------------------------------------
 

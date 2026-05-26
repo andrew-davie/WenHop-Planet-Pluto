@@ -152,6 +152,8 @@ END_BUFFERS SET *
     DEFBUF 1, GAME_GRP0
     DEFBUF 1, GAME_GRP1
 
+_P0_X               ds 1
+_P1_X               ds 1
 
     if * > END_BUFFERS
 END_BUFFERS SET *

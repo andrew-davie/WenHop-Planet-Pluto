@@ -58,6 +58,7 @@ int nextGravity;
 
 unsigned char inpt4;
 unsigned char swcha;
+
 int gameSpeed;
 int gameFrame;
 
@@ -515,7 +516,94 @@ void initNewGame() {
 void initNextLife() {
 
 
+#if 0
+
+void initNextLife() {
+
+
+#if __ENABLE_WATER
+    //    water = 0;
+    //    lava = 0;
+    lastWater = 0;
+#endif
+
+#if ENABLE_SHAKE
+    shakeTime = 0;
+    // shakeX = 0;
+    // shakeY = 0;
+#endif
+
+    bufferedSWCHA = 0xFF;
+
+    caveCompleted = false;
+    exitTrigger = false;
+
+    perfectTimer = 80;
+
+    exitMode = 0;
+    idleTimer = 0;
+    sparkleTimer = 0;
+    gameFrame = 0;
+    triggerPressCounter = 0;
+    triggerOffCounter = 0;
+    // expandSpeed = 0;
+    nextGravity = 1;
+
+    // dogeBlockCount = 0;
+    // cumulativeBlockCount = 0;
+    explodeCount = 0;
+
+    resetDelay = 0;
+    // selectResetDelay = 0;
+
+    showTool = false;
+
+#if ENABLE_DEBUG
+    selectDelay = 0;
+#endif
+
+    lavaSurfaceTrixel = 10000; // 0x1C2/3; //22 * PIECE_DEPTH - 1;
+    showLava = false;
+    showWater = false;
+
+    // lastDisplayMode = DISPLAY_NONE;
+
+#ifdef ENABLE_SWITCH
+    switchOn = true;
+#endif
+
+    frameCounter = gameSpeed; // force initial
+    selectorCounter = 0;
+
+    initWyrms();
+    initPlayer();
+    initSprites();
+
+    for (int i = 0; i < PARTICLE_COUNT; i++)
+        particle[i].age = -1;
+
+#if CIRCLE
+    initSwipeCircle(CIRCLE_ZOOM_ZERO + 1);
+#endif
+
+    initCharAnimations();
+
+    spacing = 0;
+
+    setScoreCycle(SCORELINE_CAVELEVEL);
+}
+#endif
+
+
     pulsePlayerColour = 0;
 }
+
+
+void initDataStreams(const struct dataStreams *streams, int streamCount) {
+
+    for (int i = 0; i < streamCount; i++)
+        setPointer(streams[i].dataStream, streams[i].buffer);
+}
+
 
 // EOF

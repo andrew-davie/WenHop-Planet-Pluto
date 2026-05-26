@@ -21,8 +21,8 @@ kernelGame
     ; runVectoredCode[kernel] comes here
 
 
-                    sta WSYNC
-                    jmp 0
+;                    sta WSYNC
+ ;                   jmp 0
 
 _gameLoop ; @3
                     lda #_DS_GAME_COLUP0_DATA
@@ -66,7 +66,25 @@ _gameLoop ; @3
 
                     jmp 0                           ; 3
 
+_gameExit           lda #0
+                    sta PF0
+                    sta PF1
+                    sta PF2
+                    rts
+
 VB_kernelGame
+
+                    ldx #>_P0_X
+                    stx DSPTR
+                    ldx #<_P0_X
+                    stx DSPTR
+
+                    lda #DSCOMM
+                    sta p0_x
+                    lda #DSCOMM
+                    sta p1_x
+
+
 
                     lda #0
                     sta CTRLPF
@@ -82,9 +100,9 @@ VB_kernelGame
                     sta PF0
                     sta PF1
                     sta PF2
+                    rts
 
 
-_gameExit           rts
 
 
 OS_kernelGame

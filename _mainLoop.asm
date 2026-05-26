@@ -141,10 +141,10 @@ TimerOS             .byte 36-KO           ; NTSC           262
                     .byte 36-KO           ; PAL60          262
 
 TimerVB
-                    .byte 41           ; NTSC           262
-                    .byte (41+30)      ; PAL            312
-                    .byte 41           ; SECAM          262
-                    .byte 41           ; PAL60          262
+                    .byte 40           ; NTSC           262
+                    .byte (40+30)      ; PAL            312
+                    .byte 40           ; SECAM          262
+                    .byte 40           ; PAL60          262
 
 
 ; EOF

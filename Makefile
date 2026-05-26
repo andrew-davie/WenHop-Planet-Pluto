@@ -72,6 +72,7 @@ SRCS = \
  custom.c \
  decodeCaves.c \
  draw.c \
+ drawPlayer.c \
  drawScreen.c \
  main.c \
  mellon.c \
@@ -91,6 +92,7 @@ SRCS = \
  schedule.c \
  score.c \
  scroll.c \
+ spinningPlanet.c \
  wyrm.c \
  \
  grid6.c

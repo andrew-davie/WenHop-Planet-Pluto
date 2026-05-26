@@ -47,6 +47,44 @@
 // #define UPLEFT 7
 
 
+const unsigned char caveTest[] = {
+
+    20,     // milling
+    10, 15, // doge $
+    5,      //              ,          // rain
+
+    10, 11, 50, 56, 8, // randomiser[level]
+    25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
+    // 70,65,60,55,50,
+
+    CAVEDEF_PARALLAX, STEEL, CH_GEODOGE,
+
+    0,
+    // CH_BLANK, 60, 255, 0, 255, 10,
+    // CH_PEBBLE1, 120, 0, 240, 0, 20,
+    // CH_PEBBLE2, 120, 0, 240, 0, 20,
+    // CH_ROCK, 50, 0, 240, 0, 20,
+
+
+    0xFE, CH_DOORCLOSED, 38, 16, 0xFE,
+    CH_MELLON_HUSK_BIRTH, 10, 15,
+
+
+    0xFF,
+
+    // EXTRAS
+    // LEVEL 0
+    0xFF, // LEVEL 1
+    0xFF, // LEVEL 2
+    0xFF, // LEVEL 3
+    0xFF, // LEVEL 4
+    0xFF,
+
+    'T', 'E', 'S', 'T', END_STRING};
+
+
+
+
 const unsigned char caveFast[] = {
 
     20,     // milling
@@ -67,7 +105,7 @@ const unsigned char caveFast[] = {
 
 
     0xFE, CH_DOORCLOSED, 38, 16, 0xFE,
-    CH_MELLON_HUSK_BIRTH, 1, 15,
+    CH_MELLON_HUSK_BIRTH, 10, 15,
 
 
     LINER(CH_BLANK, 0,15, 10, 2)
@@ -360,12 +398,13 @@ const unsigned char caveA2[] = {
 
     CAVEDEF_PARALLAX, STEEL, CH_BLANK,
 
-    5,
+    6,
     CH_DIRT, 50, 10, 5, 0, 20,
     CH_GEODOGE, 50, 10, 5, 0, 20,
     CH_PUSH_RIGHT, 0, 10, 5, 0, 20,
     CH_PUSH_UP, 0, 10, 5, 0, 20,
     CH_PUSH_DOWN, 0, 10, 5, 0, 20,
+    CH_WYRM_HEAD_U, 50,20,30,40,50,
 
     //   CH_BLANK,       60, 255,   0, 255,  10,
     //     CH_ROCK,     90,   0, 240,   0,  20,
@@ -385,10 +424,10 @@ const unsigned char caveA2[] = {
     //    0xFE, CH_DOORCLOSED,38,16,
     0xFE, CH_MELLON_HUSK_BIRTH, 17, 6,
 
-    0xFE, CH_WYRM_HEAD_U, 11, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 12, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 13, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 14, 6,
+   0xFE, CH_WYRM_HEAD_U, 11, 6,
+    0xFE, CH_WYRM_HEAD_U, 12, 6,
+    0xFE, CH_WYRM_HEAD_U, 13, 6,
+    0xFE, CH_WYRM_HEAD_U, 14, 6,
 //    0xFF,
 
     0xFE, CH_GRINDER_0, 4, 9,
@@ -426,7 +465,7 @@ const unsigned char caveA2[] = {
     0xFE, CH_BELT_1, 21, 15,
     0xFE, CH_GRINDER_0, 22, 15,
 
-    0xFE, CH_LAVA_BLANK, 1, 20,
+    //0xFE, CH_LAVA_BLANK, 1, 20,
 
 
     // EXTRAS
@@ -659,12 +698,14 @@ const unsigned char caveA4[] = {
 
 const unsigned char *caveList[] = {
 
-    caveFast,
+//    caveTest,
 
-    caveA,
-    caveA2,
-    caveA5,
+    // caveFast,
+
+//    caveA5,  // bad
     caveA4,
+    caveA2,         // best
+    caveA,
     caveA3,
 };
 

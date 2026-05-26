@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
@@ -21,7 +23,6 @@
 
 
 // must be init'd at startup
-int frameCounter;
 int selectorCounter;
 int waterDir;
 int explodeCount;
@@ -65,24 +66,29 @@ static const int isActive[] = {
 void initBoard() {
 
     selectorCounter = 0;
-    frameCounter = gameSpeed;
     waterDir = 0;
     explodeCount = 0;
     conveyorDirection = -1;    // ?
-
-    // tmp
-    // for (int y = 0; y < _BOARD_ROWS; y++)
-    //     for (int x = 0; x < _BOARD_COLS; x++)
-    //         RAM[_BOARD + y * _1ROW + x] = CH_GEODOGE;
 }
 
 
 void setupBoardScanner() {
-    return;    // tmp
 
-    if (frameCounter >= gameSpeed) {
+    // After board scan complete, throttles until we're at correct FPS
 
-        frameCounter = 0;
+    if (gameFrame >= gameSpeed && !autoMoveFrameCount) {
+
+        waterDir++;
+
+        restartBoardScan();
+
+        static int wyrmDelay = 0;
+        if (!wyrmDelay--) {
+            wyrmDelay = 1;
+            processWyrms();
+        }
+
+        gameFrame = 0;
 
         ++selectorCounter;
         //        activated = isActive[++selectorCounter & 3];
@@ -137,7 +143,7 @@ void setupBoardScanner() {
             boardRow = 0;
         }
 
-        setSchedule(SCHEDULE_PROCESSBOARD);
+        setSchedule(SCHEDULE_PROCESS_BOARD);
 
         // if (theCave->flags & CAVEDEF_ROCK_GENERATE) {
         //     unsigned char *const generator = RAM + _BOARD + 40 + 19;
@@ -151,6 +157,7 @@ void setupBoardScanner() {
 
 
 void processBoardSquares() {
+
 
     while (T1TC < availableIdleTime) {
 
@@ -197,7 +204,8 @@ void processBoardSquares() {
                 boardCol = _BOARD_COLS - 1;
 
                 if (!--boardRow) {
-                    restartBoardScan();
+                    setSchedule(SCHEDULE_START_SCAN);
+                    //                    restartBoardScan();
                     return;
                 }
             }
@@ -207,7 +215,8 @@ void processBoardSquares() {
             if (boardCol > (_BOARD_COLS - 1)) {
                 boardCol = 0;
                 if (++boardRow > _BOARD_ROWS - 1) {
-                    restartBoardScan();
+                    setSchedule(SCHEDULE_START_SCAN);
+                    //                    restartBoardScan();
                     return;
                 }
             }
@@ -240,9 +249,9 @@ void processTypes() {
         processWater();
         break;
 
-    case TYPE_LAVA:
-        processLava();
-        break;
+        // case TYPE_LAVA:
+        //     processLava();
+        //     break;
 
     case TYPE_MELLON_HUSK:
 
@@ -263,6 +272,8 @@ void processTypes() {
         if (!(getRandom32() & 7)) {
             nDots(1, boardCol, boardRow, PT_TWO, 10, 3, 7, 100);
         }
+
+        __attribute__((fallthrough));
 
     case TYPE_BELT:
     case TYPE_BELT_1:
@@ -461,12 +472,6 @@ void processCreatures() {
 
 
 void restartBoardScan() {
-
-    waterDir++;
-
-    processWyrms();
-
-    setSchedule(SCHEDULE_START);
 
     if (!autoMoveFrameCount) {    // delay until fully in new square
 

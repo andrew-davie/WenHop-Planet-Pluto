@@ -2,14 +2,15 @@
 
 #include "cdfjplus.h"
 
+#include "caveData.h"
 #include "colour.h"
 #include "draw.h"
+#include "grid6.h"
 #include "main.h"
 #include "menuCharacterSet.h"
+#include "random.h"
 #include "savekey.h"
 #include "sound.h"
-
-#include "grid6.h"
 
 int menuLine;
 int pushCount;
@@ -25,19 +26,56 @@ enum MENU_OPTION {
 
     MENU_OPTION_CAVE,
     MENU_OPTION_LEVEL,
-    // MENU_OPTION_TVSYSTEM,
 };
+
+
+void initDataStreams_Menu() {
+
+    static const struct dataStreams streams[] = {
+
+        {_DS_MENU_COLUBK, _BUF_MENU_COLUBK},
+
+        {_DS_MENU_PF1_LEFT, _BUF_MENU_PF},
+        {_DS_MENU_PF1_RIGHT, _BUF_MENU_PF + 3 * _SCANLINES},
+        {_DS_MENU_PF2_LEFT, _BUF_MENU_PF + 1 * _SCANLINES},
+        {_DS_MENU_PF2_RIGHT, _BUF_MENU_PF + 2 * _SCANLINES},
+
+        {_DS_MENU_AUDV0, _BUF_AUDV},
+        {_DS_MENU_AUDC0, _BUF_AUDC},
+        {_DS_MENU_AUDF0, _BUF_AUDF},
+        {_DS_MENU_COLUPF, _BUF_MENU_COLUPF},
+        {_DS_MENU_COLUP0, _BUF_MENU_COLUP0},
+
+        {_DS_MENU_GRP0A, _BUF_MENU_GRP0A},
+        {_DS_MENU_GRP1A, _BUF_MENU_GRP1A},
+        {_DS_MENU_GRP0B, _BUF_MENU_GRP0B},
+        {_DS_MENU_GRP1B, _BUF_MENU_GRP1B},
+        {_DS_MENU_GRP0C, _BUF_MENU_GRP0C},
+        {_DS_MENU_GRP1C, _BUF_MENU_GRP1C},
+
+        {DSJMP1PTR, _BUF_MENU_JUMP},
+
+    };
+
+    initDataStreams(streams, sizeof(streams) / sizeof(struct dataStreams));
+}
 
 
 void initKernel_Menu() {
 
     setJumpVectors(_BUF_MENU_JUMP, _menuLoop, _menuExit, _SCANLINES);
-    setPointer(DSJMP1PTR, _BUF_MENU_JUMP);
+    initDataStreams_Menu();
+
 
     killRepeatingAudio();
 
     flashTime2 = 0;
-    cave = 0;
+
+    static int showCave = -1;
+    if (++showCave >= caveCount)
+        showCave = 0;
+
+    cave = showCave;
     level = 0;
     menuLineTVType = 0;
 
@@ -135,49 +173,13 @@ void drawSmallString(int y, const char *smallText) {
     }
 }
 
-void initMenuDataStreams() {
-
-    static const struct ptrs {
-
-        unsigned char dataStream;
-        unsigned short buffer;
-
-    } streamInits[] = {
-
-        {_DS_MENU_COLUBK, _BUF_MENU_COLUBK},
-
-        {_DS_MENU_PF1_LEFT, _BUF_MENU_PF},
-        {_DS_MENU_PF1_RIGHT, _BUF_MENU_PF + 3 * _SCANLINES},
-        {_DS_MENU_PF2_LEFT, _BUF_MENU_PF + 1 * _SCANLINES},
-        {_DS_MENU_PF2_RIGHT, _BUF_MENU_PF + 2 * _SCANLINES},
-
-        {_DS_MENU_AUDV0, _BUF_AUDV},
-        {_DS_MENU_AUDC0, _BUF_AUDC},
-        {_DS_MENU_AUDF0, _BUF_AUDF},
-        {_DS_MENU_COLUPF, _BUF_MENU_COLUPF},
-        {_DS_MENU_COLUP0, _BUF_MENU_COLUP0},
-
-        {_DS_MENU_GRP0A, _BUF_MENU_GRP0A},
-        {_DS_MENU_GRP1A, _BUF_MENU_GRP1A},
-        {_DS_MENU_GRP0B, _BUF_MENU_GRP0B},
-        {_DS_MENU_GRP1B, _BUF_MENU_GRP1B},
-        {_DS_MENU_GRP0C, _BUF_MENU_GRP0C},
-        {_DS_MENU_GRP1C, _BUF_MENU_GRP1C},
-
-        {DSJMP1PTR, _BUF_MENU_JUMP},
-
-    };
-
-    for (unsigned int i = 0; i < sizeof(streamInits) / sizeof(struct ptrs); i++)
-        setPointer(streamInits[i].dataStream, streamInits[i].buffer);
-}
-
 
 void VB_Menu() {
 
-    initMenuDataStreams();
+    initDataStreams_Menu();
 
-    if (frame > 500)
+
+    if (frame > 200)
         setGameState(GS_GAME);
 }
 

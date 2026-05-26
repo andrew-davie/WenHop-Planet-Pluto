@@ -208,11 +208,13 @@ int decodeExplicitData(int /*sfx*/) {
 
                     //                    if (displayMode == DISPLAY_NORMAL)
                     scrollX = (playerX - (HALFWAYX / 5)) << 16;
-
-                    // else if (displayMode == DISPLAY_HALF)
-                    //     scrollX = (playerX - (HALFWAYX >> 1)) << 16;
+                    // scrollX = (HALFWAYX / 5) << 16;    // tmp
+                    //  else if (displayMode == DISPLAY_HALF)
+                    //      scrollX = (playerX - (HALFWAYX >> 1)) << 16;
 
                     scrollY = ((6 * TRILINES - 3) << 16);
+
+                    //                    scrollY = 0;    // tmp
                 }
 
                 //                thumbnailSpeed = -1;
@@ -276,11 +278,11 @@ int decodeExplicitData(int /*sfx*/) {
 
         DrawRect(theCave->borderCharacter /*& ((decodeFlasher & 4) ? 0 : 0xFF)*/, 0, 0, _BOARD_COLS, _BOARD_ROWS);
 
-        if (!(decodeFlasher & 0b11))
-            // if (sfx)
-            //     ADDAUDIO(SFX_DRIP);
-            if (!--decodeFlasher)
-                StoreObject(doorX, doorY, CH_DOORCLOSED);
+        // tmp        if (!(decodeFlasher & 0b11))
+        // if (sfx)
+        //     ADDAUDIO(SFX_DRIP);
+        if (!--decodeFlasher)
+            StoreObject(doorX, doorY, CH_DOORCLOSED);
         break;
 
     default:
@@ -307,7 +309,9 @@ void StoreObject(int x, int y, objectType anObject) {
     switch (type) {
 
     case TYPE_WYRM: {
-        newWyrm(x, y);
+
+        if (!newWyrm(x, y))
+            anObject = CH_BLANK;
         break;
     }
 

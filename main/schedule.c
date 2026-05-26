@@ -25,7 +25,7 @@ void scheduleUnpackCave() {
             if (!totalDogePossible)
                 totalDogePossible = -1;    // indicates "perfect" not possible
 
-            // tmp setSchedule(SCHEDULE_PROCESSBOARD);
+            setSchedule(SCHEDULE_START_SCAN);
             break;
         }
 }
@@ -35,8 +35,8 @@ void scheduledTasks() {
     static void (*const scheduleFunc[])() = {
 
         scheduleUnpackCave,     // SCHEDULE_UNPACK_CAVE
-        setupBoardScanner,      // SCHEDULE_START
-        processBoardSquares,    // SCHEDULE_PROCESSBOARD
+        setupBoardScanner,      // SCHEDULE_START_SCAN
+        processBoardSquares,    // SCHEDULE_PROCESS_BOARD
     };
 
     (*scheduleFunc[gameSchedule])();

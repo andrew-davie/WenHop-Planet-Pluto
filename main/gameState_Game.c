@@ -6,17 +6,50 @@
 #include "board.h"
 #include "colour.h"
 #include "decodeCaves.h"
+#include "drawPlayer.h"
 #include "drawScreen.h"
 #include "gameState.h"
 #include "kernels.h"
 #include "main.h"
+#include "random.h"
 #include "schedule.h"
+#include "scroll.h"
+#include "wyrm.h"
+
+
+void initDataStreams_Game() {
+
+    static const struct dataStreams initStreams[] = {
+
+        {_DS_GAME_PF0_LEFT, _BUF_GAME_PF0_LEFT},
+        {_DS_GAME_PF1_LEFT, _BUF_GAME_PF1_LEFT},
+        {_DS_GAME_PF2_LEFT, _BUF_GAME_PF2_LEFT},
+        {_DS_GAME_PF0_RIGHT, _BUF_GAME_PF0_RIGHT},
+        {_DS_GAME_PF1_RIGHT, _BUF_GAME_PF1_RIGHT},
+        {_DS_GAME_PF2_RIGHT, _BUF_GAME_PF2_RIGHT},
+
+        {_DS_GAME_COLUPF, _BUF_GAME_COLUPF},
+        {_DS_GAME_COLUBK, _BUF_GAME_COLUBK},
+        {_DS_GAME_COLUP0, _BUF_GAME_COLUP0},
+        {_DS_GAME_COLUP1, _BUF_GAME_COLUP1},
+        {_DS_GAME_GRP0A, _BUF_GAME_GRP0},
+        {_DS_GAME_GRP1A, _BUF_GAME_GRP1},
+
+        // {_DS_GAME_AUDV, _BUF_AUDV},
+        // {_DS_GAME_AUDC, _BUF_AUDC},
+        // {_DS_GAME_AUDF, _BUF_AUDF},
+
+        {DSJMP1PTR, _BUF_GAME_JUMP},
+    };
+
+    initDataStreams(initStreams, sizeof(initStreams) / sizeof(struct dataStreams));
+}
 
 
 void initKernel_Game() {
 
     setJumpVectors(_BUF_GAME_JUMP, _gameLoop, _gameExit, _SCANLINES);
-    setPointer(DSJMP1PTR, _BUF_GAME_JUMP);
+    initDataStreams_Game();
 }
 
 
@@ -28,90 +61,46 @@ void initGameState_Game() {
     initCharVector();
     initCharAnimations();
 
-    cave = 1;
+    initSprites();
+
+    initWyrms();    // todo: --> initNextLife
+
+
     decodeCave(cave);    // TODO: in initNextLife instead
 
     setSchedule(SCHEDULE_UNPACK_CAVE);
 
-#if 0    // original initnextlife()
+
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_GRP0), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_GRP1), 0, _SCANLINES);
+
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF0_LEFT), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF1_LEFT), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF2_LEFT), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF0_RIGHT), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF1_RIGHT), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF2_RIGHT), 0, _SCANLINES);
+
+    myMemset((unsigned char *)(RAM + _BUF_GAME_COLUBK), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_COLUP0), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_COLUP1), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_COLUPF), 0, _SCANLINES);
+
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_AUDV0), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_AUDC0), 0, _SCANLINES);
+    // myMemset((unsigned char *)(RAM + _BUF_GAME_AUDF0), 0, _SCANLINES);
+
+    gameSpeed = 6;
+    gameFrame = gameSpeed;    // force rollover
 
 
-
-void initNextLife() {
-
-
-#if __ENABLE_WATER
-    //    water = 0;
-    //    lava = 0;
-    lastWater = 0;
-#endif
-
-#if ENABLE_SHAKE
-    shakeTime = 0;
-    // shakeX = 0;
-    // shakeY = 0;
-#endif
-
-    bufferedSWCHA = 0xFF;
-
-    caveCompleted = false;
-    exitTrigger = false;
-
-    perfectTimer = 80;
-
-    exitMode = 0;
-    idleTimer = 0;
-    sparkleTimer = 0;
-    gameFrame = 0;
-    triggerPressCounter = 0;
-    triggerOffCounter = 0;
-    // expandSpeed = 0;
+    gravity = 1;
     nextGravity = 1;
 
-    // dogeBlockCount = 0;
-    // cumulativeBlockCount = 0;
-    explodeCount = 0;
-
-    resetDelay = 0;
-    // selectResetDelay = 0;
-
-    showTool = false;
-
-#if ENABLE_DEBUG
-    selectDelay = 0;
-#endif
-
-    lavaSurfaceTrixel = 10000; // 0x1C2/3; //22 * PIECE_DEPTH - 1;
+    lavaSurfaceTrixel = 10000;
     showLava = false;
     showWater = false;
 
-    // lastDisplayMode = DISPLAY_NONE;
-
-#ifdef ENABLE_SWITCH
-    switchOn = true;
-#endif
-
-    frameCounter = gameSpeed; // force initial
-    selectorCounter = 0;
-
-    initWyrms();
-    initPlayer();
-    initSprites();
-
-    for (int i = 0; i < PARTICLE_COUNT; i++)
-        particle[i].age = -1;
-
-#if CIRCLE
-    initSwipeCircle(CIRCLE_ZOOM_ZERO + 1);
-#endif
-
-    initCharAnimations();
-
-    spacing = 0;
-
-    setScoreCycle(SCORELINE_CAVELEVEL);
-}
-#endif
 
     frame = 0;
 }
@@ -122,63 +111,59 @@ void setAvailableTime(int time) {
     T1TC = 0;
     T1TCR = 1;
 
-    availableIdleTime = 90000;
+    availableIdleTime = time;
 }
 
 
 void VB_Game() {
 
-    setAvailableTime(90000);    // TODO: find correct available time
+    setAvailableTime(50000);    // TODO: find correct available time
+
+    initDataStreams_Game();
+
+    gameFrame++;
 
 
-    setPointer(DSJMP1PTR, _BUF_GAME_JUMP);
+    if (frame > 1000)
+        // setGameState(GS_RAINBOW);
+        setGameState(GS_COUCH_COMPLIANT);    // TODO: GS_MENU has sprite issues
 
-    setPointer(_DS_GAME_COLUBK, _BUF_GAME_COLUBK);
-    setPointer(_DS_GAME_COLUPF, _BUF_GAME_COLUPF);
-    setPointer(_DS_GAME_COLUP0, _BUF_GAME_COLUP0);
-    setPointer(_DS_GAME_COLUP1, _BUF_GAME_COLUP1);
+    // static int xspeed = 0;
+    // int xOff = 5000;    // rangeRandom(15000) - 7500;
 
-    setPointer(_DS_GAME_PF0_LEFT, _BUF_GAME_PF0_LEFT);
-    setPointer(_DS_GAME_PF1_LEFT, _BUF_GAME_PF1_LEFT);
-    setPointer(_DS_GAME_PF2_LEFT, _BUF_GAME_PF2_LEFT);
-    setPointer(_DS_GAME_PF0_RIGHT, _BUF_GAME_PF0_RIGHT);
-    setPointer(_DS_GAME_PF1_RIGHT, _BUF_GAME_PF1_RIGHT);
-    setPointer(_DS_GAME_PF2_RIGHT, _BUF_GAME_PF2_RIGHT);
-
-    setPointer(_DS_GAME_GRP0A, _BUF_GAME_GRP0);
-    setPointer(_DS_GAME_GRP1A, _BUF_GAME_GRP1);
+    // if (xspeed < xOff)
+    //     xspeed += 2000;
+    // if (xspeed > xOff)
+    //     xspeed -= 2000;
 
 
-    static unsigned int col;
-    col++;
+    // if (!rangeRandom(200)) {
+    //     scrollX += 2222400;
+    //     scrollY = 2500000;
+    // }
+    // if (scrollX < 0)
+    //     scrollX = 0;
 
-    unsigned char *p = RAM + _BUF_GAME_COLUBK;
-    unsigned char *c = RAM + _BUF_GAME_COLUPF;
-
-    for (int i = 0; i < _SCANLINES; i++) {
-        *p++ = 0;    // convertColour((col + (i >> 1)) & 0xFF);
-
-        // *c++ = 0xF;
-    }
-
-    setPointer(_DS_GAME_COLUBK, _BUF_GAME_COLUBK);
-
-    if (frame > 500)
-        setGameState(GS_RAINBOW);
 
     processCharAnimations();
+
+    if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
+
+        drawScreen();
+        drawPlayerSprite();
+    }
+
+
     scheduledTasks();
 }
 
 void OS_Game() {
 
-    setAvailableTime(90000);    // TODO: find available time
+
+    setAvailableTime(50000);    // TODO: find available time
 
     interleaveChronoColour(&roller);
     setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
-
-    drawScreen();
-
 
     scheduledTasks();
 }

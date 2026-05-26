@@ -1,9 +1,4 @@
-#ifndef __CAVEDATA_H
-#define __CAVEDATA_H
-
-// #define CAVEFLAG_MIRROR_X       1
-// #define CAVEFLAG_MIRROR_Y       2
-// #define CAVEFLAG_MIRROR_XY      (CAVEFLAG_MIRROR_X + CAVEFLAG_MIRROR_Y)
+#pragma once
 
 extern const unsigned char *caveList[];
 extern const unsigned int caveCount;
@@ -19,4 +14,4 @@ extern unsigned char caveFlags;
 
 #define CAVE_REQUIRES_COMPATIBLE_PALETTE 0x80000000
 
-#endif
+// EOF

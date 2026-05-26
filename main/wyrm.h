@@ -1,7 +1,7 @@
 #pragma once
 
-#define WYRM_POP 8
-#define WYRM_MAX 4
+#define WYRM_POP 16
+#define WYRM_MAX 16
 
 
 struct wyrmDetails {
@@ -15,7 +15,7 @@ struct wyrmDetails {
 extern struct wyrmDetails wyrms[WYRM_POP];
 
 void initWyrms();
-void newWyrm(int x, int y);
+bool newWyrm(int x, int y);
 void processWyrms();
 
 // EOF

@@ -123,6 +123,14 @@ VB_kernelMenu
                     sta PF1
                     sta PF2
 
+                    ldx #%00110011
+                    stx NUSIZ0
+                    stx NUSIZ1
+                    stx VDELP0
+                    stx VDELP1
+
+
+
                     rts
 
 OS_kernelMenu
