@@ -28,6 +28,8 @@ Gamax Software 2026 - Craig Daniels
 #include "scroll.h"
 #include "sound.h"
 
+#define INTIM_TO_ARM_CYCLES 3749 /* INTIM * 64 / 76 * 4452 */
+
 int usedSolves;
 int whichLot;
 int tvSystem;
@@ -323,8 +325,11 @@ void (*const verticalBlank[GS_MAX])() = {
 
 void runARM_VerticalBlank() {
 
-    if (gameState == nextGameState)
+    availableIdleTime = RAM[_INTIM] * INTIM_TO_ARM_CYCLES;
+
+    if (gameState == nextGameState) {
         (*verticalBlank[gameState])();
+    }
 
     // common to ALL VBs...
     // insert code here
@@ -354,8 +359,12 @@ int whichKernel[GS_MAX] = {
     _KERNEL_GAME,              // 6 GS_GAME
 };
 
+int intim;
+
 
 void runARM_Overscan() {
+
+    availableIdleTime = RAM[_INTIM] * INTIM_TO_ARM_CYCLES;    // --> 64 /76 * 4452
 
     if (gameState != nextGameState) {
 

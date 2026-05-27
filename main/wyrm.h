@@ -1,7 +1,7 @@
 #pragma once
 
-#define WYRM_POP 16
-#define WYRM_MAX 16
+#define WYRM_POP 8
+#define WYRM_MAX 8
 
 
 struct wyrmDetails {

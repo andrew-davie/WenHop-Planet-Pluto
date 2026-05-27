@@ -159,7 +159,8 @@ void setupBoardScanner() {
 void processBoardSquares() {
 
 
-    while (T1TC < availableIdleTime) {
+    while (T1TC < availableIdleTime - 10000) {
+
 
         me = RAM + _BOARD + boardRow * _1ROW + boardCol;
 
@@ -172,11 +173,17 @@ void processBoardSquares() {
             if (visible(boardCol, boardRow))
                 convertWaterAndLavaObjects();
 
+            extern int actualScore;
+            int tmp = T1TC;
             if (Attribute[type] & isActive[selectorCounter & 3]) {
                 processTypes();
                 processCreatures();
             }
+            tmp = T1TC - tmp;
+            if (tmp > actualScore)
+                actualScore = tmp;
         }
+
 
         // Clear any "scanned this frame" objects on the previous line
         // note: we need to also do the last row ... or do we? if it's steel wall, no

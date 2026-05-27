@@ -73,7 +73,7 @@ void initGameState_Game() {
 
     myMemsetInt((unsigned int *)(RAM + _GAME_BUFFERS_START), 0, _GAME_BUFFERS_SIZE / 4);
 
-    gameSpeed = 6;
+    gameSpeed = 6;            // tmp 6;
     gameFrame = gameSpeed;    // force rollover
 
 
@@ -88,26 +88,17 @@ void initGameState_Game() {
 }
 
 
-void setAvailableTime(int time) {
+void VB_Game() {
 
     T1TC = 0;
     T1TCR = 1;
-
-    availableIdleTime = time;
-}
-
-
-void VB_Game() {
-
-    setAvailableTime(100000);
 
     initDataStreams_Game();
 
     gameFrame++;
 
 
-    if (frame > 1000)
-        // setGameState(GS_RAINBOW);
+    if (frame > 10000)
         setGameState(GS_COUCH_COMPLIANT);
 
     processCharAnimations();
@@ -119,13 +110,19 @@ void VB_Game() {
     }
 
 
+    for (int i = 0; i < _SCANLINES; i++) {
+
+        RAM[_BUF_GAME_COLUBK + i] = colubk;
+    }
+
+
     scheduledTasks();
 }
 
 void OS_Game() {
 
-
-    setAvailableTime(81000);    // optimised 27/5/2026. loose but something at start uses extra
+    T1TC = 0;
+    T1TCR = 1;
 
     interleaveChronoColour(&roller);
     setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));

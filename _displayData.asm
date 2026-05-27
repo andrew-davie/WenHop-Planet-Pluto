@@ -21,6 +21,8 @@ _SK_RESET           ds 1            ; NOT saved; just a toggle
     ;---------------------------------------------
 
 _RUN_FUNC           ds 1
+_INTIM              ds 1            ; spare time --> ARM
+
 _SWCHA	            ds 1
 _SWCHB	            ds 1
 _INPT4              ds 1
@@ -36,9 +38,9 @@ _colubk             ds 1
 
     ;---------------------------------------------
 
-_BUF_AUDV               ds 2
-_BUF_AUDC               ds 2
-_BUF_AUDF               ds 2
+_BUF_AUDV           ds 2
+_BUF_AUDC           ds 2
+_BUF_AUDF           ds 2
 
 
 _BOARD_COLS = 40
@@ -58,7 +60,7 @@ _BOARD              ds _BOARD_COLS * _BOARD_ROWS + 4    ; extra for grab+1 in dr
 ; Buffers are guaranteed 4-byte aligned/size, so quick clears can be performed
 
     MAC DEFBUF ; {size}, {name}
-_BUF_{2}             ds {1} * _BUFFER_SIZE
+_BUF_{2}            ds {1} * _BUFFER_SIZE
     ENDM
 
 END_BUFFERS SET 0

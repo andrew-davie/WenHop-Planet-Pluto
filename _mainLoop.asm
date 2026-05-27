@@ -26,6 +26,19 @@ mainGameLoop
                     lda TimerOS,x
                     sta TIM64T
 
+
+                    jsr scanAndUpdateSaveKey            ; update ONE *CHANGED* SaveKey byte
+
+
+    ; run kernel-specific 6502 Overscan code (OS_FN_OFFSET) 
+
+                    lda kernel
+                    clc
+                    adc #OS_FN_OFFSET
+                    tax
+                    jsr runVectoredCode               ; actually run 6502 kernel-specific VB
+
+
     ; call ARM Overscan
 
                 	ldx #>_RUN_FUNC
@@ -35,6 +48,10 @@ mainGameLoop
 
                 	ldx #_RUNARM_OVERSCAN
                 	stx DSWRITE
+
+                	ldx INTIM
+                    dex                     ; adjust -1 for 6502 requirements below
+                	stx DSWRITE             ; spare time --> ARM
 
     ; send controllers to ARM
 
@@ -74,25 +91,13 @@ mainGameLoop
                     lda #DS31DATA
                     sta AUDF1
 
-
-                    jsr scanAndUpdateSaveKey            ; update ONE *CHANGED* SaveKey byte
-
-
-    ; run kernel-specific 6502 Overscan code (OS_FN_OFFSET) 
-
-                    lda kernel
-                    clc
-                    adc #OS_FN_OFFSET
-                    tax
-                    jsr runVectoredCode               ; actually run 6502 kernel-specific VB
-
 .waitOS             lda INTIM	
                     bne .waitOS
 
     ; vertical blank
     ; any kernel switching will have just happened
 
-                    ldx #%1110
+.overtime           ldx #%1110
                     txa
 .verticalSync       sta WSYNC
                     sta VSYNC                   ; indicate vblank
@@ -104,7 +109,13 @@ mainGameLoop
                     lda TimerVB,x
                     sta TIM64T
 
-    ; call ARM Vertical Blank
+    ; run kernel-specific 6502 Vertical Blank code (VB_FN_OFFSET)
+
+                    lda kernel
+                    clc
+                    adc #VB_FN_OFFSET
+                    tax
+                    jsr runVectoredCode               ; actually run 6502 kernel-specific VB
 
                     ldx #>_RUN_FUNC
                     stx DSPTR
@@ -113,28 +124,13 @@ mainGameLoop
                     ldx #_RUNARM_VBLANK
                     stx DSWRITE
 
+                	ldx INTIM
+                    dex
+                	stx DSWRITE
+
                     ldx call_fn
                     stx CALLFN                  ; call VerticalBlank in ARM
 
-
-    ; lda #0
-    ; sta COLUBK
-    ; sta COLUPF
-    ; sta COLUP0
-    ; sta COLUP1
-    ; sta GRP0
-    ; sta GRP1
-    ; sta PF0
-    ; sta PF1
-    ; sta PF2
-
-    ; run kernel-specific 6502 Vertical Blank code (VB_FN_OFFSET)
-
-                    lda kernel
-                    clc
-                    adc #VB_FN_OFFSET
-                    tax
-                    jsr runVectoredCode               ; actually run 6502 kernel-specific VB
 
 .waitVB             lda INTIM
                     bne .waitVB
@@ -152,16 +148,16 @@ mainGameLoop
 KO = (_SCANLINES - 192) * 76 / 64
 
 
-TimerOS             .byte 36-KO           ; NTSC           262
+TimerOS             .byte 34           ; NTSC           262
                     .byte (36+29)      ; PAL            312
-                    .byte 36-KO           ; SECAM          262
-                    .byte 36-KO           ; PAL60          262
+                    .byte 34           ; SECAM          262
+                    .byte 34           ; PAL60          262
 
 TimerVB
-                    .byte 40           ; NTSC           262
-                    .byte (40+30)      ; PAL            312
-                    .byte 40           ; SECAM          262
-                    .byte 40           ; PAL60          262
+                    .byte 34           ; NTSC           262
+                    .byte 34      ; PAL            312
+                    .byte 34           ; SECAM          262
+                    .byte 34           ; PAL60          262
 
 
 ; EOF
