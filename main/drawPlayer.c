@@ -118,12 +118,15 @@ void drawPlayerSprite() {    // --> 3171 cycles
 
 
         const unsigned char *spr = spriteShape[*playerAnimation];
-        if (!spr)
+        if (!spr) {
+
+            FLASH(0x44, 2);
             spr = spriteShape[1];
+        }
 
 
-        extern const unsigned char shape_FRAME_STAND[];    // tmp
-        spr = shape_FRAME_STAND;
+        // extern const unsigned char shape_FRAME_STAND[];    // tmp
+        // spr = shape_FRAME_STAND;
 
         int shapeHeight = *spr++;
 

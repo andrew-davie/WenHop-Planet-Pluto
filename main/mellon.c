@@ -81,7 +81,7 @@ void initPlayer() {
 
     faceDirection = FACE_RIGHT;
 
-    startPlayerAnimation(ID_MineUp);    // tmp
+    startPlayerAnimation(ID_Stand);    // tmp
     // startPlayerAnimation(ID_Stand);
 }
 

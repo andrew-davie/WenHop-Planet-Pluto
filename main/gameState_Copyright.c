@@ -82,9 +82,7 @@ void initGameState_Copyright() {
     loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
 
     myMemsetInt((unsigned int *)(RAM + _BUF_COPYRIGHT_GRP), 0, _BUFFER_SIZE * 6 / 4);
-
-    colubk = convertColour(0x90);    // tmp
-    myMemsetInt((unsigned int *)(RAM + _BUF_COPYRIGHT_COLUBK), colubk, _BUFFER_SIZE / 4);
+    myMemsetInt((unsigned int *)(RAM + _BUF_COPYRIGHT_COLUBK), 0, _BUFFER_SIZE / 4);
 
     presentsColour = 2 << FADE_SHIFT;
 

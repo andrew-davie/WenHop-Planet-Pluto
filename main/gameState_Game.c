@@ -98,7 +98,7 @@ void VB_Game() {
     gameFrame++;
 
 
-    if (frame > 10000)
+    if (frame > 1000)
         setGameState(GS_COUCH_COMPLIANT);
 
     processCharAnimations();
