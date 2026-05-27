@@ -6,7 +6,7 @@
 extern int scrollX;
 extern int scrollY;
 
-void Scroll();
+void scroll();
 void resetTracking();
 int isScrolling();
 bool visible(int col, int row);

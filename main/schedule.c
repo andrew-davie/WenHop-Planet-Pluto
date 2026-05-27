@@ -6,6 +6,7 @@
 
 #include "board.h"
 #include "decodeCaves.h"
+#include "main.h"
 #include "schedule.h"
 
 enum SCHEDULE gameSchedule;
@@ -40,6 +41,10 @@ void scheduledTasks() {
     };
 
     (*scheduleFunc[gameSchedule])();
+
+
+    // while (T1TC < availableIdleTime)
+    //     ;
 }
 
 

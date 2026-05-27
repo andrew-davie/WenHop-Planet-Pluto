@@ -21,7 +21,7 @@ int isScrolling() {
     return (scrollSpeedX | scrollSpeedY);
 }
 
-void Scroll() {
+void scroll() {
 
     if (playerDead && !waitRelease && *playerAnimation == FRAME_BLANK) {
 

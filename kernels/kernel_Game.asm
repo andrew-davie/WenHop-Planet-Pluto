@@ -16,13 +16,11 @@ START_GAME = *
     DEFPTR GAME_GRP1A
     
 
+;-------------------------------------------------------------------------------
+
 kernelGame
 
     ; runVectoredCode[kernel] comes here
-
-
-;                    sta WSYNC
- ;                   jmp 0
 
 _gameLoop ; @3
                     lda #_DS_GAME_COLUP0_DATA
@@ -72,6 +70,8 @@ _gameExit           lda #0
                     sta PF2
                     rts
 
+;-------------------------------------------------------------------------------
+
 VB_kernelGame
 
                     ldx #>_P0_X
@@ -79,15 +79,33 @@ VB_kernelGame
                     ldx #<_P0_X
                     stx DSPTR
 
-                    lda #DSCOMM
-                    sta p0_x
-                    lda #DSCOMM
-                    sta p1_x
+                    ldx #0
+posSpritesGame      lda #DSCOMM
+
+                    sec
+                    sta WSYNC
+div15Loop           sbc #15
+                    bcs div15Loop
+
+                    eor #7
+                    asl
+                    asl
+                    asl
+                    asl
+
+                    sta.wx HMP0,x
+                    sta RESP0,x
+
+                    inx
+                    cpx #2
+                    bne posSpritesGame
 
 
 
                     lda #0
                     sta CTRLPF
+
+;                    lda #%101
                     sta NUSIZ0
                     sta NUSIZ1
 
@@ -103,10 +121,12 @@ VB_kernelGame
                     rts
 
 
-
+;-------------------------------------------------------------------------------
 
 OS_kernelGame
                     rts
+
+;-------------------------------------------------------------------------------
 
     echo "KERNEL GAME [", (* - START_GAME)d,"] bytes"
 

@@ -12,6 +12,9 @@
 
 #define CHAMP_VOL 100
 #define DURATION_COPYRIGHT 250
+#define PRESENTS_LUM 8
+#define FADE_SPEED 17000
+#define FADE_SHIFT 16
 
 // clang-format off
 
@@ -45,25 +48,19 @@ void initDataStreams_Copyright() {
 
         {DSJMP1PTR, _BUF_COPYRIGHT_JUMP},
 
-        {_DS_CP_GRP0A + 0, _BUF_COPYRIGHT_GRP + 0 * _SCANLINES},
-        {_DS_CP_GRP0A + 1, _BUF_COPYRIGHT_GRP + 1 * _SCANLINES},
-        {_DS_CP_GRP0A + 2, _BUF_COPYRIGHT_GRP + 2 * _SCANLINES},
-        {_DS_CP_GRP0A + 3, _BUF_COPYRIGHT_GRP + 3 * _SCANLINES},
-        {_DS_CP_GRP0A + 4, _BUF_COPYRIGHT_GRP + 4 * _SCANLINES},
-        {_DS_CP_GRP0A + 5, _BUF_COPYRIGHT_GRP + 5 * _SCANLINES},
+        {_DS_CP_GRP0A + 0, _BUF_COPYRIGHT_GRP + 0 * _BUFFER_SIZE},
+        {_DS_CP_GRP0A + 1, _BUF_COPYRIGHT_GRP + 1 * _BUFFER_SIZE},
+        {_DS_CP_GRP0A + 2, _BUF_COPYRIGHT_GRP + 2 * _BUFFER_SIZE},
+        {_DS_CP_GRP0A + 3, _BUF_COPYRIGHT_GRP + 3 * _BUFFER_SIZE},
+        {_DS_CP_GRP0A + 4, _BUF_COPYRIGHT_GRP + 4 * _BUFFER_SIZE},
+        {_DS_CP_GRP0A + 5, _BUF_COPYRIGHT_GRP + 5 * _BUFFER_SIZE},
 
         {_DS_CP_PF, _BUF_COPYRIGHT_PF},
 
-        {_DS_CP_COLUPF, _BUF_GAME_COLUPF},
-        {_DS_CP_COLUP0, _BUF_GAME_COLUP0},
-        {_DS_CP_COLUP0, _BUF_GAME_COLUP0},
-
-        {_DS_CP_COLUP0, _BUF_GAME_COLUP0},
-
         {_DS_CP_COLUPF, _BUF_COPYRIGHT_COLUPF},
         {_DS_CP_COLUP0, _BUF_COPYRIGHT_COLUP0},
+        {_DS_CP_COLUBK, _BUF_COPYRIGHT_COLUBK},
     };
-
 
     initDataStreams(streams, sizeof(streams) / sizeof(struct dataStreams));
 }
@@ -71,6 +68,8 @@ void initDataStreams_Copyright() {
 void initKernel_Copyright() {
 
     // Note: kernel shared with GS_COUCH_COMPLIANT
+    // Runs AFTER initGameState_Copyright
+
     setJumpVectors(_BUF_COPYRIGHT_JUMP, _copyrightLoop, _copyrightExit, _SCANLINES);
     initDataStreams_Copyright();
 }
@@ -82,11 +81,12 @@ void initGameState_Copyright() {
     loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
     loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
 
-    unsigned char *p = (unsigned char *)(RAM + _BUF_COPYRIGHT_GRP);
-    for (int i = 0; i < _SCANLINES * 6; i++)
-        *p++ = 0;
+    myMemsetInt((unsigned int *)(RAM + _BUF_COPYRIGHT_GRP), 0, _BUFFER_SIZE * 6 / 4);
 
-    presentsColour = 0;
+    colubk = convertColour(0x90);    // tmp
+    myMemsetInt((unsigned int *)(RAM + _BUF_COPYRIGHT_COLUBK), colubk, _BUFFER_SIZE / 4);
+
+    presentsColour = 2 << FADE_SHIFT;
 
     frame = 0;
 }
@@ -109,9 +109,10 @@ void VB_Copyright() {
         unsigned char *r = l + _SCANLINES;
         unsigned char *c = RAM + _BUF_COPYRIGHT_COLUPF;
         unsigned char *spc = RAM + _BUF_COPYRIGHT_COLUP0;
+        unsigned char *bk = RAM + _BUF_COPYRIGHT_COLUBK;
 
         for (int i = 0; i < _SCANLINES; i++)
-            c[i] = 0;
+            c[i] = bk[i] = colubk;
 
         l += TOP;
         r += TOP;
@@ -140,16 +141,13 @@ void VB_Copyright() {
                     gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 8);
 
 
-#define PRESENTS_LUM 8
-#define FADE_SPEED 17000
-#define FADE_SHIFT 16
-
-        if (frame > 60)
+        if (frame > 60) {
             if (presentsColour < (PRESENTS_LUM << FADE_SHIFT))
                 presentsColour += FADE_SPEED;
 
-        draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
-                    gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, (presentsColour >> FADE_SHIFT));
+            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
+                        gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, (presentsColour >> FADE_SHIFT));
+        }
 
         if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 70) {
             int col = convertColour(frame & 16 ? 0x16 : 0x12);

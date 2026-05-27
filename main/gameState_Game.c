@@ -3,6 +3,7 @@
 
 #include "cdfjplus.h"
 
+#include "animations.h"
 #include "board.h"
 #include "colour.h"
 #include "decodeCaves.h"
@@ -11,11 +12,11 @@
 #include "gameState.h"
 #include "kernels.h"
 #include "main.h"
+#include "player.h"
 #include "random.h"
 #include "schedule.h"
 #include "scroll.h"
 #include "wyrm.h"
-
 
 void initDataStreams_Game() {
 
@@ -70,25 +71,7 @@ void initGameState_Game() {
 
     setSchedule(SCHEDULE_UNPACK_CAVE);
 
-
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_GRP0), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_GRP1), 0, _SCANLINES);
-
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF0_LEFT), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF1_LEFT), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF2_LEFT), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF0_RIGHT), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF1_RIGHT), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_PF2_RIGHT), 0, _SCANLINES);
-
-    myMemset((unsigned char *)(RAM + _BUF_GAME_COLUBK), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_COLUP0), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_COLUP1), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_COLUPF), 0, _SCANLINES);
-
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_AUDV0), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_AUDC0), 0, _SCANLINES);
-    // myMemset((unsigned char *)(RAM + _BUF_GAME_AUDF0), 0, _SCANLINES);
+    myMemsetInt((unsigned int *)(RAM + _GAME_BUFFERS_START), 0, _GAME_BUFFERS_SIZE / 4);
 
     gameSpeed = 6;
     gameFrame = gameSpeed;    // force rollover
@@ -100,7 +83,6 @@ void initGameState_Game() {
     lavaSurfaceTrixel = 10000;
     showLava = false;
     showWater = false;
-
 
     frame = 0;
 }
@@ -117,7 +99,7 @@ void setAvailableTime(int time) {
 
 void VB_Game() {
 
-    setAvailableTime(50000);    // TODO: find correct available time
+    setAvailableTime(100000);
 
     initDataStreams_Game();
 
@@ -126,24 +108,7 @@ void VB_Game() {
 
     if (frame > 1000)
         // setGameState(GS_RAINBOW);
-        setGameState(GS_COUCH_COMPLIANT);    // TODO: GS_MENU has sprite issues
-
-    // static int xspeed = 0;
-    // int xOff = 5000;    // rangeRandom(15000) - 7500;
-
-    // if (xspeed < xOff)
-    //     xspeed += 2000;
-    // if (xspeed > xOff)
-    //     xspeed -= 2000;
-
-
-    // if (!rangeRandom(200)) {
-    //     scrollX += 2222400;
-    //     scrollY = 2500000;
-    // }
-    // if (scrollX < 0)
-    //     scrollX = 0;
-
+        setGameState(GS_COUCH_COMPLIANT);
 
     processCharAnimations();
 
@@ -160,10 +125,13 @@ void VB_Game() {
 void OS_Game() {
 
 
-    setAvailableTime(50000);    // TODO: find available time
+    setAvailableTime(81000);    // optimised 27/5/2026. loose but something at start uses extra
 
     interleaveChronoColour(&roller);
     setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
+
+    updatePlayerAnimation();
+    scroll();
 
     scheduledTasks();
 }

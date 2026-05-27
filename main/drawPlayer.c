@@ -68,6 +68,10 @@ const unsigned char cx[][4] = {
 
 void drawPlayerSprite() {    // --> 3171 cycles
 
+
+    myMemsetInt((unsigned int *)(RAM + _BUF_GAME_GRP0), 0, _BUFFER_SIZE / 4);
+    //    myMemsetInt((unsigned int *)(RAM + _BUF_GAME_COLUP0), 0xFFFFFFFF, _BUFFER_SIZE / 4);
+
     static int root = 0;
     root++;
 
@@ -103,7 +107,10 @@ void drawPlayerSprite() {    // --> 3171 cycles
     int xpos = playerX * 5 - x;
 
 
-    // xpos = 20;
+    // static int txp = 0;
+    // if ((++txp >> 3) > 38)
+    //     txp = 0;
+    // xpos = txp >> 3;
     // ypos = 20;    // tmp
 
     if (((frameAdjustY || frameAdjustX || autoMoveX || autoMoveY)) ||

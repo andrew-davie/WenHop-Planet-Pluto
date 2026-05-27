@@ -1,7 +1,7 @@
 #pragma once
 
 extern const unsigned char *caveList[];
-extern const unsigned int caveCount;
+extern const int caveCount;
 extern unsigned char caveFlags;
 
 #define COLOURPOOL_SIZE 115

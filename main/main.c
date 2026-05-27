@@ -269,15 +269,13 @@ void Null() {
 
 void runARM_SystemReset() {
 
-    // myMemsetInt((void *)_DD_BASE, 0, _DISPLAY_SIZE / 4);
-
     for (int i = 0; i < 34; i++)
         setIncrement(i, 1, 0);    // all fetcher increments to 1
 
     gameState = GS_NULL;
     setGameState(GS_DETECT_CONSOLE);
 
-    RAM[_kernel] = _KERNEL_DETECT_CONSOLE;    // TODO: detectConsole - does it have its own kernel
+    RAM[_kernel] = _KERNEL_DETECT_CONSOLE;
     RAM[_tvSystem] = tvSystem = _TV_SYSTEM_NTSC;
     RAM[_soundMode] = soundMode = _SND_MODE_TIA;
     RAM[_colubk] = colubk = 0;
@@ -302,6 +300,8 @@ void runARM_Load_SaveKey() {
         unsigned short *odometer = (unsigned short *)(RAM + _SK_ODOMETER);
         (*odometer)++;
     }
+
+    // init random AFTER SK, so we can use ODOMETER as a seed
 
     initRandom();
 }
@@ -378,11 +378,12 @@ void runARM_Overscan() {
     frame++;
 
     fadeBackgroundColour();
-    RAM[_colubk] = colubk;
 
     RAM[_kernel] = kernel;
-    RAM[_tvSystem] = tvSystem;    // should be one-off only
+    RAM[_tvSystem] = tvSystem;    // could be one-off only
     RAM[_soundMode] = soundMode;
+
+    RAM[_colubk] = colubk;    // some kernels will have a DS, some use this single colour
 
     setPointer(DS31PTR, _kernel);    // reset so we get vars properly
 }

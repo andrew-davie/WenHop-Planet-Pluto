@@ -57,7 +57,7 @@ const signed char AnimationTapPush[] = {
 const signed char AnimationMineUp[] = {
 
     // ACTION_SFX, SFX_PICKAXE,
-    ACTION_DOT, 0, 0,
+ //   ACTION_DOT, 0, 0,
     FRAME_MINE_UP_1, 12,
     FRAME_MINE_UP_0, 8,
     ACTION_LOOP,
@@ -3231,7 +3231,7 @@ const unsigned short reciprocal[] = {
 #endif
 };
 
-void updateAnimation() {
+void updatePlayerAnimation() {
 
     if (autoMoveFrameCount)
         autoMoveFrameCount--;
@@ -3264,5 +3264,6 @@ void startPlayerAnimation(enum AnimationIdent animID) {
 
     processAnimationCommand();
 }
+
 
 // EOF

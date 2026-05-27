@@ -1,3 +1,20 @@
+; Work on 262 scanlines/frame
+; 70MHz --> 60Hz frames --> 1,166,666 cycles/frame
+; --> 4452 cycles/scanlines
+;
+; 198 lines of displahy
+; 64 lines VB and OS
+; divide evenly; 32 lines each
+; --> 142464 cycles
+;
+;
+; VB:  32 lines - 3 vsync = 29 * 76 cycles / 64 --> TIM64T 34
+; OS:  32 lines = 30 * 76 / 64 -> TIM64T 35
+
+
+
+
+
 
 mainGameLoop
 

@@ -13,8 +13,8 @@ void draw6Bitmap(unsigned int grpOffset, unsigned int colup0Offset,    //
 
     // Draw a 6-sprite wide bitmap
 
-    unsigned char *p = RAM + grpOffset + y;           //_BUF_COPYRIGHT_GRP0A + y;
-    unsigned char *q = RAM + colup0Offset + y - 1;    //_BUF_COPYRIGHT_COLUP0 + y - 1;
+    unsigned char *p = RAM + grpOffset + y;
+    unsigned char *q = RAM + colup0Offset + y - 1;
     const unsigned char *bm = &bitmap6[0][0];
 
     colour = convertColour(colour);
@@ -25,7 +25,7 @@ void draw6Bitmap(unsigned int grpOffset, unsigned int colup0Offset,    //
     for (int line = 0; line < height; line++) {
         q[line] = colour;
         for (int c = 0; c < 6; c++) {
-            p[c * _SCANLINES + line] = *bm++;
+            p[c * _BUFFER_SIZE + line] = *bm++;
         }
     }
 }

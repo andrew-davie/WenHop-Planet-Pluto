@@ -55,9 +55,10 @@ _BOARD              ds _BOARD_COLS * _BOARD_ROWS + 4    ; extra for grab+1 in dr
 
 ; BUFFERS MUST BE LAST
 ; Reason: they share memory and anything after the shortest will be stomped
+; Buffers are guaranteed 4-byte aligned/size, so quick clears can be performed
 
     MAC DEFBUF ; {size}, {name}
-_BUF_{2}             ds {1} * _SCANLINES
+_BUF_{2}             ds {1} * _BUFFER_SIZE
     ENDM
 
 END_BUFFERS SET 0
@@ -90,6 +91,7 @@ END_BUFFERS SET *
     DEFBUF 2, COPYRIGHT_PF
     DEFBUF 1, COPYRIGHT_COLUPF
     DEFBUF 1, COPYRIGHT_COLUP0
+    DEFBUF 1, COPYRIGHT_COLUBK
 
     if * > END_BUFFERS
 END_BUFFERS SET *
@@ -103,25 +105,16 @@ END_BUFFERS SET *
 
     DEFBUF 2, MENU_JUMP
 
+_MENU_BUFFERS_START = *
+
     DEFBUF 1, MENU_COLUBK
     DEFBUF 1, MENU_COLUPF
     DEFBUF 1, MENU_COLUP0
 
-    ; grouping important due to clear in menu
-
-    ; Order of these 4 important...
-    ; TODO: combine to 4 long
-
     DEFBUF 4, MENU_PF
+    DEFBUF 6, MENU_GRP
 
-    ; TODO:  combine to 6-long
-
-    DEFBUF 1, MENU_GRP0A
-    DEFBUF 1, MENU_GRP1A
-    DEFBUF 1, MENU_GRP0B
-    DEFBUF 1, MENU_GRP1B
-    DEFBUF 1, MENU_GRP0C
-    DEFBUF 1, MENU_GRP1C
+_MENU_BUFFERS_SIZE = * - _MENU_BUFFERS_START
 
     ; end of grouping (10)
 
@@ -135,7 +128,14 @@ END_BUFFERS SET *
     ORG _BUFFERS
 
     DEFBUF 2, GAME_JUMP
-    
+
+_GAME_BUFFERS_START = *
+
+    DEFBUF 1, GAME_COLUBK       ; assumed 1st for gameState_Game memSet block
+    DEFBUF 1, GAME_COLUPF
+    DEFBUF 1, GAME_COLUP0
+    DEFBUF 1, GAME_COLUP1
+
     DEFBUF 1, GAME_PF0_LEFT
     DEFBUF 1, GAME_PF1_LEFT
     DEFBUF 1, GAME_PF2_LEFT
@@ -144,13 +144,10 @@ END_BUFFERS SET *
     DEFBUF 1, GAME_PF1_RIGHT
     DEFBUF 1, GAME_PF2_RIGHT
 
-    DEFBUF 1, GAME_COLUBK
-    DEFBUF 1, GAME_COLUPF
-    DEFBUF 1, GAME_COLUP0
-    DEFBUF 1, GAME_COLUP1
-
     DEFBUF 1, GAME_GRP0
     DEFBUF 1, GAME_GRP1
+
+_GAME_BUFFERS_SIZE = * - _GAME_BUFFERS_START
 
 _P0_X               ds 1
 _P1_X               ds 1

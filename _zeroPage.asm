@@ -81,8 +81,8 @@ ZP_END SET *
     SEG.U ZP_GAME
     org ZP_OVERLAY
 
-p0_x                ds 1
-p1_x                ds 1
+; p0_x                ds 1
+; p1_x                ds 1
 
     IF (* > ZP_END)
 ZP_END SET *

@@ -36,9 +36,9 @@ void initDataStreams_Menu() {
         {_DS_MENU_COLUBK, _BUF_MENU_COLUBK},
 
         {_DS_MENU_PF1_LEFT, _BUF_MENU_PF},
-        {_DS_MENU_PF1_RIGHT, _BUF_MENU_PF + 3 * _SCANLINES},
-        {_DS_MENU_PF2_LEFT, _BUF_MENU_PF + 1 * _SCANLINES},
-        {_DS_MENU_PF2_RIGHT, _BUF_MENU_PF + 2 * _SCANLINES},
+        {_DS_MENU_PF1_RIGHT, _BUF_MENU_PF + 3 * _BUFFER_SIZE},
+        {_DS_MENU_PF2_LEFT, _BUF_MENU_PF + 1 * _BUFFER_SIZE},
+        {_DS_MENU_PF2_RIGHT, _BUF_MENU_PF + 2 * _BUFFER_SIZE},
 
         {_DS_MENU_AUDV0, _BUF_AUDV},
         {_DS_MENU_AUDC0, _BUF_AUDC},
@@ -46,12 +46,12 @@ void initDataStreams_Menu() {
         {_DS_MENU_COLUPF, _BUF_MENU_COLUPF},
         {_DS_MENU_COLUP0, _BUF_MENU_COLUP0},
 
-        {_DS_MENU_GRP0A, _BUF_MENU_GRP0A},
-        {_DS_MENU_GRP1A, _BUF_MENU_GRP1A},
-        {_DS_MENU_GRP0B, _BUF_MENU_GRP0B},
-        {_DS_MENU_GRP1B, _BUF_MENU_GRP1B},
-        {_DS_MENU_GRP0C, _BUF_MENU_GRP0C},
-        {_DS_MENU_GRP1C, _BUF_MENU_GRP1C},
+        {_DS_MENU_GRP0A, _BUF_MENU_GRP + 0 * _BUFFER_SIZE},
+        {_DS_MENU_GRP1A, _BUF_MENU_GRP + 1 * _BUFFER_SIZE},
+        {_DS_MENU_GRP0B, _BUF_MENU_GRP + 2 * _BUFFER_SIZE},
+        {_DS_MENU_GRP1B, _BUF_MENU_GRP + 3 * _BUFFER_SIZE},
+        {_DS_MENU_GRP0C, _BUF_MENU_GRP + 4 * _BUFFER_SIZE},
+        {_DS_MENU_GRP1C, _BUF_MENU_GRP + 5 * _BUFFER_SIZE},
 
         {DSJMP1PTR, _BUF_MENU_JUMP},
 
@@ -79,6 +79,8 @@ void initKernel_Menu() {
     level = 0;
     menuLineTVType = 0;
 
+    colubk = 0;
+
     // ARENA_COLOUR = 0;
 
     // if (rageQuit) {
@@ -92,15 +94,13 @@ void initKernel_Menu() {
     //    waitRelease = true;
     sound_max_volume = VOLUME_MAX;
 
-
-    myMemset(RAM + _BUF_MENU_PF, 0, 4 * _SCANLINES);
-    myMemset(RAM + _BUF_MENU_GRP0A, 0, 6 * _SCANLINES);
+    myMemsetInt((unsigned int *)(RAM + _MENU_BUFFERS_START), 0, _MENU_BUFFERS_SIZE / 4);
 
 
-    draw6Bitmap(_BUF_MENU_GRP0A, _BUF_MENU_COLUP0,    //
+    draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
                 gfx_grid_menu_planet_gif, gfx_grid_menu_planet_gif_HEIGHT, 94 + 30, 6);
 
-    draw6Bitmap(_BUF_MENU_GRP0A, _BUF_MENU_COLUP0,    //
+    draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
                 gfx_grid_menu_bravado_gif, gfx_grid_menu_bravado_gif_HEIGHT, 120 + 30, 6);
 
     menuLine = 0;
@@ -122,7 +122,7 @@ void drawPF(int buffer, const unsigned char image[66][4][3]) {
     for (int col = 0; col < 4; col++) {
         for (int i = 0; i < 66; i++) {
             for (int icc = 0; icc < 3; icc++) {
-                pf[col * _SCANLINES + i * 3 + icc] = image[i][col][roll];
+                pf[col * _BUFFER_SIZE + i * 3 + icc] = image[i][col][roll];
                 if (++roll > 2)
                     roll = 0;
             }
@@ -147,7 +147,7 @@ void drawCharacter(int x, int y, int ch) {
     if (ch < 0)
         ch += 43;
     const unsigned char *p = charAtoZ + ch * 10;
-    unsigned char *col = RAM + _BUF_MENU_GRP0A + _SCANLINES * x + y;
+    unsigned char *col = RAM + _BUF_MENU_GRP + _BUFFER_SIZE * x + y;
 
     for (int i = 0; i < LETTER_HEIGHT; i++)
         *col++ = *p++;
@@ -169,7 +169,7 @@ void drawSmallString(int y, const char *smallText) {
     for (int line = 0; line < 6; line++) {
         RAM[_BUF_MENU_COLUP0 + y + line - 1] = colour;
         for (int i = 0; i < 6; i++)
-            RAM[_BUF_MENU_GRP0A + _SCANLINES * i + y + line] = *smallText++;
+            RAM[_BUF_MENU_GRP + _BUFFER_SIZE * i + y + line] = *smallText++;
     }
 }
 
@@ -309,7 +309,7 @@ void OS_Menu() {
     //     shake = getRandom32() & 3;
     // }
 
-    draw6Bitmap(_BUF_MENU_GRP0A, _BUF_MENU_COLUP0,    //
+    draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
                 gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 62, 0x96);
 
 

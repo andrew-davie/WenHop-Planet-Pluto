@@ -113,7 +113,7 @@ extern unsigned int playerAnimationCount;
 extern const unsigned short reciprocal[];
 
 void processAnimationCommand();
-void updateAnimation();
+void updatePlayerAnimation();
 void startPlayerAnimation(enum AnimationIdent animID);
 
 extern const unsigned char redirect[];

@@ -487,8 +487,8 @@ void drawScreen() {    // --> cycles 62870 (@20230616)
 
                 px >>= shift;
 
-                *(pf0 + (_SCANLINES << 1)) = reverseBits[(unsigned char)px];
-                *(pf0 + _SCANLINES) = px >> 8;
+                *(pf0 + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)px];
+                *(pf0 + _BUFFER_SIZE) = px >> 8;
                 *pf0++ = reverseBits[px >> 16];
             }
         }
@@ -512,10 +512,10 @@ bool drawBit(int x, int y) {
 
     if (col >= 20) {
         col -= 20;
-        base += 3 * _SCANLINES;
+        base += 3 * _BUFFER_SIZE;
     }
 
-    base += ((col + 4) >> 3) * _SCANLINES;
+    base += ((col + 4) >> 3) * _BUFFER_SIZE;
 
     int shift;
     if (col < 4)

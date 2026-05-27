@@ -34,23 +34,23 @@ _RAM_BASE		    = _DD_BASE + _DISPLAY_SIZE
 
 
 _SCANLINES    = 198   ; number of scanlines for the arena
-
+_BUFFER_SIZE = (((_SCANLINES + 3) /4) *4)
 
 	;C Stack Pointer - leave space for IAR at top of memory
 	if (ROM_SIZE == 32)
 C_STACK = $40001FDC
-DS_SIZE = 0						;auto-generate DS_SIZE and CH_SIZE
-CH_SIZE = 0						;for later use in DD RAM allocation
+; DS_SIZE = 0						;auto-generate DS_SIZE and CH_SIZE
+; CH_SIZE = 0						;for later use in DD RAM allocation
 	endif
 	if (ROM_SIZE == 64 || ROM_SIZE == 128)
 C_STACK = $40003FDC
-DS_SIZE = 2048
-CH_SIZE = 0
+; DS_SIZE = 2048
+; CH_SIZE = 0
 	endif
 	if (ROM_SIZE == 256 || ROM_SIZE == 512)
 C_STACK = $40007FDC
-DS_SIZE = 2048
-CH_SIZE = _SCANLINES
+; DS_SIZE = 2048
+; CH_SIZE = _SCANLINES
 	endif
 
 

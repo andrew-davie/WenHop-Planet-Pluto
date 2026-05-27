@@ -17,6 +17,7 @@
 #define _BUF_CC_JUMP _BUF_COPYRIGHT_JUMP
 #define _BUF_CC_COLUPF _BUF_COPYRIGHT_COLUPF
 #define _BUF_CC_COLUP0 _BUF_COPYRIGHT_COLUP0
+#define _BUF_CC_COLUBK _BUF_COPYRIGHT_COLUBK
 #define _BUF_CC_GRP _BUF_COPYRIGHT_GRP
 #define _BUF_CC_PF _BUF_COPYRIGHT_PF
 
@@ -30,8 +31,9 @@ void initKernel_CouchCompliant() {
 
 void initGameState_CouchCompliant() {
 
-    myMemset((unsigned char *)(RAM + _BUF_CC_COLUPF), 0, _SCANLINES);
-    myMemset((unsigned char *)(RAM + _BUF_CC_COLUP0), 0, _SCANLINES);
+    myMemsetInt((unsigned int *)(RAM + _BUF_CC_COLUP0), 0, _BUFFER_SIZE / 4);
+    myMemsetInt((unsigned int *)(RAM + _BUF_CC_COLUBK), 0, _BUFFER_SIZE / 4);
+    myMemsetInt((unsigned int *)(RAM + _BUF_CC_COLUPF), 0, _BUFFER_SIZE / 4);
 
     colx = 0;
     frame = 0;
@@ -57,14 +59,14 @@ void VB_CouchCompliant() {
         int clr = colx >> 2;
 
         unsigned char *p = (unsigned char *)(RAM + _BUF_CC_COLUP0);
-        p[COUCH_BASE + colx - 1] = p[COUCH_BASE + colx - 1] & 0xF | convertColour(COLOUR_SHADOW);
+        p[COUCH_BASE + colx - 1] = (p[COUCH_BASE + colx - 1] & 0xF) | convertColour(COLOUR_SHADOW);
 
         draw6Bitmap(_BUF_CC_GRP, _BUF_CC_COLUP0, gfx_grid_couch_compliant_gif, gfx_grid_couch_compliant_gif_HEIGHT,
                     COUCH_BASE + 1 + colx, clr | COLOUR_COUCH);
 
         if (frame > 80)
             draw6Bitmap(_BUF_CC_GRP, _BUF_CC_COLUP0, gfx_grid_compliant_gif, gfx_grid_compliant_gif_HEIGHT,
-                        COUCH_BASE + 30 + colx, convertColour((COLOUR_TEXT | (frame >> 2) & 7) + 4));
+                        COUCH_BASE + 30 + colx, convertColour((COLOUR_TEXT | ((frame >> 2) & 7)) + 4));
 
 
         // fade out shadow

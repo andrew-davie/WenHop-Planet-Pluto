@@ -11,6 +11,7 @@ START_COPYRIGHT = *
     DEFPTR CP_PF
     DEFPTR CP_COLUPF
     DEFPTR CP_COLUP0
+    DEFPTR CP_COLUBK
 
 ;-------------------------------------------------------------------------------
 
@@ -61,6 +62,15 @@ VB_kernelCopyright
                     ; stx COLUP1
                     stx COLUPF
 
+                    ; ldx #>_colubk
+                    ; stx DSPTR
+                    ; ldx #<_colubk
+                    ; stx DSPTR
+                    ; lda #DSCOMM 
+                    ; sta COLUBK
+                    ; sta COLUPF
+
+
                     ldx #%00000001
                     stx CTRLPF              ; reflect PF
 
@@ -79,36 +89,38 @@ kernelCopyright
     ; runVectoredCode[kernel] comes here
 
 
-_copyrightLoop      sta WSYNC                       ; @0
-                    sta.w COLUP1                    ; 4
+_copyrightLoop      sta WSYNC
 
-                    lda #_DS_CP_GRP0A_DATA          ; 2
-                    sta GRP0                        ; 3
-                    lda #_DS_CP_GRP1A_DATA          ; 2
-                    nop                             ; 2
-                    sta GRP1                        ; 3
-                    lda #_DS_CP_GRP0B_DATA          ; 2
-                    nop                             ; 2
-                    sta GRP0                        ; 3
-                    lda #_DS_CP_GRP1C_DATA          ; 2
-                    nop                             ; 2
-                    sta CP_temp                     ; 3
-                    lda #_DS_CP_GRP0C_DATA          ; 2
-                    tax                             ; 2
-                    lda #_DS_CP_GRP1B_DATA          ; 2
-                    nop                             ; 2
-                    ldy CP_temp                     ; 3
-                    sta GRP1                        ; 3
-                    stx GRP0                        ; 3
-                    sty GRP1                        ; 3
-                    sta GRP0                        ; 3
+                    lda #_DS_CP_COLUPF_DATA
+                    sta COLUPF
 
-                    lda #_DS_CP_COLUPF_DATA         ; 2
-                    sta COLUPF                      ; 3
-                    lda #_DS_CP_COLUP0_DATA         ; 2
-                    sta COLUP0                      ; 3
+                    lda #_DS_CP_COLUBK_DATA
+                    sta COLUBK
 
-                    jmp 0                           ; 3
+                    lda #_DS_CP_GRP0A_DATA
+                    sta GRP0
+                    lda #_DS_CP_GRP1A_DATA
+                    sta.w GRP1
+                    lda #_DS_CP_GRP0B_DATA
+                    sta GRP0
+                    lda #_DS_CP_GRP1C_DATA
+                    ;nop
+                    sta CP_temp
+                    lda #_DS_CP_GRP0C_DATA
+                    tax
+                    lda #_DS_CP_GRP1B_DATA
+                    nop
+                    ldy CP_temp
+                    sta GRP1
+                    stx GRP0
+                    sty GRP1
+                    sta GRP0
+
+                    lda #_DS_CP_COLUP0_DATA
+                    sta COLUP0
+                    sta COLUP1
+
+                    jmp 0
 
 
 _copyrightExit

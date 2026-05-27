@@ -703,13 +703,13 @@ const unsigned char *caveList[] = {
     // caveFast,
 
 //    caveA5,  // bad
-    caveA4,
+ // tmp   caveA4,
     caveA2,         // best
     caveA,
     caveA3,
 };
 
-const unsigned int caveCount = sizeof(caveList) / sizeof(unsigned char *);
+const int caveCount = sizeof(caveList) / sizeof(unsigned char *);
 
 // clang-format on
 // EOF
