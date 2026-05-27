@@ -422,7 +422,7 @@ const unsigned char caveA2[] = {
         0xFE, CH_HUB, 6,8,
 
     //    0xFE, CH_DOORCLOSED,38,16,
-    0xFE, CH_MELLON_HUSK_BIRTH, 7, 6,
+    0xFE, CH_MELLON_HUSK_BIRTH, 8, 6,
 
    0xFE, CH_WYRM_HEAD_U, 11, 6,
     0xFE, CH_WYRM_HEAD_U, 12, 6,

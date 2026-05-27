@@ -120,7 +120,7 @@ void drawPlayerSprite() {    // --> 3171 cycles
         const unsigned char *spr = spriteShape[*playerAnimation];
         if (!spr) {
 
-            FLASH(0x44, 2);
+            //            FLASH(0x44, 2);
             spr = spriteShape[1];
         }
 
