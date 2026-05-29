@@ -11,8 +11,8 @@
 #include "colour.h"
 #include "main.h"
 #include "reverseBits.h"
+#include "score.h"
 #include "scroll.h"
-
 
 extern int roller;
 
@@ -409,7 +409,7 @@ void grabCharacters() {
     p += 4;
 }
 
-const unsigned char rollDirect[3][PIECE_DEPTH] = {
+const unsigned char rollDirect[3][CHAR_Y] = {
 
     {2, 0, 1, 5, 3, 4, 8, 6, 7, 11, 9, 10, 14, 12, 13, 17, 15, 16, 20, 18, 19, 23, 21, 22, 26, 24, 25, 29, 27, 28},
     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29},
@@ -424,48 +424,43 @@ const unsigned int arenas[] = {
 
 void drawScreen() {    // --> cycles 62870 (@20230616)
 
-#if ENABLE_SHAKE
-    extern int shakeX, shakeY;
+    int sY = scrollY;
+    int sX = scrollX;
 
-    shakeX = 0;    //-(0x7FFF);
-    shakeY = 0;
+#if ENABLE_SHAKE
+
+    sX += shakeX;
+    if (sX < SCROLL_MIN_X)
+        sX = SCROLL_MIN_X;
+    if (sX > SCROLL_MAX_X)
+        sX = SCROLL_MAX_X;
+
+    sY += shakeY;
+    if (sY < SCROLL_MIN_Y)
+        sY = SCROLL_MIN_Y;
+    if (sY > SCROLL_MAX_Y)
+        sY = SCROLL_MAX_Y;
+
 #endif
 
-    int lcount = -((scrollY
-#if ENABLE_SHAKE
-                    + shakeY
-#endif
-                    ) >>
-                   16) *
-                 3;
+    int lcount = -(sY >> 16) * 3;
+    // int shift = CHAR_TRIX_X - (((sX & 0xFFFF) * CHAR_TRIX_X) >> 16);
 
-    int subBlockPixel = (((scrollX
-#if ENABLE_SHAKE
-                           + shakeX
-#endif
-                           ) &
-                          0xFFFF) *
-                         5) >>
-                        16;
-    int shift = 5 - subBlockPixel;
 
-    int startRow = (-lcount * (0x10000 / PIECE_DEPTH)) >> 16;
-    lcount += startRow * PIECE_DEPTH;
+    int startRow = (-lcount * (0x10000 / CHAR_Y)) >> 16;
+    lcount += startRow * CHAR_Y;
 
-    int spos = scrollX
-#if ENABLE_SHAKE
-               + shakeX
-#endif
-        ;
-    if (spos < 0)
-        spos = scrollX;
+#define DIV(a, b) (((a) * (0x10004 / (b))) >> 16)
 
-    int characterX = spos >> 16;
+    int sXpix = sX >> 16;
+    int characterX = DIV(sXpix, CHAR_TRIX_X);
+    int shift = CHAR_TRIX_X - (sXpix - characterX * CHAR_TRIX_X);
+    actualScore = sXpix;
 
     int scanline = 0;
     for (int row = startRow; scanline < _SCANLINES; row++) {
 
-        const int height = _SCANLINES - scanline < PIECE_DEPTH ? _SCANLINES - scanline : PIECE_DEPTH;
+        const int height = _SCANLINES - scanline < CHAR_Y ? _SCANLINES - scanline : CHAR_Y;
 
         p = RAM + _BOARD + row * _1ROW + characterX;
 

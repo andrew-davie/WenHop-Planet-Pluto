@@ -15,10 +15,10 @@
             ((((N) >> 4 & 0xF) & 4) >> 1) | ((((N) & 0xF) & 4) >> 2),
 
 
-static unsigned char char_parallaxBlank[PIECE_DEPTH];
+static unsigned char char_parallaxBlank[CHAR_Y];
 
 
-const unsigned char _CHAR_DOGE_SIDE_1[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_SIDE_1[CHAR_Y] = {
 
     L(00000)    // 0
     L(00000)    // 1
@@ -32,14 +32,14 @@ const unsigned char _CHAR_DOGE_SIDE_1[CHAR_SIZE] = {
     L(00000)    // 9
 };
 
-const unsigned char _CHAR_DOGE_SIDE_3[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_SIDE_3[CHAR_Y] = {
 
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
     0b10000, 0b10000, 0b00000, 0b10000, 0b10000, 0b00000, 0b10000, 0b10000, 0b00000, 0b00000,
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
 };
 
-const unsigned char _CHAR_DOGE_SIDE_2[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_SIDE_2[CHAR_Y] = {
 
     0b00000,    // 0
     0b00000,    // 1
@@ -73,7 +73,7 @@ const unsigned char _CHAR_DOGE_SIDE_2[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_DOGE_SIDE_4[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_SIDE_4[CHAR_Y] = {
 
     0b00000,    // 0
     0b00000,    // 1
@@ -107,7 +107,7 @@ const unsigned char _CHAR_DOGE_SIDE_4[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_DOGE_FALLING_TOP[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_FALLING_TOP[CHAR_Y] = {
 
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
@@ -124,7 +124,7 @@ const unsigned char _CHAR_DOGE_FALLING_TOP[CHAR_SIZE] = {
     0b01110,    // 14
 };
 
-const unsigned char _CHAR_DOGE_FALLING_BOTTOM[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_FALLING_BOTTOM[CHAR_Y] = {
 
     0b00000,    // 15 <
     0b01110,    // 16
@@ -137,7 +137,7 @@ const unsigned char _CHAR_DOGE_FALLING_BOTTOM[CHAR_SIZE] = {
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
 };
 
-const unsigned char _CHAR_ROCK_FALLING_TOP[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_FALLING_TOP[CHAR_Y] = {
 
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
@@ -160,7 +160,7 @@ const unsigned char _CHAR_ROCK_FALLING_TOP[CHAR_SIZE] = {
 
 };
 
-const unsigned char _CHAR_ROCK_FALLING_BOTTOM[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_FALLING_BOTTOM[CHAR_Y] = {
 
     0b00001,    // 15 <
     0b00000,    // 16
@@ -182,7 +182,7 @@ const unsigned char _CHAR_ROCK_FALLING_BOTTOM[CHAR_SIZE] = {
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
 };
 
-const unsigned char _CHAR_GEODOGE_FALLING_TOP[CHAR_SIZE] = {
+const unsigned char _CHAR_GEODOGE_FALLING_TOP[CHAR_Y] = {
 
     0b00000,    //
     0b00000,    //
@@ -218,7 +218,7 @@ const unsigned char _CHAR_GEODOGE_FALLING_TOP[CHAR_SIZE] = {
 
 };
 
-const unsigned char _CHAR_GEODOGE_FALLING_BOTTOM[CHAR_SIZE] = {
+const unsigned char _CHAR_GEODOGE_FALLING_BOTTOM[CHAR_Y] = {
 
     0b00001,    // 15 <
     0b11111,    // 16
@@ -254,7 +254,7 @@ const unsigned char _CHAR_GEODOGE_FALLING_BOTTOM[CHAR_SIZE] = {
 
 };
 
-const unsigned char _CHAR_HUB[CHAR_SIZE] = {
+const unsigned char _CHAR_HUB[CHAR_Y] = {
 
     0b01110,    // 00 <
     0b01110,    // 01
@@ -288,7 +288,7 @@ const unsigned char _CHAR_HUB[CHAR_SIZE] = {
     0b00110,    // 29
 };
 
-const unsigned char _CHAR_HUB_1[CHAR_SIZE] = {
+const unsigned char _CHAR_HUB_1[CHAR_Y] = {
 
     0b01110,    // 00 <
     0b01110,    // 01
@@ -322,7 +322,7 @@ const unsigned char _CHAR_HUB_1[CHAR_SIZE] = {
     0b00110,    // 29
 };
 
-const unsigned char _CHAR_DOGE_PEBBLE[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_PEBBLE[CHAR_Y] = {
 
     0b11111,    // 00 <
     0b00000,    // 01
@@ -357,7 +357,7 @@ const unsigned char _CHAR_DOGE_PEBBLE[CHAR_SIZE] = {
 
 };
 
-const unsigned char _CHAR_PUSH_LEFT[CHAR_SIZE] = {
+const unsigned char _CHAR_PUSH_LEFT[CHAR_Y] = {
 
     0b01000,    // 00
     0b11000,    // 01
@@ -391,7 +391,7 @@ const unsigned char _CHAR_PUSH_LEFT[CHAR_SIZE] = {
     0b01000,    // 29
 };
 
-const unsigned char _CHAR_PUSH_RIGHT[CHAR_SIZE] = {
+const unsigned char _CHAR_PUSH_RIGHT[CHAR_Y] = {
 
     0b00010,    // 00
     0b00011,    // 01
@@ -425,7 +425,7 @@ const unsigned char _CHAR_PUSH_RIGHT[CHAR_SIZE] = {
     0b00010,    // 29
 };
 
-const unsigned char _CHAR_VERTICAL_BAR[CHAR_SIZE] = {
+const unsigned char _CHAR_VERTICAL_BAR[CHAR_Y] = {
 
     0b01110,    // 00
     0b01110,    // 01
@@ -459,7 +459,7 @@ const unsigned char _CHAR_VERTICAL_BAR[CHAR_SIZE] = {
     0b00110,    // 29
 };
 
-const unsigned char _CHAR_PUSH_UP[CHAR_SIZE] = {
+const unsigned char _CHAR_PUSH_UP[CHAR_Y] = {
 
     0b00000,    // 0
     0b11111,    // 1
@@ -493,7 +493,7 @@ const unsigned char _CHAR_PUSH_UP[CHAR_SIZE] = {
     0b00110,    // 29
 };
 
-const unsigned char _CHAR_PUSH_DOWN[CHAR_SIZE] = {
+const unsigned char _CHAR_PUSH_DOWN[CHAR_Y] = {
 
     0b01110,    // 00
     0b01110,    // 01
@@ -527,7 +527,7 @@ const unsigned char _CHAR_PUSH_DOWN[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_PUSH_DOWN2[CHAR_SIZE] = {
+const unsigned char _CHAR_PUSH_DOWN2[CHAR_Y] = {
 
     0b01110,    // 00
     0b01110,    // 01
@@ -561,35 +561,35 @@ const unsigned char _CHAR_PUSH_DOWN2[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_HORIZONTAL_BAR[CHAR_SIZE] = {
+const unsigned char _CHAR_HORIZONTAL_BAR[CHAR_Y] = {
 
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b11111, 0b11111, 0b11111, 0b11111,
     0b11111, 0b11111, 0b11111, 0b11111, 0b11110, 0b11111, 0b11111, 0b00000, 0b11111, 0b11111,
     0b00000, 0b11111, 0b11111, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
 };
 
-const unsigned char _CHAR_GRINDER_0[CHAR_SIZE] = {
+const unsigned char _CHAR_GRINDER_0[CHAR_Y] = {
 
     0b00000, 0b01010, 0b01010, 0b00000, 0b01010, 0b01010, 0b00000, 0b00000, 0b01110, 0b00000,
     0b00000, 0b01110, 0b00000, 0b10001, 0b11011, 0b00000, 0b10001, 0b11011, 0b00000, 0b00000,
     0b01110, 0b00000, 0b00000, 0b01110, 0b00000, 0b01010, 0b01010, 0b00000, 0b01010, 0b01010,
 };
 
-const unsigned char _CHAR_GRINDER_1[CHAR_SIZE] = {
+const unsigned char _CHAR_GRINDER_1[CHAR_Y] = {
 
     0b00000, 0b00100, 0b00100, 0b00000, 0b00100, 0b00100, 0b00000, 0b10001, 0b11111, 0b00000,
     0b10001, 0b11111, 0b00000, 0b00000, 0b01010, 0b00000, 0b00000, 0b01010, 0b00000, 0b10001,
     0b11111, 0b00000, 0b10001, 0b11111, 0b00000, 0b00100, 0b00100, 0b00000, 0b00100, 0b00100,
 };
 
-const unsigned char _CHAR_BELT_0[CHAR_SIZE] = {
+const unsigned char _CHAR_BELT_0[CHAR_Y] = {
 
     0b00000, 0b01010, 0b01010, 0b00000, 0b01010, 0b11111, 0b00000, 0b00000, 0b00000, 0b00000,
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b01010, 0b11111, 0b00000, 0b01010, 0b01010,
 };
 
-const unsigned char _CHAR_BELT_1[CHAR_SIZE] = {
+const unsigned char _CHAR_BELT_1[CHAR_Y] = {
 
     0b00000, 0b10101, 0b10101, 0b00000, 0b10101, 0b11111, 0b00000, 0b00000, 0b00000, 0b00000,
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
@@ -597,20 +597,20 @@ const unsigned char _CHAR_BELT_1[CHAR_SIZE] = {
 };
 
 #ifdef ENABLE_SWITCH
-const unsigned char _CHAR_SWITCH_LEFT_OFF[CHAR_SIZE] = {
+const unsigned char _CHAR_SWITCH_LEFT_OFF[CHAR_Y] = {
 
     0b1000, 0b1000, 0b0000, 0b1100, 0b1100, 0b0000, 0b1100, 0b1100, 0b0000, 0b1000, 0b1000, 0b0000,
     0b1000, 0b1000, 0b0000, 0b1000, 0b1000, 0b0000, 0b1000, 0b1000, 0b0000, 0b1000, 0b1000, 0b0000,
 };
 
-const unsigned char _CHAR_SWITCH_LEFT_ON[CHAR_SIZE] = {
+const unsigned char _CHAR_SWITCH_LEFT_ON[CHAR_Y] = {
 
     0b1000, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000,
     0b1100, 0b1100, 0b1000, 0b1100, 0b1100, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000, 0b1000,
 };
 #endif
 
-const unsigned char _CHAR_WYRM_TAIL_U[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_TAIL_U[CHAR_Y] = {
 
     0b00010,    // 00 <
     0b00010,    // 01
@@ -644,7 +644,7 @@ const unsigned char _CHAR_WYRM_TAIL_U[CHAR_SIZE] = {
     0b00111,    // 29
 };
 
-const unsigned char _CHAR_WYRM_TAIL_R[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_TAIL_R[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b00000,    // 01
@@ -678,7 +678,7 @@ const unsigned char _CHAR_WYRM_TAIL_R[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_WYRM_TAIL_D[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_TAIL_D[CHAR_Y] = {
 
     0b01110,    // 00 <
     0b00100,    // 01
@@ -712,7 +712,7 @@ const unsigned char _CHAR_WYRM_TAIL_D[CHAR_SIZE] = {
     0b00100,    // 29
 };
 
-const unsigned char _CHAR_WYRM_TAIL_L[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_TAIL_L[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b00000,    // 01
@@ -746,7 +746,7 @@ const unsigned char _CHAR_WYRM_TAIL_L[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_WYRM_HEAD_U[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_HEAD_U[CHAR_Y] = {
 
     0b01110,    // 00 <
     0b00000,    // 01
@@ -780,7 +780,7 @@ const unsigned char _CHAR_WYRM_HEAD_U[CHAR_SIZE] = {
     0b01110,    // 29
 };
 
-const unsigned char _CHAR_WYRM_HEAD_D[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_HEAD_D[CHAR_Y] = {
 
     0b01110,    // 27
     0b00000,    // 28
@@ -814,7 +814,7 @@ const unsigned char _CHAR_WYRM_HEAD_D[CHAR_SIZE] = {
     0b01110,    // 02
 };
 
-const unsigned char _CHAR_WYRM_HEAD_L[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_HEAD_L[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b00000,    // 01
@@ -848,7 +848,7 @@ const unsigned char _CHAR_WYRM_HEAD_L[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_WYRM_HEAD_R[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_HEAD_R[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b00000,    // 01
@@ -882,7 +882,7 @@ const unsigned char _CHAR_WYRM_HEAD_R[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_WYRM_CORNER_RD[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_CORNER_RD[CHAR_Y] = {
 
     0b00011,    // 00 <
     0b00000,    // 01
@@ -916,7 +916,7 @@ const unsigned char _CHAR_WYRM_CORNER_RD[CHAR_SIZE] = {
     0b01111,    // 29
 };
 
-const unsigned char _CHAR_WYRM_CORNER_LD[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_CORNER_LD[CHAR_Y] = {
 
     0b11000,    // 00 <
     0b00000,    // 01
@@ -950,7 +950,7 @@ const unsigned char _CHAR_WYRM_CORNER_LD[CHAR_SIZE] = {
     0b11111,    // 29
 };
 
-const unsigned char _CHAR_WYRM_CORNER_RU[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_CORNER_RU[CHAR_Y] = {
 
     0b01110,    // 00 <
     0b00000,    // 01
@@ -984,7 +984,7 @@ const unsigned char _CHAR_WYRM_CORNER_RU[CHAR_SIZE] = {
     0b00000,    // 20
 };
 
-const unsigned char _CHAR_WYRM_CORNER_LU[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_CORNER_LU[CHAR_Y] = {
 
     0b11110,    // 00 <
     0b00000,    // 01
@@ -1019,7 +1019,7 @@ const unsigned char _CHAR_WYRM_CORNER_LU[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_LAVA_LARGE[CHAR_SIZE] = {
+const unsigned char _CHAR_LAVA_LARGE[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b00000,    // 01
@@ -1062,7 +1062,7 @@ const unsigned char _CHAR_LAVA_LARGE[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_LAVA_MEDIUM[CHAR_SIZE] = {
+const unsigned char _CHAR_LAVA_MEDIUM[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b00000,    // 00 <
@@ -1096,7 +1096,7 @@ const unsigned char _CHAR_LAVA_MEDIUM[CHAR_SIZE] = {
     0b00000,    // 28
 };
 
-// const unsigned char _CHAR_LAVA_2[CHAR_SIZE] = {
+// const unsigned char _CHAR_LAVA_2[CHAR_Y] = {
 
 //     0b00000, // 00 <
 //     0b00000, // 01
@@ -1130,7 +1130,7 @@ const unsigned char _CHAR_LAVA_MEDIUM[CHAR_SIZE] = {
 //     0b00000, // 29
 // };
 
-const unsigned char _CHAR_LAVA_SMALL[CHAR_SIZE] = {
+const unsigned char _CHAR_LAVA_SMALL[CHAR_Y] = {
 
     0b00000,    // 00 < <--
     0b00000,    // 01 <--
@@ -1165,7 +1165,7 @@ const unsigned char _CHAR_LAVA_SMALL[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_WATER_0[CHAR_SIZE] = {
+const unsigned char _CHAR_WATER_0[CHAR_Y] = {
 
     0b00000,    // 00
     0b00000,    // 00 <
@@ -1199,7 +1199,7 @@ const unsigned char _CHAR_WATER_0[CHAR_SIZE] = {
     0b00000,    // 00
 };
 
-const unsigned char _CHAR_WATER_1[CHAR_SIZE] = {
+const unsigned char _CHAR_WATER_1[CHAR_Y] = {
 
     0b00000,    // 28
     0b00000,    // 29
@@ -1233,7 +1233,7 @@ const unsigned char _CHAR_WATER_1[CHAR_SIZE] = {
     0b00000,    // 27 <
 };
 
-const unsigned char _CHAR_WATER_2[CHAR_SIZE] = {
+const unsigned char _CHAR_WATER_2[CHAR_Y] = {
 
     0b00000,    // 28
     0b00000,    // 29
@@ -1267,7 +1267,7 @@ const unsigned char _CHAR_WATER_2[CHAR_SIZE] = {
     0b00000,    // 27
 };
 
-const unsigned char _CHAR_WATER_3[CHAR_SIZE] = {
+const unsigned char _CHAR_WATER_3[CHAR_Y] = {
 
     0b00000,    // 28
     0b00000,    // 29
@@ -1431,7 +1431,7 @@ const unsigned char _CHAR_WATERFLOW_0[] = {
 };
 
 
-const unsigned char _CHAR_TAP_0[CHAR_SIZE] = {
+const unsigned char _CHAR_TAP_0[CHAR_Y] = {
 
     0b00000, 0b00000, 0b00000,
 
@@ -1472,7 +1472,7 @@ const unsigned char _CHAR_TAP_0[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_TAP_1[CHAR_SIZE] = {
+const unsigned char _CHAR_TAP_1[CHAR_Y] = {
 
     0b00000, 0b00000, 0b00000,
 
@@ -1513,7 +1513,7 @@ const unsigned char _CHAR_TAP_1[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_FLIP_GRAVITY_0[CHAR_SIZE] = {
+const unsigned char _CHAR_FLIP_GRAVITY_0[CHAR_Y] = {
 
     0b00000,    // 00
     0b00000,    // 01
@@ -1547,7 +1547,7 @@ const unsigned char _CHAR_FLIP_GRAVITY_0[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_FLIP_GRAVITY_1[CHAR_SIZE] = {
+const unsigned char _CHAR_FLIP_GRAVITY_1[CHAR_Y] = {
 
     0b00000,    // 00
     0b00000,    // 01
@@ -1581,7 +1581,7 @@ const unsigned char _CHAR_FLIP_GRAVITY_1[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_FLIP_GRAVITY_2[CHAR_SIZE] = {
+const unsigned char _CHAR_FLIP_GRAVITY_2[CHAR_Y] = {
 
     0b00000,    // 00
     0b00000,    // 01
@@ -1615,7 +1615,7 @@ const unsigned char _CHAR_FLIP_GRAVITY_2[CHAR_SIZE] = {
     0b00100,    // 29
 };
 
-// const unsigned char _CHAR_HORIZ_ZAP_0[CHAR_SIZE] = {
+// const unsigned char _CHAR_HORIZ_ZAP_0[CHAR_Y] = {
 
 //     0b00000,  // 00
 //     0b00000,  // 01
@@ -1649,7 +1649,7 @@ const unsigned char _CHAR_FLIP_GRAVITY_2[CHAR_SIZE] = {
 //     0b00000,  // 29
 // };
 
-// const unsigned char _CHAR_HORIZ_ZAP_1[CHAR_SIZE] = {
+// const unsigned char _CHAR_HORIZ_ZAP_1[CHAR_Y] = {
 
 //     0b00000,  // 00
 //     0b00000,  // 01
@@ -1683,7 +1683,7 @@ const unsigned char _CHAR_FLIP_GRAVITY_2[CHAR_SIZE] = {
 //     0b00000,  // 29
 // };
 
-// const unsigned char _CHAR_HORIZ_ZAP_2[CHAR_SIZE] = {
+// const unsigned char _CHAR_HORIZ_ZAP_2[CHAR_Y] = {
 
 //     0b00000,  // 00
 //     0b00000,  // 01
@@ -1717,7 +1717,7 @@ const unsigned char _CHAR_FLIP_GRAVITY_2[CHAR_SIZE] = {
 //     0b00000,  // 29
 // };
 
-// const unsigned char _CHAR_HORIZ_ZAP_3[CHAR_SIZE] = {
+// const unsigned char _CHAR_HORIZ_ZAP_3[CHAR_Y] = {
 
 //     0b00000,  // 00
 //     0b00010,  // 01
@@ -1751,7 +1751,7 @@ const unsigned char _CHAR_FLIP_GRAVITY_2[CHAR_SIZE] = {
 //     0b00100,  // 29
 // };
 
-// const unsigned char _CHAR_HORIZ_ZAP_V3[CHAR_SIZE] = {
+// const unsigned char _CHAR_HORIZ_ZAP_V3[CHAR_Y] = {
 
 //     0b00000,  // 00
 //     0b00000,  // 01
@@ -1785,7 +1785,7 @@ const unsigned char _CHAR_FLIP_GRAVITY_2[CHAR_SIZE] = {
 //     0b00000,  // 29
 // };
 
-const unsigned char _CHAR_BLOCK[CHAR_SIZE] = {
+const unsigned char _CHAR_BLOCK[CHAR_Y] = {
 
     0b00000,    // 00
     0b01111,    // 01
@@ -1819,7 +1819,7 @@ const unsigned char _CHAR_BLOCK[CHAR_SIZE] = {
     0b11110,    // 29
 };
 
-const unsigned char _CHAR_BLANK[CHAR_SIZE] = {
+const unsigned char _CHAR_BLANK[CHAR_Y] = {
 
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
     0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000,
@@ -1828,7 +1828,7 @@ const unsigned char _CHAR_BLANK[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_ROCK[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK[CHAR_Y] = {
 
     0b00110,    // 00 <
     0b00000,    // 01
@@ -1864,7 +1864,7 @@ const unsigned char _CHAR_ROCK[CHAR_SIZE] = {
 
 // #define const unsigned char _CHAR_ROCK_SHAKE const unsigned char _CHAR_ROCK
 
-const unsigned char _CHAR_GEODOGE[CHAR_SIZE] = {
+const unsigned char _CHAR_GEODOGE[CHAR_Y] = {
 
     0b00110,    // 00 <
     0b00110,    // 01
@@ -1899,7 +1899,7 @@ const unsigned char _CHAR_GEODOGE[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_ROCK_U[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_U[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b11011,    // 01
@@ -1934,7 +1934,7 @@ const unsigned char _CHAR_ROCK_U[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_ROCK_R[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_R[CHAR_Y] = {
 
     0b00111,    // 00 <
     0b00111,    // 01
@@ -1968,7 +1968,7 @@ const unsigned char _CHAR_ROCK_R[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_ROCK_D[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_D[CHAR_Y] = {
 
     0b00110,    // 00 <
     0b00110,    // 01
@@ -2003,7 +2003,7 @@ const unsigned char _CHAR_ROCK_D[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_ROCK_L[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_L[CHAR_Y] = {
 
     0b11110,    // 00 <
     0b11110,    // 01
@@ -2038,7 +2038,7 @@ const unsigned char _CHAR_ROCK_L[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_ROCK_UR[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_UR[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b11011,    // 01
@@ -2073,7 +2073,7 @@ const unsigned char _CHAR_ROCK_UR[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_ROCK_UD[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_UD[CHAR_Y] = {
 
     0b00001,    // 00 <
     0b11011,    // 01
@@ -2107,7 +2107,7 @@ const unsigned char _CHAR_ROCK_UD[CHAR_SIZE] = {
     0b00100,    // 29
 };
 
-const unsigned char _CHAR_ROCK_UL[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_UL[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b11011,    // 01
@@ -2141,7 +2141,7 @@ const unsigned char _CHAR_ROCK_UL[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_ROCK_RD[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_RD[CHAR_Y] = {
 
     0b00111,    // 00 <
     0b00111,    // 01
@@ -2175,7 +2175,7 @@ const unsigned char _CHAR_ROCK_RD[CHAR_SIZE] = {
     0b00100,    // 29
 };
 
-const unsigned char _CHAR_ROCK_RL[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_RL[CHAR_Y] = {
 
     0b11111,    // 00 <
     0b11111,    // 01
@@ -2208,7 +2208,7 @@ const unsigned char _CHAR_ROCK_RL[CHAR_SIZE] = {
     0b11111,    // 28
     0b00000,    // 29
 };
-const unsigned char _CHAR_ROCK_DL[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_DL[CHAR_Y] = {
 
     0b11110,    // 00 <
     0b11110,    // 01
@@ -2242,7 +2242,7 @@ const unsigned char _CHAR_ROCK_DL[CHAR_SIZE] = {
     0b00100,    // 29
 };
 
-const unsigned char _CHAR_ROCK_URD[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_URD[CHAR_Y] = {
 
     0b10000,    // 00 <
     0b11011,    // 01
@@ -2276,7 +2276,7 @@ const unsigned char _CHAR_ROCK_URD[CHAR_SIZE] = {
     0b00100,    // 29
 };
 
-const unsigned char _CHAR_ROCK_URL[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_URL[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b11011,    // 01
@@ -2310,7 +2310,7 @@ const unsigned char _CHAR_ROCK_URL[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_ROCK_UDL[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_UDL[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b11011,    // 01
@@ -2344,7 +2344,7 @@ const unsigned char _CHAR_ROCK_UDL[CHAR_SIZE] = {
     0b00100,    // 29
 };
 
-const unsigned char _CHAR_ROCK_RDL[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_RDL[CHAR_Y] = {
 
     0b11111,    // 00 <
     0b11111,    // 01
@@ -2378,7 +2378,7 @@ const unsigned char _CHAR_ROCK_RDL[CHAR_SIZE] = {
     0b00100,    // 29
 };
 
-const unsigned char _CHAR_ROCK_URDL[CHAR_SIZE] = {
+const unsigned char _CHAR_ROCK_URDL[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b11011,    // 01
@@ -2515,7 +2515,7 @@ const unsigned char _CHAR_ROCK_URDL[CHAR_SIZE] = {
     ,    //             0b0000, // 20
 */
 
-const unsigned char _CHAR_PEBBLE2[CHAR_SIZE] = {
+const unsigned char _CHAR_PEBBLE2[CHAR_Y] = {
 
     0b11111,    // 00 <
     0b00000,    // 01
@@ -2549,7 +2549,7 @@ const unsigned char _CHAR_PEBBLE2[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_STEELWALL[CHAR_SIZE] = {
+const unsigned char _CHAR_STEELWALL[CHAR_Y] = {
 
     0b11111,    // 00 <
     0b00000,    // 01
@@ -2584,7 +2584,7 @@ const unsigned char _CHAR_STEELWALL[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_DIRT[CHAR_SIZE] = {
+const unsigned char _CHAR_DIRT[CHAR_Y] = {
 
     0b11111,    // 00 <
     0b00000,    // 01
@@ -2618,7 +2618,7 @@ const unsigned char _CHAR_DIRT[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_BRICKWALL[CHAR_SIZE] = {
+const unsigned char _CHAR_BRICKWALL[CHAR_Y] = {
 
     0b0000,    // 00 <
     0b1110,    // 01
@@ -2804,7 +2804,7 @@ const unsigned char _CHAR_BRICKWALL[CHAR_SIZE] = {
 
 */
 
-const unsigned char _CHAR_DUST_0[CHAR_SIZE] = {
+const unsigned char _CHAR_DUST_0[CHAR_Y] = {
 
     0b00000,    // 24 <
     0b00000,    // 25
@@ -2841,7 +2841,7 @@ const unsigned char _CHAR_DUST_0[CHAR_SIZE] = {
 #define _CHAR_DUST_ROCK_0 _CHAR_DUST_0
 
 
-const unsigned char _CHAR_DUST_1[CHAR_SIZE] = {
+const unsigned char _CHAR_DUST_1[CHAR_Y] = {
 
 
     0b00000,    // 27
@@ -2879,7 +2879,7 @@ const unsigned char _CHAR_DUST_1[CHAR_SIZE] = {
 
 #define _CHAR_DUST_ROCK_1 _CHAR_DUST_1
 
-const unsigned char _CHAR_DUST_2[CHAR_SIZE] = {
+const unsigned char _CHAR_DUST_2[CHAR_Y] = {
 
 
     0b00000,    // 24
@@ -2917,7 +2917,7 @@ const unsigned char _CHAR_DUST_2[CHAR_SIZE] = {
 #define _CHAR_DUST_ROCK_2 _CHAR_DUST_2
 
 
-/*const unsigned char _CHAR_PARALLA10TEMPLATE[CHAR_SIZE] = {
+/*const unsigned char _CHAR_PARALLA10TEMPLATE[CHAR_Y] = {
     ,    // squished in here - careful about count above/below chars
 
     ,    //    %00000000, //,  // 00
@@ -3011,7 +3011,7 @@ const unsigned char _CHAR_DUST_2[CHAR_SIZE] = {
 };
 */
 
-const unsigned char _CHAR_DOGE_00[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_00[CHAR_Y] = {
     // doged
 
     0b00000,    // 00 <
@@ -3046,7 +3046,7 @@ const unsigned char _CHAR_DOGE_00[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_DOGE_01[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_01[CHAR_Y] = {
     // doged
 
     0b00000,    // 00 <
@@ -3081,7 +3081,7 @@ const unsigned char _CHAR_DOGE_01[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_DOGE_02[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_02[CHAR_Y] = {
     // doged
 
     0b00000,    // 00 <
@@ -3116,7 +3116,7 @@ const unsigned char _CHAR_DOGE_02[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_DOGE_03[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_03[CHAR_Y] = {
     // doged
 
     0b00000,    // 00 <
@@ -3151,7 +3151,7 @@ const unsigned char _CHAR_DOGE_03[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_DOGE_04[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_04[CHAR_Y] = {
     // doged
 
     0b00000,    // 00 <
@@ -3186,7 +3186,7 @@ const unsigned char _CHAR_DOGE_04[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_DOGE_05[CHAR_SIZE] = {
+const unsigned char _CHAR_DOGE_05[CHAR_Y] = {
 
     0b00000,    // 00 <
     0b00000,    // 01
@@ -3254,7 +3254,7 @@ const unsigned char _CHAR_DOGE_05[CHAR_SIZE] = {
     ,    //     0b00000, // 29
 */
 
-const unsigned char _CHAR_PEBBLE1[CHAR_SIZE] = {
+const unsigned char _CHAR_PEBBLE1[CHAR_Y] = {
 
     0b11111,    // 00 <
     0b00000,    // 01
@@ -3289,7 +3289,7 @@ const unsigned char _CHAR_PEBBLE1[CHAR_SIZE] = {
 };
 
 
-const unsigned char _CHAR_WYRM_0[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_0[CHAR_Y] = {
 
     0b00011,    // 00 <
     0b00000,    // 01
@@ -3323,7 +3323,7 @@ const unsigned char _CHAR_WYRM_0[CHAR_SIZE] = {
     0b00000,    // 29
 };
 
-const unsigned char _CHAR_WYRM_2[CHAR_SIZE] = {
+const unsigned char _CHAR_WYRM_2[CHAR_Y] = {
 
     0b01111,    // 00 <
     0b00000,    // 01
@@ -3357,7 +3357,7 @@ const unsigned char _CHAR_WYRM_2[CHAR_SIZE] = {
     0b01111,    // 29
 };
 
-/*const unsigned char _CHAR_WYRM_3[CHAR_SIZE] = {
+/*const unsigned char _CHAR_WYRM_3[CHAR_Y] = {
 
     ,    // 0b00 |0b00 |0b0100, // 00 < <--
     ,    // 0b00 |0b00 |0b0100, // 01 <--

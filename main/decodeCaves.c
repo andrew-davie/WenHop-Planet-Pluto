@@ -206,15 +206,28 @@ int decodeExplicitData(int /*sfx*/) {
                     playerX = a;
                     playerY = b;
 
-                    //                    if (displayMode == DISPLAY_NORMAL)
-                    scrollX = (playerX - (HALFWAYX / 5)) << 16;
-                    // scrollX = (HALFWAYX / 5) << 16;    // tmp
-                    //  else if (displayMode == DISPLAY_HALF)
-                    //      scrollX = (playerX - (HALFWAYX >> 1)) << 16;
+                    // scrollX = playerX * CHAR_TRIX_X - HALFWAY_X;
 
-                    scrollY = ((6 * TRILINES - 3) << 16);
+                    // if (scrollX < 0)
+                    //     scrollX = 0;
 
-                    //                    scrollY = 0;    // tmp
+                    // if (scrollX >= BOARD_TRIX_X - SCREEN_TRIX_X)
+                    //     scrollX = BOARD_TRIX_X - SCREEN_TRIX_X;
+
+                    // scrollX <<= 16;
+
+
+                    // scrollY = playerY * CHAR_TRIX_Y - HALFWAY_Y;
+
+                    // if (scrollY < 0)
+                    //     scrollY = 0;
+
+                    // if (scrollY >= BOARD_TRIX_Y - SCREEN_TRIX_Y)
+                    //     scrollY = BOARD_TRIX_Y - SCREEN_TRIX_Y;
+
+                    // scrollY <<= 16;
+
+                    resetTracking();
                 }
 
                 //                thumbnailSpeed = -1;
@@ -318,7 +331,7 @@ void StoreObject(int x, int y, objectType anObject) {
     case TYPE_LAVA: {
 
         showLava = true;
-        int line = y * TRILINES;
+        int line = y * CHAR_TRIX_Y;
         if (lavaSurfaceTrixel > 0 && line < lavaSurfaceTrixel)
             lavaSurfaceTrixel = line;
 
@@ -328,7 +341,7 @@ void StoreObject(int x, int y, objectType anObject) {
     case TYPE_WATER: {
 
         showWater = true;
-        int line = y * TRILINES;
+        int line = y * CHAR_TRIX_Y;
         if (lavaSurfaceTrixel > 0 && line < lavaSurfaceTrixel)
             lavaSurfaceTrixel = line;
 

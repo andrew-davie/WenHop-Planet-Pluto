@@ -10,8 +10,10 @@
 #include "drawPlayer.h"
 #include "drawScreen.h"
 #include "gameState.h"
+#include "joystick.h"
 #include "kernels.h"
 #include "main.h"
+#include "mellon.h"
 #include "player.h"
 #include "random.h"
 #include "schedule.h"
@@ -64,10 +66,14 @@ void initGameState_Game() {
 
     initSprites();
 
-    initWyrms();    // todo: --> initNextLife
+    initWyrms();     // todo: --> initNextLife
+    initPlayer();    // --> initNextLife
+
+    exitMode = 0;    // --> initNextlife
 
 
     decodeCave(cave);    // TODO: in initNextLife instead
+    loadPalette();
 
     setSchedule(SCHEDULE_UNPACK_CAVE);
 
@@ -75,6 +81,13 @@ void initGameState_Game() {
 
     gameSpeed = 6;            // tmp 6;
     gameFrame = gameSpeed;    // force rollover
+
+
+#if ENABLE_SHAKE
+    shakeTime = 0;
+    shakeX = 0;
+    shakeY = 0;
+#endif
 
 
     gravity = 1;
@@ -97,11 +110,26 @@ void VB_Game() {
 
     gameFrame++;
 
+#if ENABLE_SHAKE
 
-    if (frame > 1000)
-        setGameState(GS_COPYRIGHT);    // GS_COUCH_COMPLIANT);
+    // shakeTime = 20;
+
+    if (shakeTime) {
+        shakeTime--;
+        shakeX = (rangeRandom(3) - 1) << 16;
+        shakeY = (rangeRandom(3) - 1) << 16;
+    }
+
+    else
+        shakeX = shakeY = 0;
+#endif
+
+    // if (frame > 1000)
+    //     setGameState(GS_COPYRIGHT);    // GS_COUCH_COMPLIANT);
 
     processCharAnimations();
+    setPalette();
+    scroll();
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
@@ -110,10 +138,10 @@ void VB_Game() {
     }
 
 
-    for (int i = 0; i < _SCANLINES; i++) {
+    // for (int i = 0; i < _SCANLINES; i++) {
 
-        RAM[_BUF_GAME_COLUBK + i] = colubk;
-    }
+    //     RAM[_BUF_GAME_COLUBK + i] = colubk;
+    // }
 
 
     scheduledTasks();
@@ -128,7 +156,14 @@ void OS_Game() {
     setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
 
     updatePlayerAnimation();
-    scroll();
+
+
+    //   if (gameSchedule == SCHEDULE_UNPACK_CAVE)
+    //     return;
+
+    getJoystick();
+    bufferedSWCHA &= swcha;    // | inhibitSWCHA;
+
 
     scheduledTasks();
 }

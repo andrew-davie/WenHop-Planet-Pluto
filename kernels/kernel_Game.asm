@@ -100,7 +100,8 @@ div15Loop           sbc #15
                     cpx #2
                     bne posSpritesGame
 
-
+                    sta WSYNC
+                    sta HMOVE
 
                     lda #0
                     sta CTRLPF

@@ -25,8 +25,4 @@ extern int playerX, playerY;
 extern bool playerDead;
 // extern bool playerDeadRelease;
 
-extern const signed char xInc[];
-extern const signed char yInc[];
-
-
 // EOF

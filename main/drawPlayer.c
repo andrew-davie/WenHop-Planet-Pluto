@@ -92,18 +92,16 @@ void drawPlayerSprite() {    // --> 3171 cycles
     }
 
 #if ENABLE_SHAKE
-    extern int shakeX, shakeY;
-
-    int x = ((scrollX + shakeX) * 5) >> 16;
+    int x = (scrollX + shakeX) >> 16;
     int y = (scrollY + shakeY) >> 16;
 #else
-    int x = scrollX >> 14;
+    int x = scrollX >> 16;
     int y = scrollY >> 16;
 
 #endif
 
 
-    int ypos = (playerY + 1) * PIECE_DEPTH - y * 3 - frameAdjustY * gravity - 8 + autoMoveY - SCORE_SCANLINES;
+    int ypos = (playerY + 1) * CHAR_Y - y * 3 - frameAdjustY * gravity - 8 + autoMoveY - SCORE_SCANLINES;
     int xpos = playerX * 5 - x;
 
 
@@ -114,7 +112,7 @@ void drawPlayerSprite() {    // --> 3171 cycles
     // ypos = 20;    // tmp
 
     if (((frameAdjustY || frameAdjustX || autoMoveX || autoMoveY)) ||
-        (xpos >= 0 && xpos < _BOARD_COLS * 5 - 1 && ypos >= 0 && ypos < _SCANLINES - PIECE_DEPTH)) {
+        (xpos >= 0 && xpos < _BOARD_COLS * 5 - 1 && ypos >= 0 && ypos < _SCANLINES - CHAR_Y)) {
 
 
         const unsigned char *spr = spriteShape[*playerAnimation];
@@ -142,6 +140,7 @@ void drawPlayerSprite() {    // --> 3171 cycles
 
         if (playerSpriteY < 0 || playerSpriteY >= _SCANLINES - SPRITE_DEPTH || pX > 159)
             return;
+
 
         RAM[_P0_X] = pX;
         if (faceDirection == FACE_LEFT) {

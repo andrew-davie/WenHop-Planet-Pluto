@@ -2,6 +2,7 @@
 #include "defines_dasm.h"
 
 #include "characterset.h"
+#include "colour.h"
 #include "main.h"
 #include "mellon.h"
 #include "player.h"
@@ -12,177 +13,122 @@ int scrollX, scrollY;
 static int scrollSpeedX, scrollSpeedY;
 static int targetScrollSpeed, targetYScrollSpeed;
 
-#define accel 4096
-#define accelY (accel * 16)
-#define decel (accel * 8 / 8)
-#define decelY (decel * 8)
+// #define accel 4096
+// #define accelY (accel * 16)
+// #define decel (accel * 8 / 8)
+// #define decelY (decel * 8)
 
-int isScrolling() {
-    return (scrollSpeedX | scrollSpeedY);
+// void calculateVisibleBorders();
+
+bool isScrolling() {
+    return (scrollSpeedX || scrollSpeedY);
 }
+
+
+int clamp(int *v, int min, int max) {
+    if (*v < min)
+        *v = min;
+    if (*v > max)
+        *v = max;
+}
+
+
+int approach(int current, int target, int speed) {
+
+    int diff = target - current;
+
+    if (diff > speed)
+        return current + speed;
+
+    if (diff < -speed)
+        return current - speed;
+
+    return target;
+}
+
 
 void scroll() {
 
+    // if (true) {
     if (playerDead && !waitRelease && *playerAnimation == FRAME_BLANK) {
 
-        int speedFactor = 1;
+        // Manual look-around
 
-        for (int dir = 0; dir < 4; dir++) {
-            if (!(swcha & (joyDirectBit[dir] << 4))) {
-                scrollX += ((int)xInc[joyDirectBit[dir]] * speedFactor) << 13;
-                scrollY += ((int)yInc[joyDirectBit[dir]] * speedFactor) << 16;
-            }
-        }
+        int dir = (swcha ^ 0xFF) >> 4;
+        scrollSpeedX = xInc[dir] << 16;
+        scrollSpeedY = yInc[dir] << 17;
     }
 
     else {
 
-#define PIXELS_PER_CHAR2 4
+        // Auto-tracking
 
-        int recip = reciprocal[0];
+#define MAX_SPEED_X (1 << 15)
+#define SCROLL_EDGE_X ((SCREEN_TRIX_X / 4) << 16)
+#define ACCEL_X (1 << 12)
+#define DECEL_X (1 << 9)
 
-        int rockx = playerX * PIXELS_PER_CHAR2 + (PIXELS_PER_CHAR2 >> 1);
-        int rocky = playerY * TRILINES + (TRILINES >> 1);
+        int tX = ((playerX * CHAR_TRIX_X) << 16) + (CHAR_TRIX_X << 15);
+        int hX = scrollX + (SCREEN_TRIX_X << 15);
 
-        int max = (SCROLLSPEED_MAXIMUM_X * recip) >> 8;
+        if (tX < (hX - SCROLL_EDGE_X)) {
+            scrollSpeedX = approach(scrollSpeedX, -MAX_SPEED_X, ACCEL_X);
+        } else if (tX > (hX + SCROLL_EDGE_X))
+            scrollSpeedX = approach(scrollSpeedX, MAX_SPEED_X, ACCEL_X);
+        else
+            scrollSpeedX = approach(scrollSpeedX, 0, DECEL_X);
 
-        int halfwayPix = (scrollX >> 14) + HALFWAYX;
-        int triggerEdgePix = SCROLL_TRIGGEREDGE_HORIZONTAL;
+#define MAX_SPEED_Y (1 << 16)
+#define SCROLL_EDGE_Y ((SCREEN_TRIX_Y / 4) << 16)
+#define ACCEL_Y (1 << 13)
+#define DECEL_Y (1 << 10)
 
-        if (rockx < halfwayPix - triggerEdgePix)
-            targetScrollSpeed = -max;
-        else if (rockx > halfwayPix + triggerEdgePix)
-            targetScrollSpeed = max;
+        int tY = ((playerY * CHAR_TRIX_Y) << 16) + (CHAR_TRIX_Y << 15);
+        int hY = scrollY + (SCREEN_TRIX_Y << 15);
 
-        // Y...
-
-        halfwayPix = (scrollY >> 16) + HALFWAYY;
-        max = (SCROLLSPEED_MAXIMUM_Y * recip) >> 8;
-
-        triggerEdgePix = SCROLL_TRIGGEREDGE_VERTICAL;
-
-        if ((halfwayPix - triggerEdgePix) - rocky > 0)
-            targetYScrollSpeed = -max;
-        else if (rocky - (halfwayPix + triggerEdgePix) > 0)
-            targetYScrollSpeed = max;
-
-        int adjustedAccel = (accel * recip) >> 16;
-
-        if (scrollSpeedX < targetScrollSpeed) {
-            scrollSpeedX += adjustedAccel;
-            if (scrollSpeedX > targetScrollSpeed)
-                scrollSpeedX = targetScrollSpeed;
-        }
-
-        if (scrollSpeedX > targetScrollSpeed) {
-            scrollSpeedX -= adjustedAccel;
-            if (scrollSpeedX < targetScrollSpeed)
-                scrollSpeedX = targetScrollSpeed;
-        }
-
-        adjustedAccel = (accelY * recip) >> 16;
-
-        if (scrollSpeedY < targetYScrollSpeed) {
-            scrollSpeedY += adjustedAccel;
-            if (scrollSpeedY > targetYScrollSpeed)
-                scrollSpeedY = targetYScrollSpeed;
-        }
-
-        if (scrollSpeedY > targetYScrollSpeed) {
-            scrollSpeedY -= adjustedAccel;
-            if (scrollSpeedY < targetYScrollSpeed)
-                scrollSpeedY = targetYScrollSpeed;
-        }
-
-        adjustedAccel = (decel * recip) >> 16;
-
-        if (targetScrollSpeed < 0) {
-            targetScrollSpeed += adjustedAccel;
-            if (targetScrollSpeed > 0)
-                targetScrollSpeed = 0;
-        }
-
-        if (targetScrollSpeed > 0) {
-            targetScrollSpeed -= adjustedAccel;
-            if (targetScrollSpeed < 0)
-                targetScrollSpeed = 0;
-        }
-
-        adjustedAccel = (decelY * recip) >> 16;
-
-        if (targetYScrollSpeed < 0) {
-            targetYScrollSpeed += adjustedAccel;
-            if (targetYScrollSpeed > 0)
-                targetYScrollSpeed = 0;
-        }
-
-        if (targetYScrollSpeed > 0) {
-            targetYScrollSpeed -= adjustedAccel;
-            if (targetYScrollSpeed < 0)
-                targetYScrollSpeed = 0;
-        }
-
-        scrollX += scrollSpeedX;
-        scrollY += scrollSpeedY;
+        if (tY < (hY - SCROLL_EDGE_Y))
+            scrollSpeedY = approach(scrollSpeedY, -MAX_SPEED_Y, ACCEL_Y);
+        else if (tY > (hY + SCROLL_EDGE_Y))
+            scrollSpeedY = approach(scrollSpeedY, MAX_SPEED_Y, ACCEL_Y);
+        else
+            scrollSpeedY = approach(scrollSpeedY, 0, DECEL_Y);
     }
 
-    int maxX, maxY;
+    scrollX += scrollSpeedX;
+    scrollY += scrollSpeedY;
 
-    maxX = SCROLL_MAXIMUM_X;
-    maxY = (16 * TRILINES - 6) << 16;
 
-    if (scrollX >= maxX) {
-        scrollX = maxX;
-        targetScrollSpeed = 0;
+    if (scrollX > SCROLL_MAX_X) {
+        scrollX = SCROLL_MAX_X;
         scrollSpeedX = 0;
     }
 
-    else if (scrollX < SCROLL_MINIMUM) {
-        scrollX = SCROLL_MINIMUM;
+    else if (scrollX < SCROLL_MIN_X) {
+        scrollX = SCROLL_MIN_X;
         scrollSpeedX = 0;
-        targetScrollSpeed = 0;
     }
 
-    if (scrollY > maxY) {
-        scrollY = maxY;
+    if (scrollY > SCROLL_MAX_Y) {
+        scrollY = SCROLL_MAX_Y;
         scrollSpeedY = 0;
-        targetYScrollSpeed = 0;
     }
 
-    else if (scrollY < SCROLL_MINIMUM) {
-        scrollY = SCROLL_MINIMUM;
+    else if (scrollY < SCROLL_MIN_Y) {
+        scrollY = SCROLL_MIN_Y;
         scrollSpeedY = 0;
-        targetYScrollSpeed = 0;
     }
 }
+
 
 void resetTracking() {
 
-    scrollX = (playerX - (HALFWAYX / 5)) << 16;
-    scrollY = ((playerY - 4) * TRILINES) << 16;
+    scrollX = ((playerX * CHAR_TRIX_X - (SCREEN_TRIX_X >> 1)) << 16) + (CHAR_TRIX_X << 15);
+    clamp(&scrollX, SCROLL_MIN_X, SCROLL_MAX_X);
 
-    if (scrollX < 0)
-        scrollX = 0;
-    if (scrollY < 0)
-        scrollY = 0;
+    scrollY = ((playerY * CHAR_TRIX_Y - (SCREEN_TRIX_Y >> 1)) << 16) + (CHAR_TRIX_Y << 15);
+    clamp(&scrollX, SCROLL_MIN_X, SCROLL_MAX_X);
 
-    scrollSpeedX = scrollSpeedY = targetScrollSpeed = targetYScrollSpeed = 0;
-}
-
-bool visible(int col, int row) {
-
-    int y = (scrollY /* + shakeY*/) >> 16;
-    int deltaY = row * TRILINES - y;
-
-    if (deltaY <= -TRILINES || deltaY >= _SCANLINES / 3)
-        return false;
-
-    int x = ((scrollX /* + shakeX*/) * 5) >> 16;
-    int deltaX = col * 5 - x;
-    if ((unsigned int)/*deltaX < -4 ||*/ deltaX >= 40)
-        return false;
-
-    return true;
+    scrollSpeedX = scrollSpeedY = 0;
 }
 
 

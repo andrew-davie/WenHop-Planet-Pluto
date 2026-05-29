@@ -74,6 +74,7 @@ SRCS = \
  draw.c \
  drawPlayer.c \
  drawScreen.c \
+ joystick.c \
  main.c \
  mellon.c \
  player.c \

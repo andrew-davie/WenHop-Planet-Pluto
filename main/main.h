@@ -10,8 +10,32 @@
 #define NEW_LINE 0xFF
 #define END_STRING NEW_LINE, NEW_LINE
 
-#define HALFWAYX 20
-#define HALFWAYY 32
+#define ENABLE_SHAKE 1
+
+//------------------------------------------------------------------------------
+
+
+#define CHAR_TRIX_X 5
+#define CHAR_TRIX_Y 10
+
+#define CHAR_Y (3 * CHAR_TRIX_Y)
+
+#define BOARD_TRIX_X (_BOARD_COLS * CHAR_TRIX_X)
+#define BOARD_TRIX_Y (_BOARD_ROWS * CHAR_TRIX_Y)
+
+// #define HALFWAY_X (BOARD_TRIX_X / 2)
+// #define HALFWAY_Y (BOARD_TRIX_Y / 2)
+
+#define SCREEN_TRIX_X 40
+#define SCREEN_TRIX_Y (_SCANLINES / 3)
+
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+
+// #define CHAR_SIZE (PIECE_DEPTH)
+// #define TRILINES (PIECE_DEPTH / 3)
 
 
 #define GET(a) (((unsigned char)((a) << 1)) >> 1)
@@ -79,12 +103,15 @@ extern bool playerDead;
 extern int gameFrame;
 
 extern const unsigned char joyDirectBit[4];
-extern const signed char xInc[];
-extern const signed char yInc[];
+extern const int xInc[];
+extern const int yInc[];
 extern unsigned int availableIdleTime;
 
 extern int pulsePlayerColour;
 
+#if ENABLE_SHAKE
+extern int shakeX, shakeY, shakeTime;
+#endif
 
 void ClearChannel(void *ptr);
 void MemCopy32(void *ptr1, void *ptr2, unsigned int count);
@@ -98,7 +125,6 @@ void setGameState(enum GAME_STATE state);
 
 int sphereDot(int dotX, int dotY, int type, unsigned char age);
 void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
-void surroundingConglomerate(int col, int row);
 
 int dirFromCoords(int x, int y, int prevX, int prevY);
 void initNewGame();

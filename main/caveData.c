@@ -57,18 +57,20 @@ const unsigned char caveTest[] = {
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
 
-    CAVEDEF_PARALLAX, STEEL, CH_GEODOGE,
+    CAVEDEF_PARALLAX, STEEL, CH_DIRT,
 
-    0,
-    // CH_BLANK, 60, 255, 0, 255, 10,
-    // CH_PEBBLE1, 120, 0, 240, 0, 20,
-    // CH_PEBBLE2, 120, 0, 240, 0, 20,
+    3,
+    CH_BLANK, 60, 255, 0, 255, 10,
+    CH_PEBBLE1, 5, 0, 240, 0, 20,
+    CH_PEBBLE2, 5, 0, 240, 0, 20,
     // CH_ROCK, 50, 0, 240, 0, 20,
 
 
     0xFE, CH_DOORCLOSED, 38, 16, 0xFE,
-    CH_MELLON_HUSK_BIRTH, 10, 15,
+    CH_MELLON_HUSK_BIRTH, 20, 10,
 
+//    0xFE, CH_WATER, 1, 20,
+    //0xFE, CH_LAVA_BLANK, 1, 20,
 
     0xFF,
 
@@ -698,15 +700,15 @@ const unsigned char caveA4[] = {
 
 const unsigned char *caveList[] = {
 
-//    caveTest,
+   caveTest,
 
     // caveFast,
 
 //    caveA5,  // bad
-    caveA4,
-    caveA2,         // best
-    caveA,
-    caveA3,
+   caveA4,
+   caveA2,         // best
+   caveA,
+   caveA3,
 };
 
 const int caveCount = sizeof(caveList) / sizeof(unsigned char *);

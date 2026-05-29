@@ -9,3 +9,6 @@ main/defines_dasm.h
 ROMs/
 screenshots/
 icc/
+main/board_temp.c
+main/processTypes.c
+main/processTypes.h

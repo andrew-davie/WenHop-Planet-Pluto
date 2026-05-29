@@ -2,6 +2,7 @@
 
 #include "animations.h"
 #include "attribute.h"
+#include "board.h"
 #include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
@@ -181,8 +182,8 @@ bool checkHighPriorityMove(int dir) {
             if (*meOffset == CH_TAP_1) {
                 // showWater = true;
                 // showLava = false;
-                if (21 * TRILINES < lavaSurfaceTrixel)
-                    lavaSurfaceTrixel = 21 * TRILINES;
+                if (21 * CHAR_TRIX_Y < lavaSurfaceTrixel)
+                    lavaSurfaceTrixel = 21 * CHAR_TRIX_Y;
             }
 
             *(meOffset + _1ROW) = (GET(*(meOffset + _1ROW)) == CH_HUB) ? CH_HUB_1 : CH_HUB;
@@ -331,7 +332,7 @@ bool checkHighPriorityMove(int dir) {
                 autoMoveFrameCount = ((gameSpeed * 2) << playerSlow);
 
                 autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
-                autoMoveY = autoMoveDeltaY = -(ydir[dir] * PIECE_DEPTH) >> playerSlow;
+                autoMoveY = autoMoveDeltaY = -(ydir[dir] * CHAR_Y) >> playerSlow;
             }
 
             handled = true;
@@ -443,12 +444,12 @@ void movePlayer(unsigned char *me) {
 
     // breath bubbles
     static int breath;
-    if (showWater && playerY * TRILINES > lavaSurfaceTrixel) {
+    if (showWater && playerY * CHAR_TRIX_Y > lavaSurfaceTrixel) {
 
         breath++;
         if (!(breath & 35) && (breath & 63) < 21) {
             int x = (playerX * 5) + 3;
-            int y = (playerY * TRILINES) + 4;
+            int y = (playerY * CHAR_TRIX_Y) + 4;
             bubbles(1, x - 1, y - 2, 400, 0x1000);
             // ADDAUDIO(SFX_BUBBLER);
         }
@@ -472,6 +473,7 @@ void movePlayer(unsigned char *me) {
 
     if (autoMoveFrameCount)
         return;
+
 
     lastUsableSWCHA = usableSWCHA;
 

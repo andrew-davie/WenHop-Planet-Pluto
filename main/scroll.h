@@ -8,16 +8,13 @@ extern int scrollY;
 
 void scroll();
 void resetTracking();
-int isScrolling();
-bool visible(int col, int row);
+bool isScrolling();
 
 
-#define SCROLLSPEED_MAXIMUM_X (256)
-#define SCROLL_MAXIMUM_X (((_BOARD_COLS - 8) << 16))
-#define SCROLLSPEED_MAXIMUM_Y (SCROLLSPEED_MAXIMUM_X * 8)
-#define SCROLL_MINIMUM 0
+#define SCROLL_MAX_X ((BOARD_TRIX_X - SCREEN_TRIX_X) << 16)
+#define SCROLL_MIN_X 0
+#define SCROLL_MAX_Y ((BOARD_TRIX_Y - SCREEN_TRIX_Y) << 16)
+#define SCROLL_MIN_Y 0
 
-#define SCROLL_TRIGGEREDGE_HORIZONTAL 2
-#define SCROLL_TRIGGEREDGE_VERTICAL 10
 
 // EOF

@@ -192,10 +192,10 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age) {
 void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed) {
 
     if (gravity < 0)
-        offsetY = TRILINES - offsetY;
+        offsetY = CHAR_TRIX_Y - offsetY;
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * 5 + offsetX, dripY * TRILINES + offsetY, type, age);
+        int idx = sphereDot(dripX * 5 + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age);
         if (idx >= 0) {
             particle[idx].speed = rangeRandom(speed >> 1);
             if (type == PT_SPIRAL2)
@@ -207,10 +207,10 @@ void nDots(int count, int dripX, int dripY, int type, unsigned char age, int off
 void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed) {
 
     if (gravity < 0)
-        offsetY = TRILINES - offsetY;
+        offsetY = CHAR_TRIX_Y - offsetY;
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * 5 + offsetX, dripY * TRILINES + offsetY, type, age);
+        int idx = sphereDot(dripX * 5 + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age);
 
         // TODO vector
         particle[idx].x += particle[idx].age * particle[idx].speed;

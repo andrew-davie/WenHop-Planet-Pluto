@@ -54,6 +54,37 @@ void chainReact_GeoDogeToDoge();
 void chainReact_Pipe();
 void doRoll();
 
+//------------------------------------------------------------------------------
+
+#define isVisible(x, y) (onScreenX[x] && onScreenY[y])
+
+#define W4 ((_BOARD_COLS + 3) & ~3)
+#define H4 ((_BOARD_ROWS + 3) & ~3)
+
+bool onScreenX[W4];
+bool onScreenY[H4];
+
+void calculateVisibleMasks() {
+
+    myMemsetInt((unsigned int *)onScreenX, 0, sizeof(onScreenX) / 4);
+    myMemsetInt((unsigned int *)onScreenY, 0, sizeof(onScreenY) / 4);
+
+    int sX = scrollX >> 16;
+    int eX = sX + 40;
+    int x = (sX * (0x10000 / CHAR_TRIX_X)) >> 16;
+
+    for (int i = sX; i < eX; i += CHAR_TRIX_X)
+        onScreenX[x++] = true;
+
+    int sY = scrollY >> 16;
+    int eY = sY + _SCANLINES / 3;
+    int y = (sY * (0x10000 / CHAR_TRIX_Y)) >> 16;
+
+    for (int i = sY; i < eY; i += CHAR_TRIX_Y)
+        onScreenY[y++] = true;
+}
+
+//------------------------------------------------------------------------------
 
 static const int isActive[] = {
 
@@ -95,7 +126,7 @@ void setupBoardScanner() {
 
         if (showLava) {
 
-            if (gravity > 0 && lavaSurfaceTrixel && !(gameFrame & 15))
+            if (gravity > 0 && lavaSurfaceTrixel && !(frame & 15))
                 lavaSurfaceTrixel -= gravity;
 
             // Surface lava "bubbles"
@@ -123,7 +154,7 @@ void setupBoardScanner() {
 
             for (int i = 0; i < 4; i++) {
                 int posX = ((scrollX * 5) >> 16) + rangeRandom(_BOARD_COLS);
-                int deep = lavaSurfaceTrixel + rangeRandom(21 * PIECE_DEPTH - lavaSurfaceTrixel);
+                int deep = lavaSurfaceTrixel + rangeRandom(21 * CHAR_Y - lavaSurfaceTrixel);
                 if (deep > 0 && deep < _SCANLINES)
                     bubbles(1, posX, deep, 2240, 0x8000);
             }
@@ -142,6 +173,8 @@ void setupBoardScanner() {
             boardCol = 0;
             boardRow = 0;
         }
+
+        calculateVisibleMasks();
 
         setSchedule(SCHEDULE_PROCESS_BOARD);
 
@@ -170,18 +203,13 @@ void processBoardSquares() {
 
             type = CharToType[creature];
 
-            if (visible(boardCol, boardRow))
+            if (isVisible(boardCol, boardRow))
                 convertWaterAndLavaObjects();
 
-            extern int actualScore;
-            int tmp = T1TC;
             if (Attribute[type] & isActive[selectorCounter & 3]) {
                 processTypes();
                 processCreatures();
             }
-            tmp = T1TC - tmp;
-            if (tmp > actualScore)
-                actualScore = tmp;
         }
 
 
@@ -236,7 +264,7 @@ void convertWaterAndLavaObjects() {
 
     // Any blanks/dissolves underwater/lava gets transformed to water/lava chars
 
-    if (boardRow * TRILINES >= lavaSurfaceTrixel && Attribute[type] & ATT_CONVERT)
+    if (boardRow * CHAR_TRIX_Y >= lavaSurfaceTrixel && Attribute[type] & ATT_CONVERT)
         *me = showLava ? CH_LAVA_BLANK : CH_WATER;
 }
 
@@ -292,6 +320,14 @@ void processTypes() {
         if (!rangeRandom(150)) {
             *me = FLAG(CH_ROCK_PEBBLE_1);
             nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
+        }
+
+        else if (!rangeRandom(3)) {
+
+            static const int xy[] = {1, -1, _1ROW, -_1ROW};
+            unsigned char *d = me + xy[getRandom32() & 3];
+            if (GET(*d) == CH_DIRT)
+                *d = rangeRandom(2) + CH_PEBBLE1;
         }
 
         else
@@ -528,6 +564,8 @@ void restartBoardScan() {
 
 void processDoge() {
 
+    // FLASH(0x94, 4);
+
     unsigned char *next = me + _1ROW * gravity;
     int attrNext = Attribute[CharToType[GET(*next)]];
 
@@ -563,7 +601,7 @@ void processPebble() {
 
 void processWater() {
 
-    if ((boardRow - 1) * TRILINES >= lavaSurfaceTrixel) {
+    if ((boardRow - 1) * CHAR_TRIX_Y >= lavaSurfaceTrixel) {
         unsigned char *neighbour = me + dirOffset[waterDir & 3];
         if (Attribute[CharToType[GET(*neighbour)]] & ATT_DISSOLVES) {
             // FLASH(0x44, 2);
@@ -574,10 +612,10 @@ void processWater() {
 
 void processLava() {
 
-    if (visible(boardCol, boardRow)) {
+    if (isVisible(boardCol, boardRow)) {
 
         int rand = getRandom32();
-        if ((boardRow - 1) * TRILINES >= lavaSurfaceTrixel) {
+        if ((boardRow - 1) * CHAR_TRIX_Y >= lavaSurfaceTrixel) {
 
             int i = waterDir & 3;
 
@@ -626,7 +664,7 @@ void processWaterFlow() {
         return;
     }
 
-    int line = (boardRow + 1) * TRILINES;
+    int line = (boardRow + 1) * CHAR_TRIX_Y;
     if (line < lavaSurfaceTrixel) {
         if (boardRow < 20) {
 
@@ -676,7 +714,7 @@ void processCharBeltAndGrinder() {
 
 void processOutlet() {
 
-    if ((boardRow + 2) * TRILINES <= lavaSurfaceTrixel) {
+    if ((boardRow + 2) * CHAR_TRIX_Y <= lavaSurfaceTrixel) {
 
         if (GET(*(me - _1ROW * 2)) == CH_TAP_0) {
 
@@ -1040,4 +1078,29 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 
     FLASH(4, 4);
 }
+
+
+void surroundingConglomerate(int col, int row) {
+
+    if (isVisible(col, row)) {
+
+        unsigned char *pos = RAM + _BOARD + row * _1ROW + col;
+        for (int i = 0; i < 5; i++) {
+
+            unsigned char *offsetPos = pos + dirOffset[i];
+            if (Attribute[CharToType[GET(*offsetPos)]] & ATT_GEODOGE) {
+
+                int cong = CH_GEODOGE;
+
+                for (int j = 0; j < 4; j++)
+                    if (Attribute[CharToType[GET(*(offsetPos + dirOffset[j]))]] & ATT_GEODOGE)
+                        cong += 1 << j;
+
+                *offsetPos = cong;
+            }
+        }
+    }
+}
+
+
 // EOF

@@ -13,6 +13,17 @@ const unsigned char AnimateBelt[] = {
     ANIM_LOOP,
 };
 
+
+const unsigned char AnimatePebbleToGeoDoge[] = {
+
+    CH_PEBBLE_ROCK, 3,
+    CH_DIRT, 3,
+    ANIM_LOOP
+};
+
+
+
+
 const unsigned char AnimateBelt1[] = {
     CH_BELT_1, 12,
     CH_BELT_0, 12,
@@ -183,7 +194,7 @@ const unsigned char *const AnimateBase[TYPE_MAX] = {
     0,                    // 20 TYPE_GEODOGE
     0,                    // 21 TYPE_GEODOGE_FALLING
     0,                    // 22 TYPE_LAVA
-    0,                    // 23 TYPE_PEBBLE_ROCK
+    0,                    // 23 TYPE_PEBBLE_ROCK    (pebble to geodoge)
     AnimateGravity,       // 24 TYPE_FLIP_GRAVITY
     0,                    // 25 TYPE_BLOCK
     AnimateGrinder,       // 26 TYPE_GRINDER
@@ -201,6 +212,7 @@ const unsigned char *const AnimateBase[TYPE_MAX] = {
     AnimateBelt1,         // 38 TYPE_BELT1
     0,                    // 39 TYPE_CONVERT_PIPE
     0,                    // 40 TYPE_DOGE_FALLING2
+    0,                    // 40 TYPE_ROCK_PEBBLE (geodoge disintegrating)
 };
 
 void initCharAnimations() {

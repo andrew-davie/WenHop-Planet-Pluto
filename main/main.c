@@ -28,6 +28,16 @@ Gamax Software 2026 - Craig Daniels
 #include "scroll.h"
 #include "sound.h"
 
+
+#if ENABLE_SHAKE
+
+int shakeX;
+int shakeY;
+int shakeTime;
+
+#endif
+
+
 #define INTIM_TO_ARM_CYCLES 3749 /* INTIM * 64 / 76 * 4452 */
 
 int usedSolves;
@@ -74,7 +84,7 @@ unsigned int availableIdleTime;
 int pulsePlayerColour;
 
 
-const signed char xInc[] = {
+const int xInc[] = {
 
     // RLDU
     0,     // 0000
@@ -95,7 +105,7 @@ const signed char xInc[] = {
     0,     // 1111
 };
 
-const signed char yInc[] = {
+const int yInc[] = {
 
     // RLDU
     0,     // 0000
@@ -468,29 +478,6 @@ void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAdd
     for (int i = 0; i < length - 1; i++)
         RAM_2B[(buffer / 2) + i] = loopAddress;
     RAM_2B[(buffer / 2) + length - 1] = endAddress;
-}
-
-
-void surroundingConglomerate(int col, int row) {
-
-    if (visible(col, row)) {
-
-        unsigned char *pos = RAM + _BOARD + row * _1ROW + col;
-        for (int i = 0; i < 5; i++) {
-
-            unsigned char *offsetPos = pos + dirOffset[i];
-            if (Attribute[CharToType[GET(*offsetPos)]] & ATT_GEODOGE) {
-
-                int cong = CH_GEODOGE;
-
-                for (int j = 0; j < 4; j++)
-                    if (Attribute[CharToType[GET(*(offsetPos + dirOffset[j]))]] & ATT_GEODOGE)
-                        cong += 1 << j;
-
-                *offsetPos = cong;
-            }
-        }
-    }
 }
 
 
