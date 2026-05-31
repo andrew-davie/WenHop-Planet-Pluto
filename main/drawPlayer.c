@@ -66,11 +66,9 @@ const unsigned char cx[][4] = {
     {0x20, 0x30, 0x40, 0x50},
 };
 
-void drawPlayerSprite() {    // --> 3171 cycles
+void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
-
-    myMemsetInt((unsigned int *)(RAM + _BUF_GAME_GRP0), 0, _BUFFER_SIZE / 4);
-    //    myMemsetInt((unsigned int *)(RAM + _BUF_GAME_COLUP0), 0xFFFFFFFF, _BUFFER_SIZE / 4);
+    myMemsetInt((unsigned int *)(RAM + _BUF_GAME_GRP0), 0, _BUFFER_SIZE * 2 / 4);
 
     static int root = 0;
     root++;
@@ -102,7 +100,7 @@ void drawPlayerSprite() {    // --> 3171 cycles
 
 
     int ypos = (playerY + 1) * CHAR_Y - y * 3 - frameAdjustY * gravity - 8 + autoMoveY - SCORE_SCANLINES;
-    int xpos = playerX * 5 - x;
+    int xpos = playerX * CHAR_TRIX_X - x;
 
 
     // static int txp = 0;
@@ -112,7 +110,7 @@ void drawPlayerSprite() {    // --> 3171 cycles
     // ypos = 20;    // tmp
 
     if (((frameAdjustY || frameAdjustX || autoMoveX || autoMoveY)) ||
-        (xpos >= 0 && xpos < _BOARD_COLS * 5 - 1 && ypos >= 0 && ypos < _SCANLINES - CHAR_Y)) {
+        (xpos >= 0 && xpos < BOARD_TRIX_X && ypos >= 0 && ypos < _SCANLINES - CHAR_Y)) {
 
 
         const unsigned char *spr = spriteShape[*playerAnimation];
@@ -128,7 +126,7 @@ void drawPlayerSprite() {    // --> 3171 cycles
 
         int shapeHeight = *spr++;
 
-        ypos += 30 - (shapeHeight & 0x3f);
+        ypos += CHAR_Y - (shapeHeight & 0x3f);
 
         int frameOffset = *(const signed char *)spr++;
         int frameYOffset = *(const signed char *)spr++;

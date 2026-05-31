@@ -12,9 +12,6 @@
 #include "scroll.h"
 #include "wyrm.h"
 
-#define DRAW_LINE 0b01000000
-#define DRAW_RECT 0b11000000
-#define DRAW_FILLED_RECT 0b10000000
 
 /* **************************************** */
 /* Types */
@@ -75,17 +72,17 @@ void decodeCave(int cave) {
     cave_random_b = cave_random_a++;    // ensure one is non-zero!
 
     lockDisplay = theCave->flags & CAVEDEF_OVERVIEW;
+
+
     // displayMode = lockDisplay ? DISPLAY_HALF : DISPLAY_NORMAL;
 
     doges = theCave->dogeRequired[level];
     time = (theCave->timeToComplete[level] << 8) + 60;
     millingTime = theCave->millingTime * 60;
 
-    int *s = (int *)(RAM + _BOARD);
-    for (int i = 0; i < (_BOARD_ROWS * _BOARD_COLS) / 4; i++)
-        *(s + i) = 0;    //(FLAG_UNCOVER << 24) | (FLAG_UNCOVER << 16) | (FLAG_UNCOVER << 8) | FLAG_UNCOVER;
+    myMemsetInt((unsigned int *)(RAM + _BOARD), 0, (_BOARD_COLS * _BOARD_ROWS) / 4);
 
-    decodingRow = -1;
+    decodingRow = 0;
     decodeFlasher = 21;
     totalDogePossible = 0;
 
@@ -117,21 +114,28 @@ int decodeExplicitData(int /*sfx*/) {
 
         if (decodingRow < _BOARD_ROWS) {
 
-            DrawLine(theCave->borderCharacter, 0, decodingRow + 1, _BOARD_COLS, 2);
 
-            if (decodingRow > 0 && decodingRow < _BOARD_ROWS - 1) {
+            DrawLine(theCave->interiorCharacter /*| FLAG_UNCOVER*/, 0, decodingRow, _BOARD_COLS, 2);
 
-                DrawLine(theCave->interiorCharacter /*| FLAG_UNCOVER*/, 1, decodingRow, _BOARD_COLS - 2, 2);
+            for (int x = 0; x < _BOARD_COLS; x++)
+                for (int object = 0; object < theCave->objectCount; object++) {
+                    unsigned char *p = (&(theCave->objectData)) + object * 6;
 
-                for (int x = 1; x < _BOARD_COLS - 1; x++)
-                    for (int object = 0; object < theCave->objectCount; object++) {
-                        unsigned char *p = (&(theCave->objectData)) + object * 6;
+                    // unsigned char *me = RAM + _BOARD + x + decodingRow * _BOARD_COLS;
+                    // if (GET(*me) == 0)
+                    if ((getCaveRandom32() >> 24) < p[level + 1])
+                        StoreObject(x, decodingRow, p[0]);
+                }
 
-                        // unsigned char *me = RAM + _BOARD + x + decodingRow * _BOARD_COLS;
-                        // if (GET(*me) == 0)
-                        if ((getCaveRandom32() >> 24) < p[level + 1])
-                            StoreObject(x, decodingRow, p[0]);
-                    }
+            if (theCave->borderCharacter) {
+
+                if (!decodingRow || decodingRow == _BOARD_ROWS - 1)
+                    DrawLine(theCave->borderCharacter, 0, decodingRow, _BOARD_COLS, 2);
+
+                else {
+                    StoreObject(0, decodingRow, theCave->borderCharacter);
+                    StoreObject(_BOARD_COLS - 1, decodingRow, theCave->borderCharacter);
+                }
             }
 
             decodingRow++;
@@ -289,7 +293,8 @@ int decodeExplicitData(int /*sfx*/) {
 
     case DECODE_FLASH:
 
-        DrawRect(theCave->borderCharacter /*& ((decodeFlasher & 4) ? 0 : 0xFF)*/, 0, 0, _BOARD_COLS, _BOARD_ROWS);
+        if (theCave->borderCharacter)
+            DrawRect(theCave->borderCharacter /*& ((decodeFlasher & 4) ? 0 : 0xFF)*/, 0, 0, _BOARD_COLS, _BOARD_ROWS);
 
         // tmp        if (!(decodeFlasher & 0b11))
         // if (sfx)

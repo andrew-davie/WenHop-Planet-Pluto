@@ -6,6 +6,7 @@
 
 #include "attribute.h"
 #include "characterset.h"
+#include "decodeCaves.h"
 #include "drawscreen.h"
 #include "main.h"
 #include "mellon.h"
@@ -44,6 +45,9 @@ void modifyCharAtTip(int x, int y) {
     } else if (ch == TYPE_DOGE) {
         //  audio = SFX_BUBBLER;
         *b = CH_DOGE_00 | FLAG_THISFRAME;
+    } else if (ch == TYPE_BRICKWALL) {
+
+        *b = CH_DUST_0 | FLAG_THISFRAME;
     }
 
     if (*b & FLAG_THISFRAME) {
@@ -59,6 +63,9 @@ const int PIXEL_ASPECT = 181;
 
 void drawRope() {
 
+    if ((RAM[_INPT4] & 0x80) || theCave->weapon[level] != WEAPON_ROPE)
+        return;
+
     if (--ropeLength > ROPE_PARTICLE_COUNT)    // relies on unsigned int arithmetic
         ropeLength = ROPE_PARTICLE_COUNT;
 
@@ -68,7 +75,6 @@ void drawRope() {
     int x = 0, y = 0;
 
     for (unsigned int i = 0; i < ropeLength; i++) {
-
         x += (xsin[(ropeDirection[i] >> 3) & 0x1F] * PIXEL_ASPECT) >> 8;
         y += (xsin[((ropeDirection[i] >> 3) + 4) & 0x1F] * 256) >> 8;
 
@@ -159,7 +165,7 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age) {
 
     int whichDrop = -1;
 
-    int col = dotX - ((scrollX * 5) >> 16);
+    int col = dotX - ((scrollX) >> 16);
     if (col >= 0 && col < 40 /*pixels*/) {
 
         int line = dotY - (scrollY >> 16);
@@ -195,7 +201,7 @@ void nDots(int count, int dripX, int dripY, int type, unsigned char age, int off
         offsetY = CHAR_TRIX_Y - offsetY;
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * 5 + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age);
+        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age);
         if (idx >= 0) {
             particle[idx].speed = rangeRandom(speed >> 1);
             if (type == PT_SPIRAL2)
@@ -210,7 +216,7 @@ void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age
         offsetY = CHAR_TRIX_Y - offsetY;
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * 5 + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age);
+        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age);
 
         // TODO vector
         particle[idx].x += particle[idx].age * particle[idx].speed;

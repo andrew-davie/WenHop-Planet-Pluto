@@ -455,7 +455,6 @@ void drawScreen() {    // --> cycles 62870 (@20230616)
     int sXpix = sX >> 16;
     int characterX = DIV(sXpix, CHAR_TRIX_X);
     int shift = CHAR_TRIX_X - (sXpix - characterX * CHAR_TRIX_X);
-    actualScore = sXpix;
 
     int scanline = 0;
     for (int row = startRow; scanline < _SCANLINES; row++) {
@@ -499,8 +498,8 @@ bool drawBit(int x, int y) {
     if (line < 0 || line >= _SCANLINES - 3)
         return false;
 
-    int col = x - ((scrollX * 5) >> 16);
-    if (col < 0 || col > _BOARD_COLS - 1)
+    int col = x - ((scrollX /** CHAR_TRIX_X*/) >> 16);
+    if (col < 0 || col > SCREEN_TRIX_X - 1)
         return false;
 
     unsigned char *base = _BUF_GAME_PF0_LEFT + RAM + line;

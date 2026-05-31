@@ -272,6 +272,11 @@ void processTypes() {
 
     switch (type) {
 
+    case TYPE_OUTBOX:
+        FLASH(0x28, 10);
+        nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x10000);
+        break;
+
     case TYPE_DOGE:
         processDoge();
         break;
@@ -317,18 +322,20 @@ void processTypes() {
 
     case TYPE_GEODOGE:
 
-        if (!rangeRandom(150)) {
+        if (!rangeRandom(250)) {
             *me = FLAG(CH_ROCK_PEBBLE_1);
-            nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
+            FLASH(0x42, 10);
+            // nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
+            nDots(10, boardCol, boardRow, PT_TWO, 10, 3, 7, 100);
         }
 
-        else if (!rangeRandom(3)) {
+        // else if (!rangeRandom(3)) {
 
-            static const int xy[] = {1, -1, _1ROW, -_1ROW};
-            unsigned char *d = me + xy[getRandom32() & 3];
-            if (GET(*d) == CH_DIRT)
-                *d = rangeRandom(2) + CH_PEBBLE1;
-        }
+        //     static const int xy[] = {1, -1, _1ROW, -_1ROW};
+        //     unsigned char *d = me + xy[getRandom32() & 3];
+        //     if (GET(*d) == CH_DIRT)
+        //         *d = rangeRandom(2) + CH_PEBBLE1;
+        // }
 
         else
             processCharGeoDogeAndRock();
@@ -355,7 +362,7 @@ void processCreatures() {
         break;
 
     case CH_ROCK_PEBBLE:
-        *me = FLAG(CH_DUST_ROCK_0);
+        *me = FLAG(CH_BLANK);
         break;
 
     case CH_PEBBLE_ROCK:
@@ -496,6 +503,12 @@ void processCreatures() {
             FLASH(0x28, 10);
         }
         break;
+
+    case CH_DOOROPEN_0:
+        FLASH(0xC4, 10);
+        nDots(2, boardCol, boardRow, PT_TWO, 10, 3, 7, 100);
+        break;
+
 
     case CH_MELLON_HUSK_BIRTH:
 
@@ -875,7 +888,7 @@ void processFallingThings() {
         }
         }
 
-        if (creature != CH_DOGE_FALLING)
+        if (creature != CH_DOGE_FALLING && CharToType[creature] != TYPE_GEODOGE_FALLING)
             nDots(6, boardCol, boardRow, PT_TWO, 20, 2, 10, 600);
 
         // if (att & ATT_ROLL && creature == CH_DOGE_FALLING)
@@ -975,6 +988,7 @@ void genericPushReverse(int offsetX, int offsetY) {
 const unsigned char thisFrame[] = {0, FLAG_THISFRAME, FLAG_THISFRAME, 0};
 
 void chainReact_GeoDogeToDoge() {
+
 
     bool ongoing = false;
     *me = FLAG(CH_DOGE_00);
@@ -1083,6 +1097,9 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 void surroundingConglomerate(int col, int row) {
 
     if (isVisible(col, row)) {
+
+        //        if (rangeRandom(10))
+        //          return;
 
         unsigned char *pos = RAM + _BOARD + row * _1ROW + col;
         for (int i = 0; i < 5; i++) {

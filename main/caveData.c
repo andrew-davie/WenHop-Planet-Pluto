@@ -1,8 +1,9 @@
 #include "cavedata.h"
 #include "attribute.h"
+#include "decodeCaves.h"
+#include "decodecaves.h"
 #include "main.h"
 
-// clang-format off
 
 // #define LINE 0b01000000
 // #define FILLRECT 0b10000000
@@ -47,15 +48,133 @@
 // #define UPLEFT 7
 
 
-const unsigned char caveTest[] = {
+const unsigned char caveUseWall[] = {
+    // clang-format off
+
+    20,                             // milling
+    10, 15,                         // doge $
+    5,                              // rain
+
+    10, 11, 50, 56, 8,              // randomiser[level]
+    30, 12, 12, 12, 12,             // doge req
+     200, 200, 200, 200, 200,
+
+    WEAPON_NONE,                    //0
+    WEAPON_NONE,                    //1
+    WEAPON_NONE,                    //2
+    WEAPON_NONE,                    //3
+    WEAPON_NONE,                    //4
+
+    0, CH_BLANK, CH_DIRT,           // flags, border, fill
+
+    1,
+    // CH_WYRM_HEAD_U, 60, 255, 0, 255, 10,
+     ///CH_PEBBLE1, 5, 0, 240, 0, 20,
+     //CH_PEBBLE2, 5, 0, 240, 0, 20,
+     CH_BLANK, 120, 0, 240, 0, 20,
+
+    DRAW_FILLED_RECT+CH_BRICKWALL,10+1,1,12,12,CH_BLANK,
+    DRAW_FILLED_RECT+CH_GEODOGE,10+2,6,10,6,CH_GEODOGE,
+
+    0xFE, CH_DOORCLOSED, 10+8, 2,
+    0xFE, CH_MELLON_HUSK_BIRTH, 10+2, 5,
+
+    // 0xFE, CH_WYRM_HEAD_U, 10, 5,
+    0xFE, CH_WYRM_HEAD_U, 10+11, 4,
+    0xFE, CH_WYRM_HEAD_U, 10+11, 5,
+    0xFE, CH_WYRM_HEAD_U, 10+11, 6,
+    0xFE, CH_WYRM_HEAD_U, 10+11, 7,
+    0xFE, CH_WYRM_HEAD_U, 10+11, 8,
+    // 0xFE, CH_WYRM_HEAD_U, 9, 5,
+//    0xFE, CH_WATER, 1, 20,
+    //0xFE, CH_LAVA_BLANK, 1, 20,
+
+    0xFF,
+
+    // EXTRAS
+    // LEVEL 0
+    0xFF, // LEVEL 1
+    0xFF, // LEVEL 2
+    0xFF, // LEVEL 3
+    0xFF, // LEVEL 4
+    0xFF,
+
+    'T', 'E', 'S', 'T', END_STRING
+
+    // clang-format on
+};
+
+
+const unsigned char caveWyrms[] = {
+    // clang-format off
 
     20,     // milling
     10, 15, // doge $
     5,      //              ,          // rain
 
+    
+    10, 11, 50, 56, 8, // randomiser[level]
+    25, 12, 12, 12, 12,
+    200, 200, 200, 200, 200,
+    // 70,65,60,55,50,
+
+    WEAPON_ROPE,                    //0
+    WEAPON_ROPE,                    //1
+    WEAPON_ROPE,                    //2
+    WEAPON_ROPE,                    //3
+    WEAPON_ROPE,                    //4
+
+    CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y, CH_BLANK, CH_BRICKWALL,
+
+    0,
+    // CH_WYRM_HEAD_U, 60, 255, 0, 255, 10,
+    // CH_PEBBLE1, 5, 0, 240, 0, 20,
+    // CH_PEBBLE2, 5, 0, 240, 0, 20,
+    // CH_ROCK, 50, 0, 240, 0, 20,
+
+    DRAW_FILLED_RECT+CH_STEELWALL,1,1,9,8,CH_GEODOGE,
+    DRAW_FILLED_RECT+CH_BRICKWALL,4,4,3,3,CH_ROCK,
+
+
+
+    0xFE, CH_DOORCLOSED, 5, 4,
+    0xFE, CH_MELLON_HUSK_BIRTH, 5, 5,
+
+//    0xFE, CH_WATER, 1, 20,
+    //0xFE, CH_LAVA_BLANK, 1, 20,
+
+    0xFF,
+
+    // EXTRAS
+    // LEVEL 0
+    0xFF, // LEVEL 1
+    0xFF, // LEVEL 2
+    0xFF, // LEVEL 3
+    0xFF, // LEVEL 4
+    0xFF,
+
+    'T', 'E', 'S', 'T', END_STRING
+    // clang-format on
+};
+
+
+const unsigned char caveTest[] = {
+    // clang-format off
+
+    20,     // milling
+    10, 15, // doge $
+    5,      //              ,          // rain
+
+    
     10, 11, 50, 56, 8, // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
+
+    WEAPON_NONE,                    //0
+    WEAPON_NONE,                    //1
+    WEAPON_NONE,                    //2
+    WEAPON_NONE,                    //3
+    WEAPON_NONE,                    //4
 
     CAVEDEF_PARALLAX, STEEL, CH_DIRT,
 
@@ -82,20 +201,28 @@ const unsigned char caveTest[] = {
     0xFF, // LEVEL 4
     0xFF,
 
-    'T', 'E', 'S', 'T', END_STRING};
-
-
+    'T', 'E', 'S', 'T', END_STRING
+    // clang-format on
+};
 
 
 const unsigned char caveFast[] = {
+    // clang-format off
 
     20,     // milling
     10, 15, // doge $
     5,      //              ,          // rain
 
+
     10, 11, 50, 56, 8, // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
+
+    WEAPON_NONE,                    //0
+    WEAPON_NONE,                    //1
+    WEAPON_NONE,                    //2
+    WEAPON_NONE,                    //3
+    WEAPON_NONE,                    //4
 
     CAVEDEF_PARALLAX, STEEL, DIRT,
 
@@ -124,19 +251,28 @@ const unsigned char caveFast[] = {
     0xFF, // LEVEL 4
     0xFF,
 
-    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING};
-
+    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
+    // clang-format on
+};
 
 
 const unsigned char caveA[] = {
+    // clang-format off
 
     20,     // milling
     10, 15, // doge $
     5,      //              ,          // rain
 
+    
     10, 11, 50, 56, 8, // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
+
+    WEAPON_NONE,                    //0
+    WEAPON_NONE,                    //1
+    WEAPON_NONE,                    //2
+    WEAPON_NONE,                    //3
+    WEAPON_NONE,                    //4
 
     CAVEDEF_PARALLAX, STEEL, DIRT,
 
@@ -386,17 +522,28 @@ const unsigned char caveA[] = {
     0xFF, // LEVEL 4
     0xFF,
 
-    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING};
+    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
+    // clang-format on
+};
+
 
 const unsigned char caveA2[] = {
+    // clang-format off
 
     20,     // milling
     10, 15, // doge $
     5,      //              ,          // rain
 
+    
     10, 11, 50, 56, 8, // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
+
+    WEAPON_NONE,                    //0
+    WEAPON_NONE,                    //1
+    WEAPON_NONE,                    //2
+    WEAPON_NONE,                    //3
+    WEAPON_NONE,                    //4
 
     CAVEDEF_PARALLAX, STEEL, CH_BLANK,
 
@@ -422,6 +569,8 @@ const unsigned char caveA2[] = {
         0xFE,CH_PUSH_UP,6,7,
         //0xFE,CH_PUSH_DOWN,13,1,
         0xFE, CH_HUB, 6,8,
+    
+        0xFE, CH_LAVA_BLANK, 1, 20,
 
     //    0xFE, CH_DOORCLOSED,38,16,
     0xFE, CH_MELLON_HUSK_BIRTH, 8, 6,
@@ -478,19 +627,28 @@ const unsigned char caveA2[] = {
     0xFF, // LEVEL 4
     0xFF,
 
-    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING};
-
+    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
+    // clang-format on
+};
 
 
 const unsigned char caveA5[] = {
+    // clang-format off
 
     20,     // milling
     10, 15, // doge $
     5,      //              ,          // rain
 
+    
     10, 11, 50, 56, 8, // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
+
+    WEAPON_NONE,                    //0
+    WEAPON_NONE,                    //1
+    WEAPON_NONE,                    //2
+    WEAPON_NONE,                    //3
+    WEAPON_NONE,                    //4
 
     CAVEDEF_PARALLAX, STEEL, CH_BLANK,
 
@@ -548,10 +706,13 @@ const unsigned char caveA5[] = {
     0xFF, // LEVEL 4
     0xFF,
 
-    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING};
+    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
+    // clang-format on
+};
 
 
 const unsigned char caveA3[] = {
+    // clang-format off
 
     20,    // milling
     1, 15, // doge $
@@ -560,6 +721,12 @@ const unsigned char caveA3[] = {
     10, 11, 50, 56, 8, // randomiser[level]
     8, 8, 8, 8, 8, 20, 200, 200, 200, 200,
     // 70,65,60,55,50,
+
+    WEAPON_NONE,                    //0
+    WEAPON_NONE,                    //1
+    WEAPON_NONE,                    //2
+    WEAPON_NONE,                    //3
+    WEAPON_NONE,                    //4
 
     CAVEDEF_PARALLAX, STEEL, CH_BLANK,
 
@@ -638,38 +805,53 @@ const unsigned char caveA3[] = {
     0xFF, // LEVEL 4
     0xFF,
 
-    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING};
+    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
+    // clang-format on
+};
+
 
 const unsigned char caveA4[] = {
+    // clang-format off
 
     20,    // milling
     1, 15, // doge $
     5,     //              ,          // rain
 
+    
     10, 11, 50, 56, 8, // randomiser[level]
     17, 17, 17, 17, 17, 20, 200, 200, 200, 200,
     // 70,65,60,55,50,
 
-    CAVEDEF_PARALLAX, STEEL, CH_BLANK,
+    WEAPON_PIPE,                    //0
+    WEAPON_NONE,                    //1
+    WEAPON_NONE,                    //2
+    WEAPON_NONE,                    //3
+    WEAPON_NONE,                    //4
 
-    0,
+    CAVEDEF_LOCK_Y, CH_BLANK, CH_DIRT,
 
-    0x80 + CH_STEELWALL, 10, 5, 20, 5, CH_DIRT,
+    1,
+    CH_BLANK, 50, 10, 5, 0, 20,
+
+    0x80 + CH_STEELWALL, 10, 3, 20, 5, CH_DIRT,
 
     //    LINER(CH_HORIZ_ZAP_0, 13,7,10,R)
     // LINER(CH_DOGE_00, 13,8,16,R)
     // LINER(CH_DOGE_00, 13,7,16,R)
-    LINER(CH_DOGE_00, 13, 6, 16, R)
+    LINER(CH_DOGE_00, 13, 4, 16, R)
     //    0xFE, CH_FLIP_GRAVITY_0, 16,6,
     // 0xFE, CH_FLIP_GRAVITY_0, 22,8,
     // 0xFE, CH_FLIP_GRAVITY_0, 11,8,
     //    0xFE, CH_DOGE_00, 16,8,
-    0xFE,
-    CH_ROCK, 1, 6, 0xFE, CH_STEELWALL, 12, 6, 0xFE, CH_STEELWALL, 12, 7,
+    // 0xFE,
+    // CH_ROCK, 1, 4,
+    0xFE, CH_STEELWALL, 12, 4,
+    0xFE, CH_STEELWALL, 12, 5,
 
-    0xFE, CH_STEELWALL, 14, 7, 0xFE, CH_STEELWALL, 14, 8,
+    0xFE, CH_STEELWALL, 14, 5,
+    0xFE, CH_STEELWALL, 14, 6,
 
-    0xFE, CH_PEBBLE1, 13, 7,
+    0xFE, CH_PEBBLE1, 13, 5,
     // 0xFE, CH_DIRT, 11,6,
     // 0xFE, CH_DIRT, 11,8,
 
@@ -679,12 +861,12 @@ const unsigned char caveA4[] = {
     //  0xFE, CH_FLIP_GRAVITY_0, 12,6,
 
     // 0xFE, CH_STEELWALL, 16,7,
-    0xFE, CH_DOORCLOSED, 16, 5,
+    0xFE, CH_DOORCLOSED, 16, 3,
     // 0xFE, CH_BLOCK, 16,6,
     // 0xFE, CH_BLOCK, 16,7,
     // 0xFE, CH_ROCK, 16,9,
 
-    0xFE, CH_MELLON_HUSK_BIRTH, 11, 6,
+    0xFE, CH_MELLON_HUSK_BIRTH, 11, 4,
 
     0xFF,
 
@@ -696,22 +878,29 @@ const unsigned char caveA4[] = {
     0xFF, // LEVEL 4
     0xFF,
 
-    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING};
+    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
+    // clang-format on
+};
 
 const unsigned char *caveList[] = {
+    // clang-format off
 
-   caveTest,
+    caveA4,
+    caveUseWall,
 
-    // caveFast,
+    caveWyrms,
 
+//    caveTest,
+//    caveFast,
 //    caveA5,  // bad
-   caveA4,
-   caveA2,         // best
-   caveA,
-   caveA3,
+
+    caveA2,         // best
+    caveA,
+    caveA3,
+
+    // clang-format on
 };
 
 const int caveCount = sizeof(caveList) / sizeof(unsigned char *);
 
-// clang-format on
 // EOF

@@ -161,7 +161,7 @@ void processWyrms() {
                     wyrm->length > WYRM_MAX - 2) {
                     unsigned char *tailPos = RAM + _BOARD + wyrm->y[0] * _1ROW + wyrm->x[0];
 
-                    *tailPos = CH_DUST_ROCK_0;
+                    *tailPos = CH_BLANK;    // CH_DUST_ROCK_0;
 
                     for (int i = 0; i < WYRM_MAX - 1; i++) {
                         wyrm->x[i] = wyrm->x[i + 1];
@@ -190,7 +190,7 @@ void processWyrms() {
             segment = RAM + _BOARD + candidateY * 40 + candidateX;
 
             if (TYPEOF(*segment) == TYPE_DOGE)
-                nDots(8, candidateX, candidateY, PT_TWO, 50, 3, 0, 100);
+                nDots(4, candidateX, candidateY, PT_TWO, 50, 3, 0, 100);
 
             *segment = wyrm->dir + CH_WYRM_HEAD_U;
         }
@@ -225,6 +225,6 @@ void processWyrms() {
             *head = headChar;
         }
 
-        nDots(4, wyrm->x[0], wyrm->y[0], PT_SPIRAL, 30, 2, 5, 100);
+        nDots(2, wyrm->x[0], wyrm->y[0], PT_SPIRAL, 30, 2, 5, 100);
     }
 }

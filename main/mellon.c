@@ -49,9 +49,9 @@ const signed char faceDirectionDef[] = {
 
 const signed char animDeltaX[] = {
     0,
-    -20,
+    -25,
     0,
-    -20,
+    -25,
 };
 
 const unsigned char mineAnimation[] = {
@@ -264,62 +264,66 @@ bool checkHighPriorityMove(int dir) {
 
             // Fix bar stuff
 
-            if (!(inpt4 & 0x80)) {
+            if (theCave->weapon[level] == WEAPON_PIPE) {
+                if (!(inpt4 & 0x80)) {
 
-                int udlr = 0;
+                    int udlr = 0;
 
-                static const unsigned char udlrChar[] = {
+                    static const unsigned char udlrChar[] = {
 
-                    // 1 = up
-                    // 2 = right
-                    // 4 = down
-                    // 8 = left
+                        // 1 = up
+                        // 2 = right
+                        // 4 = down
+                        // 8 = left
 
-                    CH_HORIZONTAL_BAR,    // 00
-                    CH_VERTICAL_BAR,      // 01 U
-                    CH_HORIZONTAL_BAR,    // 02 R
-                    CH_HUB_1,             // 03 UR
-                    CH_VERTICAL_BAR,      // 04 D
-                    CH_VERTICAL_BAR,      // 05 UD
-                    CH_HUB_1,             // 06 RD
-                    CH_HUB_1,             // 07 URD
-                    CH_HORIZONTAL_BAR,    // 08 L
-                    CH_HUB_1,             // 09 UL
-                    CH_HORIZONTAL_BAR,    // 10 RL
-                    CH_HUB_1,             // 11 URL
-                    CH_HUB_1,             // 12 LD
-                    CH_HUB_1,             // 13 UDL
-                    CH_HUB_1,             // 14 RDL
-                    CH_HUB_1,             // 15 URDL
-                };
+                        CH_HORIZONTAL_BAR,    // 00
+                        CH_VERTICAL_BAR,      // 01 U
+                        CH_HORIZONTAL_BAR,    // 02 R
+                        CH_HUB_1,             // 03 UR
+                        CH_VERTICAL_BAR,      // 04 D
+                        CH_VERTICAL_BAR,      // 05 UD
+                        CH_HUB_1,             // 06 RD
+                        CH_HUB_1,             // 07 URD
+                        CH_HORIZONTAL_BAR,    // 08 L
+                        CH_HUB_1,             // 09 UL
+                        CH_HORIZONTAL_BAR,    // 10 RL
+                        CH_HUB_1,             // 11 URL
+                        CH_HUB_1,             // 12 LD
+                        CH_HUB_1,             // 13 UDL
+                        CH_HUB_1,             // 14 RDL
+                        CH_HUB_1,             // 15 URDL
+                    };
 
-                for (int d = 0; d < 4; d++) {
-                    if ((ATTRIBUTE_BIT(*(me + dirOffset[d]), ATT_PIPE)) || GET(*(me + dirOffset[d])) == CH_MELLON_HUSK)
-                        udlr |= 1 << d;
+                    for (int d = 0; d < 4; d++) {
+                        if ((ATTRIBUTE_BIT(*(me + dirOffset[d]), ATT_PIPE)) ||
+                            GET(*(me + dirOffset[d])) == CH_MELLON_HUSK)
+                            udlr |= 1 << d;
+                    }
+
+                    *me = udlrChar[udlr];
+
+                    // if (*me == CH_HUB_1 && Attribute[CharToType[GET(*(me - _BOARD_COLS))]] &
+                    // ATT_BLANK)
+                    //     *(me - _BOARD_COLS) = CH_TAP_0;
+
+                    showTool = true;
                 }
-
-                *me = udlrChar[udlr];
-
-                // if (*me == CH_HUB_1 && Attribute[CharToType[GET(*(me - _BOARD_COLS))]] &
-                // ATT_BLANK)
-                //     *(me - _BOARD_COLS) = CH_TAP_0;
-
-                showTool = true;
             }
 
             else
-                *me = FLAG(CH_DUST_ROCK_0);
+                // *me = FLAG(CH_DUST_ROCK_0);
+                *me = FLAG(CH_BLANK);
 
-            playerSlow = 0;
+            playerSlow = 1;
             if (!autoMoveFrameCount && ((Attribute[destType] & (ATT_DIRT | ATT_WATERFLOW)) || destType == TYPE_LAVA)) {
 
-                playerSlow = ((Attribute[destType] & ATT_WATERFLOW)) ? 2 : 1;
+                playerSlow = 1;    // tmp ((Attribute[destType] & ATT_WATERFLOW)) ? 2 : 1;
 
                 ADDAUDIO(SFX_DIRT);
                 // dirtFlag = true;
                 startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK]);
 
-                nDots(6, playerX, playerY, PT_TWO, 25, 2, 5, 50);
+                //                nDots(6, playerX, playerY, PT_ONE, 25, 2, 5, 50);
             }
 
             int dir2 = (gravity < 0) ? dir ^ 2 : dir;
@@ -329,10 +333,10 @@ bool checkHighPriorityMove(int dir) {
 
             if (!autoMoveFrameCount) {
 
-                autoMoveFrameCount = ((gameSpeed * 2) << playerSlow);
+                autoMoveFrameCount = ((gameSpeed) << playerSlow);
 
                 autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
-                autoMoveY = autoMoveDeltaY = -(ydir[dir] * CHAR_Y) >> playerSlow;
+                autoMoveY = autoMoveDeltaY = -(ydir[dir] * (CHAR_Y + 6)) >> playerSlow;
             }
 
             handled = true;
@@ -439,6 +443,7 @@ void bubbles(int count, int dripX, int dripY, int age, int /*speed*/) {
 }
 
 void movePlayer(unsigned char *me) {
+
 
     handled = false;
 

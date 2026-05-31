@@ -7,9 +7,9 @@
 #include "characterset.h"
 #include "colour.h"
 #include "main.h"
+#include "random.h"
 #include "savekey.h"
 #include "scroll.h"
-
 
 unsigned char bgPalette[_BOARD_ROWS];
 unsigned char fgPalette[2];
@@ -149,7 +149,7 @@ void setPalette() {
 
     //  interleaveColour();
 
-    unsigned char bgCol = 0;    // tmp flashTime ? ARENA_COLOUR : 0;
+    unsigned char bgCol = colubk;    // tmp flashTime ? ARENA_COLOUR : 0;
 
     int i = 0;
     unsigned char *pfCol = RAM + _BUF_GAME_COLUPF;
@@ -240,9 +240,14 @@ void setPalette() {
 
 const unsigned char colourPool[][4] = {
 
+    {0xC4, 0x28, 0xB8, 0xB8},    // 0
 
-    {0x14, 0x94, 8, 2}, {0xA6, 0x24, 0x32, 0x52}, {0x88, 0xD6, 20, 20},     {0xA6, 0xC4, 0x46, 0x22},
-    {0x98, 0x24, 4, 4}, {0x26, 0xD4, 0x84, 0xE4}, {0x98, 0x24, 0x86, 0x46},
+    {0x98, 0x24, 0x86, 0x46},    // 0
+    {0x16, 0x96, 8, 2},
+
+
+    {0xA6, 0x24, 0x32, 0x52}, {0x88, 0xD6, 20, 20},     {0xA6, 0xC4, 0x46, 0x22},
+    {0x98, 0x24, 4, 4},       {0x26, 0xD4, 0x84, 0xE4},
 
     /*;    dc 0xB6, 0x28, 0x82, 0x82
     ;    dc 10, 12, 8, 8
@@ -390,8 +395,13 @@ const unsigned char colourPool[][4] = {
 void loadPalette() {
 
     unsigned char *c = (unsigned char *)colourPool;
-    currentPalette = 0;    // tmp
-    c += ((currentPalette & 15) << 2);
+    currentPalette = rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));    // tmp
+
+    // if (currentPalette > sizeof(colourPool) / sizeof(colourPool[0]))
+    //     currentPalette = 0;
+
+
+    c += ((currentPalette) << 2);
     setBackgroundPalette(c);
 }
 

@@ -1,5 +1,13 @@
 #pragma once
 
+enum WEAPON {
+
+    WEAPON_NONE = 0,
+    WEAPON_PIPE,
+    WEAPON_ROPE,
+};
+
+
 struct CAVE_DEFINITION {
 
     unsigned char millingTime;
@@ -10,6 +18,7 @@ struct CAVE_DEFINITION {
     unsigned char randomInit[5];
     unsigned char dogeRequired[5];
     unsigned char timeToComplete[5];
+    enum WEAPON weapon[5];
 
     unsigned char flags;    // CAVEDEF_...
 

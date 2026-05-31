@@ -1,8 +1,10 @@
 
 #include "defines_dasm.h"
 
+#include "cavedata.h"
 #include "characterset.h"
 #include "colour.h"
+#include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"
 #include "player.h"
@@ -61,12 +63,13 @@ void scroll() {
 
     else {
 
+
         // Auto-tracking
 
-#define MAX_SPEED_X (1 << 15)
+#define MAX_SPEED_X 0x7000
 #define SCROLL_EDGE_X ((SCREEN_TRIX_X / 4) << 16)
 #define ACCEL_X (1 << 12)
-#define DECEL_X (1 << 9)
+#define DECEL_X (2 << 9)
 
         int tX = ((playerX * CHAR_TRIX_X) << 16) + (CHAR_TRIX_X << 15);
         int hX = scrollX + (SCREEN_TRIX_X << 15);
@@ -79,9 +82,9 @@ void scroll() {
             scrollSpeedX = approach(scrollSpeedX, 0, DECEL_X);
 
 #define MAX_SPEED_Y (1 << 16)
-#define SCROLL_EDGE_Y ((SCREEN_TRIX_Y / 4) << 16)
+#define SCROLL_EDGE_Y (4 << 16)
 #define ACCEL_Y (1 << 13)
-#define DECEL_Y (1 << 10)
+#define DECEL_Y (1 << 12)
 
         int tY = ((playerY * CHAR_TRIX_Y) << 16) + (CHAR_TRIX_Y << 15);
         int hY = scrollY + (SCREEN_TRIX_Y << 15);
@@ -115,6 +118,17 @@ void scroll() {
 
     else if (scrollY < SCROLL_MIN_Y) {
         scrollY = SCROLL_MIN_Y;
+        scrollSpeedY = 0;
+    }
+
+
+    if (theCave->flags & CAVEDEF_LOCK_X) {
+        scrollX = 0x70000;
+        scrollSpeedX = 0;
+    }
+
+    if (theCave->flags & CAVEDEF_LOCK_Y) {
+        scrollY = 0x110000;
         scrollSpeedY = 0;
     }
 }

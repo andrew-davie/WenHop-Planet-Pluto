@@ -14,9 +14,11 @@
 #include "kernels.h"
 #include "main.h"
 #include "mellon.h"
+#include "particle.h"
 #include "player.h"
 #include "random.h"
 #include "schedule.h"
+#include "score.h"
 #include "scroll.h"
 #include "wyrm.h"
 
@@ -112,28 +114,42 @@ void VB_Game() {
 
 #if ENABLE_SHAKE
 
-    // shakeTime = 20;
+    // if (!rangeRandom(100)) {
+    //     FLASH(0x26, 3);
+    //     shakeTime = 20;
+    // }
 
     if (shakeTime) {
         shakeTime--;
-        shakeX = (rangeRandom(3) - 1) << 16;
-        shakeY = (rangeRandom(3) - 1) << 16;
+
+        int richter = shakeTime >> 3 << 1;
+
+        if (richter < 2)
+            richter = 2;
+        if (richter > 4)
+            richter = 4;
+
+        shakeX = (rangeRandom(richter + 1) - (richter >> 1)) << 16;
+        shakeY = (rangeRandom(richter + 1) - (richter >> 1)) << 16;
     }
 
     else
         shakeX = shakeY = 0;
 #endif
 
-    // if (frame > 1000)
-    //     setGameState(GS_COPYRIGHT);    // GS_COUCH_COMPLIANT);
+    extern int actualScore;
+    actualScore = RAM[_SWCHB];
+
+    //    if (frame > 20000)
+    if (RAM[_SWCHB] != 0x3F)
+        setGameState(GS_MENU);    // GS_COUCH_COMPLIANT);
 
     processCharAnimations();
     setPalette();
-    scroll();
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
-        drawScreen();
+        drawScore();
         drawPlayerSprite();
     }
 
@@ -152,10 +168,23 @@ void OS_Game() {
     T1TC = 0;
     T1TCR = 1;
 
+    setScoreCycle(SCORELINE_SCORE);    // tmp
+
     interleaveChronoColour(&roller);
     setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
 
     updatePlayerAnimation();
+    scroll();
+
+    if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
+
+        drawScreen();
+        drawParticles();
+        drawRope();
+
+        // drawScore();
+        // drawPlayerSprite();
+    }
 
 
     //   if (gameSchedule == SCHEDULE_UNPACK_CAVE)

@@ -234,24 +234,24 @@ const unsigned char _DIGIT_SHAPE[] = {
     //    0b00000000
 
 
-    0b00011100,
-    0b00011100,
-    0b00011100,
-    0b00010110,
-    0b00010010,
-    0b00010010,
-    0b00111010,
-    0b00111010,
-    0b00111010,
-    0b00111010,
-    0b00111010,
-    0b00111010,
-    0b00010010,
-    0b00010010,
-    0b00010110,
-    0b00011100,
-    0b00011100,
-    0b00011100,
+    0b00000100,
+    0b00000100,
+    0b00000100,
+    0b00000100,
+    0b00000100,
+    0b00000100,
+    0b00001110,
+    0b00001110,
+    0b00001110,
+    0b00001110,
+    0b00001110,
+    0b00001110,
+    0b00000100,
+    0b00000100,
+    0b00000100,
+    0b00000100,
+    0b00000100,
+    0b00000100,
     0b00000000,
     0b00000000,
 
@@ -775,10 +775,12 @@ void drawSpeedRun() {
 
 void drawDoge() {
 
-    scoreLineNew[1] = DIGIT_PLUS;
-    scoreLineNew[0] = DIGIT_DOGE;
-    scoreLineColour[1] = scoreLineColour[0] = RGB_GREEN;
-    drawDecimal2(scoreLineNew + 2, scoreLineColour + 2, RGB_YELLOW, doges < 0 ? -doges : doges);
+    if (doges < 0) {
+        scoreLineNew[1] = DIGIT_PLUS;
+        // scoreLineNew[0] = DIGIT_DOGE;
+        scoreLineColour[1] = scoreLineColour[0] = RGB_GREEN;
+    }
+    drawDecimal2(scoreLineNew + 2, scoreLineColour + 1, RGB_YELLOW, doges < 0 ? -doges : doges);
 }
 
 void drawTime() {
@@ -849,10 +851,10 @@ void drawScore() {
     switch (scoreCycle) {
     case SCORELINE_TIME:
     case SCORELINE_SCORE:
-        //        drawDoges();
+        drawDoge();
         //        drawTime();
         //        break;
-        drawTheScore(actualScore);
+        // drawTheScore(actualScore);
         break;
     case SCORELINE_LIVES:
         //        drawTime();
@@ -873,7 +875,7 @@ void drawScore() {
     }
 
     for (int i = 0; i < 10; i++) {
-        drawBigDigit(scoreLineNew[i], 9 - i, 9, 7, false);
+        drawBigDigit(scoreLineNew[i], 9 - i, 14, 7, false);
     }
 }
 
