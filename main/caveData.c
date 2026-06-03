@@ -20,7 +20,7 @@
 //  #define U 0
 //  #define D 4
 
-#define LINER(char, x, y, length, direction) 0x40 + char, x, y, direction, length,
+#define LINER(char, x, y, length, direction) DRAW_LINE, char, x, y, direction, length,
 
 // #define RECTR(char, fill, x, y, width, height) 0x80 + char, x, y, width, height, fill,
 // #define RECTE(char, x, y, width, height) 0xC0 + char, x, y, width, height,
@@ -55,49 +55,56 @@ const unsigned char caveUseWall[] = {
     10, 15,                         // doge $
     5,                              // rain
 
-    10, 11, 50, 56, 8,              // randomiser[level]
-    30, 12, 12, 12, 12,             // doge req
-     200, 200, 200, 200, 200,
+     10,  11,  50,  56,  8,         // randomiser[level]
+     30,  12,  12,  12,  12,        // doge req
+    200, 200, 200, 200, 200,
 
-    WEAPON_NONE,                    //0
-    WEAPON_NONE,                    //1
-    WEAPON_NONE,                    //2
-    WEAPON_NONE,                    //3
-    WEAPON_NONE,                    //4
+    WEAPON_PIPE,                    // 0
+    WEAPON_PIPE,                    // 1
+    WEAPON_PIPE,                    // 2
+    WEAPON_PIPE,                    // 3
+    WEAPON_PIPE,                    // 4
 
-    0, CH_BLANK, CH_DIRT,           // flags, border, fill
+    0, CH_STEELWALL, CH_DIRT,           // flags, border, fill
 
-    1,
-    // CH_WYRM_HEAD_U, 60, 255, 0, 255, 10,
-     ///CH_PEBBLE1, 5, 0, 240, 0, 20,
-     //CH_PEBBLE2, 5, 0, 240, 0, 20,
-     CH_BLANK, 120, 0, 240, 0, 20,
+    // Random objects
 
-    DRAW_FILLED_RECT+CH_BRICKWALL,10+1,1,12,12,CH_BLANK,
-    DRAW_FILLED_RECT+CH_GEODOGE,10+2,6,10,6,CH_GEODOGE,
+    3,
+    CH_BLANK, 120, 0, 240, 0, 20,
+    CH_PEBBLE1, 60,40,40,40,40,
+    CH_PEBBLE2, 60,40,40,40,40,
 
-    0xFE, CH_DOORCLOSED, 10+8, 2,
-    0xFE, CH_MELLON_HUSK_BIRTH, 10+2, 5,
+    // Start of cave draw
 
-    // 0xFE, CH_WYRM_HEAD_U, 10, 5,
-    0xFE, CH_WYRM_HEAD_U, 10+11, 4,
-    0xFE, CH_WYRM_HEAD_U, 10+11, 5,
-    0xFE, CH_WYRM_HEAD_U, 10+11, 6,
-    0xFE, CH_WYRM_HEAD_U, 10+11, 7,
-    0xFE, CH_WYRM_HEAD_U, 10+11, 8,
-    // 0xFE, CH_WYRM_HEAD_U, 9, 5,
-//    0xFE, CH_WATER, 1, 20,
-    //0xFE, CH_LAVA_BLANK, 1, 20,
+    DRAW_FILLED_RECT, CH_BRICKWALL, 11, 6, 12, 12, CH_BLANK,
+    DRAW_FILLED_RECT, CH_GEODOGE, 12, 12, 10, 5, CH_GEODOGE,
 
-    0xFF,
+    CH_DOORCLOSED, 18, 8,
+    CH_MELLON_HUSK_BIRTH, 12, 11,
+
+    CH_WYRM_HEAD_U, 21, 10,
+    CH_WYRM_HEAD_U, 21, 11,
+    CH_WYRM_HEAD_U, 21, 12,
+    CH_WYRM_HEAD_U, 21, 13,
+    CH_WYRM_HEAD_U, 21, 14,
+
+    DRAW_EOF,
 
     // EXTRAS
-    // LEVEL 0
-    0xFF, // LEVEL 1
-    0xFF, // LEVEL 2
-    0xFF, // LEVEL 3
-    0xFF, // LEVEL 4
-    0xFF,
+    // LEVEL 0 HERE
+
+    DRAW_EOF,
+
+     // LEVEL 1
+    DRAW_EOF,
+
+    // LEVEL 2
+    DRAW_EOF,
+
+    // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+
+    DRAW_EOF,
 
     'T', 'E', 'S', 'T', END_STRING
 
@@ -132,26 +139,26 @@ const unsigned char caveWyrms[] = {
     // CH_PEBBLE2, 5, 0, 240, 0, 20,
     // CH_ROCK, 50, 0, 240, 0, 20,
 
-    DRAW_FILLED_RECT+CH_STEELWALL,1,1,9,8,CH_GEODOGE,
-    DRAW_FILLED_RECT+CH_BRICKWALL,4,4,3,3,CH_ROCK,
+    DRAW_FILLED_RECT,CH_STEELWALL,1,1,9,8,CH_GEODOGE,
+    DRAW_FILLED_RECT,CH_BRICKWALL,4,4,3,3,CH_ROCK,
 
 
 
-    0xFE, CH_DOORCLOSED, 5, 4,
-    0xFE, CH_MELLON_HUSK_BIRTH, 5, 5,
+    CH_DOORCLOSED, 5, 4,
+    CH_MELLON_HUSK_BIRTH, 5, 5,
 
 //    0xFE, CH_WATER, 1, 20,
     //0xFE, CH_LAVA_BLANK, 1, 20,
 
-    0xFF,
+    DRAW_EOF,
 
     // EXTRAS
     // LEVEL 0
-    0xFF, // LEVEL 1
-    0xFF, // LEVEL 2
-    0xFF, // LEVEL 3
-    0xFF, // LEVEL 4
-    0xFF,
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
 
     'T', 'E', 'S', 'T', END_STRING
     // clang-format on
@@ -182,24 +189,20 @@ const unsigned char caveTest[] = {
     CH_BLANK, 60, 255, 0, 255, 10,
     CH_PEBBLE1, 5, 0, 240, 0, 20,
     CH_PEBBLE2, 5, 0, 240, 0, 20,
-    // CH_ROCK, 50, 0, 240, 0, 20,
 
 
-    0xFE, CH_DOORCLOSED, 38, 16, 0xFE,
+    CH_DOORCLOSED, 38, 16,
     CH_MELLON_HUSK_BIRTH, 20, 10,
 
-//    0xFE, CH_WATER, 1, 20,
-    //0xFE, CH_LAVA_BLANK, 1, 20,
-
-    0xFF,
+    DRAW_EOF,
 
     // EXTRAS
     // LEVEL 0
-    0xFF, // LEVEL 1
-    0xFF, // LEVEL 2
-    0xFF, // LEVEL 3
-    0xFF, // LEVEL 4
-    0xFF,
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
 
     'T', 'E', 'S', 'T', END_STRING
     // clang-format on
@@ -233,7 +236,7 @@ const unsigned char caveFast[] = {
     // CH_ROCK, 50, 0, 240, 0, 20,
 
 
-    0xFE, CH_DOORCLOSED, 38, 16, 0xFE,
+    CH_DOORCLOSED, 38, 16,
     CH_MELLON_HUSK_BIRTH, 10, 15,
 
 
@@ -241,15 +244,15 @@ const unsigned char caveFast[] = {
     LINER(CH_BLANK, 10,15, 6, 0)
 
 
-    0xFF,
+    DRAW_EOF,
 
     // EXTRAS
     // LEVEL 0
-    0xFF, // LEVEL 1
-    0xFF, // LEVEL 2
-    0xFF, // LEVEL 3
-    0xFF, // LEVEL 4
-    0xFF,
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
 
     'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
     // clang-format on
@@ -299,13 +302,13 @@ const unsigned char caveA[] = {
 
     // 0xFE, CH_FLOOD_0, 5, 5,
 
-    0xFE, CH_WYRM_BODY, 12, 8,
+    CH_WYRM_BODY, 12, 8,
 
-        0xFE, CH_HORIZONTAL_BAR, 0,3,
-        0xFE, CH_HORIZONTAL_BAR, 1,3,
-        0xFE, CH_TAP_0, 2,2,
-        0xFE, CH_HUB, 2,3,
-        0xFE, CH_OUTLET, 2,4,
+    CH_HORIZONTAL_BAR, 0,3,
+    CH_HORIZONTAL_BAR, 1,3,
+    CH_TAP_0, 2,2,
+    CH_HUB, 2,3,
+    CH_OUTLET, 2,4,
 
 
         // 0xFE, CH_HORIZONTAL_BAR, 3,3,
@@ -420,8 +423,8 @@ const unsigned char caveA[] = {
 
     // LINE+CH_BLANK,30,15,4,5,
 
-    0xFE, CH_DOORCLOSED, 38, 16,
-    0xFE, CH_MELLON_HUSK_BIRTH, 4, 2,
+    CH_DOORCLOSED, 38, 16,
+    CH_MELLON_HUSK_BIRTH, 4, 2,
 
     // 0xFE, CH_GRINDER_0, 4, 9,
     // 0xFE, CH_GRINDER_0, 5, 8,
@@ -484,7 +487,7 @@ const unsigned char caveA[] = {
 
 //    0xFE, CH_LAVA_BLANK, 1, 20,
 
-    0xFE, CH_WATER, 1, 20,
+    CH_WATER, 1, 20,
 
     // 0xFE, CH_BRICKWALL, 20,10,
     // 0xFE, CH_BRICKWALL, 21,10,
@@ -512,15 +515,15 @@ const unsigned char caveA[] = {
     // 0xFE, CH_WYRM_BODY, 12, 12,
     // 0xFE, CH_WYRM_BODY, 2, 12,
 
-    0xFF,
+    DRAW_EOF,
 
     // EXTRAS
     // LEVEL 0
-    0xFF, // LEVEL 1
-    0xFF, // LEVEL 2
-    0xFF, // LEVEL 3
-    0xFF, // LEVEL 4
-    0xFF,
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
 
     'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
     // clang-format on
@@ -560,72 +563,68 @@ const unsigned char caveA2[] = {
 
     //0x80 + CH_STEELWALL, 10, 5, 20, 12, CH_DIRT,
 
-        0xFE,CH_PUSH_DOWN,6,9,
-    //    0xFE,CH_PUSH_DOWN,7,1,
-        0xFE,CH_PUSH_RIGHT,7,8,
-      //  0xFE,CH_PUSH_DOWN,9,1,
-        0xFE,CH_PUSH_LEFT,5,8,
-        //0xFE,CH_PUSH_DOWN,11,1,
-        0xFE,CH_PUSH_UP,6,7,
-        //0xFE,CH_PUSH_DOWN,13,1,
-        0xFE, CH_HUB, 6,8,
-    
-        0xFE, CH_LAVA_BLANK, 1, 20,
+    CH_PUSH_DOWN,6,9,
+    CH_PUSH_RIGHT,7,8,
+    CH_PUSH_LEFT,5,8,
+    CH_PUSH_UP,6,7,
+    CH_HUB, 6,8,
+
+    CH_LAVA_BLANK, 1, 20,
 
     //    0xFE, CH_DOORCLOSED,38,16,
-    0xFE, CH_MELLON_HUSK_BIRTH, 8, 6,
+    CH_MELLON_HUSK_BIRTH, 8, 6,
 
-   0xFE, CH_WYRM_HEAD_U, 11, 6,
-    0xFE, CH_WYRM_HEAD_U, 12, 6,
-    0xFE, CH_WYRM_HEAD_U, 13, 6,
-    0xFE, CH_WYRM_HEAD_U, 14, 6,
+    CH_WYRM_HEAD_U, 11, 6,
+    CH_WYRM_HEAD_U, 12, 6,
+    CH_WYRM_HEAD_U, 13, 6,
+    CH_WYRM_HEAD_U, 14, 6,
 //    0xFF,
 
-    0xFE, CH_GRINDER_0, 4, 9,
-    0xFE, CH_GRINDER_0, 5, 8,
-    0xFE, CH_GRINDER_0, 6, 6,
-    0xFE, CH_GRINDER_0, 7, 6,
-    0xFE, CH_GRINDER_0, 8, 5,
+    CH_GRINDER_0, 4, 9,
+    CH_GRINDER_0, 5, 8,
+    CH_GRINDER_0, 6, 6,
+    CH_GRINDER_0, 7, 6,
+    CH_GRINDER_0, 8, 5,
 
-    0xFE, CH_GRINDER_0, 8, 9,
-    0xFE, CH_GRINDER_1, 9, 9,
-    0xFE, CH_GRINDER_0, 9, 8,
-    0xFE, CH_GRINDER_1, 10, 8,
-    0xFE, CH_GRINDER_0, 10, 7,
+    CH_GRINDER_0, 8, 9,
+    CH_GRINDER_1, 9, 9,
+    CH_GRINDER_0, 9, 8,
+    CH_GRINDER_1, 10, 8,
+    CH_GRINDER_0, 10, 7,
 
-    0xFE, CH_GRINDER_1, 11, 12,
-    0xFE, CH_BELT_0, 12, 12,
-    0xFE, CH_BELT_1, 13, 12,
-    0xFE, CH_GRINDER_1, 14, 12,
-    0xFE, CH_BELT_1, 15, 12,
-    0xFE, CH_BELT_0, 16, 12,
-    0xFE, CH_GRINDER_1, 17, 12,
-    0xFE, CH_BELT_1, 18, 12,
-    0xFE, CH_BELT_0, 19, 12,
-    0xFE, CH_GRINDER_1, 20, 12,
+    CH_GRINDER_1, 11, 12,
+    CH_BELT_0, 12, 12,
+    CH_BELT_1, 13, 12,
+    CH_GRINDER_1, 14, 12,
+    CH_BELT_1, 15, 12,
+    CH_BELT_0, 16, 12,
+    CH_GRINDER_1, 17, 12,
+    CH_BELT_1, 18, 12,
+    CH_BELT_0, 19, 12,
+    CH_GRINDER_1, 20, 12,
 
-    0xFE, CH_HUB_1, 20, 8,
-     0xFE, CH_PUSH_DOWN, 20, 9,
+    CH_HUB_1, 20, 8,
+    CH_PUSH_DOWN, 20, 9,
 
-    0xFE, CH_GRINDER_0, 15, 15,
-    0xFE, CH_BELT_0, 16, 15,
-    0xFE, CH_BELT_1, 17, 15,
-    0xFE, CH_BELT_0, 18, 15,
-    0xFE, CH_BELT_1, 19, 15,
-    0xFE, CH_BELT_0, 20, 15,
-    0xFE, CH_BELT_1, 21, 15,
-    0xFE, CH_GRINDER_0, 22, 15,
+    CH_GRINDER_0, 15, 15,
+    CH_BELT_0, 16, 15,
+    CH_BELT_1, 17, 15,
+    CH_BELT_0, 18, 15,
+    CH_BELT_1, 19, 15,
+    CH_BELT_0, 20, 15,
+    CH_BELT_1, 21, 15,
+    CH_GRINDER_0, 22, 15,
 
     //0xFE, CH_LAVA_BLANK, 1, 20,
 
 
     // EXTRAS
     // LEVEL 0
-    0xFF, // LEVEL 1
-    0xFF, // LEVEL 2
-    0xFF, // LEVEL 3
-    0xFF, // LEVEL 4
-    0xFF,
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
 
     'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
     // clang-format on
@@ -660,7 +659,7 @@ const unsigned char caveA5[] = {
     // CH_PUSH_DOWN, 0, 10, 5, 0, 20,
 
     //    0xFE, CH_DOORCLOSED,38,16,
-    0xFE, CH_MELLON_HUSK_BIRTH, 7, 6,
+    CH_MELLON_HUSK_BIRTH, 7, 6,
 
     // 0xFE, CH_WYRM_HEAD_U, 11, 6,
     // 0xFE, CH_WYRM_HEAD_U, 12, 6,
@@ -700,11 +699,11 @@ const unsigned char caveA5[] = {
 
     // EXTRAS
     // LEVEL 0
-    0xFF, // LEVEL 1
-    0xFF, // LEVEL 2
-    0xFF, // LEVEL 3
-    0xFF, // LEVEL 4
-    0xFF,
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
 
     'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
     // clang-format on
@@ -732,14 +731,13 @@ const unsigned char caveA3[] = {
 
     0,
 
-    0x80 + CH_STEELWALL, 10, 5, 20, 5, CH_BLANK,
+    DRAW_FILLED_RECT, CH_STEELWALL, 10, 5, 20, 5, CH_BLANK,
 
     //    LINER(CH_HORIZ_ZAP_0, 13,7,10,R)
     LINER(CH_DOGE_00, 13, 8, 9, R)
     //    0xFE, CH_FLIP_GRAVITY_0, 16,6,
     // 0xFE, CH_FLIP_GRAVITY_0, 22,8,
     // 0xFE, CH_FLIP_GRAVITY_0, 11,8,
-    0xFE,
     CH_DOGE_00, 16, 8, 0xFE, CH_ROCK, 1, 6, 0xFE, CH_STEELWALL, 12, 7,
 
     // 0xFE, CH_FLIP_GRAVITY_0, 16,6,
@@ -748,18 +746,30 @@ const unsigned char caveA3[] = {
     //  0xFE, CH_FLIP_GRAVITY_0, 12,6,
 
     // 0xFE, CH_STEELWALL, 16,7,
-    0xFE, CH_DOORCLOSED, 16, 5, 0xFE, CH_BLOCK, 16, 6, 0xFE, CH_BLOCK, 16, 7, 0xFE, CH_ROCK, 16, 9,
+    
+    CH_DOORCLOSED, 16, 5,
+    CH_BLOCK, 16, 6,
+    CH_BLOCK, 16, 7,
+    CH_ROCK, 16, 9,
 
-    0xFE, CH_ROCK, 16, 9, 0xFE, CH_ROCK, 16, 10, 0xFE, CH_ROCK, 16, 11, 0xFE, CH_ROCK, 16, 12, 0xFE,
-    CH_ROCK, 16, 13, 0xFE, CH_ROCK, 16, 14, 0xFE, CH_ROCK, 16, 15, 0xFE, CH_ROCK, 16, 16, 0xFE,
-    CH_ROCK, 16, 17, 0xFE, CH_ROCK, 16, 18,
+    CH_ROCK, 16, 9,
+    CH_ROCK, 16, 10,
+    CH_ROCK, 16, 11,
+    CH_ROCK, 16, 12,
+    CH_ROCK, 16, 13,
+    CH_ROCK, 16, 14,
+    CH_ROCK, 16, 15,
+    CH_ROCK, 16, 16,
+    CH_ROCK, 16, 17,
+    CH_ROCK, 16, 18,
+    
     // 0xFE, CH_DOGE_00, 16,18,
-    0xFE, CH_FLIP_GRAVITY_0, 16, 18,
-    0xFE, CH_FLIP_GRAVITY_0, 16, 19,
-    0xFE, CH_BLOCK, 16, 20,
+    CH_FLIP_GRAVITY_0, 16, 18,
+    CH_FLIP_GRAVITY_0, 16, 19,
+    CH_BLOCK, 16, 20,
 
     //    0xFE, CH_ROCK, 16,9,
-    0xFE, CH_FLIP_GRAVITY_0, 16, 8,
+    CH_FLIP_GRAVITY_0, 16, 8,
 
     // LINER(CH_PUSH_DOWN,11,6,18,R)
     // LINER(CH_PUSH_UP,11,11,18,R)
@@ -785,7 +795,7 @@ const unsigned char caveA3[] = {
     */
 
     //    0xFE, CH_DOORCLOSED,38,16,
-    0xFE, CH_MELLON_HUSK_BIRTH, 11, 7,
+    CH_MELLON_HUSK_BIRTH, 11, 7,
 
     //    0xFE, CH_WYRM_HEAD_U, 16, 9,
 
@@ -795,15 +805,15 @@ const unsigned char caveA3[] = {
     // 0xFE, CH_WYRM_HEAD_U, 14, 9,
     // 0xFE, CH_WYRM_HEAD_U, 15, 9,
 
-    0xFF,
+    DRAW_EOF,
 
     // EXTRAS
     // LEVEL 0
-    0xFF, // LEVEL 1
-    0xFF, // LEVEL 2
-    0xFF, // LEVEL 3
-    0xFF, // LEVEL 4
-    0xFF,
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
 
     'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
     // clang-format on
@@ -816,11 +826,24 @@ const unsigned char caveA4[] = {
     20,    // milling
     1, 15, // doge $
     5,     //              ,          // rain
-
     
-    10, 11, 50, 56, 8, // randomiser[level]
-    17, 17, 17, 17, 17, 20, 200, 200, 200, 200,
-    // 70,65,60,55,50,
+    10,                             //0
+    11,                             //1
+    50,                             //2
+    56,                             //3
+    8,                              //4 randomiser[level]
+
+    17,                             //0
+    17,                             //1
+    17,                             //2
+    17,                             //3
+    17,                             //4
+    
+    20,                             //0
+    200,                            //1
+    200,                            //2
+    200,                            //3
+    200,                            //4
 
     WEAPON_PIPE,                    //0
     WEAPON_NONE,                    //1
@@ -833,7 +856,7 @@ const unsigned char caveA4[] = {
     1,
     CH_BLANK, 50, 10, 5, 0, 20,
 
-    0x80 + CH_STEELWALL, 10, 3, 20, 5, CH_DIRT,
+    DRAW_FILLED_RECT, CH_STEELWALL, 10, 3, 20, 5, CH_DIRT,
 
     //    LINER(CH_HORIZ_ZAP_0, 13,7,10,R)
     // LINER(CH_DOGE_00, 13,8,16,R)
@@ -845,13 +868,12 @@ const unsigned char caveA4[] = {
     //    0xFE, CH_DOGE_00, 16,8,
     // 0xFE,
     // CH_ROCK, 1, 4,
-    0xFE, CH_STEELWALL, 12, 4,
-    0xFE, CH_STEELWALL, 12, 5,
+    CH_STEELWALL, 12, 4,
+    CH_STEELWALL, 12, 5,
+    CH_STEELWALL, 14, 5,
+    CH_STEELWALL, 14, 6,
 
-    0xFE, CH_STEELWALL, 14, 5,
-    0xFE, CH_STEELWALL, 14, 6,
-
-    0xFE, CH_PEBBLE1, 13, 5,
+    CH_PEBBLE1, 13, 5,
     // 0xFE, CH_DIRT, 11,6,
     // 0xFE, CH_DIRT, 11,8,
 
@@ -861,22 +883,22 @@ const unsigned char caveA4[] = {
     //  0xFE, CH_FLIP_GRAVITY_0, 12,6,
 
     // 0xFE, CH_STEELWALL, 16,7,
-    0xFE, CH_DOORCLOSED, 16, 3,
+    CH_DOORCLOSED, 16, 3,
     // 0xFE, CH_BLOCK, 16,6,
     // 0xFE, CH_BLOCK, 16,7,
     // 0xFE, CH_ROCK, 16,9,
 
-    0xFE, CH_MELLON_HUSK_BIRTH, 11, 4,
+    CH_MELLON_HUSK_BIRTH, 11, 4,
 
-    0xFF,
+    DRAW_EOF,
 
     // EXTRAS
     // LEVEL 0
-    0xFF, // LEVEL 1
-    0xFF, // LEVEL 2
-    0xFF, // LEVEL 3
-    0xFF, // LEVEL 4
-    0xFF,
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
 
     'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
     // clang-format on
@@ -885,8 +907,8 @@ const unsigned char caveA4[] = {
 const unsigned char *caveList[] = {
     // clang-format off
 
-    caveA4,
     caveUseWall,
+    caveA4,
 
     caveWyrms,
 

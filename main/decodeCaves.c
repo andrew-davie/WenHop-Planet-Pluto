@@ -158,7 +158,7 @@ int decodeExplicitData(int /*sfx*/) {
 
             theCode = *theCaveData++;
 
-            if (theCode == 0xFF) {
+            if (theCode == DRAW_EOF) {
 
                 // Now handle the individual level additions
                 // format <block> 0xFF... <block> 0xFF
@@ -173,21 +173,21 @@ int decodeExplicitData(int /*sfx*/) {
                 }
 
                 for (int skipBotBlock = level; skipBotBlock < 4; skipBotBlock++)
-                    while (*theCaveData++ != 0xFF)
+                    while (*theCaveData++ != DRAW_EOF)
                         ;
 
                 decodeState = DECODE_FLASH;
                 break;
             }
 
-            if (theCode == 0xFE) {
-                theObject = *theCaveData++;
+            if (theCode <= DRAW_OBJ) {
+                theObject = theCode;
                 cmd = 0;
             }
 
             else {
-                cmd = theCode & 0b11000000;
-                theObject = theCode & 0x3F;
+                cmd = theCode;
+                theObject = *theCaveData++;
             }
 
             a = *theCaveData++;

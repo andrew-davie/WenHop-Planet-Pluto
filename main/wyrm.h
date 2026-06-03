@@ -10,6 +10,8 @@ struct wyrmDetails {
     signed char head;
     unsigned char dir;
     unsigned char length;
+    unsigned char speed;
+    unsigned char pace;
 };
 
 extern struct wyrmDetails wyrms[WYRM_POP];

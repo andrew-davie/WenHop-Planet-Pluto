@@ -12,3 +12,9 @@ icc/
 main/board_temp.c
 main/processTypes.c
 main/processTypes.h
+tools/.idea/misc.xml
+.gitignore
+tools/.idea/modules.xml
+tools/.idea/tools.iml
+tools/.idea/vcs.xml
+tools/.idea/inspectionProfiles/profiles_settings.xml

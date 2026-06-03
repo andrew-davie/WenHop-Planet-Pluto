@@ -49,6 +49,7 @@ bool newWyrm(int x, int y) {
             thisWyrm->x[0] = x;
             thisWyrm->y[0] = y;
             thisWyrm->length = 2;
+            thisWyrm->speed = thisWyrm->pace = rangeRandom(5) + 3;
 
             return true;
         }
@@ -66,6 +67,13 @@ void processWyrms() {
         //     continue;
 
         struct wyrmDetails *wyrm = &wyrms[i];
+
+
+        if (--wyrm->speed)
+            continue;
+
+
+        wyrm->speed = wyrm->pace;
 
         int headPos = wyrm->head;
         if (headPos < 0)
@@ -85,24 +93,25 @@ void processWyrms() {
         int whatsThere = CharToType[GET(*newHead)];
         int moveable = Attribute[whatsThere] & mask;
 
-        if (!moveable || !(getRandom32() & 3)) {
+        if (!moveable) {    // || !(getRandom32() & 3)) {
 
-            int rdir = getRandom32() & 3;
+            wyrm->dir = (wyrm->dir + 1) & 3;
+            //            int rdir = wyrm->dir + 1) & 3; getRandom32() & 3;
 
-            for (int dir = 0; dir < 4; dir++) {
+            //            for (int dir = 0; dir < 4; dir++) {
 
-                candidateX = x + xdir[rdir];
-                candidateY = y + ydir[rdir];
+            candidateX = x + xdir[wyrm->dir];
+            candidateY = y + ydir[wyrm->dir];
 
-                newHead = RAM + _BOARD + candidateY * _1ROW + candidateX;
-                whatsThere = CharToType[GET(*newHead)];
-                if (Attribute[whatsThere] & mask) {
-                    wyrm->dir = rdir;
-                    moveable = true;
-                    break;
-                }
+            newHead = RAM + _BOARD + candidateY * _1ROW + candidateX;
+            whatsThere = CharToType[GET(*newHead)];
+            if (Attribute[whatsThere] & mask) {
+                //                    wyrm->dir = rdir;
+                moveable = true;
+                //                  break;
+                //            }
 
-                rdir = (rdir + 1) & 3;
+                //                rdir = (rdir + 1) & 3;
             }
         }
 

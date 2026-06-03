@@ -170,6 +170,7 @@ bool checkHighPriorityMove(int dir) {
 
     {    // no fire button
 
+
         //        bool grabbed = false;
         int type = CharToType[GET(*meOffset)];
 
@@ -254,6 +255,8 @@ bool checkHighPriorityMove(int dir) {
             frameAdjustX = frameAdjustY = 0;
 
             if (!exitMode) {
+
+                *me = FLAG(CH_BLANK);
                 *meOffset = FLAG(CH_MELLON_HUSK);
 
                 if (Attribute[destType] & ATT_DIRT)
@@ -310,9 +313,9 @@ bool checkHighPriorityMove(int dir) {
                 }
             }
 
-            else
-                // *me = FLAG(CH_DUST_ROCK_0);
-                *me = FLAG(CH_BLANK);
+            // else
+            //     // *me = FLAG(CH_DUST_ROCK_0);
+            //     *me = FLAG(CH_BLANK);
 
             playerSlow = 1;
             if (!autoMoveFrameCount && ((Attribute[destType] & (ATT_DIRT | ATT_WATERFLOW)) || destType == TYPE_LAVA)) {
@@ -483,8 +486,9 @@ void movePlayer(unsigned char *me) {
     lastUsableSWCHA = usableSWCHA;
 
     for (int dir = 0; dir < 4; dir++)
-        if (checkHighPriorityMove(dir))
+        if (checkHighPriorityMove(dir)) {
             return;
+        }
 
     for (int dir = 0; dir < 4 && !handled; dir++)
         if (checkLowPriorityMove(dir))

@@ -20,9 +20,13 @@ extern unsigned char caveFlags;
 
 #define CAVE_REQUIRES_COMPATIBLE_PALETTE 0x80000000
 
-#define DRAW_LINE 0b01000000
-#define DRAW_RECT 0b11000000
-#define DRAW_FILLED_RECT 0b10000000
+
+#define DRAW_EOF 255
+#define DRAW_FILLED_RECT 254
+#define DRAW_RECT 253
+#define DRAW_LINE 252
+
+#define DRAW_OBJ 251 /* "last" */
 
 
 // EOF

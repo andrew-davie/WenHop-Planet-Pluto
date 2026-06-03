@@ -113,11 +113,11 @@ void setupBoardScanner() {
 
         restartBoardScan();
 
-        static int wyrmDelay = 0;
-        if (!wyrmDelay--) {
-            wyrmDelay = 1;
-            processWyrms();
-        }
+        // static int wyrmDelay = 0;
+        // if (!wyrmDelay--) {
+        //     wyrmDelay = 1;
+        processWyrms();
+        // }
 
         gameFrame = 0;
 
@@ -324,8 +324,8 @@ void processTypes() {
 
         if (!rangeRandom(250)) {
             *me = FLAG(CH_ROCK_PEBBLE_1);
-            FLASH(0x42, 10);
-            // nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
+            // FLASH(0x42, 10);
+            //  nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
             nDots(10, boardCol, boardRow, PT_TWO, 10, 3, 7, 100);
         }
 
@@ -594,15 +594,15 @@ void processDoge() {
 
 void processPebble() {
 
-    // don't form way above player
-    if (boardCol == playerX && boardRow < playerY)
+    // don't form way above player (but DO form 1 above)
+    if (boardCol == playerX && boardRow < playerY - 1)
         return;
 
     int chance = 50;
 
     for (int i = 0; i < 4; i++)
         if (TYPEOF(*(me + dirOffset[i])) == TYPE_MELLON_HUSK) {
-            chance = 5;
+            chance = 10;
             break;
         }
 
@@ -700,7 +700,7 @@ void processWaterFlow() {
                     // Water has hit something below
                     nDots(3, boardCol, boardRow, PT_TWO + PARTICLE_GRAVITY_FLAG, 40, 2 + rangeRandom(3), 11, 100);
 #if ENABLE_SHAKE
-                shakeTime = 20;
+                // shakeTime = 20;
 #endif
             }
         }

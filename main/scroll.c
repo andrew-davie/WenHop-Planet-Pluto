@@ -87,7 +87,7 @@ void scroll() {
 #define DECEL_Y (1 << 12)
 
         int tY = ((playerY * CHAR_TRIX_Y) << 16) + (CHAR_TRIX_Y << 15);
-        int hY = scrollY + (SCREEN_TRIX_Y << 15);
+        int hY = scrollY + (SCREEN_TRIX_Y << 15) + (CHAR_TRIX_Y << 16);    // @navel :)
 
         if (tY < (hY - SCROLL_EDGE_Y))
             scrollSpeedY = approach(scrollSpeedY, -MAX_SPEED_Y, ACCEL_Y);

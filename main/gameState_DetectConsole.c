@@ -73,7 +73,7 @@ void VB_DetectConsole() {
         }
 
         //        setGameState(GS_COPYRIGHT);
-        setGameState(GS_GAME);
+        setGameState(GS_MENU);
     }
     }
 
