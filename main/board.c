@@ -272,6 +272,19 @@ void processTypes() {
 
     switch (type) {
 
+
+    case TYPE_ELECTRIC: {
+
+        unsigned char new = getRandom32() & 3;
+        if (CH_ELECTRIC_0 + new == *me)
+            new = (new + 1) & 3;
+        *me = CH_ELECTRIC_0 + new;
+
+        if (!rangeRandom(30))
+            nDots(5, boardCol, boardRow, PT_SPIRAL2, 20, 3, 5, 0xC0);
+
+    } break;
+
     case TYPE_OUTBOX:
         FLASH(0x28, 10);
         nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x10000);
@@ -901,87 +914,75 @@ void processFallingThings() {
 
 void genericPush(int offsetX, int offsetY) {
 
-#ifdef ENABLE_SWITCH
-    if (switchOn) {
-#endif
-        bool atEdge = (boardCol < 3) || (boardCol > 36) || (boardRow < 3) || (boardRow > 18);
-        unsigned char *playerPos = RAM + _BOARD + playerY * _1ROW + playerX;
+    bool atEdge = (boardCol < 3) || (boardCol > 36) || (boardRow < 3) || (boardRow > 18);
+    unsigned char *playerPos = RAM + _BOARD + playerY * _1ROW + playerX;
 
-        int adjustOffset = offsetY * _1ROW + offsetX;
-        unsigned char *pushPos = me + adjustOffset;
+    int adjustOffset = offsetY * _1ROW + offsetX;
+    unsigned char *pushPos = me + adjustOffset;
 
-        unsigned char alternate = CH_STEELWALL;
-        unsigned char *pushPosFurther = atEdge ? &alternate : pushPos + adjustOffset;
-        int attPushPosFurther = Attribute[CharToType[GET(*pushPosFurther)]];
+    unsigned char alternate = CH_STEELWALL;
+    unsigned char *pushPosFurther = atEdge ? &alternate : pushPos + adjustOffset;
+    int attPushPosFurther = Attribute[CharToType[GET(*pushPosFurther)]];
 
-        //??
-        if (playerPos == pushPos && (atEdge || !(attPushPosFurther & ATT_PERMEABLE))) {
-            // shakeTime = 20;
-            FLASH(0x42, 8);
-            startPlayerAnimation(ID_Xray);
-            nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 50, 3, 4, 0x18000);
-        }
-
-        int attPushPos = Attribute[CharToType[GET(*pushPos)]];
-
-        if (!(GET(*pushPos) & FLAG_THISFRAME)) {
-            if ((attPushPos & ATT_PERMEABLE) || ((attPushPos & ATT_PUSH) && (attPushPosFurther & ATT_PERMEABLE))) {
-
-                // Note we may have a lagging flag clear until next frame but who cares
-
-                if (attPushPosFurther & ATT_PERMEABLE)
-                    *pushPosFurther = FLAG(*pushPos);
-
-                *pushPos = FLAG(*me);
-                *me = offsetX ? CH_HORIZONTAL_BAR : CH_VERTICAL_BAR;
-
-                if (playerPos == pushPos) {
-
-                    pulsePlayerColour = 20;
-                    ADDAUDIO(SFX_EXPLODE_QUIET);
-
-                    if (attPushPosFurther & ATT_BLANK) {
-
-                        autoMoveY = 0;
-                        autoMoveY = 0;
-                        autoMoveFrameCount = 0;
-                        playerX += offsetX;
-                        playerY += offsetY;
-                    }
-                }
-
-                surroundingConglomerate(boardCol, boardRow);
-                surroundingConglomerate(boardCol + offsetX, boardRow + offsetY);
-
-                //??
-                if (!(attPushPos & ATT_PERMEABLE))
-                    nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 150, 3, 4, 0x10000);
-                return;
-            }
-        }
-
-        *me = (*me) + 1;    // reverse
-#ifdef ENABLE_SWITCH
+    //??
+    if (playerPos == pushPos && (atEdge || !(attPushPosFurther & ATT_PERMEABLE))) {
+        // shakeTime = 20;
+        FLASH(0x42, 8);
+        startPlayerAnimation(ID_Xray);
+        nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 50, 3, 4, 0x18000);
     }
-#endif
+
+    int attPushPos = Attribute[CharToType[GET(*pushPos)]];
+
+    if (!(GET(*pushPos) & FLAG_THISFRAME)) {
+        if ((attPushPos & ATT_PERMEABLE) || ((attPushPos & ATT_PUSH) && (attPushPosFurther & ATT_PERMEABLE))) {
+
+            // Note we may have a lagging flag clear until next frame but who cares
+
+            if (attPushPosFurther & ATT_PERMEABLE)
+                *pushPosFurther = FLAG(*pushPos);
+
+            *pushPos = FLAG(*me);
+            *me = offsetX ? CH_HORIZONTAL_BAR : CH_VERTICAL_BAR;
+
+            if (playerPos == pushPos) {
+
+                pulsePlayerColour = 20;
+                ADDAUDIO(SFX_EXPLODE_QUIET);
+
+                if (attPushPosFurther & ATT_BLANK) {
+
+                    autoMoveY = 0;
+                    autoMoveY = 0;
+                    autoMoveFrameCount = 0;
+                    playerX += offsetX;
+                    playerY += offsetY;
+                }
+            }
+
+            surroundingConglomerate(boardCol, boardRow);
+            surroundingConglomerate(boardCol + offsetX, boardRow + offsetY);
+
+            //??
+            if (!(attPushPos & ATT_PERMEABLE))
+                nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 150, 3, 4, 0x10000);
+            return;
+        }
+    }
+
+    *me = (*me) + 1;    // reverse
 }
 
 void genericPushReverse(int offsetX, int offsetY) {
 
-#ifdef ENABLE_SWITCH
-    if (switchOn) {
-#endif
-        unsigned char *pushPos = me + offsetY * _BOARD_COLS + offsetX;
-        int type = CharToType[GET(*pushPos)];
+    unsigned char *pushPos = me + offsetY * _BOARD_COLS + offsetX;
+    int type = CharToType[GET(*pushPos)];
 
-        if (type == TYPE_PUSHER) {
-            *pushPos = FLAG(*me);
-            *me = CH_BLANK;
-        } else
-            *me = (*me) - 1;
-#ifdef ENABLE_SWITCH
-    }
-#endif
+    if (type == TYPE_PUSHER) {
+        *pushPos = FLAG(*me);
+        *me = CH_BLANK;
+    } else
+        *me = (*me) - 1;
 }
 
 

@@ -76,11 +76,12 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
     int rooted = cx[1][(root >> 3) & 3];
 
     if (pulsePlayerColour) {
-        if (!(--pulsePlayerColour & 7)) {
-            int cswitch = getRandom32() & 0xF0;
-            for (int i = 9; i < 13; i++)
-                postProcessPlayerColours[i] = cswitch;
-        }
+        //    if (--pulsePlayerColour) {
+        --pulsePlayerColour;                           //       if (!(--pulsePlayerColour & 7)) {
+        int cswitch = rangeRandom(4) ? 0x40 : 0x20;    // getRandom32() & 0xF0;
+        for (int i = 0; i < 16; i++)
+            postProcessPlayerColours[i] = cswitch;
+        //     }
     }
 
     else {
@@ -114,27 +115,32 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
 
         const unsigned char *spr = spriteShape[*playerAnimation];
-        if (!spr) {
+        // if (!spr) {    // tmp
 
-            //            FLASH(0x44, 2);
-            spr = spriteShape[1];
-        }
+        //     FLASH(0x44, 2);
+        //     spr = spriteShape[1];
+        // }
 
-
-        // extern const unsigned char shape_FRAME_STAND[];    // tmp
-        // spr = shape_FRAME_STAND;
 
         int shapeHeight = *spr++;
 
         ypos += CHAR_Y - (shapeHeight & 0x3f);
 
-        int frameOffset = *(const signed char *)spr++;
+        int frameXOffset = *(const signed char *)spr++;
         int frameYOffset = *(const signed char *)spr++;
 
         int lavaLine = (lavaSurfaceTrixel - (scrollY >> 16)) * 3;
         playerSpriteY = ypos - frameYOffset - 1;
 
-        int pX = (xpos) * 4 + (faceDirection * (frameOffset + frameAdjustX + autoMoveX)) + 2;
+        int pX = (xpos) * 4 + (faceDirection * (frameXOffset + frameAdjustX + autoMoveX)) + 2;
+
+        if (pulsePlayerColour) {
+
+            int ppc = (pulsePlayerColour >> 3) + 3;
+
+            pX += rangeRandom(ppc) - (ppc >> 1);
+            playerSpriteY += rangeRandom(ppc) - (ppc >> 1);
+        }
 
         if (playerSpriteY < 0 || playerSpriteY >= _SCANLINES - SPRITE_DEPTH || pX > 159)
             return;

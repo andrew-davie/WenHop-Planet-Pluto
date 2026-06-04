@@ -76,17 +76,26 @@ const unsigned char caveUseWall[] = {
 
     // Start of cave draw
 
-    DRAW_FILLED_RECT, CH_BRICKWALL, 11, 6, 12, 12, CH_BLANK,
-    DRAW_FILLED_RECT, CH_GEODOGE, 12, 12, 10, 5, CH_GEODOGE,
+    CH_GRINDER_1, 13,7,
+    CH_ELECTRIC_0, 13,8,
+    CH_ELECTRIC_0, 13,9,
+    CH_ELECTRIC_0, 13,10,
+    CH_ELECTRIC_0, 13,11,
+    CH_ELECTRIC_0, 13,12,
+    CH_ELECTRIC_0, 13,13,
+        CH_GRINDER_1, 13,14,
+
+    // DRAW_FILLED_RECT, CH_BRICKWALL, 11, 6, 12, 12, CH_BLANK,
+    // DRAW_FILLED_RECT, CH_GEODOGE, 12, 12, 10, 5, CH_GEODOGE,
 
     CH_DOORCLOSED, 18, 8,
     CH_MELLON_HUSK_BIRTH, 12, 11,
 
-    CH_WYRM_HEAD_U, 21, 10,
-    CH_WYRM_HEAD_U, 21, 11,
-    CH_WYRM_HEAD_U, 21, 12,
-    CH_WYRM_HEAD_U, 21, 13,
-    CH_WYRM_HEAD_U, 21, 14,
+    // CH_WYRM_HEAD_U, 21, 10,
+    // CH_WYRM_HEAD_U, 21, 11,
+    // CH_WYRM_HEAD_U, 21, 12,
+    // CH_WYRM_HEAD_U, 21, 13,
+    // CH_WYRM_HEAD_U, 21, 14,
 
     DRAW_EOF,
 
@@ -890,6 +899,12 @@ const unsigned char caveA4[] = {
 
     CH_MELLON_HUSK_BIRTH, 11, 4,
 
+
+    CH_ELECTRIC_0, 18,4,
+    CH_ELECTRIC_0, 18,5,
+    CH_ELECTRIC_0, 18,6,
+
+
     DRAW_EOF,
 
     // EXTRAS
@@ -907,8 +922,8 @@ const unsigned char caveA4[] = {
 const unsigned char *caveList[] = {
     // clang-format off
 
-    caveUseWall,
     caveA4,
+    caveUseWall,
 
     caveWyrms,
 

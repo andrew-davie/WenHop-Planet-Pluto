@@ -5,10 +5,12 @@
 #include <stdbool.h>
 
 #include "random.h"
+#include "scroll.h"
 #include "sound.h"
 
-
 #define ENABLE_SOUND 1
+
+// format of sounds:     // AUIDC, AUDF, AUDV, DUR
 
 
 void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument);
@@ -72,6 +74,27 @@ const unsigned char samplePick[] = {
     CMD_STOP,
 };
 
+const unsigned char sampleZap[] = {
+    // clang-format off
+
+    3, 11, 12, 14,
+    CMD_STOP,
+
+    // clang-format on
+};
+
+const unsigned char sampleZap2[] = {
+    // clang-format off
+
+    0,0,0,3,
+    3, 10, 3, 20,
+
+    CMD_STOP,
+
+    // clang-format on
+};
+
+
 const unsigned char sampleRock[] = {
     8, 18, 5, 4, 8, 18, 5, 3, 8, 18, 4, 2, 8, 18, 3, 1, CMD_STOP,
 };
@@ -118,8 +141,20 @@ const unsigned char samplePush[] = {
 };
 
 const unsigned char sampleExplode[] = {
-    8,  7, 9, 2, 8,  10, 8, 2, 8,  13, 7,  2, 8,  16, 7,  3, 8,  19, 6,  4,        8,
-    22, 5, 5, 8, 25, 4,  6, 8, 28, 3,  10, 8, 29, 2,  15, 8, 31, 1,  15, CMD_STOP,
+    // clang-format off
+
+    8, 7, 14, 2,
+    8, 10, 13, 2,
+    8, 13, 12,  2,
+    8, 16, 11,  3,
+    8, 19, 10,  4,
+    8, 22, 8, 5,
+    8, 25, 6,  6,
+    8, 28, 4,  10,
+    8, 29, 2,  15,
+    8, 31, 1,  15,
+    CMD_STOP,
+    // clang-format on
 };
 
 const unsigned char sampleExplodeQuiet[] = {
@@ -214,117 +249,50 @@ const unsigned char sampleExit[] = {
 //     CMD_STOP,
 // };
 
-const struct AudioTable AudioSamples[] = {
+const struct AudioTable AudioSamples[SFX_MAX] = {
+
+    // audio data, priority, flags
 
     {sampleNone, 0, 0},    // 0  PLACEHOLDER - NOT USED AS SOUND
 
     // MUST correspond to AudioID enum ordering/number
     // MUST be in priority order!
 
-    {sampleUncovered, 201, 0},                                          // 01 SFX_UNCOVERED
-    {sample10987654321, 200, AUDIO_LOCKED},                             // 02 SFX_COUNTDOWN2
-    {samplePick, 200, 0},                                               // 03 SFX_PICKAXE
-    {sampleSFX, 200, 0},                                                // 04 SFX_DOGE2
-    {sampleWhoosh, 127, 0},                                             // 05 SFX_WHOOSH
-    {sampleBlip, 125, 0},                                               // 06 SFX_BLIP
-    {sampleExxtra, 110, 0},                                             // 07 SFX_EXTRA
-    {sampleExit, 99, 0},                                                // 08 SFX_EXIT
-    {sampleExplode, 99, 0},                                             // 09 SFX_EXPLODE
-    {sampleExplodeQuiet, 99, 0},                                        // 10 SFX_EXPLODE_QUIET
-    {sampleMagic, 50, AUDIO_KILL},                                      // 11 SFX_MAGIC
-    {sampleMagic2, 50, 0},                                              // 12 SFX_MAGIC2
-    {sampleRock, 11, 0},                                                // 13 SFX_ROCK
-    {sampleRock2, 10, 0},                                               // 14 SFX_ROCK2
-    {sampleDrip2, 10, 0},                                               // 15 SFX_SCORE
-    {sampleDoge2, 9, 0},                                                // 16 SFX_DOGE
-    {sampleDoge3, 9, 0},                                                // 17 SFX_DOGE3
-    {sampleDirt, 9, 0},                                                 // 18 SFX_DIRT
-    {samplePush, 8, 0},                                                 // 19 SFX_PUSH
-    {sampleSpace, 8, 0},                                                // 20 SFX_SPACE
-    {sampleDrip2, 8, 0},                                                // 21 SFX_DRIP
-    {sampleBubbler, 7, AUDIO_LOCKED | AUDIO_SINGLETON | AUDIO_KILL},    // 22 SFX_BUBBLER
-    {sampleDrip, 5, 0},                                                 // 23 SFX_DRIP2
-    {sampleUncover, 2, AUDIO_LOCKED | AUDIO_KILL},                      // 24 SFX_UNCOVER
+    //                                                                     priority order
+    //                                                                     --------------
+    {sampleUncovered, 201, 0},                                          // SFX_UNCOVERED
+    {sample10987654321, 200, AUDIO_LOCKED},                             // SFX_COUNTDOWN2
+    {samplePick, 200, 0},                                               // SFX_PICKAXE
+    {sampleSFX, 200, 0},                                                // SFX_DOGE2
+    {sampleWhoosh, 127, 0},                                             // SFX_WHOOSH
+    {sampleBlip, 125, 0},                                               // SFX_BLIP
+    {sampleExxtra, 110, 0},                                             // SFX_EXTRA
+    {sampleExit, 99, 0},                                                // SFX_EXIT
+    {sampleExplode, 99, 0},                                             // SFX_EXPLODE
+    {sampleZap, 98, AUDIO_ATTENUATE},                                   // SFX_ZAP
+    {sampleZap2, 98, 0},                                                // SFX_ZAP2
+    {sampleExplodeQuiet, 97, 0},                                        // SFX_EXPLODE_QUIET
+    {sampleMagic, 50, AUDIO_KILL},                                      // SFX_MAGIC
+    {sampleMagic2, 50, 0},                                              // SFX_MAGIC2
+    {sampleRock, 11, 0},                                                // SFX_ROCK
+    {sampleRock2, 10, 0},                                               // SFX_ROCK2
+    {sampleDrip2, 10, 0},                                               // SFX_SCORE
+    {sampleDoge2, 9, 0},                                                // SFX_DOGE
+    {sampleDoge3, 9, 0},                                                // SFX_DOGE3
+    {sampleDirt, 9, 0},                                                 // SFX_DIRT
+    {samplePush, 8, 0},                                                 // SFX_PUSH
+    {sampleSpace, 8, 0},                                                // SFX_SPACE
+    {sampleDrip2, 8, 0},                                                // SFX_DRIP
+    {sampleBubbler, 7, AUDIO_LOCKED | AUDIO_SINGLETON | AUDIO_KILL},    // SFX_BUBBLER
+    {sampleDrip, 5, 0},                                                 // SFX_DRIP2
+    {sampleUncover, 2, AUDIO_LOCKED | AUDIO_KILL},                      // SFX_UNCOVER
 
 #if _ENABLE_LAVA2
     {sampleLava, 2, true},    // 25 SFX_LAVA
 #endif
 };
 
-// clang-format off
 
-// #define STRINGIFY2(x) #x
-// #define STRINGIFY(x) STRINGIFY2(x)
-
-// __asm__(".section .rodata\n"
-//         ".global AudioSamples2\n"
-//         "AudioSamples2:\n"
-
-//         ".hword " STRINGIFY(__sampleNone) "\n"
-//         ".byte 0\n"
-//         ".byte 0\n"
-
-
-//         ".hword sampleAbort\n"
-//         ".byte 127\n"
-//         ".byte 0\n"
-
-//         ".hword sampleWhoosh\n"
-//         ".byte 127\n"
-//         ".byte 0\n"
-
-//         ".hword " STRINGIFY(__sampleBlip) "\n"
-//         ".byte 125\n"
-//         ".byte 0\n"
-
-//         ".hword sampleRev\n"
-//         ".byte 117\n"
-//         ".byte 0\n"
-
-//         ".hword " STRINGIFY(__sampleSelectionBlip) "\n"
-//         ".byte 92\n"
-//         ".byte 0\n"
-
-//         ".hword sampleBeepHornTwice\n"
-//         ".byte 110\n"
-//         ".byte " STRINGIFY(AUDIO_ATTENUATE) "\n"
-
-//         ".hword sampleFastBeep2\n"
-//         ".byte 100\n"
-//         ".byte " STRINGIFY(AUDIO_ATTENUATE) "\n"
-
-//         ".hword " STRINGIFY(__sampleExit) "\n"
-//         ".byte 99\n"
-//         ".byte 0\n"
-
-//         ".hword sampleSpinWheel\n"
-//         ".byte 96\n"
-//         ".byte 0\n"
-
-
-//         ".hword " STRINGIFY(__sampleMagic) "\n"
-//         ".byte 91\n"
-//         ".byte " STRINGIFY(AUDIO_KILL) "\n"
-
-//         ".hword " STRINGIFY(__sampleFireworks) "\n"
-//         ".byte 90\n"
-//         ".byte 0\n"
-
-//         ".hword sampleDirt\n"
-//         ".byte 9\n"
-//         ".byte 0\n"
-
-//         ".hword " STRINGIFY(__sampleSpace) "\n"
-//         ".byte 8\n"
-//         ".byte 0\n"
-
-// );
-
-// clang-format on
-
-// extern const short int AudioSamples2[SFX_MAX];
-// const struct AudioTable *AudioSamples = (const struct AudioTable *)AudioSamples2;
-// #endif
 bool audioRequest[SFX_MAX];
 
 void killRepeatingAudio() {
@@ -410,16 +378,14 @@ void processSoundEffects() {
 
             // we've now found the lowest priority sound in our current batch...
             // if the lowest slot is lower priority than new sound, replace it
-            if (lowest >= 0) {
-                // && (!sfx[lowest].id || AudioSamples[id].priority >=
-                //                                         AudioSamples[sfx[lowest].id].priority))
-                //                                         {
+            if (lowest >= 0 &&
+                (!sfx[lowest].id || AudioSamples[id].priority >= AudioSamples[sfx[lowest].id].priority)) {
 
                 sfx[lowest].index = 0;
                 sfx[lowest].id = id;
                 sfx[lowest].delay = AudioSamples[id].sample[3];
 
-                sfx[lowest].attenuation = (AudioSamples[id].flags & AUDIO_ATTENUATE) ? rangeRandom(256) : 255;
+                sfx[lowest].attenuation = (AudioSamples[id].flags & AUDIO_ATTENUATE) ? rangeRandom(128) | 128 : 255;
 
                 audioRequest[id] = false;
             }
@@ -564,7 +530,7 @@ const unsigned char trackGridLockMelodyIntro[] = {
     c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4 g3 b3
     d4 a3 c4 e4 b3 d4 f4 c3 e3 g3 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4
 
-    TRACK_LOOP
+    TRACK_END
 };
 
 const unsigned char trackGridLockBase[] = {
@@ -575,7 +541,7 @@ const unsigned char trackGridLockBase[] = {
     g3 a2_SHARP a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 f2 f2 c3 c3 g3 g3 d3
     d3 a2_SHARP a2_SHARP e3 e3 c2 c2 c2 c2
 
-    TRACK_LOOP
+    TRACK_END
 };
 
 
@@ -632,16 +598,30 @@ void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int
 const int multiplier[] = {0, 0x100, 0x200, 0x400};
 const unsigned char RENOTE[] = {1, 4, 6, 12};
 
+
+// int approach(int current, int target, int speed) {
+//     int diff = target - current;
+//     if (diff > speed)
+//         return current + speed;
+//     if (diff < -speed)
+//         return current - speed;
+//     return target;
+// }
+
+
 void processMusic() {
 
-    if (sound_volume < sound_max_volume)
-        sound_volume += 2;
 
-    else {
-        sound_volume -= 3;
-        if (sound_volume < 0)
-            sound_volume = 0;
-    }
+    sound_volume = approach(sound_volume, sound_max_volume, 2);
+
+    // if (sound_volume < sound_max_volume)
+    //     sound_volume += 2;
+
+    // else {
+    //     sound_volume -= 3;
+    //     if (sound_volume < 0)
+    //         sound_volume = 0;
+    // }
 
     for (int i = 0; i < MUSIC_MAX; i++) {
 

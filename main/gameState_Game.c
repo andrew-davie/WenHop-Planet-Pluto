@@ -20,7 +20,11 @@
 #include "schedule.h"
 #include "score.h"
 #include "scroll.h"
+#include "sound.h"
 #include "wyrm.h"
+
+extern const unsigned char trackGridLockMelodyIntro[];
+extern const unsigned char trackGridLockBase[];
 
 void initDataStreams_Game() {
 
@@ -100,6 +104,11 @@ void initGameState_Game() {
     showWater = false;
 
     frame = 0;
+
+
+    sound_volume = VOLUME_PLAYING;
+    loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
+    loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
 }
 
 
@@ -107,6 +116,14 @@ void VB_Game() {
 
     T1TC = 0;
     T1TCR = 1;
+
+
+    if (!rangeRandom(500)) {
+        //        FLASH(0x94,4);
+
+        loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
+        loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
+    }
 
     initDataStreams_Game();
 
@@ -149,7 +166,7 @@ void VB_Game() {
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
-        drawScore();
+        // drawScore();
         drawPlayerSprite();
     }
 
@@ -182,8 +199,8 @@ void OS_Game() {
         drawParticles();
         drawRope();
 
-        // drawScore();
-        // drawPlayerSprite();
+        drawScore();
+        drawPlayerSprite();
     }
 
 

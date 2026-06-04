@@ -24,7 +24,7 @@ enum AudioCommand {
 
 enum AudioID {
 
-    // Ordered by priority; see AudioSamples[]
+    // Ordered by PRIORITY; see AudioSamples[]
 
     SFX_NULL,             // 00
     SFX_UNCOVERED,        // 01
@@ -36,21 +36,23 @@ enum AudioID {
     SFX_EXTRA,            // 07
     SFX_EXIT,             // 08
     SFX_EXPLODE,          // 09
-    SFX_EXPLODE_QUIET,    // 10
-    SFX_MAGIC,            // 11
-    SFX_MAGIC2,           // 12
-    SFX_ROCK,             // 13
-    SFX_ROCK2,            // 14
-    SFX_SCORE,            // 15
-    SFX_DOGE,             // 16
-    SFX_DOGE3,            // 17
-    SFX_DIRT,             // 18
-    SFX_PUSH,             // 19
-    SFX_SPACE,            // 20
-    SFX_DRIP,             // 21
-    SFX_BUBBLER,          // 22
-    SFX_DRIP2,            // 23
-    SFX_UNCOVER,          // 24
+    SFX_ZAP,              // 10
+    SFX_ZAP2,             // 11
+    SFX_EXPLODE_QUIET,    // 12
+    SFX_MAGIC,            // 13
+    SFX_MAGIC2,           // 14
+    SFX_ROCK,             // 15
+    SFX_ROCK2,            // 16
+    SFX_SCORE,            // 17
+    SFX_DOGE,             // 18
+    SFX_DOGE3,            // 19
+    SFX_DIRT,             // 20
+    SFX_PUSH,             // 21
+    SFX_SPACE,            // 22
+    SFX_DRIP,             // 23
+    SFX_BUBBLER,          // 24
+    SFX_DRIP2,            // 25
+    SFX_UNCOVER,          // 26
 
 #if _ENABLE_LAVA2
     SFX_LAVA,    // 25

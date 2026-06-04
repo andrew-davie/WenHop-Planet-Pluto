@@ -156,6 +156,11 @@ int tapDelay = 0;
 
 bool checkHighPriorityMove(int dir) {
 
+    static int zapDelay = 0;
+    if (zapDelay)
+        --zapDelay;
+
+
     unsigned char joyBit = joyDirectBit[dir] << 4;
     if (usableSWCHA & joyBit)
         return false;
@@ -204,6 +209,33 @@ bool checkHighPriorityMove(int dir) {
 #endif
         }
 
+
+        else if (type == TYPE_ELECTRIC) {
+
+            if (!zapDelay || !rangeRandom(4))
+                FLASH(0x28, 3);
+
+            pulsePlayerColour = 100;
+            if (!zapDelay || (!rangeRandom(30))) {
+                zapDelay = 50;
+                // ADDAUDIO(SFX_ZAP2);
+            }
+
+            if (rangeRandom(20)) {
+
+                ADDAUDIO(SFX_ZAP);
+            } else {
+                FLASH(0x0F, 1);
+                ADDAUDIO(SFX_EXPLODE);
+            }
+
+            shakeTime = 5;
+
+            nDots(3, playerX, playerY, PT_SPIRAL, 25, 3 + ((xdir[dir] * CHAR_TRIX_X) >> 1) + rangeRandom(5) - 2,
+                  4 + ((ydir[dir] * CHAR_TRIX_Y) >> 1) + rangeRandom(5) - 2, 100);
+        }
+
+
         else if (Attribute[destType] & (ATT_BLANK | ATT_PERMEABLE | ATT_GRAB | ATT_EXIT)) {
 
             // startCharAnimation(TYPE_MELLON_HUSK,
@@ -220,12 +252,6 @@ bool checkHighPriorityMove(int dir) {
                 exitMode = 151;
                 waitRelease = true;
             }
-
-#ifdef ENABLE_SWITCH
-            else if (destType == TYPE_SWITCH) {
-                switchOn = !switchOn;
-            }
-#endif
 
             else if (destType == TYPE_FLIP_GRAVITY) {
                 nextGravity = -gravity;
@@ -398,6 +424,7 @@ bool checkLowPriorityMove(int dir) {
                 nDots(6, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 3, yOffset[dir] + 5, 40);
             }
 
+
             else {
                 *meOffset = FLAG(CH_CONVERT_PIPE);
             }
@@ -449,6 +476,11 @@ void movePlayer(unsigned char *me) {
 
 
     handled = false;
+
+
+    if (pulsePlayerColour)
+        nDots(2, playerX, playerY, PT_ONE, 25, 2, 5, 100);
+
 
     // breath bubbles
     static int breath;

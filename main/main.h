@@ -126,6 +126,8 @@ void setGameState(enum GAME_STATE state);
 int sphereDot(int dotX, int dotY, int type, unsigned char age);
 void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
 
+void nDotsAt(int count, int x, int y, int age, int speed);
+
 int dirFromCoords(int x, int y, int prevX, int prevY);
 void initNewGame();
 

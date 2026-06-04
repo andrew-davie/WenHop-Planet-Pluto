@@ -3,26 +3,19 @@
 Reformats C source files containing const byte arrays of exactly 30 bytes.
 Each group of 3 bytes = 1 row of 5 pixels (R bits, G bits, B bits).
 Outputs 3 bytes per line in binary format with ASCII art comment.
-
-ASCII shading map (combined RGB brightness 0-7):
-  0 → ' '  1 → '.'  2 → '@'  3 → '#'
-  4 → '░'  5 → '▒'  6 → '▓'  7 → '█'
 """
 
 import re
 import sys
 import os
 
-SHADE = [' ', '.', '@', '#', '░', '▒', '▓', '█']
-
+SHADE = [' ', '.', ':', '+', 'o', 'O', '#', '@']
 
 def pixel_char(r_bit, g_bit, b_bit):
-    """Map 3 single bits to a shade character (0–7)."""
     return SHADE[r_bit * 4 + g_bit * 2 + b_bit]
 
 
 def row_ascii(r_byte, g_byte, b_byte):
-    """Generate 5-char ASCII art string from one row's RGB bytes."""
     chars = []
     for bit_pos in range(4, -1, -1):  # bits 4..0 = pixels left to right
         r = (r_byte >> bit_pos) & 1
@@ -33,7 +26,6 @@ def row_ascii(r_byte, g_byte, b_byte):
 
 
 def parse_byte(token):
-    """Parse a C integer literal (binary 0b…, hex 0x…, or decimal)."""
     token = token.strip().rstrip(',')
     if token.startswith(('0b', '0B')):
         return int(token, 2)
@@ -44,35 +36,25 @@ def parse_byte(token):
 
 
 def format_byte(val):
-    """Format byte as 8-digit binary literal."""
-    return f'0b{val:08b}'
+    return f'0b{val:05b}'
 
 
 def reformat_array_body(bytes_list, indent):
-    """
-    Given exactly 30 bytes, produce reformatted lines:
-    3 bytes per line, binary, with // comment showing row index and ASCII art.
-    Returns list of strings (no trailing newline).
-    """
-    assert len(bytes_list) == 30, f"Expected 30 bytes, got {len(bytes_list)}"
+    """indent is the horizontal indent of the array declaration line (spaces only)."""
+    assert len(bytes_list) == 30
     lines = []
     for row in range(10):
         r = bytes_list[row * 3]
         g = bytes_list[row * 3 + 1]
         b = bytes_list[row * 3 + 2]
         art = row_ascii(r, g, b)
-        b0 = format_byte(r)
-        b1 = format_byte(g)
-        b2 = format_byte(b)
-        is_last_row = (row == 9)
-        comma = '' if is_last_row else ','
-        line = f'{indent}    {b0}, {b1}, {b2}{comma}  // row {row:2d}: |{art}|'
-        lines.append(line)
+        b0, b1, b2 = format_byte(r), format_byte(g), format_byte(b)
+        comma = ',' #''' if row == 9 else ','
+        lines.append(f'{indent}    {b0}, {b1}, {b2}{comma}  // {row:1d} |{art}|')
     return lines
 
 
 def extract_bytes_from_tokens(tokens):
-    """Parse token list into list of ints. Returns None if any token is unparseable."""
     result = []
     for t in tokens:
         t = t.strip()
@@ -85,9 +67,8 @@ def extract_bytes_from_tokens(tokens):
     return result
 
 
-# Matches:  [static] [const] [unsigned] TYPE name[] = {
 ARRAY_START_RE = re.compile(
-    r'^(?P<indent>\s*)'
+    r'(?P<indent>[^\S\n]*)'          # horizontal whitespace only (no newlines)
     r'(?P<prefix>(?:(?:static|const|unsigned|volatile)\s+)*)'
     r'(?P<type>(?:unsigned\s+)?(?:uint8_t|uint16_t|int8_t|char|byte|PROGMEM\s+\w+|\w+))'
     r'\s+'
@@ -98,20 +79,15 @@ ARRAY_START_RE = re.compile(
 
 
 def process_source(source):
-    """
-    Scan source for const array declarations, collect their bodies,
-    check for exactly 30 bytes, reformat them.
-    """
     out = []
     pos = 0
     text = source
 
     for m in ARRAY_START_RE.finditer(text):
-        # Emit everything up to this match unchanged
-        out.append(text[pos:m.end()])
+        out.append(text[pos:m.end()] + '\n')
         pos = m.end()
 
-        indent = m.group('indent')
+        indent = m.group('indent')  # spaces only, no newlines
         array_start_pos = m.end()
 
         # Find matching closing brace
@@ -124,20 +100,18 @@ def process_source(source):
                 depth -= 1
             i += 1
 
-        body_text = text[array_start_pos:i - 1]  # between { and }
-        after_brace = text[i - 1]                 # the closing '}'
-        pos = i  # continue after '}'
+        body_text = text[array_start_pos:i - 1]
+        after_brace = text[i - 1]
+        pos = i
 
-        # Strip comments from body before tokenising
+        # Strip comments before tokenising
         body_stripped = re.sub(r'//[^\n]*', '', body_text)
         body_stripped = re.sub(r'/\*.*?\*/', '', body_stripped, flags=re.DOTALL)
 
-        # Tokenise
         raw_tokens = re.split(r'[\s,]+', body_stripped.strip())
         tokens = [t for t in raw_tokens if t]
 
         if len(tokens) != 30:
-            # Not a 30-byte array — emit unchanged
             out.append(body_text)
             out.append(after_brace)
             continue
@@ -148,14 +122,10 @@ def process_source(source):
             out.append(after_brace)
             continue
 
-        # Emit reformatted body
         reformatted = reformat_array_body(bytes_list, indent)
-        out.append('\n')
-        out.append('\n'.join(reformatted))
-        out.append('\n' + indent)
+        out.append('\n' + '\n'.join(reformatted) + '\n' + indent)
         out.append(after_brace)
 
-    # Remainder of file
     out.append(text[pos:])
     return ''.join(out)
 
