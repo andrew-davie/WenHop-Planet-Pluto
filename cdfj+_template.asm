@@ -11,7 +11,7 @@
 	PROCESSOR 6502
 
 _DISPLAY_SIZE		= 6400			; For current framework: 4352 for 32K ROM; 6400 for 64K and 128K; 9472 for 256K and 512K
-ROM_SIZE		    = 128			; in kB - 32, 64, 128, 256 or 512
+ROM_SIZE		    = 64			; in kB - 32, 64, 128, 256 or 512
 
 ;**********************************************************************
 ; These must be BEFORE include of cdfjplus.h

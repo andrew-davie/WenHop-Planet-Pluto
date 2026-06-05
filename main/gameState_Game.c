@@ -21,6 +21,7 @@
 #include "score.h"
 #include "scroll.h"
 #include "sound.h"
+#include "swipe.h"
 #include "wyrm.h"
 
 extern const unsigned char trackGridLockMelodyIntro[];
@@ -71,9 +72,15 @@ void initGameState_Game() {
     initCharAnimations();
 
     initSprites();
+    initParticles();
 
     initWyrms();     // todo: --> initNextLife
     initPlayer();    // --> initNextLife
+
+#if ENABLE_SWIPE
+    setSwipeType(SWIPE_STAR);
+    initStarSwipe();
+#endif
 
     exitMode = 0;    // --> initNextlife
 
@@ -118,12 +125,12 @@ void VB_Game() {
     T1TCR = 1;
 
 
-    if (!rangeRandom(500)) {
-        //        FLASH(0x94,4);
+    // if (!rangeRandom(500)) {
+    //     //        FLASH(0x94,4);
 
-        loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
-        loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
-    }
+    //     loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
+    //     loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
+    // }
 
     initDataStreams_Game();
 

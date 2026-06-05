@@ -897,7 +897,7 @@ const unsigned char _CHAR_ELECTRIC_1[CHAR_Y] = {
     0b00000, 0b00100, 0b00100,    // 0 |  +  |
     0b00000, 0b00100, 0b00100,    // 1 |  +  |
     0b00000, 0b00100, 0b00100,    // 2 |  +  |
-    0b00000, 0b00100, 0b00100,    // 3 |  +  |
+    0b00000, 0b00110, 0b00110,    // 3 |   + |
     0b00000, 0b00100, 0b00100,    // 4 |  +  |
     0b00000, 0b00100, 0b00100,    // 5 |  +  |
     0b00000, 0b00100, 0b00100,    // 6 |  +  |
@@ -947,6 +947,35 @@ const unsigned char _CHAR_ELECTRIC_4[CHAR_Y] = {
     0b00000, 0b01000, 0b01000,    // 7 | +   |
     0b00000, 0b00100, 0b00100,    // 8 |  +  |
     0b00000, 0b00010, 0b00010,    // 9 |   + |
+};
+
+
+const unsigned char _CHAR_INSULATOR_TOP[CHAR_Y] = {
+
+    0b01110, 0b00010, 0b01110,    // 0 | OO@ |
+    0b11111, 0b00001, 0b11111,    // 1 |OOOO@|
+    0b11011, 0b00000, 0b00000,    // 2 |oo oo|
+    0b10110, 0b00000, 0b00000,    // 3 |o oo |
+    0b01110, 0b00010, 0b01110,    // 4 | OO@ |
+    0b01110, 0b00010, 0b01110,    // 5 | OO@ |
+    0b00000, 0b00000, 0b00000,    // 6 |     |
+    0b00100, 0b00000, 0b00000,    // 7 |  o  |
+    0b00100, 0b00000, 0b00100,    // 8 |  O  |
+    0b00000, 0b00000, 0b00000,    // 9 |     |
+};
+
+const unsigned char _CHAR_INSULATOR_BOTTOM[CHAR_Y] = {
+
+    0b00000, 0b00000, 0b00000,    // 0 |     |
+    0b00100, 0b00000, 0b00100,    // 1 |  O  |
+    0b00100, 0b00000, 0b00000,    // 2 |  o  |
+    0b00000, 0b00000, 0b00000,    // 3 |     |
+    0b01110, 0b00010, 0b01110,    // 4 | OO@ |
+    0b01110, 0b00010, 0b01110,    // 5 | OO@ |
+    0b10110, 0b00000, 0b00000,    // 6 |o oo |
+    0b11011, 0b00000, 0b00000,    // 7 |oo oo|
+    0b11111, 0b00001, 0b11111,    // 8 |OOOO@|
+    0b01110, 0b00010, 0b01110,    // 9 | OO@ |
 };
 
 
@@ -1207,6 +1236,20 @@ const unsigned char _CHAR_ROCK_URDL[CHAR_Y] = {
     0b00000, 0b11011, 0b00100,    // 9 |::.::|
 };
 
+const unsigned char _CHAR_PEBBLE1[CHAR_Y] = {
+
+    0b11111, 0b00000, 0b00000,    // 0 |ooooo|
+    0b11111, 0b00000, 0b00000,    // 1 |ooooo|
+    0b11111, 0b00000, 0b00100,    // 2 |ooOoo|
+    0b11111, 0b00000, 0b00100,    // 3 |ooOoo|
+    0b11111, 0b00000, 0b00000,    // 4 |ooooo|
+    0b11111, 0b00000, 0b00000,    // 5 |ooooo|
+    0b11111, 0b00000, 0b00000,    // 6 |ooooo|
+    0b11111, 0b00000, 0b00000,    // 7 |ooooo|
+    0b11111, 0b00000, 0b00000,    // 8 |ooooo|
+    0b11111, 0b00000, 0b00000,    // 9 |ooooo|
+};
+
 const unsigned char _CHAR_PEBBLE2[CHAR_Y] = {
 
     0b11111, 0b00000, 0b00000,    // 0 |ooooo|
@@ -1264,6 +1307,20 @@ const unsigned char _CHAR_DIRT[CHAR_Y] = {
     0b11111, 0b00000, 0b00000,    // 9 |ooooo|
 };
 
+const unsigned char _CHAR_BROKEN_DIRT[CHAR_Y] = {
+
+    0b00000, 0b00000, 0b00000,    // 0 |     |
+    0b00100, 0b00000, 0b00000,    // 1 |  o  |
+    0b01000, 0b00000, 0b00000,    // 2 | o   |
+    0b00100, 0b00000, 0b00000,    // 3 |  o  |
+    0b01010, 0b00000, 0b00000,    // 4 | o o |
+    0b00000, 0b00000, 0b00000,    // 5 |     |
+    0b01010, 0b00000, 0b00000,    // 6 | o o |
+    0b00100, 0b00000, 0b00000,    // 7 |  o  |
+    0b00010, 0b00000, 0b00000,    // 8 |   o |
+    0b00000, 0b00000, 0b00000,    // 9 |     |
+};
+
 const unsigned char _CHAR_BRICKWALL[CHAR_Y] = {
 
     0b00000, 0b11110, 0b11111,    // 0 |++++.|
@@ -1280,8 +1337,8 @@ const unsigned char _CHAR_BRICKWALL[CHAR_Y] = {
 
 const unsigned char _CHAR_DUST_0[CHAR_Y] = {
 
-    0b00000, 0b00000, 0b00000,    // 0 |     |
-    0b00000, 0b00000, 0b00000,    // 1 |     |
+    0b00010, 0b00000, 0b00000,    // 0 |   o |
+    0b00011, 0b00000, 0b00000,    // 1 |   oo|
     0b01000, 0b00000, 0b00000,    // 2 | o   |
     0b11100, 0b00000, 0b00000,    // 3 |ooo  |
     0b01000, 0b00000, 0b00000,    // 4 | o   |
@@ -1410,20 +1467,6 @@ const unsigned char _CHAR_DOGE_05[CHAR_Y] = {
     0b00000, 0b00000, 0b00000,    // 9 |     |
 };
 
-const unsigned char _CHAR_PEBBLE1[CHAR_Y] = {
-
-    0b11111, 0b00000, 0b00000,    // 0 |ooooo|
-    0b11111, 0b00000, 0b00010,    // 1 |oooOo|
-    0b11111, 0b00000, 0b00010,    // 2 |oooOo|
-    0b11111, 0b00000, 0b00000,    // 3 |ooooo|
-    0b11111, 0b00000, 0b00000,    // 4 |ooooo|
-    0b11111, 0b00000, 0b00000,    // 5 |ooooo|
-    0b11111, 0b00000, 0b00000,    // 6 |ooooo|
-    0b11111, 0b00000, 0b00000,    // 7 |ooooo|
-    0b11111, 0b00000, 0b00000,    // 8 |ooooo|
-    0b11111, 0b00000, 0b00000,    // 9 |ooooo|
-};
-
 
 const unsigned char _CHAR_WYRM_0[CHAR_Y] = {
 
@@ -1455,6 +1498,7 @@ const unsigned char _CHAR_WYRM_2[CHAR_Y] = {
 
 
 const unsigned char *const charSet[CH_MAX] = {
+
 
     // see ChName @ attribute.h
 
@@ -1572,6 +1616,9 @@ const unsigned char *const charSet[CH_MAX] = {
     _CHAR_ELECTRIC_2,                                   // 111 CH_ELECTRIC_2
     _CHAR_ELECTRIC_3,                                   // 112 CH_ELECTRIC_3
     _CHAR_ELECTRIC_4,                                   // 113 CH_ELECTRIC_4
+    _CHAR_BROKEN_DIRT,                                  // 114 CH_BROKEN_DIRT
+    _CHAR_INSULATOR_TOP,                                // 115 CH_INSULATOR_TOP
+    _CHAR_INSULATOR_BOTTOM,                             // 116 CH_INSULATOR_BOTTOM
 };
 
 // EOF

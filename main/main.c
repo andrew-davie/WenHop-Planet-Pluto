@@ -287,6 +287,10 @@ void runARM_SystemReset() {
     gameState = GS_NULL;
     setGameState(GS_DETECT_CONSOLE);
 
+#if ENABLE_SWIPE
+    setSwipePhase(SWIPE_GROW);
+#endif
+
     RAM[_kernel] = _KERNEL_DETECT_CONSOLE;
     RAM[_tvSystem] = tvSystem = _TV_SYSTEM_NTSC;
     RAM[_soundMode] = soundMode = _SND_MODE_TIA;

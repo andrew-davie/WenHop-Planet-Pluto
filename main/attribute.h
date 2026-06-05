@@ -53,6 +53,7 @@ enum ObjectType {
     TYPE_DOGE_FALLING2,            // 39
     TYPE_ROCK_PEBBLE,              // 40
     TYPE_ELECTRIC,                 // 41
+    TYPE_INSULATOR,                // 42
 
     TYPE_MAX
 };
@@ -177,6 +178,10 @@ enum ChName {
     CH_ELECTRIC_1,                // 111
     CH_ELECTRIC_2,                // 112
     CH_ELECTRIC_3,                // 113
+    CH_BROKEN_DIRT,               // 114
+    CH_INSULATOR_TOP,             // 115
+    CH_INSULATOR_BOTTOM,          // 115
+
     // 127 is limit
 
     CH_MAX

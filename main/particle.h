@@ -27,6 +27,7 @@ struct Particle {
 
 extern struct Particle particle[PARTICLE_COUNT];
 
+void initParticles();
 void drawParticles();
 void drawRope();
 

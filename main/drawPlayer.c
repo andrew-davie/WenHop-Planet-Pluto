@@ -136,7 +136,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
         if (pulsePlayerColour) {
 
-            int ppc = (pulsePlayerColour >> 3) + 3;
+            int ppc = ((pulsePlayerColour * 1) >> 5) + 3;
 
             pX += rangeRandom(ppc) - (ppc >> 1);
             playerSpriteY += rangeRandom(ppc) - (ppc >> 1);

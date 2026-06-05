@@ -4,6 +4,7 @@
 
 #include "cdfjplus.h"
 
+#include "animations.h"
 #include "attribute.h"
 #include "board.h"
 #include "characterset.h"
@@ -61,8 +62,8 @@ void doRoll();
 #define W4 ((_BOARD_COLS + 3) & ~3)
 #define H4 ((_BOARD_ROWS + 3) & ~3)
 
-bool onScreenX[W4];
-bool onScreenY[H4];
+bool onScreenX[W4] __attribute__((aligned(4)));
+bool onScreenY[H4] __attribute__((aligned(4)));
 
 void calculateVisibleMasks() {
 
@@ -192,7 +193,7 @@ void setupBoardScanner() {
 void processBoardSquares() {
 
 
-    while (T1TC < availableIdleTime - 7500) {
+    while (T1TC < availableIdleTime - 15000) {
 
 
         me = RAM + _BOARD + boardRow * _1ROW + boardCol;
@@ -361,9 +362,69 @@ void processTypes() {
     }
 }
 
+void electric(unsigned char *p, unsigned char ch) {
+
+    p -= _1ROW;
+    while (CharToType[GET(*p)] != TYPE_INSULATOR) {
+        *p = ch;
+        p -= _1ROW;
+    }
+}
+
+void disableInsulator(unsigned char *p) {
+
+    ADDAUDIO(SFX_ZAP);
+    ADDAUDIO(SFX_ZAP2);
+
+    FLASH(0x2C, 10);
+
+    bool disabled = false;
+    int dir = (GET(*p) == CH_INSULATOR_TOP) ? _1ROW : -_1ROW;
+    p += dir;
+
+    if (CharToType[GET(*p)] == TYPE_ELECTRIC) {
+        while (CharToType[GET(*p)] == TYPE_ELECTRIC) {
+            disabled = true;
+            *p = CH_BLANK;
+            p += dir;
+        }
+    }
+
+    else {
+
+        while (CharToType[GET(*p)] == TYPE_SPACE)
+            p += dir;
+
+        if (CharToType[GET(*p)] == TYPE_INSULATOR || CharToType[GET(*p)] == TYPE_STEELWALL) {
+            dir = -dir;
+            p += dir;
+
+            while (CharToType[GET(*p)] == TYPE_SPACE) {
+                *p = CH_ELECTRIC_0;
+                p += dir;
+            }
+            // FLASH(0xCC, 10);
+
+
+            // FLASH(0xD4, 2);
+
+        }
+
+        else
+            FLASH(0x44, 2);
+    }
+}
+
+
 void processCreatures() {
 
     switch (creature) {
+
+
+    case CH_INSULATOR_TOP: {
+
+    } break;
+
 
     case CH_OUTLET:
         processOutlet();
@@ -526,7 +587,7 @@ void processCreatures() {
     case CH_MELLON_HUSK_BIRTH:
 
         if (
-#if CIRCLE
+#if ENABLE_SWIPE
             checkSwipeFinished() &&
 #endif
             (!isScrolling())) {
@@ -871,9 +932,11 @@ void processFallingThings() {
             nDots(6, boardCol, boardRow + 1, PT_TWO, 40, 3, 1, 100);
         }
 
-        else
+        else {
             explode(next, FLAG(CH_DUST_0));
-
+            initParticles();
+            nDots(PARTICLE_COUNT, boardCol, boardRow + 1, PT_TWO, 100, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 50);
+        }
     } else {
 
         // stop falling
@@ -1079,9 +1142,9 @@ void explode(unsigned char *where, unsigned char explosionShape) {
     ADDAUDIO(SFX_EXPLODE);
 
     int offset[] = {-_BOARD_COLS - 1, -_BOARD_COLS, -_BOARD_COLS + 1, -1, 1,
-                    _BOARD_COLS - 1,  _BOARD_COLS,  _BOARD_COLS + 1};
+                    _BOARD_COLS - 1,  _BOARD_COLS,  _BOARD_COLS + 1,  0};
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 9; i++) {
         unsigned char *cell = where + offset[i];
         unsigned char type = CharToType[GET(*cell)];
         if (Attribute[type] & ATT_EXPLODABLE) {

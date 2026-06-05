@@ -67,7 +67,7 @@ void scroll() {
         // Auto-tracking
 
 #define MAX_SPEED_X 0x7000
-#define SCROLL_EDGE_X ((SCREEN_TRIX_X / 4) << 16)
+#define SCROLL_EDGE_X ((SCREEN_TRIX_X / 5) << 16)
 #define ACCEL_X (1 << 12)
 #define DECEL_X (2 << 9)
 

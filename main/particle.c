@@ -102,6 +102,13 @@ void drawRope() {
 
 struct Particle particle[PARTICLE_COUNT];
 
+void initParticles() {
+
+    for (int i = 0; i < PARTICLE_COUNT; i++)
+        particle[i].age = 0;
+}
+
+
 void drawParticles() {
 
     for (int i = 0; i < PARTICLE_COUNT; i++) {

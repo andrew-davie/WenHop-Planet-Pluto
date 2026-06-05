@@ -19,6 +19,8 @@ void processMusic();
 // const unsigned char trackSimple[];
 // static const unsigned char trackSimple2[];
 
+const unsigned char trackGridLockMelodyIntro2[];
+const unsigned char trackGridLockBase2[];
 const unsigned char trackGridLockMelodyIntro[];
 const unsigned char trackGridLockBase[];
 const unsigned char trackTrophy1[];
@@ -78,6 +80,7 @@ const unsigned char sampleZap[] = {
     // clang-format off
 
     3, 11, 12, 14,
+    3, 8, 12, 10,
     CMD_STOP,
 
     // clang-format on
@@ -524,6 +527,35 @@ const unsigned char trackTrophy2[] = {
 
 
 
+const unsigned char trackGridLockMelody2[] = {
+    FULLNOTE
+    e4 g4 c5 b4 d5 g4 a4 c5 e4 g4 c5 b4 d5 f4 a4 c5
+    e4 g4 c5 b4 d5 g4 a4 c5 e5 d5 b4 a4 g4 e4 g4 b4
+    // HALFNOTE
+    c5 b4 a4 g4 f4 e4 d4 c4
+    // FULLNOTE
+    e4 g4 b4 a4 c5 e5 d5 b4 c5 e5 g5 f5 a5 g5 e5 d5
+    c5 e5 d5 b4 a4 g4 f4 e4 g4 b4 d5 c5 e5 g5 e5 c5
+
+    TRACK_END
+};
+
+const unsigned char trackGridLockBase2[] = {
+    FULLNOTE
+    c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
+    c2 c2 e3 e3 g3 g3 c3 c3
+    c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
+    d3 d3 b2 b2 g3 g3 c3 c3
+    // HALFNOTE
+    c3 b2 a2_SHARP g3 f2 e3 d3 c2
+    // FULLNOTE
+    c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
+    c2 c2 g3 g3 d3 d3 a2_SHARP a2_SHARP
+    e3 e3 c3 c3 g3 g3 c2 c2
+    f2 f2 c3 c3 g3 g3 c2 c2
+
+    TRACK_END
+};
 
 const unsigned char trackGridLockMelodyIntro[] = {
     FULLNOTE

@@ -212,10 +212,14 @@ bool checkHighPriorityMove(int dir) {
 
         else if (type == TYPE_ELECTRIC) {
 
-            if (!zapDelay || !rangeRandom(4))
-                FLASH(0x28, 3);
+
+            // startPlayerAnimation(ID_Turn);
+
+            //            if (!zapDelay || !rangeRandom(4))
+            FLASH(0x28, 13);
 
             pulsePlayerColour = 100;
+
             if (!zapDelay || (!rangeRandom(30))) {
                 zapDelay = 50;
                 // ADDAUDIO(SFX_ZAP2);
@@ -224,15 +228,18 @@ bool checkHighPriorityMove(int dir) {
             if (rangeRandom(20)) {
 
                 ADDAUDIO(SFX_ZAP);
+                ADDAUDIO(SFX_ZAP2);
             } else {
                 FLASH(0x0F, 1);
                 ADDAUDIO(SFX_EXPLODE);
             }
 
-            shakeTime = 5;
+            shakeTime = 50;
 
             nDots(3, playerX, playerY, PT_SPIRAL, 25, 3 + ((xdir[dir] * CHAR_TRIX_X) >> 1) + rangeRandom(5) - 2,
                   4 + ((ydir[dir] * CHAR_TRIX_Y) >> 1) + rangeRandom(5) - 2, 100);
+
+            return true;
         }
 
 
@@ -285,10 +292,15 @@ bool checkHighPriorityMove(int dir) {
                 *me = FLAG(CH_BLANK);
                 *meOffset = FLAG(CH_MELLON_HUSK);
 
-                if (Attribute[destType] & ATT_DIRT)
+                if (destType == TYPE_PEBBLE1)
+                    nDots(4, playerX, playerY, PT_ONE, 10, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 240);
+
+
+                if (Attribute[destType] & ATT_DIRT) {
                     startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK]);
-                else
-                    startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK] + 6);
+                    nDots(8, playerX, playerY, PT_ONE, 15, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 60);
+                } else
+                    startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK] + 12);
             }
 
             // Fix bar stuff
@@ -388,6 +400,10 @@ bool checkLowPriorityMove(int dir) {
         return false;
     }
 
+    int offX = playerX + xdir[dir];
+    int offY = playerY + ydir[dir];
+
+
     int offset = dirOffset[dir];
     unsigned char *meOffset = me + offset;
     unsigned char destType = CharToType[GET(*meOffset)];
@@ -415,13 +431,24 @@ bool checkLowPriorityMove(int dir) {
             static signed char yOffset[] = {-5, 0, 5, 0};
 
             if (Attribute[destType] & ATT_MINE) {
-                addScore(VALUE_BREAK_GEODE);
 
-                //            pushCounter = 2;
-                *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
 
-                surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
-                nDots(6, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 3, yOffset[dir] + 5, 40);
+                if (destType == TYPE_INSULATOR) {
+
+
+                    nDots(PARTICLE_COUNT, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40);
+                    disableInsulator(meOffset);
+                }
+
+                else {
+                    addScore(VALUE_BREAK_GEODE);
+
+                    //            pushCounter = 2;
+                    *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
+
+                    surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
+                    nDots(6, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40);
+                }
             }
 
 
@@ -478,8 +505,10 @@ void movePlayer(unsigned char *me) {
     handled = false;
 
 
-    if (pulsePlayerColour)
+    if (pulsePlayerColour) {
         nDots(2, playerX, playerY, PT_ONE, 25, 2, 5, 100);
+        return;
+    }
 
 
     // breath bubbles

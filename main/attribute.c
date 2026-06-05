@@ -121,6 +121,9 @@ const unsigned char CharToType[CH_MAX] = {
     TYPE_ELECTRIC,                 // 111 CH_ELECTRIC_1
     TYPE_ELECTRIC,                 // 112 CH_ELECTRIC_2
     TYPE_ELECTRIC,                 // 113 CH_ELECTRIC_3
+    TYPE_DIRT,                     // 114 CH_BROKEN_DIRT  (not actually used on board)
+    TYPE_INSULATOR,                // 115 CH_INSULATOR_TOP
+    TYPE_INSULATOR,                // 116 CH_INSULATOR_BOTTOM
 };
 
 // clang-format off
@@ -209,6 +212,7 @@ const unsigned int Attribute[TYPE_MAX] = {
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ |XPD| _ | _ | _  , // 39 TYPE_DOGE_FALLING2
     _ |PAD| _ | _ |DIS|PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _  , // 40 TYPE_ROCK_PEBBLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 41 TYPE_ELECTRIC
+    _ | _ | _ | _ | _ |PH4| _ | _ | _ | _ |MIN| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 41 TYPE_INSULATOR
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+----+
 
     // clang-format on

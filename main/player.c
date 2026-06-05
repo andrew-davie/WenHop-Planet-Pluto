@@ -184,9 +184,9 @@ const signed char AnimationLocked[] = {
 // };
 
 const signed char AnimationTurn[] = {
-    FRAME_LOOK1, 4,
-    FRAME_LOOK2, 4,
-    ACTION_FLIP,
+    FRAME_PUSH,6,// _LOOK1, 4,
+    FRAME_PUSH2,6,//, 4,
+//    ACTION_FLIP,
     ACTION_STOP,
 };
 
@@ -283,7 +283,7 @@ const signed char AnimationXray[] = {
 
 const signed char AnimationSkeleton[] = {
 
-    FRAME_SKELETON1, 8,
+    FRAME_SKELETON1, 28,
     FRAME_SKELETON2, 8,
     FRAME_SKELETON3, 8,
     FRAME_SKELETON4, 8,

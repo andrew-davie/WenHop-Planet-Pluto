@@ -144,11 +144,18 @@ const unsigned char AnimMellonHusk[] = {
 
     // Note that mellon.c indexes into this with an offset so this must be kept synched
 
-    CH_DUST_0, 6,
-    CH_DUST_1, 6,
-    CH_DUST_2, 6,
+    // CH_DUST_ROCK_0, 12,
+    // CH_DUST_ROCK_1, 6,
+    // CH_DUST_ROCK_2, 6,
 
-    CH_MELLON_HUSK, ANIM_HALT,
+    CH_DUST_0, 3,
+    CH_BROKEN_DIRT, 3,
+    CH_DUST_0, 3,
+    CH_BROKEN_DIRT, 3,
+    CH_DUST_1, 6,
+    CH_DUST_2, 3,
+
+    CH_BLANK, ANIM_HALT,
 
     // @+2
     // CH_DOGE_GRAB,8,
@@ -163,6 +170,9 @@ const unsigned char *const AnimateBase[TYPE_MAX] = {
 
     // indexed by object TYPE (def: ObjectType in attribute.h)
     // =0 if object does not auto-animate
+
+    // SUPER CRITICAL:  *ALL* characters of the given type will animate in unison.
+    //  You *CANNOT* use this to animate a just single character onscreen.
 
     // Note that the type number is an ID, not ordinal. That's because the continuity may
     // be compromised by the conditional compilation. Beware.
@@ -209,6 +219,7 @@ const unsigned char *const AnimateBase[TYPE_MAX] = {
     0,                    // 39 TYPE_DOGE_FALLING2
     AnimateRockPebble,    // 40 TYPE_ROCK_PEBBLE (geodoge disintegrating)
     0,                    // 41 TYPE_ELECTRIC_0
+    0,                    // 42 TYPE_INSULATOR
 };
 
 void initCharAnimations() {

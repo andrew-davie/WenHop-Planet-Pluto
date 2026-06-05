@@ -47,6 +47,7 @@ _BOARD_COLS = 40
 _BOARD_ROWS = 22
 _1ROW = _BOARD_COLS
 
+    .align 4
 _BOARD              ds _BOARD_COLS * _BOARD_ROWS + 4    ; extra for grab+1 in drawscreen "bug"
 
 

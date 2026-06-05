@@ -76,14 +76,14 @@ const unsigned char caveUseWall[] = {
 
     // Start of cave draw
 
-    CH_GRINDER_1, 13,7,
+    CH_INSULATOR_TOP, 13,7,
     CH_ELECTRIC_0, 13,8,
     CH_ELECTRIC_0, 13,9,
     CH_ELECTRIC_0, 13,10,
     CH_ELECTRIC_0, 13,11,
     CH_ELECTRIC_0, 13,12,
     CH_ELECTRIC_0, 13,13,
-        CH_GRINDER_1, 13,14,
+        CH_INSULATOR_BOTTOM, 13,14,
 
     // DRAW_FILLED_RECT, CH_BRICKWALL, 11, 6, 12, 12, CH_BLANK,
     // DRAW_FILLED_RECT, CH_GEODOGE, 12, 12, 10, 5, CH_GEODOGE,
@@ -559,13 +559,13 @@ const unsigned char caveA2[] = {
 
     CAVEDEF_PARALLAX, STEEL, CH_BLANK,
 
-    6,
+    5,
     CH_DIRT, 50, 10, 5, 0, 20,
     CH_GEODOGE, 50, 10, 5, 0, 20,
     CH_PUSH_RIGHT, 0, 10, 5, 0, 20,
     CH_PUSH_UP, 0, 10, 5, 0, 20,
     CH_PUSH_DOWN, 0, 10, 5, 0, 20,
-    CH_WYRM_HEAD_U, 50,20,30,40,50,
+//    CH_WYRM_HEAD_U, 50,20,30,40,50,
 
     //   CH_BLANK,       60, 255,   0, 255,  10,
     //     CH_ROCK,     90,   0, 240,   0,  20,
@@ -842,11 +842,11 @@ const unsigned char caveA4[] = {
     56,                             //3
     8,                              //4 randomiser[level]
 
-    17,                             //0
-    17,                             //1
-    17,                             //2
-    17,                             //3
-    17,                             //4
+    15,                             //0
+    15,                             //1
+    15,                             //2
+    15,                             //3
+    15,                             //4
     
     20,                             //0
     200,                            //1
@@ -877,8 +877,10 @@ const unsigned char caveA4[] = {
     //    0xFE, CH_DOGE_00, 16,8,
     // 0xFE,
     // CH_ROCK, 1, 4,
-    CH_STEELWALL, 12, 4,
-    CH_STEELWALL, 12, 5,
+    CH_ELECTRIC_0, 12, 4,
+    CH_ELECTRIC_0, 12, 5,
+    CH_INSULATOR_BOTTOM,12,6,
+
     CH_STEELWALL, 14, 5,
     CH_STEELWALL, 14, 6,
 
@@ -899,11 +901,16 @@ const unsigned char caveA4[] = {
 
     CH_MELLON_HUSK_BIRTH, 11, 4,
 
-
+    // CH_INSULATOR_TOP,18,4,
     CH_ELECTRIC_0, 18,4,
     CH_ELECTRIC_0, 18,5,
-    CH_ELECTRIC_0, 18,6,
-
+    // CH_ELECTRIC_0, 18,6,
+    CH_INSULATOR_BOTTOM,18,6,
+ 
+    CH_ELECTRIC_0, 24,4,
+    CH_ELECTRIC_0, 24,5,
+    // CH_ELECTRIC_0, 18,6,
+    CH_INSULATOR_BOTTOM,24,6,
 
     DRAW_EOF,
 
@@ -922,8 +929,8 @@ const unsigned char caveA4[] = {
 const unsigned char *caveList[] = {
     // clang-format off
 
-    caveA4,
     caveUseWall,
+    caveA4,
 
     caveWyrms,
 
@@ -931,8 +938,8 @@ const unsigned char *caveList[] = {
 //    caveFast,
 //    caveA5,  // bad
 
-    caveA2,         // best
     caveA,
+    caveA2,         // best
     caveA3,
 
     // clang-format on
