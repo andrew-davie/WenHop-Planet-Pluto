@@ -110,6 +110,8 @@ void setupBoardScanner() {
 
     if (gameFrame >= gameSpeed && !autoMoveFrameCount) {
 
+        doges = gameFrame;
+
         waterDir++;
 
         restartBoardScan();
@@ -132,7 +134,7 @@ void setupBoardScanner() {
 
             // Surface lava "bubbles"
             int posX = ((scrollX * 5) >> 16) + rangeRandom(_BOARD_COLS);
-            nDotsAtTrixel(1, posX, lavaSurfaceTrixel - 2, 120, 0x1000);
+            nDotsAtTrixel(1, posX, lavaSurfaceTrixel - 2, 120, 0x1000, 6);
         }
 
         if (showWater) {
@@ -276,14 +278,16 @@ void processTypes() {
 
     case TYPE_ELECTRIC: {
 
-        unsigned char new = getRandom32() & 3;
-        if (CH_ELECTRIC_0 + new == *me)
-            new = (new + 1) & 3;
-        *me = CH_ELECTRIC_0 + new;
+        if (!rangeRandom(10))
+            *me = CH_ELECTRIC_0 + rangeRandom(4);
 
-        if (!rangeRandom(30))
-            nDots(5, boardCol, boardRow, PT_SPIRAL2, 20, 3, 5, 0xC0);
+        if (Attribute[CharToType[GET(*(me + _1ROW))]] & (ATT_DISSOLVES | ATT_BLANK))
+            *(me + _1ROW) = CH_ELECTRIC_0 + rangeRandom(4);
 
+        if (Attribute[CharToType[GET(*(me - _1ROW))]] & (ATT_DISSOLVES | ATT_BLANK))
+            *(me - _1ROW) = CH_ELECTRIC_0 + rangeRandom(4);
+
+        *me = CH_ELECTRIC_0 + ((*me + 1 - CH_ELECTRIC_0) & 3);
     } break;
 
     case TYPE_OUTBOX:
@@ -392,23 +396,11 @@ void disableInsulator(unsigned char *p) {
 
     else {
 
-        while (CharToType[GET(*p)] == TYPE_SPACE)
-            p += dir;
+        // while (CharToType[GET(*p)] == TYPE_SPACE)
+        //     p += dir;
 
-        if (CharToType[GET(*p)] == TYPE_INSULATOR || CharToType[GET(*p)] == TYPE_STEELWALL) {
-            dir = -dir;
-            p += dir;
-
-            while (CharToType[GET(*p)] == TYPE_SPACE) {
-                *p = CH_ELECTRIC_0;
-                p += dir;
-            }
-            // FLASH(0xCC, 10);
-
-
-            // FLASH(0xD4, 2);
-
-        }
+        if (Attribute[CharToType[GET(*p)]] & (ATT_DISSOLVES | ATT_BLANK))
+            *p = CH_ELECTRIC_0 + rangeRandom(4);
 
         else
             FLASH(0x44, 2);

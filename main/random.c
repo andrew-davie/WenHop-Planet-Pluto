@@ -39,10 +39,4 @@ unsigned int rangeRandom(int range) {
     return ((getRandom32() >> 16) * range) >> 16;
 }
 
-unsigned int getCaveRandom32() {
-    cave_random_b = 36969 * (cave_random_b & 65535) + (cave_random_b >> 16);
-    cave_random_a = 18000 * (cave_random_a & 65535) + (cave_random_a >> 16);
-    return (cave_random_b << 16) + cave_random_a;
-}
-
 // EOF

@@ -492,7 +492,10 @@ void drawScreen() {    // --> cycles 62870 (@20230616)
     }
 }
 
-bool drawBit(int x, int y) {
+bool drawBit(int x, int y, unsigned char colour) {
+
+    colour |= colour << 3;
+    colour >>= roller;
 
     int line = (y - ((scrollY) >> 16)) * 3;
     if (line < 0 || line >= _SCANLINES - 3)
@@ -523,9 +526,14 @@ bool drawBit(int x, int y) {
 
     int bit = 1 << shift;
 
-    base[0] |= bit;
-    base[1] |= bit;
-    base[2] |= bit;
+    unsigned char mask0 = (colour) << shift;
+    unsigned char mask1 = (colour >> 1) << shift;
+    unsigned char mask2 = (colour >> 2) << shift;
+
+
+    base[0] |= bit & mask0;
+    base[1] |= bit & mask1;
+    base[2] |= bit & mask2;
 
     return true;
 }

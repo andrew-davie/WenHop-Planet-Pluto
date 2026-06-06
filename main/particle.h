@@ -19,6 +19,7 @@ struct Particle {
     unsigned char type;
     unsigned char age;
     unsigned char speed;
+    unsigned char colour;
     int x;
     int y;
     unsigned char direction;
@@ -32,9 +33,9 @@ void drawParticles();
 void drawRope();
 
 
-int sphereDot(int dotX, int dotY, int type, unsigned char age);
+int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char colour);
 void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
 void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
-void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed);
+void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed, unsigned char colour);
 
 // EOF

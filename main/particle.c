@@ -54,7 +54,7 @@ void modifyCharAtTip(int x, int y) {
 
         // if (audio != SFX_DRIP)
         //     ADDAUDIO(audio);
-        nDotsAtTrixel(5, (x >> 8) + 2, (y >> 8) + 5, 30, 50);
+        nDotsAtTrixel(5, (x >> 8) + 2, (y >> 8) + 5, 30, 50, 6);
     }
 }
 
@@ -70,7 +70,7 @@ void drawRope() {
         ropeLength = ROPE_PARTICLE_COUNT;
 
     int baseX = (playerX * 5 + 2 + ((faceDirection * autoMoveX) >> 2)) << 8;
-    int baseY = ((playerY * 10 + 6) << 8) + (autoMoveY * (256 / 3));
+    int baseY = ((playerY * 10 + 6) << 8) + (autoMoveY * (256 / 3)) - 2;
 
     int x = 0, y = 0;
 
@@ -78,8 +78,10 @@ void drawRope() {
         x += (xsin[(ropeDirection[i] >> 3) & 0x1F] * PIXEL_ASPECT) >> 8;
         y += (xsin[((ropeDirection[i] >> 3) + 4) & 0x1F] * 256) >> 8;
 
-        drawBit((baseX + x) >> 8, (baseY + y) >> 8);
-        drawBit((baseX - x) >> 8, (baseY - y) >> 8);
+        drawBit((baseX + x) >> 8, ((baseY + y) >> 8), 7);
+        drawBit((baseX + x) >> 8, ((baseY + y) >> 8) + 1, 7);
+        drawBit((baseX - x) >> 8, ((baseY - y) >> 8), 1 + 7);
+        drawBit((baseX - x) >> 8, ((baseY - y) >> 8) + 1, 7);
     }
 
     modifyCharAtTip(baseX + x, baseY + y);
@@ -133,7 +135,7 @@ void drawParticles() {
                 particle[i].direction += PARTICLE_SPIRAL_ANGULAR_SPEED;
 
                 if (!rangeRandom(250))
-                    nDotsAtTrixel(4, x, y, 30, 0x20);
+                    nDotsAtTrixel(4, x, y, 30, 0x20, particle[i].colour);
                 break;
             }
 
@@ -155,7 +157,7 @@ void drawParticles() {
                 break;
             }
 
-            if (!drawBit(x, y))
+            if (!drawBit(x, y, particle[i].colour))
                 particle[i].age = 0;
 
             else {
@@ -168,7 +170,7 @@ void drawParticles() {
     }
 }
 
-int sphereDot(int dotX, int dotY, int type, unsigned char age) {
+int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char colour) {
 
     int whichDrop = -1;
 
@@ -190,8 +192,9 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age) {
             particle[whichDrop].x = dotX << 8;
 
             particle[whichDrop].y = dotY << 8;
-            particle[whichDrop].speed = 0;    // rangeRandom(15) + 16;
+            particle[whichDrop].speed = 0;
             particle[whichDrop].age = age;
+            particle[whichDrop].colour = colour;
 
             particle[whichDrop].direction = getRandom32();    // 16.16 angle
             particle[whichDrop].distance = 96;                // 16.16 speed
@@ -208,7 +211,7 @@ void nDots(int count, int dripX, int dripY, int type, unsigned char age, int off
         offsetY = CHAR_TRIX_Y - offsetY;
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age);
+        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, 2);
         if (idx >= 0) {
             particle[idx].speed = rangeRandom(speed >> 1);
             if (type == PT_SPIRAL2)
@@ -223,7 +226,7 @@ void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age
         offsetY = CHAR_TRIX_Y - offsetY;
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age);
+        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, 3);
 
         // TODO vector
         particle[idx].x += particle[idx].age * particle[idx].speed;
@@ -234,10 +237,10 @@ void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age
     }
 }
 
-void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed) {
+void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed, unsigned char colour) {
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX, dripY, PT_SPIRAL, age);
+        int idx = sphereDot(dripX, dripY, PT_SPIRAL, age, colour);
         if (idx >= 0)
             particle[idx].speed = speed;
     }

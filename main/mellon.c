@@ -489,7 +489,7 @@ bool checkLowPriorityMove(int dir) {
 
 void bubbles(int count, int dripX, int dripY, int age, int /*speed*/) {
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX, dripY, PT_BUBBLE, age);
+        int idx = sphereDot(dripX, dripY, PT_BUBBLE, age, 1);
         if (idx >= 0) {
             particle[idx].speed = 10;    //(-0x2800 - rangeRandom(0x2800)) >> 4;
             // particle.speedX[idx] >>= 4;
@@ -500,7 +500,6 @@ void bubbles(int count, int dripX, int dripY, int age, int /*speed*/) {
 }
 
 void movePlayer(unsigned char *me) {
-
 
     handled = false;
 

@@ -1,6 +1,7 @@
 todo:
-memcpy int alignment crash on stella
 
 
 swipe import from BD
-dirt clear import from BD
+colour particles
+
+potential issue with wyrm on stella (crash per earlier bug)

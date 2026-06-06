@@ -53,8 +53,8 @@ struct CAVE_DEFINITION *theCave;
 
 static int decodeFlasher;
 
-// int last_prng_a;
-// int last_prng_b;
+int last_prng_a;
+int last_prng_b;
 
 void decodeCave(int cave) {
 
@@ -68,8 +68,9 @@ void decodeCave(int cave) {
 
     decodeState = DECODE_NONE;
 
-    cave_random_a = theCave->randomInit[level];
-    cave_random_b = cave_random_a++;    // ensure one is non-zero!
+
+    last_prng_a = theCave->randomInit[level];
+    last_prng_b = last_prng_a++;
 
     lockDisplay = theCave->flags & CAVEDEF_OVERVIEW;
 
@@ -80,7 +81,7 @@ void decodeCave(int cave) {
     time = (theCave->timeToComplete[level] << 8) + 60;
     millingTime = theCave->millingTime * 60;
 
-    myMemsetInt((unsigned int *)(RAM + _BOARD), 0, (_BOARD_COLS * _BOARD_ROWS) / 4);
+    //    myMemsetInt((unsigned int *)(RAM + _BOARD), 0, (_BOARD_COLS * _BOARD_ROWS) / 4);
 
     decodingRow = 0;
     decodeFlasher = 21;
@@ -92,49 +93,40 @@ void decodeCave(int cave) {
 }
 
 unsigned char cmd;
-unsigned char a, b, c, d, e, f;
+unsigned char x, y, c, d, e, f;
 unsigned char theCode;
 unsigned char theObject;
 
-// unsigned int restore_prng_a, restore_prng_b;
 
 int decodeExplicitData(int /*sfx*/) {
 
-    // restore_prng_a = prng_a;
-    // restore_prng_b = prng_b;
-
-    // prng_a = last_prng_a;
-    // prng_b = last_prng_b;
+    prng_a = last_prng_a;
+    prng_b = last_prng_b;
 
     switch (decodeState) {
     case DECODE_START:
 
-        // if (sfx)
-        //     ADDAUDIO(SFX_SCORE);
-
         if (decodingRow < _BOARD_ROWS) {
 
-
-            DrawLine(theCave->interiorCharacter /*| FLAG_UNCOVER*/, 0, decodingRow, _BOARD_COLS, 2);
+            myMemsetInt((unsigned int *)(RAM + _BOARD + decodingRow * _1ROW), 0, _BOARD_COLS / 4);
 
             for (int x = 0; x < _BOARD_COLS; x++)
                 for (int object = 0; object < theCave->objectCount; object++) {
                     unsigned char *p = (&(theCave->objectData)) + object * 6;
-
-                    // unsigned char *me = RAM + _BOARD + x + decodingRow * _BOARD_COLS;
-                    // if (GET(*me) == 0)
-                    if ((getCaveRandom32() >> 24) < p[level + 1])
+                    if ((getRandom32() >> 24) < p[level + 1])
                         StoreObject(x, decodingRow, p[0]);
                 }
 
-            if (theCave->borderCharacter) {
+            unsigned char border = theCave->borderCharacter;
+
+            if (border) {
 
                 if (!decodingRow || decodingRow == _BOARD_ROWS - 1)
-                    DrawLine(theCave->borderCharacter, 0, decodingRow, _BOARD_COLS, 2);
-
+                    myMemsetInt((unsigned int *)(RAM + _BOARD + decodingRow * _1ROW),
+                                (border << 24 | border << 16 | border << 8 | border), _BOARD_COLS / 4);
                 else {
-                    StoreObject(0, decodingRow, theCave->borderCharacter);
-                    StoreObject(_BOARD_COLS - 1, decodingRow, theCave->borderCharacter);
+                    StoreObject(0, decodingRow, border);
+                    StoreObject(_BOARD_COLS - 1, decodingRow, border);
                 }
             }
 
@@ -145,7 +137,6 @@ int decodeExplicitData(int /*sfx*/) {
 
 
             d = e = 0;
-            // theCaveData = caveList[cave].cavePtr + sizeof(struct CAVE_DEFINITION);
             decodeState = DECODE_STOP;
             processedLevel = false;
         }
@@ -190,51 +181,25 @@ int decodeExplicitData(int /*sfx*/) {
                 theObject = *theCaveData++;
             }
 
-            a = *theCaveData++;
-            b = *theCaveData++;
+            x = *theCaveData++;
+            y = *theCaveData++;
 
             if (!cmd) {
 
-                // if (theObject == CH_DOGE)
-                //     theObject = CH_DOGE_PULSE_0 + rangeRandom(7);
-
-                StoreObject(a, b, theObject);
+                StoreObject(x, y, theObject);
 
                 if (theObject == CH_DOORCLOSED) {
-                    doorX = a;
-                    doorY = b;
+                    doorX = x;
+                    doorY = y;
                 }
 
                 else if (theObject == CH_MELLON_HUSK_BIRTH) {
 
-                    playerX = a;
-                    playerY = b;
-
-                    // scrollX = playerX * CHAR_TRIX_X - HALFWAY_X;
-
-                    // if (scrollX < 0)
-                    //     scrollX = 0;
-
-                    // if (scrollX >= BOARD_TRIX_X - SCREEN_TRIX_X)
-                    //     scrollX = BOARD_TRIX_X - SCREEN_TRIX_X;
-
-                    // scrollX <<= 16;
-
-
-                    // scrollY = playerY * CHAR_TRIX_Y - HALFWAY_Y;
-
-                    // if (scrollY < 0)
-                    //     scrollY = 0;
-
-                    // if (scrollY >= BOARD_TRIX_Y - SCREEN_TRIX_Y)
-                    //     scrollY = BOARD_TRIX_Y - SCREEN_TRIX_Y;
-
-                    // scrollY <<= 16;
+                    playerX = x;
+                    playerY = y;
 
                     resetTracking();
                 }
-
-                //                thumbnailSpeed = -1;
             }
 
             else {
@@ -261,31 +226,21 @@ int decodeExplicitData(int /*sfx*/) {
             switch (cmd) {
 
             case DRAW_LINE:
-                DrawLine(theObject, a, b, d, c);
-                // if (sfx)
-                //     ADDAUDIO(SFX_DRIP);
+                DrawLine(theObject, x, y, d, c);
                 break;
 
             case DRAW_FILLED_RECT:
-                // thumbnailSpeed = -2;
-                DrawFilledRect(theObject, a, b, c, d, f);
-                // if (sfx)
-                //     ADDAUDIO(SFX_DIRT);
+                DrawFilledRect(theObject, x, y, c, d, f);
                 break;
 
             case DRAW_RECT:
                 d = e;
-                DrawRect(theObject, a, b, c, d);
-                // if (sfx)
-                //     ADDAUDIO(SFX_BLIP);
+                DrawRect(theObject, x, y, c, d);
                 break;
 
             default:
                 break;
             }
-
-            // if (d == e)
-            //     thumbnailSpeed = -10;
         }
 
         break;
@@ -296,9 +251,6 @@ int decodeExplicitData(int /*sfx*/) {
         if (theCave->borderCharacter)
             DrawRect(theCave->borderCharacter /*& ((decodeFlasher & 4) ? 0 : 0xFF)*/, 0, 0, _BOARD_COLS, _BOARD_ROWS);
 
-        // tmp        if (!(decodeFlasher & 0b11))
-        // if (sfx)
-        //     ADDAUDIO(SFX_DRIP);
         if (!--decodeFlasher)
             StoreObject(doorX, doorY, CH_DOORCLOSED);
         break;
@@ -307,11 +259,8 @@ int decodeExplicitData(int /*sfx*/) {
         break;
     }
 
-    // last_prng_a = prng_a;
-    // last_prng_b = prng_b;
-
-    // prng_a = restore_prng_a;
-    // prng_b = restore_prng_b;
+    last_prng_a = prng_a;
+    last_prng_b = prng_b;
 
     return decodeFlasher;
 }

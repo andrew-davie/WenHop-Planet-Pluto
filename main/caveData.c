@@ -78,12 +78,7 @@ const unsigned char caveUseWall[] = {
 
     CH_INSULATOR_TOP, 13,7,
     CH_ELECTRIC_0, 13,8,
-    CH_ELECTRIC_0, 13,9,
-    CH_ELECTRIC_0, 13,10,
-    CH_ELECTRIC_0, 13,11,
-    CH_ELECTRIC_0, 13,12,
-    CH_ELECTRIC_0, 13,13,
-        CH_INSULATOR_BOTTOM, 13,14,
+    CH_INSULATOR_BOTTOM, 13,14,
 
     // DRAW_FILLED_RECT, CH_BRICKWALL, 11, 6, 12, 12, CH_BLANK,
     // DRAW_FILLED_RECT, CH_GEODOGE, 12, 12, 10, 5, CH_GEODOGE,
@@ -865,7 +860,7 @@ const unsigned char caveA4[] = {
     1,
     CH_BLANK, 50, 10, 5, 0, 20,
 
-    DRAW_FILLED_RECT, CH_STEELWALL, 10, 3, 20, 5, CH_DIRT,
+    DRAW_FILLED_RECT, CH_BRICKWALL, 10, 3, 20, 5, CH_DIRT,
 
     //    LINER(CH_HORIZ_ZAP_0, 13,7,10,R)
     // LINER(CH_DOGE_00, 13,8,16,R)
@@ -877,7 +872,6 @@ const unsigned char caveA4[] = {
     //    0xFE, CH_DOGE_00, 16,8,
     // 0xFE,
     // CH_ROCK, 1, 4,
-    CH_ELECTRIC_0, 12, 4,
     CH_ELECTRIC_0, 12, 5,
     CH_INSULATOR_BOTTOM,12,6,
 

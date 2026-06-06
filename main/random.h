@@ -8,6 +8,5 @@ extern unsigned int cave_random_a, cave_random_b;
 void initRandom();
 unsigned int getRandom32();
 unsigned int rangeRandom(int range);
-unsigned int getCaveRandom32();
 
 // EOF
