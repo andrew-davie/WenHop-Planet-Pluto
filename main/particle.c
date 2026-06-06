@@ -26,6 +26,8 @@ const int xsin[32] = {
 
 void modifyCharAtTip(int x, int y) {
 
+    unsigned char colour = 0;
+
     int xchar = (x * (256 / 5)) >> 16;
     int ychar = (y * (256 / 10)) >> 16;
 
@@ -33,33 +35,124 @@ void modifyCharAtTip(int x, int y) {
     int ch = CharToType[GET(*b)];
     //    int audio = SFX_DRIP;
 
-    if (ch == TYPE_ROCK) {
+    if (ch == TYPE_DOGE) {
+        *b = CH_BLANK | FLAG_THISFRAME;
+        colour = rangeRandom(7) + 1;
+    }
+
+
+    else if (ch == TYPE_ROCK) {
         *b = CH_GEODOGE | FLAG_THISFRAME;
+        colour = 1;
         //      audio = SFX_ROCK;
     } else if (ch == TYPE_GEODOGE) {
         *b = CH_DOGE_00 | FLAG_THISFRAME;
+        colour = 3;
         //    audio = SFX_DOGE3;
     } else if (ch == TYPE_DIRT) {
         *b = CH_DUST_0 | FLAG_THISFRAME;
+        colour = 2;
         //  audio = SFX_DIRT;
-    } else if (ch == TYPE_DOGE) {
-        //  audio = SFX_BUBBLER;
-        *b = CH_DOGE_00 | FLAG_THISFRAME;
-    } else if (ch == TYPE_BRICKWALL) {
+        // }
+        //  else if (ch == TYPE_DOGE) {
+        //     //  audio = SFX_BUBBLER;
+        //     *b = CH_DOGE_00 | FLAG_THISFRAME;
+    } else {
 
-        *b = CH_DUST_0 | FLAG_THISFRAME;
+        if (x > 0 && x < _BOARD_COLS && y > 0 && y < _BOARD_ROWS) {
+
+            if (ch == TYPE_BRICKWALL) {
+
+                *b = CH_DUST_0 | FLAG_THISFRAME;
+                colour = 7;
+            }
+
+            else if (ch == TYPE_STEELWALL) {
+                *b = CH_DUST_0 | FLAG_THISFRAME;
+                colour = 7;
+            }
+        }
     }
+
 
     if (*b & FLAG_THISFRAME) {
 
         // if (audio != SFX_DRIP)
         //     ADDAUDIO(audio);
-        nDotsAtTrixel(5, (x >> 8) + 2, (y >> 8) + 5, 30, 50, 6);
+        nDotsAtTrixel(5, (x >> 8) + 2, (y >> 8) + 5, 30, 50, colour);
     }
 }
 
 // bool ropeEnabled = false;
 const int PIXEL_ASPECT = 181;
+
+
+void drawMace() {
+
+    if ((RAM[_INPT4] & 0x80) || theCave->weapon[level] != WEAPON_ROPE)
+        return;
+
+    // if (ropeLength > ROPE_PARTICLE_COUNT)    // relies on unsigned int arithmetic
+    ropeLength = ROPE_PARTICLE_COUNT;
+
+    int baseX = (playerX * CHAR_TRIX_X + 2 + ((faceDirection * autoMoveX) >> 2)) << 8;
+    int baseY = ((playerY * CHAR_TRIX_Y + 6) << 8) + (autoMoveY * (256 / 3)) - 3;
+
+    int x = 0, y = 0;
+
+    for (unsigned int i = 0; i < ropeLength; i++) {
+        x += (xsin[(ropeDirection[i] >> 3) & 0x1F] * PIXEL_ASPECT) >> 8;
+        y += (xsin[((ropeDirection[i] >> 3) + 4) & 0x1F] * 256) >> 8;
+
+        if (x < -0100 || x > 0x200 || y < -0x300 || y > 0x000)
+            drawBit((baseX + x) >> 8, ((baseY + y) >> 8), 1);
+    }
+
+
+    // The ball
+    // clang-format off
+    struct BALL {
+        unsigned char x;
+        unsigned char y;
+    };
+    
+    struct BALL ball[] = {
+        {1,0},
+        {0,1},{1,1},{2,1},
+        {0,2},{1,2},{2,2},
+        {0,3},{1,3},{2,3},
+        {0,4},{1,4},{2,4},
+        {1,5},
+
+    };
+
+    // clang-format on
+
+    for (int i = 0; i < sizeof(ball) / sizeof(ball[0]); i++)
+        drawBit(((baseX + x) >> 8) + ball[i].x - 1, ((baseY + y) >> 8) + ball[i].y - 2, 7);
+
+    nDots(2, 0, 0, PT_TWO, 40, (baseX + x) >> 8, (baseY + y) >> 8, 20, 6);
+
+
+    modifyCharAtTip(baseX + x, baseY + y);
+
+    static int wantedDirection = 0;
+
+    // if (!(frame & 1)) {
+    if (ropeDirection[0] == wantedDirection)
+        wantedDirection = rangeRandom(256);
+
+    else if (wantedDirection > ropeDirection[0])
+        ropeDirection[0] += ((wantedDirection - ropeDirection[0]) >> 3) + 1;
+
+    else
+        ropeDirection[0] -= ((ropeDirection[0] - wantedDirection) >> 3) + 1;
+
+    for (int i = ropeLength - 1; i > 0; i--)
+        ropeDirection[i] = (ropeDirection[i] + ropeDirection[i - 1] * 3) >> 2;
+    // }
+}
+
 
 void drawRope() {
 
@@ -70,7 +163,7 @@ void drawRope() {
         ropeLength = ROPE_PARTICLE_COUNT;
 
     int baseX = (playerX * 5 + 2 + ((faceDirection * autoMoveX) >> 2)) << 8;
-    int baseY = ((playerY * 10 + 6) << 8) + (autoMoveY * (256 / 3)) - 2;
+    int baseY = ((playerY * 10 + 6) << 8) + (autoMoveY * (256 / 3));
 
     int x = 0, y = 0;
 
@@ -78,10 +171,8 @@ void drawRope() {
         x += (xsin[(ropeDirection[i] >> 3) & 0x1F] * PIXEL_ASPECT) >> 8;
         y += (xsin[((ropeDirection[i] >> 3) + 4) & 0x1F] * 256) >> 8;
 
-        drawBit((baseX + x) >> 8, ((baseY + y) >> 8), 7);
-        drawBit((baseX + x) >> 8, ((baseY + y) >> 8) + 1, 7);
-        drawBit((baseX - x) >> 8, ((baseY - y) >> 8), 1 + 7);
-        drawBit((baseX - x) >> 8, ((baseY - y) >> 8) + 1, 7);
+        drawBit((baseX + x) >> 8, (baseY + y) >> 8, 6);
+        drawBit((baseX - x) >> 8, (baseY - y) >> 8, 6);
     }
 
     modifyCharAtTip(baseX + x, baseY + y);
@@ -205,15 +296,16 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
 }
 
 
-void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed) {
+void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed,
+           unsigned char colour) {
 
     if (gravity < 0)
         offsetY = CHAR_TRIX_Y - offsetY;
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, 2);
+        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, colour);
         if (idx >= 0) {
-            particle[idx].speed = rangeRandom(speed >> 1);
+            particle[idx].speed = rangeRandom(speed);
             if (type == PT_SPIRAL2)
                 particle[idx].distance = rangeRandom(200) + 50;
         }

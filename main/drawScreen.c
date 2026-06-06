@@ -531,9 +531,9 @@ bool drawBit(int x, int y, unsigned char colour) {
     unsigned char mask2 = (colour >> 2) << shift;
 
 
-    base[0] |= bit & mask0;
-    base[1] |= bit & mask1;
-    base[2] |= bit & mask2;
+    base[0] = (base[0] & ~bit) | (bit & mask0);
+    base[1] = (base[1] & ~bit) | (bit & mask1);
+    base[2] = (base[2] & ~bit) | (bit & mask2);
 
     return true;
 }

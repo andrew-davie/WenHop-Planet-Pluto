@@ -5,3 +5,10 @@ swipe import from BD
 colour particles
 
 potential issue with wyrm on stella (crash per earlier bug)
+
+slowdown on player move (13 frames!)
+rolling on hardware (spiceware)
+
+particle colours
+
+sound priority (process all, use loudest)

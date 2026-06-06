@@ -5,7 +5,7 @@
 
 #include "gameState.h"
 #include "main.h"
-
+#include "score.h"
 
 #define DETECT_FRAME_COUNT 10
 
@@ -17,17 +17,25 @@ int detectionFrame;
 
 const struct fmt {
 
-    int frequency;
+    int armFrequency;
+    int count;
     unsigned char format;
 
 } mapTimeToFormat[] = {
 
     // Measured with Gopher over DETECT_FRAME_COUNT frames
-    // 70MHz ARM
 
-    { 0xB26349, _TV_SYSTEM_NTSC,  },
-    { 0xB33EF7, _TV_SYSTEM_SECAM, },
-    { 0xB384BA, _TV_SYSTEM_PAL60, },
+    // 70MHz ARM
+    { 70000000, 0xB26349, _TV_SYSTEM_NTSC,  },
+    { 70000000, 0xB33EF7, _TV_SYSTEM_SECAM, },
+    { 70000000, 0xB384BA, _TV_SYSTEM_PAL60, },
+
+    // 60MHz ARM
+    { 60000000, 0x98E311, _TV_SYSTEM_NTSC,  },
+    { 60000000, 0x99B301, _TV_SYSTEM_SECAM, },
+    { 60000000, 0x9A0260, _TV_SYSTEM_PAL60, },
+
+
 };
 
 // clang-format on
@@ -58,19 +66,28 @@ void VB_DetectConsole() {
     case DETECT_FRAME_COUNT: {
 
         unsigned int detectedPeriod = T1TC;
+        actualScore = detectedPeriod;
 
         int delta = INT_MAX;
         for (unsigned int i = 0; i < sizeof(mapTimeToFormat) / sizeof(struct fmt); i++) {
 
-            int dist = detectedPeriod - mapTimeToFormat[i].frequency;
+            int dist = detectedPeriod - mapTimeToFormat[i].count;
             if (dist < 0)
                 dist = -dist;
 
             if (dist < delta) {
                 delta = dist;
                 tvSystem = mapTimeToFormat[i].format;
+                armFrequency = mapTimeToFormat[i].armFrequency;
             }
         }
+
+
+        armCycles = armFrequency * (0x10000 / 60) >> 16;      // now cycles/frame
+        armCycles = armCycles * (0x10000 / 262) >> 16;        // now cycles/scanline
+        armCycles = armCycles * (64 * 0x10000 / 76) >> 16;    //
+
+        armCycles = 3000;
 
         //        setGameState(GS_COPYRIGHT);
         setGameState(GS_MENU);

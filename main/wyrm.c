@@ -199,7 +199,7 @@ void processWyrms() {
             segment = RAM + _BOARD + candidateY * 40 + candidateX;
 
             if (TYPEOF(*segment) == TYPE_DOGE)
-                nDots(4, candidateX, candidateY, PT_TWO, 50, 3, 0, 100);
+                nDots(4, candidateX, candidateY, PT_TWO, 50, 3, 0, 100, 2);
 
             *segment = wyrm->dir + CH_WYRM_HEAD_U;
         }
@@ -234,6 +234,6 @@ void processWyrms() {
             *head = headChar;
         }
 
-        nDots(2, wyrm->x[0], wyrm->y[0], PT_SPIRAL, 30, 2, 5, 100);
+        nDots(2, wyrm->x[0], wyrm->y[0], PT_SPIRAL, 30, 2, 5, 100, 2);
     }
 }

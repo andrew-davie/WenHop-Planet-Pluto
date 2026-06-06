@@ -148,12 +148,12 @@ const unsigned char AnimMellonHusk[] = {
     // CH_DUST_ROCK_1, 6,
     // CH_DUST_ROCK_2, 6,
 
-    CH_DUST_0, 3,
-    CH_BROKEN_DIRT, 3,
-    CH_DUST_0, 3,
-    CH_BROKEN_DIRT, 3,
+    CH_DIRT, 5,
+    CH_DUST_0,6,
+    // CH_BROKEN_DIRT, 3,
+    // CH_BROKEN_DIRT, 3,
     CH_DUST_1, 6,
-    CH_DUST_2, 3,
+    CH_DUST_2, 6,
 
     CH_BLANK, ANIM_HALT,
 

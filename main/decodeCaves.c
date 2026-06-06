@@ -108,7 +108,10 @@ int decodeExplicitData(int /*sfx*/) {
 
         if (decodingRow < _BOARD_ROWS) {
 
-            myMemsetInt((unsigned int *)(RAM + _BOARD + decodingRow * _1ROW), 0, _BOARD_COLS / 4);
+            int bgchar = theCave->interiorCharacter;
+            bgchar |= (bgchar << 24) | (bgchar << 16) | (bgchar << 8);
+
+            myMemsetInt((unsigned int *)(RAM + _BOARD + decodingRow * _1ROW), bgchar, _BOARD_COLS / 4);
 
             for (int x = 0; x < _BOARD_COLS; x++)
                 for (int object = 0; object < theCave->objectCount; object++) {
@@ -188,7 +191,7 @@ int decodeExplicitData(int /*sfx*/) {
 
                 StoreObject(x, y, theObject);
 
-                if (theObject == CH_DOORCLOSED) {
+                if (theObject == CH_DOORCLOSED || theObject == CH_DOOROPEN_0) {
                     doorX = x;
                     doorY = y;
                 }

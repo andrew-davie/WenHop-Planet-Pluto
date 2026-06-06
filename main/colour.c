@@ -27,7 +27,7 @@ int roller;
 
 
 void interleaveChronoColour(int *r) {
-    if (++*r > saveKeyEnableICC)
+    if (++*r > 2)    // saveKeyEnableICC)
         *r = 0;
 }
 

@@ -60,6 +60,9 @@
 
 extern unsigned int frame;
 extern int tvSystem;
+extern int armFrequency;
+extern int armCycles;
+
 extern unsigned int rand;
 extern unsigned char colubk;
 extern int level;

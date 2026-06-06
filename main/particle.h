@@ -1,7 +1,7 @@
 #pragma once
 
 #define PARTICLE_COUNT 24
-#define ROPE_PARTICLE_COUNT 24
+#define ROPE_PARTICLE_COUNT 15
 #define PARTICLE_SPIRAL_ANGULAR_SPEED 6
 
 enum ParticleType {
@@ -31,10 +31,12 @@ extern struct Particle particle[PARTICLE_COUNT];
 void initParticles();
 void drawParticles();
 void drawRope();
+void drawMace();
 
 
 int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char colour);
-void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
+void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed,
+           unsigned char colour);
 void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
 void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed, unsigned char colour);
 

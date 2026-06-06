@@ -204,7 +204,8 @@ void OS_Game() {
 
         drawScreen();
         drawParticles();
-        drawRope();
+        drawMace();
+        //        drawRope();
 
         drawScore();
         drawPlayerSprite();

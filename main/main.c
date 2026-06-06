@@ -43,6 +43,8 @@ int shakeTime;
 int usedSolves;
 int whichLot;
 int tvSystem;
+int armFrequency;    // 60 or 70
+int armCycles;
 
 int level;
 bool lockDisplay;
@@ -339,7 +341,7 @@ void (*const verticalBlank[GS_MAX])() = {
 
 void runARM_VerticalBlank() {
 
-    availableIdleTime = RAM[_INTIM] * INTIM_TO_ARM_CYCLES;
+    availableIdleTime = RAM[_INTIM] * armCycles;
 
     if (gameState == nextGameState) {
         (*verticalBlank[gameState])();
@@ -378,7 +380,7 @@ int intim;
 
 void runARM_Overscan() {
 
-    availableIdleTime = RAM[_INTIM] * INTIM_TO_ARM_CYCLES;    // --> 64 /76 * 4452
+    availableIdleTime = RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
 
     if (gameState != nextGameState) {
 

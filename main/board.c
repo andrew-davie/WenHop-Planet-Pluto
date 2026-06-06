@@ -110,7 +110,7 @@ void setupBoardScanner() {
 
     if (gameFrame >= gameSpeed && !autoMoveFrameCount) {
 
-        doges = gameFrame;
+        //        doges = gameFrame;
 
         waterDir++;
 
@@ -134,7 +134,7 @@ void setupBoardScanner() {
 
             // Surface lava "bubbles"
             int posX = ((scrollX * 5) >> 16) + rangeRandom(_BOARD_COLS);
-            nDotsAtTrixel(1, posX, lavaSurfaceTrixel - 2, 120, 0x1000, 6);
+            nDotsAtTrixel(1, posX, lavaSurfaceTrixel - 2, 120, 0x10, 6);    // untested speed
         }
 
         if (showWater) {
@@ -292,7 +292,7 @@ void processTypes() {
 
     case TYPE_OUTBOX:
         FLASH(0x28, 10);
-        nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x10000);
+        nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x100, 7);    // untested speed
         break;
 
     case TYPE_DOGE:
@@ -328,7 +328,7 @@ void processTypes() {
     case TYPE_GRINDER:
     case TYPE_GRINDER_1:
         if (!(getRandom32() & 7)) {
-            nDots(1, boardCol, boardRow, PT_TWO, 10, 3, 7, 100);
+            nDots(1, boardCol, boardRow, PT_TWO, 10, 3, 7, 100, 2);
         }
 
         __attribute__((fallthrough));
@@ -344,7 +344,7 @@ void processTypes() {
             *me = FLAG(CH_ROCK_PEBBLE_1);
             // FLASH(0x42, 10);
             //  nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
-            nDots(10, boardCol, boardRow, PT_TWO, 10, 3, 7, 100);
+            nDots(10, boardCol, boardRow, PT_TWO, 10, 3, 7, 100, 2);
         }
 
         // else if (!rangeRandom(3)) {
@@ -572,7 +572,7 @@ void processCreatures() {
 
     case CH_DOOROPEN_0:
         FLASH(0xC4, 10);
-        nDots(2, boardCol, boardRow, PT_TWO, 10, 3, 7, 100);
+        nDots(2, boardCol, boardRow, PT_TWO, 10, 3, 7, 100, 2);
         break;
 
 
@@ -617,7 +617,7 @@ void restartBoardScan() {
         playerDead = (type != TYPE_MELLON_HUSK && type != TYPE_MELLON_HUSK_PRE && !exitMode);
 
         if (explodeCount > 0) {
-            nDots(2, playerX, playerY, PT_ONE, 1, 2, 0, 100);
+            nDots(2, playerX, playerY, PT_ONE, 1, 2, 0, 100, 2);
             --explodeCount;
         }
 
@@ -636,7 +636,7 @@ void restartBoardScan() {
         }
 
         if (playerDead && *playerAnimation)
-            nDots(4, playerX, playerY, PT_ONE, 100, 2, 8, 100);
+            nDots(4, playerX, playerY, PT_ONE, 100, 2, 8, 100, 2);
     }
 }
 
@@ -674,7 +674,7 @@ void processPebble() {
 
     if (!rangeRandom((chance))) {
         *me = FLAG(CH_PEBBLE_ROCK);
-        nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x10000);
+        nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x10000, 2);
     }
 }
 
@@ -708,7 +708,7 @@ void processLava() {
             else if (att & ATT_MELTS && !(rand & 63)) {
 
                 *neighbour = FLAG((att & ATT_GEODOGE) ? CH_DOGE_00 : CH_DUST_0);
-                nDots(8, boardCol + xdir[i], boardRow + ydir[i], PT_TWO, 50, 3, 4, 0x10000);
+                nDots(8, boardCol + xdir[i], boardRow + ydir[i], PT_TWO, 50, 3, 4, 0x10000, 2);
             }
         }
 
@@ -717,7 +717,7 @@ void processLava() {
         case CH_LAVA_BLANK: {
             if (!(rand & (15 << 7))) {
                 (*me)++;
-                nDots(3, boardCol, boardRow, PT_SPIRAL, 30, 2, 5, 0xC000);
+                nDots(3, boardCol, boardRow, PT_SPIRAL, 30, 2, 5, 0xC000, 2);
             }
             break;
         case CH_LAVA_SMALL:
@@ -764,7 +764,7 @@ void processWaterFlow() {
                 } else
 
                     // Water has hit something below
-                    nDots(3, boardCol, boardRow, PT_TWO + PARTICLE_GRAVITY_FLAG, 40, 2 + rangeRandom(3), 11, 100);
+                    nDots(3, boardCol, boardRow, PT_TWO + PARTICLE_GRAVITY_FLAG, 40, 2 + rangeRandom(3), 11, 100, 2);
 #if ENABLE_SHAKE
                 // shakeTime = 20;
 #endif
@@ -805,7 +805,7 @@ void processOutlet() {
                     *(me + _1ROW) = CH_WATERFLOW_0 + (getRandom32() & 3);
 
                 else
-                    nDots(1, boardCol, boardRow, PT_TWO, 30, rangeRandom(3) + 2, 10, 0x8000);
+                    nDots(1, boardCol, boardRow, PT_TWO, 30, rangeRandom(3) + 2, 10, 0x8000, 2);
             }
         }
 
@@ -899,11 +899,11 @@ void processFallingThings() {
                     unsigned char *dR = dL + 2;
 
                     if (!CharToType[GET(*dR)]) {
-                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100);
+                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
                     }
 
                     if (!CharToType[GET(*dL)]) {
-                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100);
+                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
                     }
                 }
                 // else
@@ -921,13 +921,13 @@ void processFallingThings() {
             *me = FLAG(CH_BLANK);
             pulsePlayerColour = 5;
             grabDoge();
-            nDots(6, boardCol, boardRow + 1, PT_TWO, 40, 3, 1, 100);
+            nDots(6, boardCol, boardRow + 1, PT_TWO, 40, 3, 1, 100, 2);
         }
 
         else {
             explode(next, FLAG(CH_DUST_0));
             initParticles();
-            nDots(PARTICLE_COUNT, boardCol, boardRow + 1, PT_TWO, 100, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 50);
+            nDots(PARTICLE_COUNT, boardCol, boardRow + 1, PT_TWO, 100, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 50, 2);
         }
     } else {
 
@@ -957,7 +957,7 @@ void processFallingThings() {
         }
 
         if (creature != CH_DOGE_FALLING && CharToType[creature] != TYPE_GEODOGE_FALLING)
-            nDots(6, boardCol, boardRow, PT_TWO, 20, 2, 10, 600);
+            nDots(6, boardCol, boardRow, PT_TWO, 20, 2, 10, 600, 2);
 
         // if (att & ATT_ROLL && creature == CH_DOGE_FALLING)
         //     doRoll(me, creature);
@@ -984,7 +984,7 @@ void genericPush(int offsetX, int offsetY) {
         // shakeTime = 20;
         FLASH(0x42, 8);
         startPlayerAnimation(ID_Xray);
-        nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 50, 3, 4, 0x18000);
+        nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 50, 3, 4, 0x18000, 2);
     }
 
     int attPushPos = Attribute[CharToType[GET(*pushPos)]];
@@ -1020,7 +1020,7 @@ void genericPush(int offsetX, int offsetY) {
 
             //??
             if (!(attPushPos & ATT_PERMEABLE))
-                nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 150, 3, 4, 0x10000);
+                nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 150, 3, 4, 0x10000, 2);
             return;
         }
     }
@@ -1115,10 +1115,10 @@ void doRoll() {
 
                     int off = offset < 0 ? 4 : 0;
 
-                    nDots(1, boardCol, boardRow, PT_TWO, 15, offset * 2 + off, 4 * gravity, 0);
-                    nDots(1, boardCol, boardRow, PT_TWO, 20, offset * 4 + off, 4 * gravity, 0);
-                    nDots(1, boardCol, boardRow, PT_TWO, 25, offset * 6 + off, 7 * gravity, 0);
-                    nDots(1, boardCol, boardRow, PT_TWO, 30, offset * 7 + off, 10 * gravity, 0);
+                    nDots(1, boardCol, boardRow, PT_TWO, 15, offset * 2 + off, 4 * gravity, 0, 2);
+                    nDots(1, boardCol, boardRow, PT_TWO, 20, offset * 4 + off, 4 * gravity, 0, 2);
+                    nDots(1, boardCol, boardRow, PT_TWO, 25, offset * 6 + off, 7 * gravity, 0, 2);
+                    nDots(1, boardCol, boardRow, PT_TWO, 30, offset * 7 + off, 10 * gravity, 0, 2);
 
                     surroundingConglomerate(boardCol, boardRow);
                     return;

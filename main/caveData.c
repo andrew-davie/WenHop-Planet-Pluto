@@ -69,10 +69,11 @@ const unsigned char caveUseWall[] = {
 
     // Random objects
 
-    3,
-    CH_BLANK, 120, 0, 240, 0, 20,
-    CH_PEBBLE1, 60,40,40,40,40,
-    CH_PEBBLE2, 60,40,40,40,40,
+    4,
+    CH_BLANK, 255, 0, 240, 0, 20,
+    CH_BLANK, 255, 0, 240, 0, 20,
+    CH_PEBBLE1, 20,40,40,40,40,
+    CH_PEBBLE2, 20,40,40,40,40,
 
     // Start of cave draw
 
@@ -168,6 +169,56 @@ const unsigned char caveWyrms[] = {
     // clang-format on
 };
 
+const unsigned char caveMace[] = {
+    // clang-format off
+
+    20,     // milling
+    10, 15, // doge $
+    5,      //              ,          // rain
+
+    
+    10, 11, 50, 56, 8, // randomiser[level]
+    1, 12, 12, 12, 12,
+    200, 200, 200, 200, 200,
+    // 70,65,60,55,50,
+
+    WEAPON_ROPE,                    //0
+    WEAPON_ROPE,                    //1
+    WEAPON_ROPE,                    //2
+    WEAPON_ROPE,                    //3
+    WEAPON_ROPE,                    //4
+
+    0, CH_BRICKWALL, CH_DIRT,
+
+    3,
+    CH_BLANK, 10,100,100,100,100,
+    CH_PEBBLE1, 30, 255, 0, 255, 10,
+    CH_PEBBLE2, 30, 255, 0, 255, 10,
+
+//    DRAW_FILLED_RECT,CH_STEELWALL,1,1,9,8,CH_DIRT,
+    // DRAW_FILLED_RECT,CH_BRICKWALL,4,4,3,3,CH_ROCK,
+
+
+
+    CH_DOORCLOSED, 5, 4,
+    CH_MELLON_HUSK_BIRTH, 5, 5,
+
+//    0xFE, CH_WATER, 1, 20,
+    //0xFE, CH_LAVA_BLANK, 1, 20,
+
+    DRAW_EOF,
+
+    // EXTRAS
+    // LEVEL 0
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
+
+    'T', 'E', 'S', 'T', END_STRING
+    // clang-format on
+};
 
 const unsigned char caveTest[] = {
     // clang-format off
@@ -923,10 +974,11 @@ const unsigned char caveA4[] = {
 const unsigned char *caveList[] = {
     // clang-format off
 
+    caveMace,
     caveUseWall,
     caveA4,
-
     caveWyrms,
+
 
 //    caveTest,
 //    caveFast,
