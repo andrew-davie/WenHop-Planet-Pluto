@@ -182,11 +182,11 @@ const unsigned char caveMace[] = {
     200, 200, 200, 200, 200,
     // 70,65,60,55,50,
 
-    WEAPON_ROPE,                    //0
-    WEAPON_ROPE,                    //1
-    WEAPON_ROPE,                    //2
-    WEAPON_ROPE,                    //3
-    WEAPON_ROPE,                    //4
+    WEAPON_GUN,                    //0
+    WEAPON_MACE,                    //1
+    WEAPON_MACE,                    //2
+    WEAPON_MACE,                    //3
+    WEAPON_MACE,                    //4
 
     0, CH_BRICKWALL, CH_DIRT,
 
@@ -597,16 +597,16 @@ const unsigned char caveA2[] = {
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
 
-    WEAPON_NONE,                    //0
+    WEAPON_MACE,                    //0
     WEAPON_NONE,                    //1
     WEAPON_NONE,                    //2
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_PARALLAX, STEEL, CH_BLANK,
+    CAVEDEF_PARALLAX, STEEL, CH_DIRT,
 
     5,
-    CH_DIRT, 50, 10, 5, 0, 20,
+    CH_BLANK, 100, 10, 5, 0, 20,
     CH_GEODOGE, 50, 10, 5, 0, 20,
     CH_PUSH_RIGHT, 0, 10, 5, 0, 20,
     CH_PUSH_UP, 0, 10, 5, 0, 20,
@@ -900,7 +900,7 @@ const unsigned char caveA4[] = {
     200,                            //3
     200,                            //4
 
-    WEAPON_PIPE,                    //0
+    WEAPON_NONE,                    //0
     WEAPON_NONE,                    //1
     WEAPON_NONE,                    //2
     WEAPON_NONE,                    //3
@@ -974,6 +974,7 @@ const unsigned char caveA4[] = {
 const unsigned char *caveList[] = {
     // clang-format off
 
+    caveA2,         // best
     caveMace,
     caveUseWall,
     caveA4,
@@ -985,7 +986,6 @@ const unsigned char *caveList[] = {
 //    caveA5,  // bad
 
     caveA,
-    caveA2,         // best
     caveA3,
 
     // clang-format on

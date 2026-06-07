@@ -5,6 +5,8 @@ enum WEAPON {
     WEAPON_NONE = 0,
     WEAPON_PIPE,
     WEAPON_ROPE,
+    WEAPON_MACE,
+    WEAPON_GUN,
 };
 
 

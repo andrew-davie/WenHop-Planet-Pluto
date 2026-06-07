@@ -1,7 +1,7 @@
 #pragma once
 
 #define PARTICLE_COUNT 24
-#define ROPE_PARTICLE_COUNT 15
+#define ROPE_PARTICLE_COUNT 24
 #define PARTICLE_SPIRAL_ANGULAR_SPEED 6
 
 enum ParticleType {
@@ -32,6 +32,7 @@ void initParticles();
 void drawParticles();
 void drawRope();
 void drawMace();
+void drawGun();
 
 
 int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char colour);

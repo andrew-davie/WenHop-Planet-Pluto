@@ -279,7 +279,7 @@ bool checkHighPriorityMove(int dir) {
                 grabDoge(/* meOffset */);
                 //     grabbed = true;
                 // if (grabbed)
-                nDots(4, playerX, playerY, PT_SPIRAL, 25, 3, 4, 100, 2);
+                nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
             }
 
             playerX += xdir[dir];
@@ -293,7 +293,7 @@ bool checkHighPriorityMove(int dir) {
                 *meOffset = FLAG(CH_MELLON_HUSK);
 
                 if (destType == TYPE_PEBBLE1)
-                    nDots(4, playerX, playerY, PT_ONE, 10, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 10, 2);
+                    nDots(4, playerX, playerY, PT_ONE, 10, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 10, 7);
 
 
                 if (Attribute[destType] & ATT_DIRT) {
@@ -318,7 +318,7 @@ bool checkHighPriorityMove(int dir) {
                             xoff = (xdir[dir] < 0) ? 1 + rangeRandom(xsize)
                                                    : 4 - xsize + rangeRandom(xsize);    // + rangeRandom(ysize);
                         }
-                        nDots(1, playerX, playerY, PT_ONE, 30, xoff, yoff, 30, 2);
+                        nDots(1, playerX, playerY, PT_ONE, 30, xoff, yoff, 30, 2);    // OK
                     }
                 } else
                     startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK] + 8);
@@ -468,7 +468,7 @@ bool checkLowPriorityMove(int dir) {
                     *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
 
                     surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
-                    nDots(6, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40, 2);
+                    nDots(6, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40, 7);
                 }
             }
 
@@ -526,7 +526,7 @@ void movePlayer(unsigned char *me) {
 
 
     if (pulsePlayerColour) {
-        nDots(2, playerX, playerY, PT_ONE, 25, 2, 5, 100, 2);
+        nDots(2, playerX, playerY, PT_ONE, 25, 2, 5, 100, 7);
         return;
     }
 

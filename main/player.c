@@ -3176,7 +3176,7 @@ void processAnimationCommand() {
 
             int dotX = 2 + (*++playerAnimation) * faceDirection;
             int dotY = *++playerAnimation;
-            nDots(6, playerX, playerY, PT_TWO, 20, dotX, dotY, 100, 2);
+            nDots(6, playerX, playerY, PT_TWO, 20, dotX, dotY, 100, 7);
             playerAnimation++;
             break;
         }

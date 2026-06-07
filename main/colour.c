@@ -27,7 +27,7 @@ int roller;
 
 
 void interleaveChronoColour(int *r) {
-    if (++*r > 2)    // saveKeyEnableICC)
+    if (++*r > saveKeyEnableICC)
         *r = 0;
 }
 
@@ -239,15 +239,16 @@ void setPalette() {
 
 
 const unsigned char colourPool[][4] = {
+    // clang-format off
 
-    {0xC4, 0x28, 0xB8, 0xB8},    // 0
-
-    {0x98, 0x24, 0x86, 0x46},    // 0
-    {0x16, 0x96, 8, 2},
-
-
-    {0xA6, 0x24, 0x32, 0x52}, {0x88, 0xD6, 20, 20},     {0xA6, 0xC4, 0x46, 0x22},
-    {0x98, 0x24, 4, 4},       {0x26, 0xD4, 0x84, 0xE4},
+    {0xC4, 0x28, 0xB8, 0xB8},    // 00
+    {0x98, 0x24, 0x86, 0x46},    // 01
+    {0x16, 0x96, 8, 2},          // 02
+    {0xA6, 0x24, 0x32, 0x52},    // 03
+    {0x88, 0xD6, 20, 20},        // 04
+    {0xA6, 0xC4, 0x46, 0x22},    // 05
+    {0x98, 0x24, 4, 4},          // 06
+    {0x26, 0xD4, 0x84, 0xE4},    // 07
 
     /*;    dc 0xB6, 0x28, 0x82, 0x82
     ;    dc 10, 12, 8, 8
@@ -382,12 +383,13 @@ const unsigned char colourPool[][4] = {
     ;     dc ooCOMPATIBLE_COMPATIBLE_PALETTE + 0xA6, 0x48, 0xA2, 0xA2 ;0x46, 0xA2, 0xA2, 0xA2
     ; ;    dc 4, 8, 10, 10
 
-    ;     ; 15 purple rock light blue doge green mortar good glint *
+    ;     ; 15 purple rock light blue doge green mortar googlint *
     ;     dc ooCOMPATIBLE_COMPATIBLE_PALETTE + 0xA8, 0xC4, 0x26, 0x94
     ; ;x    dc 0x3A, 0xA4, 0x54, 0x54 ;0x46, 0xA2, 0xA2, 0xA2
     ; ;    dc 0x50, 0y08, 0y04, 0y04
 
     */
+    // clang-format on
 
 };
 
@@ -395,14 +397,21 @@ const unsigned char colourPool[][4] = {
 void loadPalette() {
 
     unsigned char *c = (unsigned char *)colourPool;
-    currentPalette = rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));    // tmp
+
+    unsigned char rp[4];
+    for (int i = 0; i < 4; i++)
+        rp[i] = (getRandom32() & 0xF0) | 6;
+
+
+    rp[3] += 2;
+    //    currentPalette = 6;    // rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));    // tmp
 
     // if (currentPalette > sizeof(colourPool) / sizeof(colourPool[0]))
     //     currentPalette = 0;
 
 
-    c += ((currentPalette) << 2);
-    setBackgroundPalette(c);
+    //  c += ((currentPalette) << 2);
+    setBackgroundPalette(rp);
 }
 
 // EOF

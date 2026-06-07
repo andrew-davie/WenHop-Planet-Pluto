@@ -173,16 +173,14 @@ void VB_Game() {
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
-        // drawScore();
         drawPlayerSprite();
+
+        drawMace();
+        drawRope();
+        drawGun();
+
+        drawParticles();
     }
-
-
-    // for (int i = 0; i < _SCANLINES; i++) {
-
-    //     RAM[_BUF_GAME_COLUBK + i] = colubk;
-    // }
-
 
     scheduledTasks();
 }
@@ -203,21 +201,12 @@ void OS_Game() {
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
         drawScreen();
-        drawParticles();
-        drawMace();
-        //        drawRope();
-
         drawScore();
         drawPlayerSprite();
     }
 
-
-    //   if (gameSchedule == SCHEDULE_UNPACK_CAVE)
-    //     return;
-
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;
-
 
     scheduledTasks();
 }

@@ -13,8 +13,6 @@
 int detectionFrame;
 
 
-// clang-format off
-
 const struct fmt {
 
     int armFrequency;
@@ -23,6 +21,7 @@ const struct fmt {
 
 } mapTimeToFormat[] = {
 
+    // clang-format off
     // Measured with Gopher over DETECT_FRAME_COUNT frames
 
     // 70MHz ARM
@@ -35,10 +34,9 @@ const struct fmt {
     { 60000000, 0x99B301, _TV_SYSTEM_SECAM, },
     { 60000000, 0x9A0260, _TV_SYSTEM_PAL60, },
 
-
+    // clang-format on
 };
 
-// clang-format on
 
 void initKernel_DetectConsole() {
 }
@@ -83,11 +81,18 @@ void VB_DetectConsole() {
         }
 
 
-        armCycles = armFrequency * (0x10000 / 60) >> 16;      // now cycles/frame
-        armCycles = armCycles * (0x10000 / 262) >> 16;        // now cycles/scanline
-        armCycles = armCycles * (64 * 0x10000 / 76) >> 16;    //
+        // Calculate ARM cycles per TIA clock tick.
+        // e.g., 70MHz --> 70000000 cycles/sec
+        // /60 = 1,166,666 cycles/frame
+        // /262 = 4,452 cycles/scanline
+        // /76 = 58 cycles/TIA clock
+        // *64 = ~3712 cycles per INTIM tick
 
-        armCycles = 3000;
+        // Following code does the above, avoiding overflow
+
+        armCycles = ((armFrequency >> 8) * (0x10000 / 60)) >> 8;    // cycles/frame
+        armCycles = (armCycles * (0x10000 / 262)) >> 16;            // cycles/scanline
+        armCycles = (armCycles * (64 * 0x10000 / 76)) >> 16;        // cycles/INTIM
 
         //        setGameState(GS_COPYRIGHT);
         setGameState(GS_MENU);
