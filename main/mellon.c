@@ -25,6 +25,8 @@ enum FaceDirectionX faceDirection;
 bool playerDead;
 int waitForNothing;
 bool handled;
+bool gearsActive;
+bool gearsWaitRelease;
 
 enum JOYSTICK_DIRECTION {
     JOYSTICK_UP = 1,
@@ -81,6 +83,9 @@ void initPlayer() {
     playerDead = false;
 
     faceDirection = FACE_RIGHT;
+
+    gearsActive = false;
+    gearsWaitRelease = false;
 
     startPlayerAnimation(ID_Stand);    // tmp
     // startPlayerAnimation(ID_Stand);
@@ -203,10 +208,32 @@ bool checkHighPriorityMove(int dir) {
         }
 
         else if (type == TYPE_GRINDER || type == TYPE_GRINDER_1) {
-            // ADDAUDIO(SFX_EXPLODE_QUIET);
+            ADDAUDIO(SFX_EXPLODE_QUIET);
+
+
+            nDots(4, playerX, playerY, PT_TWO, 40,    //
+                  ((xdir[dir] + 1) >> 1) * CHAR_TRIX_X + (ydir[dir] ? (CHAR_TRIX_X >> 1) : 0),
+                  ((ydir[dir] + 1) >> 1) * CHAR_TRIX_Y + (xdir[dir] ? (CHAR_TRIX_Y >> 1) : 0), 50, rangeRandom(7) + 1);
+
+
+            if (!gearsWaitRelease) {
+
+
+                gearsWaitRelease = true;
+                gearsActive = !gearsActive;
+
+                if (gearsActive)
+                    FLASH(0x28, 10);
+
+                toggleGears(gearsActive);
+            }
+
 #if ENABLE_SHAKE
-            shakeTime = 5;
+
+            if (!gearsActive)
+                shakeTime = 5;
 #endif
+
         }
 
 
@@ -515,7 +542,7 @@ void bubbles(int count, int dripX, int dripY, int age, int /*speed*/) {
             particle[idx].speed = 10;    //(-0x2800 - rangeRandom(0x2800)) >> 4;
             // particle.speedX[idx] >>= 4;
 
-            particle[idx].direction = 128 + rangeRandom(64) - 32;
+            particle[idx].dir = 128 + rangeRandom(64) - 32;
         }
     }
 }
@@ -565,6 +592,11 @@ void movePlayer(unsigned char *me) {
 
 
     lastUsableSWCHA = usableSWCHA;
+
+
+    if (gearsWaitRelease && usableSWCHA == 0xFF)
+        gearsWaitRelease = false;
+
 
     for (int dir = 0; dir < 4; dir++)
         if (checkHighPriorityMove(dir)) {

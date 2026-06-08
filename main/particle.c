@@ -6,6 +6,7 @@
 
 #include "attribute.h"
 #include "characterset.h"
+#include "colour.h"
 #include "decodeCaves.h"
 #include "drawscreen.h"
 #include "main.h"
@@ -14,19 +15,41 @@
 #include "player.h"
 #include "random.h"
 #include "scroll.h"
+#include "sound.h"
 
 unsigned int weaponLength = 0;
-unsigned char ropeDirection[ROPE_PARTICLE_COUNT];
-
-// const int xsin[32] = {
-//     //    0, 97, 181, 236, 256, 236, 181, 97, 0, -97, -181, -236, -256, -236, -181, -97,
-//     0, 49,  97,  142,  181,  212,  236,  251,  256,  251,  236,  212,  181,  142,  97,  49,
-//     0, -49, -97, -142, -181, -212, -236, -251, -256, -251, -236, -212, -181, -142, -97, -49,
-// };
 
 
-const int xsin[32] = {0, 50,  98,  142,  181,  213,  237,  251,  256,  251,  237,  213,  181,  142,  98,  50,
-                      0, -50, -98, -142, -181, -213, -237, -251, -256, -251, -237, -213, -181, -142, -98, -50};
+#define TOOL_MAX 24
+
+struct TOOL {
+
+    unsigned char age;
+    unsigned char dir;
+    unsigned short x;
+    unsigned short y;
+    unsigned short speed;
+};
+
+
+struct TOOL tool[TOOL_MAX];
+
+
+const int sin_cos[32] = {
+    // clang-format off
+    // Combined sin/cos table
+       0,   50,   98,  142,  181,  213,  237,  251,     //   0° (D) to <  90° (R)
+     256,  251,  237,  213,  181,  142,   98,   50,      //  90° (R) to < 180° (U)
+       0,  -50,  -98, -142, -181, -213, -237, -251,    // 180° (U) to < 270° (L)
+    -256, -251, -237, -213, -181, -142,  -98,  -50,      // 270° (L) to <   0° (D)
+    // clang-format on
+};
+
+
+void initTool() {
+    for (int i = 0; i < TOOL_MAX; i++)
+        tool[i].age = 0;
+}
 
 
 void modifyCharAtTip(int x, int y) {
@@ -117,100 +140,133 @@ void drawMace() {
         return;
     }
 
-
     if (inpt4 & 0x80)
         weaponLength--;
-
-    //    if ((RAM[_INPT4] & 0x80) || theCave->weapon[level] != WEAPON_ROPE)
-    //      return;
 
     else if (weaponLength < ROPE_PARTICLE_COUNT)
         weaponLength++;
 
-
-    // if (ropeLength > ROPE_PARTICLE_COUNT)    // relies on unsigned int arithmetic
-    //    ropeLength = ROPE_PARTICLE_COUNT;
-
-    int baseX = (playerX * CHAR_TRIX_X + 2 + ((faceDirection * autoMoveX) >> 2)) << 8;
-    int baseY = ((playerY * CHAR_TRIX_Y + 6) << 8) + (autoMoveY * (256 / 3)) - 3;
+    int baseX = (playerX * CHAR_TRIX_X + (CHAR_TRIX_X >> 1) + ((faceDirection * autoMoveX) >> 2)) << 8;
+    int baseY = ((playerY * CHAR_TRIX_Y + (CHAR_TRIX_Y >> 1)) << 8) + (autoMoveY * (256 / 3));
 
     int x = 0, y = 0;
 
     for (unsigned int i = 0; i < weaponLength; i++) {
-        x += (xsin[(ropeDirection[i] >> 3) & 0x1F] * PIXEL_ASPECT) >> 8;
-        y += (xsin[((ropeDirection[i] >> 3) + 8) & 0x1F] * 256) >> 8;
+        x += (sin_cos[(tool[i].dir >> 3) & 0x1F] * PIXEL_ASPECT) >> 8;
+        y += (sin_cos[((tool[i].dir >> 3) + 8) & 0x1F] * 256) >> 8;
 
-        if (x < -0100 || x > 0x200 || y < -0x300 || y > 0x000)
+        // Don't underwrite the player's body - looks better
+        if (x < -0x100 || x > 0x200 || y < -0x300 || y > 0x000)
             drawBit((baseX + x) >> 8, ((baseY + y) >> 8), 1);
     }
 
+    struct {
 
-    // The ball
-    // clang-format off
-    struct BALL {
         unsigned char x;
         unsigned char y;
-    };
-    
-    struct BALL ball[] = {
-        {1,0},
-        {0,1},{1,1},{2,1},
-        {0,2},{1,2},{2,2},
-        {0,3},{1,3},{2,3},
-        {0,4},{1,4},{2,4},
-        {1,5},
+
+    } ball[] = {
+
+        {1, 0},                    //
+        {0, 1}, {1, 1}, {2, 1},    //
+        {0, 2}, {1, 2}, {2, 2},    //
+        {0, 3}, {1, 3}, {2, 3},    //
+        {0, 4}, {1, 4}, {2, 4},    //
+        {1, 5},                    //
 
     };
 
-    // clang-format on
 
-    for (int i = 0; i < sizeof(ball) / sizeof(ball[0]); i++)
+    for (int i = 0; i < (int)(sizeof(ball) / sizeof(ball[0])); i++)
         drawBit(((baseX + x) >> 8) + ball[i].x - 1, ((baseY + y) >> 8) + ball[i].y - 2, 7);
 
-    if (!(inpt4 & 0x80))
-        nDots(1, 0, 0, PT_TWO, 50, (baseX + x) >> 8, (baseY + y) >> 8, 20, 6);
+    nDots(1, 0, 0, PT_TWO, 50, (baseX + x) >> 8, (baseY + y) >> 8, 20, 6);
 
 
     modifyCharAtTip(baseX + x, baseY + y);
 
-    static short unsigned int wantedDirection = 0;
+    static unsigned char wantedDirection = 0;
 
-    if (ropeDirection[0] == wantedDirection >> 8)
+    if (tool[0].dir == wantedDirection)
         wantedDirection = getRandom32();
 
-    ropeDirection[0] = turn_toward(ropeDirection[0], wantedDirection >> 8, 5);
+    tool[0].dir = turn_toward(tool[0].dir, wantedDirection, 5);
 
     for (int i = weaponLength - 1; i > 0; i--)
-        ropeDirection[i] = ropeDirection[i - 1];
+        tool[i].dir = tool[i - 1].dir;
+}
+
+void addTool(int x, int y, unsigned char dir, unsigned short speed) {
+
+    for (int i = 0; i < TOOL_MAX; i++)
+        if (!tool[i].age) {
+
+            tool[i].x = x;
+            tool[i].y = y;
+            tool[i].dir = dir;
+            tool[i].speed = speed;
+
+            tool[i].age = 60;
+            return;
+        }
 }
 
 
 void drawGun() {
 
+    for (int i = 0; i < TOOL_MAX; i++)
+        if (tool[i].age && tool[i].age--) {
+
+            int s = tool[i].dir >> 3;
+
+            tool[i].x += (tool[i].speed * sin_cos[s]) >> 8;
+            tool[i].y += (tool[i].speed * 2 * sin_cos[(s + 8) & 0x1f]) >> 8;
+
+            drawBit(tool[i].x >> 8, (tool[i].y >> 8), 7);
+            drawBit(tool[i].x >> 8, (tool[i].y >> 8) + 1, 7);
+        }
+
+
     static int gunDelay = 0;
 
-    if (--gunDelay < 0)
-        gunDelay = 0;
-
-    if (gunDelay || (inpt4 & 0x80) || theCave->weapon[level] != WEAPON_GUN)
+    if (--gunDelay > 0 || (inpt4 & 0x80) || theCave->weapon[level] != WEAPON_GUN)
         return;
 
-    gunDelay = 10;
+    ADDAUDIO(SFX_EXPLODE);
 
-    int baseX = (playerX * CHAR_TRIX_X + 2 + ((faceDirection * autoMoveX) >> 2)) << 8;
-    int baseY = ((playerY * CHAR_TRIX_Y + 6) << 8) + (autoMoveY * (256 / 3)) - 3;
+    int x = (playerX * CHAR_TRIX_X + (CHAR_TRIX_X >> 1) + ((faceDirection * autoMoveX) >> 2)) << 8;
+    int y = ((playerY * CHAR_TRIX_Y + 6) << 8) + (autoMoveY * (256 / 3)) - 4;
 
-    int x = 0, y = 0;
-
-    int idx = sphereDot(baseX >> 8, baseY >> 8, PT_ONE, 200, 7);
-    if (idx >= 0) {
-        particle[idx].direction = 64;
-        particle[idx].speed = 250;
-    }
+    gunDelay = 20;
 
 
-    // nDots(1, 0, 0, PT_TWO, 50, (baseX + x) >> 8, (baseY + y) >> 8, 20, 6);
-    // nDots(1, 0, 0, PT_TWO, 50, (baseX + x) >> 8, ((baseY + y) >> 8) + 1, 20, 6);
+    static char angle[] = {
+
+        0,      // 00
+        128,    // 01 UP
+        0,      // 02 DOWN
+        0,      // 03
+        192,    // 04 LEFT
+        160,    // 05
+        224,    // 06
+        0,      // 07
+        64,     // 08 RIGHT
+        96,     // 09
+        32,     // 10
+        0,      // 11
+        0,      // 12
+        0,      // 13
+        0,      // 14
+        0,      // 15
+
+
+    };
+
+    int joy = (swcha ^ 0xFF) >> 4;
+    int fireDir = joy ? angle[joy] : faceDirection == 1 ? 64 : 192;
+
+
+    addTool(x, y, fireDir, 0xC0);
 }
 
 
@@ -228,8 +284,8 @@ void drawRope() {
     int x = 0, y = 0;
 
     for (unsigned int i = 0; i < weaponLength; i++) {
-        x += (xsin[(ropeDirection[i] >> 3) & 0x1F] * PIXEL_ASPECT) >> 8;
-        y += (xsin[((ropeDirection[i] >> 3) + 4) & 0x1F] * 256) >> 8;
+        x += (sin_cos[(tool[i].dir >> 3) & 0x1F] * PIXEL_ASPECT) >> 8;
+        y += (sin_cos[((tool[i].dir >> 3) + 4) & 0x1F] * 256) >> 8;
 
         drawBit((baseX + x) >> 8, (baseY + y) >> 8, 6);
         drawBit((baseX - x) >> 8, (baseY - y) >> 8, 6);
@@ -240,20 +296,21 @@ void drawRope() {
 
     static int wantedDirection = 0;
 
-    if (ropeDirection[0] == wantedDirection)
+    if (tool[0].dir == wantedDirection)
         wantedDirection = rangeRandom(256);
 
-    else if (wantedDirection > ropeDirection[0])
-        ropeDirection[0] += ((wantedDirection - ropeDirection[0]) >> 2) + 1;
+    else if (wantedDirection > tool[0].dir)
+        tool[0].dir += ((wantedDirection - tool[0].dir) >> 2) + 1;
 
     else
-        ropeDirection[0] -= ((ropeDirection[0] - wantedDirection) >> 2) + 1;
+        tool[0].dir -= ((tool[0].dir - wantedDirection) >> 2) + 1;
 
     for (int i = weaponLength - 1; i > 0; i--)
-        ropeDirection[i] = (ropeDirection[i] + ropeDirection[i - 1] * 3) >> 2;
+        tool[i].dir = (tool[i].dir + tool[i - 1].dir * 3) >> 2;
 }
 
 struct Particle particle[PARTICLE_COUNT];
+
 
 void initParticles() {
 
@@ -271,8 +328,8 @@ void drawParticles() {
 
         if (particle[i].age) {
 
-            int xOffset = (xsin[particle[i].direction >> 3] * particle[i].distance) >> 8;
-            int yOffset = (xsin[((particle[i].direction >> 3) + 8) & 0x1F] * particle[i].distance * 3) >> 8;
+            int xOffset = (sin_cos[particle[i].dir >> 3] * particle[i].distance) >> 8;
+            int yOffset = (sin_cos[(particle[i].dir + 64) >> 3] * particle[i].distance * 3) >> 8;
 
             int y = (particle[i].y + yOffset) >> 8;
             int x = (particle[i].x + xOffset) >> 8;
@@ -287,7 +344,7 @@ void drawParticles() {
             case PT_SPIRAL2:
             case PT_SPIRAL: {
 
-                particle[i].direction += PARTICLE_SPIRAL_ANGULAR_SPEED;
+                particle[i].dir += PARTICLE_SPIRAL_ANGULAR_SPEED;
 
                 if (!rangeRandom(250))
                     nDotsAtTrixel(4, x, y, 30, 0x20, particle[i].colour);
@@ -351,8 +408,8 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
             particle[whichDrop].age = age;
             particle[whichDrop].colour = colour;
 
-            particle[whichDrop].direction = getRandom32();    // 16.16 angle
-            particle[whichDrop].distance = 96;                // 16.16 speed
+            particle[whichDrop].dir = getRandom32();    // 16.16 angle
+            particle[whichDrop].distance = 96;          // 16.16 speed
         }
     }
 
@@ -383,13 +440,14 @@ void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age
 
     for (int i = 0; i < count; i++) {
         int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, 3);
+        if (idx >= 0) {
+            // TODO  vector
+            particle[idx].x += particle[idx].age * particle[idx].speed;
+            particle[idx].y += particle[idx].age * particle[idx].speed;
 
-        // TODO vector
-        particle[idx].x += particle[idx].age * particle[idx].speed;
-        particle[idx].y += particle[idx].age * particle[idx].speed;
-
-        // particle.speedX[idx] = -particle.speedX[idx];
-        // particle.speedY[idx] = -particle.speedY[idx];
+            // particle.speedX[idx] = -particle.speedX[idx];
+            // particle.speedY[idx] = -particle.speedY[idx];
+        }
     }
 }
 

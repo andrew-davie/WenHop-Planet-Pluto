@@ -73,6 +73,7 @@ void initGameState_Game() {
 
     initSprites();
     initParticles();
+    initTool();
 
     initWyrms();     // todo: --> initNextLife
     initPlayer();    // --> initNextLife
@@ -189,6 +190,17 @@ void OS_Game() {
 
     T1TC = 0;
     T1TCR = 1;
+
+
+    // if (armFrequency == 70000000)
+    //     doges = 70;
+
+    // else if (armFrequency == 60000000)
+    //     doges = 60;
+
+    // else
+    //     doges = 99;
+
 
     setScoreCycle(SCORELINE_SCORE);    // tmp
 

@@ -77,7 +77,8 @@ void decodeCave(int cave) {
 
     // displayMode = lockDisplay ? DISPLAY_HALF : DISPLAY_NORMAL;
 
-    doges = theCave->dogeRequired[level];
+    // tmp    doges = theCave->dogeRequired[level];
+
     time = (theCave->timeToComplete[level] << 8) + 60;
     millingTime = theCave->millingTime * 60;
 

@@ -520,6 +520,9 @@ void processCreatures() {
         break;
 
     case CH_GEODOGE_FALLING_TOP:
+
+        nDots(3, boardCol, boardRow, PT_TWO, 15, rangeRandom(CHAR_TRIX_X), rangeRandom(CHAR_TRIX_Y), 0, 2);
+
         *me = FLAG(CH_DUST_ROCK_0);
         break;
 
@@ -664,17 +667,17 @@ void processPebble() {
     if (boardCol == playerX && boardRow < playerY - 1)
         return;
 
-    int chance = 50;
+    int chance = 250;
 
     for (int i = 0; i < 4; i++)
         if (TYPEOF(*(me + dirOffset[i])) == TYPE_MELLON_HUSK) {
-            chance = 10;
+            chance = 0;
             break;
         }
 
     if (!rangeRandom((chance))) {
         *me = FLAG(CH_PEBBLE_ROCK);
-        nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x100, 7);
+        nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x40, 7);
     }
 }
 
@@ -719,7 +722,7 @@ void processLava() {
                 (*me)++;
                 nDots(3, boardCol, boardRow, PT_SPIRAL, 30, 2, 5, 0xC0, 7);
             }
-            break;
+        } break;
         case CH_LAVA_SMALL:
             *me = CH_LAVA_MEDIUM;
             break;
@@ -729,7 +732,6 @@ void processLava() {
         case CH_LAVA_LARGE:
             *me = CH_LAVA_BLANK;
             break;
-        }
         }
     }
 }

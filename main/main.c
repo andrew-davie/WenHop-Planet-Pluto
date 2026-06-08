@@ -315,6 +315,13 @@ void runARM_Load_SaveKey() {
 
         saveKeyEnableICC = RAM[_SK_ENABLE_ICC];
 
+        // Dubious fixes for illegal SK values
+        // TODO: put any other 'catch errors' here - it will "fix" the SK
+
+        if (saveKeyEnableICC > CC_ICC) {
+            saveKeyEnableICC = RAM[_SK_ENABLE_ICC] = CC_PCC;    // error!  FIX IT
+        }
+
         unsigned short *odometer = (unsigned short *)(RAM + _SK_ODOMETER);
         (*odometer)++;
     }

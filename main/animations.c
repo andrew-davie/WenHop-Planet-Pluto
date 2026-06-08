@@ -95,6 +95,8 @@ const unsigned char AnimateGrinder[] = {
     CH_GRINDER_0, 12,
     CH_GRINDER_1, 12,
     ANIM_LOOP,
+
+    CH_GRINDER_0, 0
 };
 
 const unsigned char AnimateGrinder1[] = {
@@ -102,6 +104,8 @@ const unsigned char AnimateGrinder1[] = {
     CH_GRINDER_1, 12,
     CH_GRINDER_0, 12,
     ANIM_LOOP,
+
+    CH_GRINDER_1, 0
 };
 
 
@@ -240,12 +244,20 @@ void startCharAnimation(int type, const unsigned char *idx) {
     }
 }
 
+
 void processCharAnimations() {
 
     for (int type = 0; type < TYPE_MAX; type++)
         if (AnimateBase[type] && AnimCount[type] != ANIM_HALT)
             if (!--AnimCount[type])
                 startCharAnimation(type, Animate[type] + 2);
+}
+
+
+void toggleGears(bool active) {
+
+    startCharAnimation(TYPE_GRINDER, AnimateGrinder + (active ? 5 : 0));
+    startCharAnimation(TYPE_GRINDER_1, AnimateGrinder1 + (active ? 5 : 0));
 }
 
 // EOF

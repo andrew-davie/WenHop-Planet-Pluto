@@ -22,7 +22,7 @@ struct Particle {
     unsigned char colour;
     int x;
     int y;
-    unsigned char direction;
+    unsigned char dir;
     unsigned short distance;
 };
 
@@ -30,6 +30,8 @@ extern struct Particle particle[PARTICLE_COUNT];
 
 void initParticles();
 void drawParticles();
+
+void initTool();
 void drawRope();
 void drawMace();
 void drawGun();

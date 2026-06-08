@@ -190,10 +190,10 @@ const unsigned char caveMace[] = {
 
     0, CH_BRICKWALL, CH_DIRT,
 
-    3,
+    1,
     CH_BLANK, 10,100,100,100,100,
-    CH_PEBBLE1, 30, 255, 0, 255, 10,
-    CH_PEBBLE2, 30, 255, 0, 255, 10,
+    // CH_PEBBLE1, 30, 255, 0, 255, 10,
+    // CH_PEBBLE2, 30, 255, 0, 255, 10,
 
 //    DRAW_FILLED_RECT,CH_STEELWALL,1,1,9,8,CH_DIRT,
     // DRAW_FILLED_RECT,CH_BRICKWALL,4,4,3,3,CH_ROCK,
@@ -598,7 +598,7 @@ const unsigned char caveA2[] = {
     // 70,65,60,55,50,
 
     WEAPON_MACE,                    //0
-    WEAPON_NONE,                    //1
+    WEAPON_MACE,                    //1
     WEAPON_NONE,                    //2
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
@@ -976,6 +976,7 @@ const unsigned char *caveList[] = {
 
     caveA2,         // best
     caveMace,
+
     caveUseWall,
     caveA4,
     caveWyrms,

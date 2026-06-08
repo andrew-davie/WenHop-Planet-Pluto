@@ -56,7 +56,7 @@
 #define DIR_R 2
 #define DIR_D 4
 #define DIR_L 8
-
+extern int armFrequency;
 
 extern unsigned int frame;
 extern int tvSystem;

@@ -19,15 +19,15 @@ void setSchedule(enum SCHEDULE nextGameSchedule) {
 
 void scheduleUnpackCave() {
 
-    //    while (availableIdleTime - 20000 > T1TC)    // <-- arbitrary time allowance for slowest cave decode
-    if (!decodeExplicitData(false)) {
+    while (availableIdleTime - 30000 > T1TC)    // <-- arbitrary time allowance for slowest cave decode
+        if (!decodeExplicitData(false)) {
 
-        if (!totalDogePossible)
-            totalDogePossible = -1;    // indicates "perfect" not possible
+            if (!totalDogePossible)
+                totalDogePossible = -1;    // indicates "perfect" not possible
 
-        setSchedule(SCHEDULE_START_SCAN);
-        //          break;
-    }
+            setSchedule(SCHEDULE_START_SCAN);
+            //          break;
+        }
 }
 
 void scheduledTasks() {
@@ -41,8 +41,8 @@ void scheduledTasks() {
 
     (*scheduleFunc[gameSchedule])();
 
-    // while (T1TC < availableIdleTime)
-    //     ;
+    while (T1TC < availableIdleTime)
+        ;
 }
 
 

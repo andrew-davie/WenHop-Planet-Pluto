@@ -27,7 +27,7 @@ bool isScrolling() {
 }
 
 
-int clamp(int *v, int min, int max) {
+void clamp(int *v, int min, int max) {
     if (*v < min)
         *v = min;
     if (*v > max)
@@ -87,7 +87,7 @@ void scroll() {
 #define DECEL_Y (1 << 12)
 
         int tY = ((playerY * CHAR_TRIX_Y) << 16) + (CHAR_TRIX_Y << 15);
-        int hY = scrollY + (SCREEN_TRIX_Y << 15) + (CHAR_TRIX_Y << 16);    // @navel :)
+        int hY = scrollY + (SCREEN_TRIX_Y << 15) + (CHAR_TRIX_Y << 15);    // @navel :)
 
         if (tY < (hY - SCROLL_EDGE_Y))
             scrollSpeedY = approach(scrollSpeedY, -MAX_SPEED_Y, ACCEL_Y);
@@ -139,8 +139,8 @@ void resetTracking() {
     scrollX = ((playerX * CHAR_TRIX_X - (SCREEN_TRIX_X >> 1)) << 16) + (CHAR_TRIX_X << 15);
     clamp(&scrollX, SCROLL_MIN_X, SCROLL_MAX_X);
 
-    scrollY = ((playerY * CHAR_TRIX_Y - (SCREEN_TRIX_Y >> 1)) << 16) + (CHAR_TRIX_Y << 15);
-    clamp(&scrollX, SCROLL_MIN_X, SCROLL_MAX_X);
+    scrollY = ((playerY * CHAR_TRIX_Y - (SCREEN_TRIX_Y >> 1)) << 16);    // + (CHAR_TRIX_Y << 16);
+    clamp(&scrollY, SCROLL_MIN_Y, SCROLL_MAX_Y);
 
     scrollSpeedX = scrollSpeedY = 0;
 }

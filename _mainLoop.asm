@@ -49,9 +49,10 @@ mainGameLoop
                 	ldx #_RUNARM_OVERSCAN
                 	stx DSWRITE
 
-                	ldx INTIM
-                    dex                     ; adjust -1 for 6502 requirements below
-                	stx DSWRITE             ; spare time --> ARM
+                	lda INTIM
+                    sec
+                    sbc #3
+                	sta DSWRITE
 
     ; send controllers to ARM
 
@@ -124,9 +125,10 @@ mainGameLoop
                     ldx #_RUNARM_VBLANK
                     stx DSWRITE
 
-                	ldx INTIM
-                    dex
-                	stx DSWRITE
+                	lda INTIM
+                    sec
+                    sbc #3
+                	sta DSWRITE
 
                     ldx call_fn
                     stx CALLFN                  ; call VerticalBlank in ARM

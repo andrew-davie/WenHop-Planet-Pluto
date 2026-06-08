@@ -741,7 +741,9 @@ void drawPlanetName() {
     static int col = 0;
     col++;
 
-    const char *p = planetName[cave < sizeof(planetName) ? cave : sizeof(planetName) - 1];
+    int caveCount = sizeof(planetName) / sizeof(planetName[0]);
+
+    const char *p = planetName[cave < caveCount ? cave : caveCount - 1];
     for (int i = 2; *p; i++) {
         scoreLineNew[i] = LETTER(*p++);
         scoreLineColour[i] = col++ & 7;

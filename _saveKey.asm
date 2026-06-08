@@ -1,4 +1,4 @@
-_SK_GAME_ID         = 0x02
+_SK_GAME_ID         = 0x03
 SK_SLOT             = 99                   ; TODO: reserve slot with Champ Games
 SK_ADDRESS          = (SK_SLOT * 64)
 
@@ -26,15 +26,22 @@ noSKfound2          rts
 
 ;-------------------------------------------------------------------------------
 
-ReadSaveKey
-
-    ; will exit with SK_ID = _SK_GAME_ID if valid
+clearSaveKey
 
                     ldx #SK_BYTES               ; +1, includes _SK_RESET
                     lda #0
 .clearFlagsKey      sta SK_START,x
                     dex
                     bpl .clearFlagsKey
+                    rts
+
+
+
+ReadSaveKey
+
+                    jsr clearSaveKey
+
+    ; will exit with SK_ID = _SK_GAME_ID if valid
 
     ; Note: _SK_ID = 0 at this point
     
@@ -53,7 +60,7 @@ verify              jsr SetupSaveKey
 
                     jsr i2c_rxbyte
                     cmp #_SK_GAME_ID
-                    bne .forceInitSK
+                    bne forceInitSK
 
         ; HANDLE RESET PRESS TO CLEAR SAVEKEY DATA
 
@@ -61,7 +68,7 @@ verify              jsr SetupSaveKey
                     lsr                         ; reset -> c
                     bcs .verified
 
-.forceInitSK        inc SK_RESET
+forceInitSK         inc SK_RESET
 
                     ldx #_SK_GAME_ID
                     stx SK_ID
