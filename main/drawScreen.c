@@ -377,8 +377,8 @@ const unsigned char *const roundedCorner[] = {
 
 void grabCharacters() {
 
-    unsigned char p2;
-    unsigned char type;
+    enum ChName p2;
+    enum ObjectType type;
     unsigned char udlr;
 
     for (int col = 0; col < 5; col++) {

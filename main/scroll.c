@@ -13,7 +13,7 @@
 int scrollX, scrollY;
 
 static int scrollSpeedX, scrollSpeedY;
-static int targetScrollSpeed, targetYScrollSpeed;
+// static int targetScrollSpeed, targetYScrollSpeed;
 
 // #define accel 4096
 // #define accelY (accel * 16)

@@ -19,6 +19,8 @@
 
 unsigned int weaponLength = 0;
 
+void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
+                    unsigned char colour, unsigned char dmask);
 
 #define TOOL_MAX 24
 
@@ -26,8 +28,8 @@ struct TOOL {
 
     unsigned char age;
     unsigned char dir;
-    unsigned short x;
-    unsigned short y;
+    int x;
+    int y;
     unsigned short speed;
 };
 
@@ -63,27 +65,27 @@ void modifyCharAtTip(int x, int y) {
         return;
 
     unsigned char *b = RAM + _BOARD + ychar * _BOARD_COLS + xchar;
-    int ch = CharToType[GET(*b)];
+    enum ObjectType type = CharToType[GET(*b)];
 
 
-    if (Attribute[ch] & ATT_EXPLODABLE) {
+    if (Attribute[type] & ATT_EXPLODABLE) {
 
-        if (ch == TYPE_DOGE) {
+        if (type == TYPE_DOGE) {
             *b = CH_BLANK | FLAG_THISFRAME;
             colour = rangeRandom(7) + 1;
         }
 
-        else if (ch == TYPE_ROCK) {
+        else if (type == TYPE_ROCK) {
             *b = CH_GEODOGE | FLAG_THISFRAME;
             colour = 1;
         }
 
-        else if (ch == TYPE_GEODOGE) {
+        else if (type == TYPE_GEODOGE) {
             *b = CH_DOGE_00 | FLAG_THISFRAME;
             colour = 3;
         }
 
-        else if (ch == TYPE_DIRT) {
+        else if (type == TYPE_DIRT) {
             *b = CH_DUST_0 | FLAG_THISFRAME;
             colour = 2;
         }
@@ -92,13 +94,13 @@ void modifyCharAtTip(int x, int y) {
 
             if (xchar > 0 && xchar < _BOARD_COLS && ychar > 0 && ychar < _BOARD_ROWS) {
 
-                if (ch == TYPE_BRICKWALL) {
+                if (type == TYPE_BRICKWALL) {
 
                     *b = CH_DUST_0 | FLAG_THISFRAME;
                     colour = 7;
                 }
 
-                else if (ch == TYPE_STEELWALL) {
+                else if (type == TYPE_STEELWALL) {
                     *b = CH_DUST_0 | FLAG_THISFRAME;
                     colour = 7;
                 }
@@ -106,7 +108,7 @@ void modifyCharAtTip(int x, int y) {
         }
 
         if (*b & FLAG_THISFRAME)
-            nDotsAtTrixel(5, (x >> 8) + (CHAR_TRIX_Y >> 1), (y >> 8) + (CHAR_TRIX_Y >> 1), 30, 50, colour);
+            nDotsAtTrixel(5, (x >> 8) + (CHAR_TRIX_Y >> 1), (y >> 8) + (CHAR_TRIX_Y >> 1), 30, PT_SPIRAL, 50, colour);
     }
 }
 
@@ -132,7 +134,7 @@ void drawMace() {
     if (T1TC > availableIdleTime - 3000)
         return;
 
-    if (theCave->weapon[level] != WEAPON_MACE)
+    if (playerDead || theCave->weapon[level] != WEAPON_MACE)
         return;
 
     if ((inpt4 & 0x80) && !weaponLength) {
@@ -196,7 +198,7 @@ void drawMace() {
         tool[i].dir = tool[i - 1].dir;
 }
 
-void addTool(int x, int y, unsigned char dir, unsigned short speed) {
+void addTool(int x, int y, int age, unsigned char dir, unsigned short speed) {
 
     for (int i = 0; i < TOOL_MAX; i++)
         if (!tool[i].age) {
@@ -206,13 +208,27 @@ void addTool(int x, int y, unsigned char dir, unsigned short speed) {
             tool[i].dir = dir;
             tool[i].speed = speed;
 
-            tool[i].age = 60;
+            tool[i].age = age;
             return;
         }
 }
 
+unsigned char *getBoardAddress(int x, int y) {
+
+    int xchar = (x * (0x10000 / CHAR_TRIX_X)) >> 16;
+    int ychar = (y * (0x10000 / CHAR_TRIX_Y)) >> 16;
+
+    if (xchar < 0 || xchar >= _BOARD_COLS || ychar < 0 || ychar >= _BOARD_ROWS)
+        return 0;
+
+    return (unsigned char *)(RAM + _BOARD + ychar * _BOARD_COLS + xchar);
+}
 
 void drawGun() {
+
+    if (T1TC > availableIdleTime - 3000)
+        return;
+
 
     for (int i = 0; i < TOOL_MAX; i++)
         if (tool[i].age && tool[i].age--) {
@@ -222,57 +238,78 @@ void drawGun() {
             tool[i].x += (tool[i].speed * sin_cos[s]) >> 8;
             tool[i].y += (tool[i].speed * 2 * sin_cos[(s + 8) & 0x1f]) >> 8;
 
-            drawBit(tool[i].x >> 8, (tool[i].y >> 8), 7);
-            drawBit(tool[i].x >> 8, (tool[i].y >> 8) + 1, 7);
+            int x = tool[i].x >> 8;
+            int y = tool[i].y >> 8;
+
+            drawBit(x, y, 7);
+            drawBit(x, y + 1, 7);
+
+            enum ChName *p = getBoardAddress(x, y);
+            if (p) {
+                enum ChName ch = GET(*p);
+                enum ObjectType type = CharToType[ch];
+                const unsigned int attribute = Attribute[type];
+
+                if (type != TYPE_MELLON_HUSK) {
+                    if (!(attribute & ATT_BLANK)) {
+
+                        if ((Attribute[type] & (ATT_EXPLODABLE | ATT_HARD))) {
+                            ADDAUDIO(SFX_ROCK);
+
+                            for (int i = 0; i < 12; i++)
+                                nDotsAtTrixel(1, x, y, 12, PT_ONE, 120, 7);
+                            tool[i].age = 0;
+
+                            if (!(Attribute[type] & ATT_HARD))
+                                *p = CH_BLANK | FLAG_THISFRAME;
+                        }
+                    }
+                }
+            }
         }
 
 
     static int gunDelay = 0;
 
-    if (--gunDelay > 0 || (inpt4 & 0x80) || theCave->weapon[level] != WEAPON_GUN)
+    if (playerDead || (gunDelay && (--gunDelay > 0)) || (inpt4 & 0x80) || theCave->weapon[level] != WEAPON_GUN)
         return;
 
     ADDAUDIO(SFX_EXPLODE);
-
-    int x = (playerX * CHAR_TRIX_X + (CHAR_TRIX_X >> 1) + ((faceDirection * autoMoveX) >> 2)) << 8;
-    int y = ((playerY * CHAR_TRIX_Y + 6) << 8) + (autoMoveY * (256 / 3)) - 4;
-
     gunDelay = 20;
 
+    int x = (playerX * CHAR_TRIX_X + (CHAR_TRIX_X >> 1) + ((faceDirection * autoMoveX) >> 2)) << 8;
+    int y = ((playerY * CHAR_TRIX_Y + 6) << 8) + (autoMoveY * (256 / 3)) - (2 << 8);
 
-    static char angle[] = {
+    static char angle[16] = {
 
         0,      // 00
         128,    // 01 UP
         0,      // 02 DOWN
-        0,      // 03
+        0,      // 03 U+D
         192,    // 04 LEFT
-        160,    // 05
-        224,    // 06
+        160,    // 05 U+L
+        224,    // 06 D+L
         0,      // 07
         64,     // 08 RIGHT
-        96,     // 09
-        32,     // 10
+        96,     // 09 R+U
+        32,     // 10 R+D
         0,      // 11
         0,      // 12
         0,      // 13
         0,      // 14
         0,      // 15
-
-
     };
 
     int joy = (swcha ^ 0xFF) >> 4;
     int fireDir = joy ? angle[joy] : faceDirection == 1 ? 64 : 192;
 
-
-    addTool(x, y, fireDir, 0xC0);
+    addTool(x, y, 60, fireDir, 0xC0);
 }
 
 
 void drawRope() {
 
-    if ((RAM[_INPT4] & 0x80) || theCave->weapon[level] != WEAPON_ROPE)
+    if (playerDead || (RAM[_INPT4] & 0x80) || theCave->weapon[level] != WEAPON_ROPE)
         return;
 
     if (--weaponLength > ROPE_PARTICLE_COUNT)    // relies on unsigned int arithmetic
@@ -347,7 +384,7 @@ void drawParticles() {
                 particle[i].dir += PARTICLE_SPIRAL_ANGULAR_SPEED;
 
                 if (!rangeRandom(250))
-                    nDotsAtTrixel(4, x, y, 30, 0x20, particle[i].colour);
+                    nDotsAtTrixel(4, x, y, 30, PT_SPIRAL, 0x20, particle[i].colour);
                 break;
             }
 
@@ -433,7 +470,8 @@ void nDots(int count, int dripX, int dripY, int type, unsigned char age, int off
     }
 }
 
-void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed) {
+void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY,
+                    int /*speed*/) {
 
     if (gravity < 0)
         offsetY = CHAR_TRIX_Y - offsetY;
@@ -451,14 +489,31 @@ void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age
     }
 }
 
-void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed, unsigned char colour) {
+void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
+                   unsigned char colour) {
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX, dripY, PT_SPIRAL, age, colour);
+        int idx = sphereDot(dripX, dripY, type, age, colour);
         if (idx >= 0)
             particle[idx].speed = speed;
     }
 }
 
+#define SPREAD 96
+
+void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
+                    unsigned char colour, unsigned char dmask) {
+
+    for (int i = 0; i < count; i++) {
+        int idx = sphereDot(dripX, dripY, type, age, colour);
+        if (idx >= 0) {
+            particle[idx].speed = rangeRandom(speed);
+
+
+            int doff = rangeRandom(SPREAD) - (SPREAD >> 1);
+            particle[idx].dir = (unsigned char)(128 + dmask + doff);
+        }
+    }
+}
 
 // EOF

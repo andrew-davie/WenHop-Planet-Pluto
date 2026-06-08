@@ -30,7 +30,7 @@ int explodeCount;
 
 // init'd locally
 unsigned char creature;
-unsigned int type;
+enum ObjectType type;
 int conveyorDirection;
 
 
@@ -134,7 +134,7 @@ void setupBoardScanner() {
 
             // Surface lava "bubbles"
             int posX = ((scrollX * 5) >> 16) + rangeRandom(_BOARD_COLS);
-            nDotsAtTrixel(1, posX, lavaSurfaceTrixel - 2, 120, 0x10, 7);    // untested speed
+            nDotsAtTrixel(1, posX, lavaSurfaceTrixel - 2, PT_SPIRAL, 120, 0x10, 7);    // untested speed
         }
 
         if (showWater) {
@@ -148,7 +148,7 @@ void setupBoardScanner() {
                 if (((sinus[(waves >> 0) & 15] & 3) != 0) || (gameFrame & 31) == 0) {
                     ++waves;
 
-                    if (!(gameFrame & 7))
+                    if (!(frame & 63))
                         lavaSurfaceTrixel--;
                 }
 
@@ -382,13 +382,13 @@ void disableInsulator(unsigned char *p) {
 
     FLASH(0x2C, 10);
 
-    bool disabled = false;
+    //    bool disabled = false;
     int dir = (GET(*p) == CH_INSULATOR_TOP) ? _1ROW : -_1ROW;
     p += dir;
 
     if (CharToType[GET(*p)] == TYPE_ELECTRIC) {
         while (CharToType[GET(*p)] == TYPE_ELECTRIC) {
-            disabled = true;
+            //          disabled = true;
             *p = CH_BLANK;
             p += dir;
         }
@@ -503,7 +503,7 @@ void processCreatures() {
     case CH_BLOCK: {
 
         unsigned char *next = me + _1ROW * gravity;
-        unsigned char typeDown = CharToType[GET(*next)];
+        enum ObjectType typeDown = CharToType[GET(*next)];
         if (Attribute[typeDown] & ATT_BLANK) {
             *next = FLAG(*me);
             *me = FLAG(CH_DUST_0);
@@ -611,12 +611,12 @@ void restartBoardScan() {
 
         unsigned char *man = RAM + _BOARD + playerY * _1ROW + playerX;
 
-        int what = GET(*man);
+        enum ChName what = GET(*man);
 
         // if (invincible)
         //     what = *man = CH_MELLON_HUSK;
 
-        int type = CharToType[what];
+        enum ObjectType type = CharToType[what];
         playerDead = (type != TYPE_MELLON_HUSK && type != TYPE_MELLON_HUSK_PRE && !exitMode);
 
         if (explodeCount > 0) {
@@ -649,7 +649,7 @@ void processDoge() {
     // FLASH(0x94, 4);
 
     unsigned char *next = me + _1ROW * gravity;
-    int attrNext = Attribute[CharToType[GET(*next)]];
+    const unsigned int attrNext = Attribute[CharToType[GET(*next)]];
 
     if (attrNext & ATT_BLANK) {
         *me = FLAG(CH_DOGE_FALLING_TOP);
@@ -702,7 +702,7 @@ void processLava() {
             int i = waterDir & 3;
 
             unsigned char *neighbour = me + dirOffset[i];
-            int att = Attribute[CharToType[GET(*neighbour)]];
+            const unsigned int att = Attribute[CharToType[GET(*neighbour)]];
 
             if (att & ATT_DISSOLVES) {
                 *neighbour = CH_LAVA_BLANK;
@@ -750,7 +750,7 @@ void processWaterFlow() {
         if (boardRow < 20) {
 
             unsigned char *next = me + _1ROW * gravity;
-            int att = Attribute[CharToType[GET(*next)]];
+            const unsigned int att = Attribute[CharToType[GET(*next)]];
             if (!(att & ATT_WATERFLOW)) {
 
                 if (att & (ATT_DISSOLVES | ATT_BLANK)) {
@@ -799,7 +799,7 @@ void processOutlet() {
 
         if (GET(*(me - _1ROW * 2)) == CH_TAP_0) {
 
-            unsigned char under = GET(*(me + _1ROW));
+            enum ChName under = GET(*(me + _1ROW));
 
             if (!(Attribute[CharToType[under]] & ATT_WATERFLOW)) {
 
@@ -821,7 +821,7 @@ void processOutlet() {
 void processCharGeoDogeAndRock() {
 
     unsigned char *next = me + _1ROW * gravity;
-    unsigned char typeDown = CharToType[GET(*next)];
+    enum ObjectType typeDown = CharToType[GET(*next)];
     // int typeofMe = CharToType[GET(*me)];
 
     if (Attribute[typeDown] & ATT_BLANK) {
@@ -853,7 +853,7 @@ void processCharGeoDogeAndRock() {
 void processFallingThings() {
 
     unsigned char *next = me + _1ROW * gravity;
-    unsigned char typeDown = CharToType[GET(*next)];
+    enum ObjectType typeDown = CharToType[GET(*next)];
     if (Attribute[typeDown] & ATT_BLANK) {
 
         switch (creature) {
@@ -875,9 +875,9 @@ void processFallingThings() {
         }
 
         unsigned char *nextNext = next + _1ROW * gravity;
-        unsigned char downCh = GET(*nextNext);
+        enum ChName downCh = GET(*nextNext);
         typeDown = CharToType[downCh];
-        int attNextNext = Attribute[typeDown];
+        const unsigned int attNextNext = Attribute[typeDown];
 
         if (downCh != CH_ROCK_FALLING && downCh != CH_DOGE_FALLING && downCh != CH_GEODOGE_FALLING) {
 
@@ -979,7 +979,7 @@ void genericPush(int offsetX, int offsetY) {
 
     unsigned char alternate = CH_STEELWALL;
     unsigned char *pushPosFurther = atEdge ? &alternate : pushPos + adjustOffset;
-    int attPushPosFurther = Attribute[CharToType[GET(*pushPosFurther)]];
+    const unsigned int attPushPosFurther = Attribute[CharToType[GET(*pushPosFurther)]];
 
     //??
     if (playerPos == pushPos && (atEdge || !(attPushPosFurther & ATT_PERMEABLE))) {
@@ -989,7 +989,7 @@ void genericPush(int offsetX, int offsetY) {
         nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 50, 3, 4, 0x180, 7);
     }
 
-    int attPushPos = Attribute[CharToType[GET(*pushPos)]];
+    const unsigned int attPushPos = Attribute[CharToType[GET(*pushPos)]];
 
     if (!(GET(*pushPos) & FLAG_THISFRAME)) {
         if ((attPushPos & ATT_PERMEABLE) || ((attPushPos & ATT_PUSH) && (attPushPosFurther & ATT_PERMEABLE))) {
@@ -1033,7 +1033,7 @@ void genericPush(int offsetX, int offsetY) {
 void genericPushReverse(int offsetX, int offsetY) {
 
     unsigned char *pushPos = me + offsetY * _BOARD_COLS + offsetX;
-    int type = CharToType[GET(*pushPos)];
+    enum ObjectType type = CharToType[GET(*pushPos)];
 
     if (type == TYPE_PUSHER) {
         *pushPos = FLAG(*me);
@@ -1100,10 +1100,10 @@ void doRoll() {
         unsigned char *side = me + offset;
         if (!(*side & FLAG_THISFRAME)) {
 
-            unsigned char sideType = CharToType[GET(*side)];
+            enum ObjectType sideType = CharToType[GET(*side)];
             if (Attribute[sideType] & ATT_BLANK) {
 
-                unsigned char sideDownType = CharToType[GET(*(side + _1ROW))];
+                enum ObjectType sideDownType = CharToType[GET(*(side + _1ROW))];
                 if (Attribute[sideDownType] & ATT_BLANK) {
 
                     if (offset > 0) {
@@ -1140,7 +1140,7 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 
     for (int i = 0; i < 9; i++) {
         unsigned char *cell = where + offset[i];
-        unsigned char type = CharToType[GET(*cell)];
+        enum ObjectType type = CharToType[GET(*cell)];
         if (Attribute[type] & ATT_EXPLODABLE) {
             *cell = explosionShape;
             if (explosionShape == CH_DOGE_00)

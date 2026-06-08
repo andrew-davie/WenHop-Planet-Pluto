@@ -14,7 +14,7 @@
 unsigned char bgPalette[_BOARD_ROWS];
 unsigned char fgPalette[2];
 
-static int lastBgCol;
+// static int lastBgCol;
 static int lastPfCharLine;
 static int lastBgCharLine;
 int currentPalette;
@@ -396,7 +396,7 @@ const unsigned char colourPool[][4] = {
 
 void loadPalette() {
 
-    unsigned char *c = (unsigned char *)colourPool;
+    //    unsigned char *c = (unsigned char *)colourPool;
 
     unsigned char rp[4];
     for (int i = 0; i < 4; i++)

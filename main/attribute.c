@@ -2,7 +2,7 @@
 
 #include "attribute.h"
 
-const unsigned char CharToType[CH_MAX] = {
+const enum ObjectType CharToType[CH_MAX] = {
 
     // see ChName for corresponding character name/number
     // may need to update worstRequiredTime if that's in use
@@ -12,7 +12,7 @@ const unsigned char CharToType[CH_MAX] = {
     TYPE_BRICKWALL,                // 002 CH_BRICKWALL,
     TYPE_OUTBOX_PRE,               // 003 CH_DOORCLOSED,
     TYPE_OUTBOX,                   // 004 CH_DOOROPEN_0,
-    TYPE_STEELWALL,                // 005 CH_EXITBLANK,
+    TYPE_OUTBOX,                   // 005 CH_EXITBLANK,
     TYPE_STEELWALL,                // 006 CH_STEELWALL,
     TYPE_PEBBLE1,                  // 007 CH_PEBBLE1,
     TYPE_PEBBLE1,                  // 008 CH_PEBBLE2,
@@ -172,7 +172,7 @@ const unsigned int Attribute[TYPE_MAX] = {
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+----+
     _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ |RKF|QUI| _ | _ | _ | _ | _ | _ |SPC|PER|XPD|CVT| _ | _  , // 00 TYPE_SPACE,
    CNR| _ | _ | _ |DIS| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRT| _ |PER|XPD|CVT| _ | _  , // 01 TYPE_DIRT,
-    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ |XPD| _ | _ |ROL , // 02 TYPE_BRICKWALL,
+    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 02 TYPE_BRICKWALL,
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 03 TYPE_OUTBOX_PRE,
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 04 TYPE_OUTBOX,
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 05 TYPE_STEELWALL,

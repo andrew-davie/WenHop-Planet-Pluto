@@ -56,7 +56,7 @@ bool showWater;
 bool showLava;
 bool exitTrigger;
 
-unsigned int cave;
+int cave;
 bool caveCompleted;
 unsigned char bufferedSWCHA;
 unsigned int usableSWCHA;

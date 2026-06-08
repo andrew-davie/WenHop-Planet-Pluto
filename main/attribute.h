@@ -2,8 +2,6 @@
 
 #include "main.h"
 
-extern const unsigned int Attribute[];
-extern const unsigned char CharToType[];
 
 enum ObjectType {
 
@@ -57,6 +55,9 @@ enum ObjectType {
 
     TYPE_MAX
 };
+
+extern const unsigned int Attribute[];
+extern const enum ObjectType CharToType[];
 
 enum ChName {
 

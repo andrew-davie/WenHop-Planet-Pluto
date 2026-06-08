@@ -69,9 +69,8 @@ const unsigned char caveUseWall[] = {
 
     // Random objects
 
-    4,
-    CH_BLANK, 255, 0, 240, 0, 20,
-    CH_BLANK, 255, 0, 240, 0, 20,
+    3,
+    CH_BLANK, 60, 0, 240, 0, 20,
     CH_PEBBLE1, 20,40,40,40,40,
     CH_PEBBLE2, 20,40,40,40,40,
 
@@ -326,7 +325,7 @@ const unsigned char caveA[] = {
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
 
-    WEAPON_NONE,                    //0
+    WEAPON_GUN,                    //0
     WEAPON_NONE,                    //1
     WEAPON_NONE,                    //2
     WEAPON_NONE,                    //3
@@ -974,8 +973,9 @@ const unsigned char caveA4[] = {
 const unsigned char *caveList[] = {
     // clang-format off
 
+//    caveMace,
     caveA2,         // best
-    caveMace,
+    caveA,
 
     caveUseWall,
     caveA4,
@@ -986,7 +986,6 @@ const unsigned char *caveList[] = {
 //    caveFast,
 //    caveA5,  // bad
 
-    caveA,
     caveA3,
 
     // clang-format on

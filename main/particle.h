@@ -41,6 +41,7 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
 void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed,
            unsigned char colour);
 void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
-void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, int speed, unsigned char colour);
+void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
+                   unsigned char colour);
 
 // EOF

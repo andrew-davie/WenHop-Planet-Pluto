@@ -35,14 +35,14 @@ enum JOYSTICK_DIRECTION {
     JOYSTICK_RIGHT = 8,
 };
 
-const unsigned char joyDirectBit[] = {
+const enum JOYSTICK_DIRECTION joyDirectBit[] = {
     JOYSTICK_UP,
     JOYSTICK_RIGHT,
     JOYSTICK_DOWN,
     JOYSTICK_LEFT,
 };
 
-const signed char faceDirectionDef[] = {
+const enum FaceDirectionX faceDirectionDef[] = {
     FACE_UP,
     FACE_RIGHT,
     FACE_DOWN,
@@ -176,7 +176,7 @@ bool checkHighPriorityMove(int dir) {
     }
 
     unsigned char *meOffset = me + dirOffset[dir];
-    unsigned char destType = CharToType[GET(*meOffset)];
+    enum ObjectType destType = CharToType[GET(*meOffset)];
 
     {    // no fire button
 
@@ -217,7 +217,6 @@ bool checkHighPriorityMove(int dir) {
 
 
             if (!gearsWaitRelease) {
-
 
                 gearsWaitRelease = true;
                 gearsActive = !gearsActive;
@@ -448,13 +447,13 @@ bool checkLowPriorityMove(int dir) {
         return false;
     }
 
-    int offX = playerX + xdir[dir];
-    int offY = playerY + ydir[dir];
+    // int offX = playerX + xdir[dir];
+    // int offY = playerY + ydir[dir];
 
 
     int offset = dirOffset[dir];
     unsigned char *meOffset = me + offset;
-    unsigned char destType = CharToType[GET(*meOffset)];
+    enum ObjectType destType = CharToType[GET(*meOffset)];
 
 #if 1    // disable push
     if (/*faceDirectionDef[dir] && */ (Attribute[destType] & (ATT_MINE | ATT_PIPE))) {
@@ -594,7 +593,7 @@ void movePlayer(unsigned char *me) {
     lastUsableSWCHA = usableSWCHA;
 
 
-    if (gearsWaitRelease && usableSWCHA == 0xFF)
+    if (gearsWaitRelease && (usableSWCHA & 0xF0) == 0xF0)    // fixes gopher debug/exit 'lockup'
         gearsWaitRelease = false;
 
 

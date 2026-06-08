@@ -90,8 +90,8 @@ void processWyrms() {
         unsigned char *newHead = RAM + _BOARD + candidateY * _1ROW + candidateX;
 
         int mask = ATT_BLANK | ATT_GRAB;
-        int whatsThere = CharToType[GET(*newHead)];
-        int moveable = Attribute[whatsThere] & mask;
+        enum ObjectType whatsThere = CharToType[GET(*newHead)];
+        bool moveable = Attribute[whatsThere] & mask;
 
         if (!moveable) {    // || !(getRandom32() & 3)) {
 

@@ -75,7 +75,7 @@ extern bool showWater;
 extern bool showLava;
 extern bool exitTrigger;
 
-extern unsigned int cave;
+extern int cave;
 extern bool caveCompleted;
 extern unsigned char bufferedSWCHA;
 extern unsigned int usableSWCHA;
@@ -106,7 +106,6 @@ extern unsigned int sparkleTimer;
 extern bool playerDead;
 extern int gameFrame;
 
-extern const unsigned char joyDirectBit[4];
 extern const int xInc[];
 extern const int yInc[];
 extern unsigned int availableIdleTime;

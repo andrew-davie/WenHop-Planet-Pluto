@@ -19,7 +19,7 @@ void processMusic();
 // const unsigned char trackSimple[];
 // static const unsigned char trackSimple2[];
 
-const unsigned char trackGridLockMelodyIntro2[];
+// const unsigned char trackGridLockMelodyIntro2[];
 const unsigned char trackGridLockBase2[];
 const unsigned char trackGridLockMelodyIntro[];
 const unsigned char trackGridLockBase[];
