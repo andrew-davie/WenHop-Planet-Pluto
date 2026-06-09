@@ -52,7 +52,7 @@ int approach(int current, int target, int speed) {
 void scroll() {
 
     // if (true) {
-    if (playerDead && !waitRelease && *playerAnimation == FRAME_BLANK) {
+    if (playerDead && !waitRelease) {    // && *playerAnimation == FRAME_BLANK) {
 
         // Manual look-around
 

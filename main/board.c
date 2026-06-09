@@ -27,6 +27,7 @@
 int selectorCounter;
 int waterDir;
 int explodeCount;
+int explodeRadius;
 
 // init'd locally
 unsigned char creature;
@@ -598,12 +599,23 @@ void processCreatures() {
 
 void restartBoardScan() {
 
+    // // randomly place a new pebble
+    if (rangeRandom(256) < theCave->millingTime) {
+
+
+        int dX = playerX + rangeRandom(11) - 5;
+        int dY = playerY + rangeRandom(11) - 5;
+
+        if (dX >= 0 && dX < _BOARD_COLS && dY >= 0 && dY < _BOARD_ROWS) {
+            unsigned char *sq = RAM + _BOARD + dY * _1ROW + dX;
+            if (GET(*sq) == CH_DIRT)
+                *sq = FLAG(CH_PEBBLE1 + (getRandom32() & 1));
+        }
+    }
+
+
     if (!autoMoveFrameCount) {    // delay until fully in new square
 
-        // // randomly place a new pebble
-        // int *sq = RAM + _BOARD + rangeRandom(_BOARD_COLS * _BOARD_ROWS);
-        // if (GET(*sq) == CH_DIRT)
-        //     *sq = FLAG(CH_PEBBLE1 + (getRandom32() & 1));
 
         //                    chooseIdleAnimation();
 
@@ -613,40 +625,47 @@ void restartBoardScan() {
 
         enum ChName what = GET(*man);
 
-        // if (invincible)
-        //     what = *man = CH_MELLON_HUSK;
+        if ((usableSWCHA & 0xF0) == 0xF0)
+            waitRelease = false;
 
         enum ObjectType type = CharToType[what];
         playerDead = (type != TYPE_MELLON_HUSK && type != TYPE_MELLON_HUSK_PRE && !exitMode);
 
-        if (explodeCount > 0) {
-            nDots(2, playerX, playerY, PT_ONE, 1, 2, 0, 100, 7);
-            --explodeCount;
-        }
 
         if (oldDead != playerDead) {
-            //                        sphereDot(playerX, playerY, 1,
-            //                        -100, 2, 0);
-            explodeCount = 4;
+
+            explodeCount = 6;
+            explodeRadius = 10;
+
+            initParticles();
+
+            for (int i = 0; i < 10; i++)
+                nDots(1, playerX, playerY, PT_TWO, 50 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 30, 3);
+
             startPlayerAnimation(ID_Die);
             waitRelease = true;
             lives--;
             lockDisplay = false;
 
             sound_max_volume = VOLUME_NONPLAYING;
-            // killAudio(SFX_TICK);            // no heartbeat
-            // playerDeadRelease = false;
         }
 
-        if (playerDead && *playerAnimation)
-            nDots(4, playerX, playerY, PT_ONE, 100, 2, 8, 100, 7);
+        if (explodeCount > 0) {
+
+            explodeRadius++;
+
+            for (int i = 0; i < PARTICLE_COUNT / 2; i++)
+                nDots(1, playerX, playerY, PT_TWO, rangeRandom(20),
+                      rangeRandom(explodeRadius) - (explodeRadius >> 1) + CHAR_CENTER_X,
+                      rangeRandom(explodeRadius * 2) - explodeRadius + CHAR_CENTER_Y, rangeRandom(10),
+                      rangeRandom(2) + 2);
+            --explodeCount;
+        }
     }
 }
 
 
 void processDoge() {
-
-    // FLASH(0x94, 4);
 
     unsigned char *next = me + _1ROW * gravity;
     const unsigned int attrNext = Attribute[CharToType[GET(*next)]];
@@ -929,7 +948,8 @@ void processFallingThings() {
         else {
             explode(next, FLAG(CH_DUST_0));
             initParticles();
-            nDots(PARTICLE_COUNT, boardCol, boardRow + 1, PT_TWO, 100, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 50, 7);
+            //            nDots(PARTICLE_COUNT, boardCol, boardRow + 1, PT_TWO, 100, CHAR_CENTER_X, CHAR_CENTER_Y,
+            //            50, 7);
         }
     } else {
 
@@ -1137,12 +1157,15 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 
     int offset[] = {-_BOARD_COLS - 1, -_BOARD_COLS, -_BOARD_COLS + 1, -1, 1,
                     _BOARD_COLS - 1,  _BOARD_COLS,  _BOARD_COLS + 1,  0};
+    int shape[] = {CH_BLANK, explosionShape, CH_BLANK, explosionShape, explosionShape,
+                   CH_BLANK, explosionShape, CH_BLANK, explosionShape};
 
-    for (int i = 0; i < 9; i++) {
+
+    for (int i = 0; i < sizeof(offset) / sizeof(offset[0]); i++) {
         unsigned char *cell = where + offset[i];
         enum ObjectType type = CharToType[GET(*cell)];
         if (Attribute[type] & ATT_EXPLODABLE) {
-            *cell = explosionShape;
+            *cell = shape[i];
             if (explosionShape == CH_DOGE_00)
                 totalDogePossible++;
         }

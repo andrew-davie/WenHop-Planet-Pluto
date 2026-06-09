@@ -19,6 +19,9 @@
 #define CHAR_TRIX_X 5
 #define CHAR_TRIX_Y 10
 
+#define CHAR_CENTER_X (CHAR_TRIX_X >> 1)
+#define CHAR_CENTER_Y (CHAR_TRIX_X >> 1)
+
 #define CHAR_Y (3 * CHAR_TRIX_Y)
 
 #define BOARD_TRIX_X (_BOARD_COLS * CHAR_TRIX_X)

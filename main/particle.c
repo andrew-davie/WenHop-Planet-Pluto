@@ -108,7 +108,7 @@ void modifyCharAtTip(int x, int y) {
         }
 
         if (*b & FLAG_THISFRAME)
-            nDotsAtTrixel(5, (x >> 8) + (CHAR_TRIX_Y >> 1), (y >> 8) + (CHAR_TRIX_Y >> 1), 30, PT_SPIRAL, 50, colour);
+            nDotsAtTrixel(5, (x >> 8) + CHAR_CENTER_Y, (y >> 8) + CHAR_CENTER_Y, 30, PT_SPIRAL, 50, colour);
     }
 }
 
@@ -148,8 +148,8 @@ void drawMace() {
     else if (weaponLength < ROPE_PARTICLE_COUNT)
         weaponLength++;
 
-    int baseX = (playerX * CHAR_TRIX_X + (CHAR_TRIX_X >> 1) + ((faceDirection * autoMoveX) >> 2)) << 8;
-    int baseY = ((playerY * CHAR_TRIX_Y + (CHAR_TRIX_Y >> 1)) << 8) + (autoMoveY * (256 / 3));
+    int baseX = (playerX * CHAR_TRIX_X + CHAR_CENTER_X + ((faceDirection * autoMoveX) >> 2)) << 8;
+    int baseY = ((playerY * CHAR_TRIX_Y + CHAR_CENTER_Y) << 8) + (autoMoveY * (256 / 3));
 
     int x = 0, y = 0;
 
@@ -277,7 +277,7 @@ void drawGun() {
     ADDAUDIO(SFX_EXPLODE);
     gunDelay = 20;
 
-    int x = (playerX * CHAR_TRIX_X + (CHAR_TRIX_X >> 1) + ((faceDirection * autoMoveX) >> 2)) << 8;
+    int x = (playerX * CHAR_TRIX_X + CHAR_CENTER_X + ((faceDirection * autoMoveX) >> 2)) << 8;
     int y = ((playerY * CHAR_TRIX_Y + 6) << 8) + (autoMoveY * (256 / 3)) - (2 << 8);
 
     static char angle[16] = {

@@ -29,7 +29,7 @@ extern const unsigned char trackGridLockBase[];
 
 void initDataStreams_Game() {
 
-    static const struct dataStreams initStreams[] = {
+    static const struct dataStreams streams[] = {
 
         {_DS_GAME_PF0_LEFT, _BUF_GAME_PF0_LEFT},
         {_DS_GAME_PF1_LEFT, _BUF_GAME_PF1_LEFT},
@@ -52,7 +52,7 @@ void initDataStreams_Game() {
         {DSJMP1PTR, _BUF_GAME_JUMP},
     };
 
-    initDataStreams(initStreams, sizeof(initStreams) / sizeof(struct dataStreams));
+    initDataStreams(streams, sizeof(streams) / sizeof(struct dataStreams));
 }
 
 

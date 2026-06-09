@@ -212,8 +212,8 @@ bool checkHighPriorityMove(int dir) {
 
 
             nDots(4, playerX, playerY, PT_TWO, 40,    //
-                  ((xdir[dir] + 1) >> 1) * CHAR_TRIX_X + (ydir[dir] ? (CHAR_TRIX_X >> 1) : 0),
-                  ((ydir[dir] + 1) >> 1) * CHAR_TRIX_Y + (xdir[dir] ? (CHAR_TRIX_Y >> 1) : 0), 50, rangeRandom(7) + 1);
+                  ((xdir[dir] + 1) >> 1) * CHAR_TRIX_X + (ydir[dir] ? CHAR_CENTER_X : 0),
+                  ((ydir[dir] + 1) >> 1) * CHAR_TRIX_Y + (xdir[dir] ? CHAR_CENTER_Y : 0), 50, rangeRandom(7) + 1);
 
 
             if (!gearsWaitRelease) {
@@ -319,7 +319,7 @@ bool checkHighPriorityMove(int dir) {
                 *meOffset = FLAG(CH_MELLON_HUSK);
 
                 if (destType == TYPE_PEBBLE1)
-                    nDots(4, playerX, playerY, PT_ONE, 10, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 10, 7);
+                    nDots(4, playerX, playerY, PT_ONE, 10, CHAR_CENTER_X, CHAR_CENTER_Y, 10, 7);
 
 
                 if (Attribute[destType] & ATT_DIRT) {
@@ -474,30 +474,25 @@ bool checkLowPriorityMove(int dir) {
 
         if (pushCounter > 8) {
 
-            static signed char xOffset[] = {0, 5, 0, -5};
-            static signed char yOffset[] = {-5, 0, 5, 0};
+            static signed char xOffset[] = {0, CHAR_TRIX_X, 0, -CHAR_TRIX_X};
+            static signed char yOffset[] = {-CHAR_CENTER_Y, 0, CHAR_CENTER_Y, 0};
 
             if (Attribute[destType] & ATT_MINE) {
 
-
                 if (destType == TYPE_INSULATOR) {
-
-
                     nDots(PARTICLE_COUNT, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40, 2);
                     disableInsulator(meOffset);
                 }
 
                 else {
                     addScore(VALUE_BREAK_GEODE);
-
-                    //            pushCounter = 2;
                     *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
 
                     surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
-                    nDots(6, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40, 7);
+                    nDots(6, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + CHAR_CENTER_X,
+                          yOffset[dir] + CHAR_CENTER_Y, 40, 5);
                 }
             }
-
 
             else {
                 *meOffset = FLAG(CH_CONVERT_PIPE);
@@ -552,7 +547,7 @@ void movePlayer(unsigned char *me) {
 
 
     if (pulsePlayerColour) {
-        nDots(2, playerX, playerY, PT_ONE, 25, 2, 5, 100, 7);
+        nDots(2, playerX, playerY, PT_ONE, 25, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 100, 7);
         return;
     }
 
