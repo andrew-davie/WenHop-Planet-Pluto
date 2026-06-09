@@ -49,7 +49,7 @@ bool newWyrm(int x, int y) {
             thisWyrm->x[0] = x;
             thisWyrm->y[0] = y;
             thisWyrm->length = 2;
-            thisWyrm->speed = thisWyrm->pace = rangeRandom(5) + 3;
+            thisWyrm->speed = thisWyrm->pace = 2;    // rangeRandom(5) + 3;
 
             return true;
         }
@@ -61,13 +61,8 @@ void processWyrms() {
 
 
     for (int i = 0; i < WYRM_POP; i++) {
-        // for (int i = 0; i < WYRM_POP; i++) {
-
-        // if (rangeRandom(110))
-        //     continue;
 
         struct wyrmDetails *wyrm = &wyrms[i];
-
 
         if (--wyrm->speed)
             continue;

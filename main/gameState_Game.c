@@ -93,7 +93,7 @@ void initGameState_Game() {
 
     myMemsetInt((unsigned int *)(RAM + _GAME_BUFFERS_START), 0, _GAME_BUFFERS_SIZE / 4);
 
-    gameSpeed = 6;            // tmp 6;
+    gameSpeed = 6;
     gameFrame = gameSpeed;    // force rollover
 
 

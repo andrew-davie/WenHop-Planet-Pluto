@@ -1,5 +1,11 @@
 #pragma once
 
+#include "defines_dasm.h"
+#include <stdbool.h>
+
+extern bool onOff[_BOARD_COLS];
+
+
 void setupBoardScanner();
 void processBoardSquares();
 void initBoard();

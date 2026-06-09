@@ -51,9 +51,9 @@ const enum FaceDirectionX faceDirectionDef[] = {
 
 const signed char animDeltaX[] = {
     0,
-    -25,
+    -CHAR_TRIX_X * 5,
     0,
-    -25,
+    -CHAR_TRIX_X * 5,
 };
 
 const unsigned char mineAnimation[] = {
@@ -424,7 +424,7 @@ bool checkHighPriorityMove(int dir) {
                 autoMoveFrameCount = ((gameSpeed) << playerSlow);
 
                 autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
-                autoMoveY = autoMoveDeltaY = -(ydir[dir] * (CHAR_Y + 6)) >> playerSlow;
+                autoMoveY = autoMoveDeltaY = -(ydir[dir] * (CHAR_TRIX_Y * 4)) >> playerSlow;
             }
 
             handled = true;
@@ -475,13 +475,13 @@ bool checkLowPriorityMove(int dir) {
         if (pushCounter > 8) {
 
             static signed char xOffset[] = {0, CHAR_TRIX_X, 0, -CHAR_TRIX_X};
-            static signed char yOffset[] = {-CHAR_CENTER_Y, 0, CHAR_CENTER_Y, 0};
+            static signed char yOffset[] = {-(CHAR_CENTER_Y >> 1), 0, CHAR_CENTER_Y >> 1, 0};
 
             if (Attribute[destType] & ATT_MINE) {
 
                 if (destType == TYPE_INSULATOR) {
                     nDots(PARTICLE_COUNT, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40, 2);
-                    disableInsulator(meOffset);
+                    onOff[boardCol] = false;    // disableInsulator(meOffset);
                 }
 
                 else {
@@ -489,8 +489,19 @@ bool checkLowPriorityMove(int dir) {
                     *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
 
                     surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
-                    nDots(6, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + CHAR_CENTER_X,
-                          yOffset[dir] + CHAR_CENTER_Y, 40, 5);
+
+
+                    if (destType == TYPE_ROCK) {
+
+                        nDots(10, playerX, playerY, PT_ONE, 30,
+                              xOffset[dir] + CHAR_CENTER_X /*+ rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1)*/,
+                              /*rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + */ yOffset[dir] + CHAR_CENTER_Y, 40, 2);
+                        nDots(10, playerX, playerY, PT_ONE, 15,
+                              xOffset[dir] + CHAR_CENTER_X + rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1),
+                              rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + yOffset[dir] + CHAR_CENTER_Y, 50, 3);
+                    } else
+                        nDots(6, playerX, playerY, PT_TWO, 30, xOffset[dir] + CHAR_CENTER_X,
+                              yOffset[dir] + CHAR_CENTER_Y, 40, 7);
                 }
             }
 

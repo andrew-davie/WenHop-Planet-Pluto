@@ -65,26 +65,48 @@ const unsigned char caveUseWall[] = {
     WEAPON_PIPE,                    // 3
     WEAPON_PIPE,                    // 4
 
-    0, CH_STEELWALL, CH_DIRT,           // flags, border, fill
+    CAVEDEF_LOCK_Y,CH_STEELWALL, CH_BLANK,           // flags, border, fill
 
     // Random objects
 
-    3,
-    CH_BLANK, 60, 0, 240, 0, 20,
-    CH_PEBBLE1, 20,40,40,40,40,
-    CH_PEBBLE2, 20,40,40,40,40,
+    2,
+    // CH_BLANK, 60, 0, 240, 0, 20,
+    CH_GEODOGE, 30,40,40,40,40,
+    CH_ROCK, 60,40,40,40,40,
+    // CH_PEBBLE2, 20,40,40,40,40,
 
     // Start of cave draw
 
-    CH_INSULATOR_TOP, 13,7,
-    CH_ELECTRIC_0, 13,8,
-    CH_INSULATOR_BOTTOM, 13,14,
+    DRAW_RECT,CH_BRICKWALL, 0,1,40,8,
+    CH_LAVA_SMALL, 39, 8,
+
+
+
+    CH_INSULATOR_TOP, 6,2,
+    CH_INSULATOR_BOTTOM, 6,7,
+
+
+        CH_INSULATOR_TOP, 11,2,
+    CH_INSULATOR_BOTTOM, 11,7,
+
+    CH_INSULATOR_TOP, 13,2,
+    // CH_ELECTRIC_0, 13,12,
+    CH_INSULATOR_BOTTOM, 13,7,
+
+
+    CH_INSULATOR_TOP, 15,2,
+    CH_INSULATOR_BOTTOM, 15,7,
+
+    CH_INSULATOR_TOP, 17,2,
+    CH_INSULATOR_BOTTOM, 17,7,
+
+
 
     // DRAW_FILLED_RECT, CH_BRICKWALL, 11, 6, 12, 12, CH_BLANK,
     // DRAW_FILLED_RECT, CH_GEODOGE, 12, 12, 10, 5, CH_GEODOGE,
 
-    CH_DOORCLOSED, 18, 8,
-    CH_MELLON_HUSK_BIRTH, 12, 11,
+    CH_DOORCLOSED, 18, 5,
+    CH_MELLON_HUSK_BIRTH, 2, 3,
 
     // CH_WYRM_HEAD_U, 21, 10,
     // CH_WYRM_HEAD_U, 21, 11,
@@ -129,7 +151,7 @@ const unsigned char caveWyrms[] = {
     200, 200, 200, 200, 200,
     // 70,65,60,55,50,
 
-    WEAPON_ROPE,                    //0
+    WEAPON_MACE,                    //0
     WEAPON_ROPE,                    //1
     WEAPON_ROPE,                    //2
     WEAPON_ROPE,                    //3
@@ -204,6 +226,14 @@ const unsigned char caveMace[] = {
 
 //    0xFE, CH_WATER, 1, 20,
     //0xFE, CH_LAVA_BLANK, 1, 20,
+
+    //DRAW_LINE,CH_WATERFLOW_0,1,1,38,2,
+    
+    DRAW_LINE,CH_TAP_0,1,1,2,10,
+    DRAW_LINE,CH_HUB,1,2,2,10,
+    DRAW_LINE,CH_OUTLET,1,3,2,10,
+    CH_INSULATOR_TOP,12,1,
+
 
     DRAW_EOF,
 
@@ -971,24 +1001,18 @@ const unsigned char caveA4[] = {
 };
 
 const unsigned char *caveList[] = {
-    // clang-format off
 
-//    caveMace,
-    caveA,
+    caveUseWall,    //
     caveA2,         // best
+    caveA4,         //
+    caveWyrms,      //
+    caveA,          //
+    // caveA3,         //
 
-    caveUseWall,
-    caveA4,
-    caveWyrms,
-
-
-//    caveTest,
-//    caveFast,
-//    caveA5,  // bad
-
-    caveA3,
-
-    // clang-format on
+    // caveMace,
+    //    caveTest,
+    //    caveFast,
+    //    caveA5,  // bad
 };
 
 const int caveCount = sizeof(caveList) / sizeof(caveList[0]);

@@ -62,7 +62,8 @@ void decodeCave(int cave) {
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
 
-    theCave = (struct CAVE_DEFINITION *)(((int)caveList[cave]) & 0xFFFF);
+    // theCave = (struct CAVE_DEFINITION *)(((int)caveList[cave]) & 0xFFFF);
+    theCave = (struct CAVE_DEFINITION *)caveList[cave];
 
 #pragma GCC diagnostic pop
 

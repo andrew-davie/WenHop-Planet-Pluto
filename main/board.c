@@ -109,7 +109,7 @@ void setupBoardScanner() {
 
     // After board scan complete, throttles until we're at correct FPS
 
-    if (gameFrame >= gameSpeed && !autoMoveFrameCount) {
+    if (gameFrame >= gameSpeed) {    // && !autoMoveFrameCount) {
 
         //        doges = gameFrame;
 
@@ -117,11 +117,8 @@ void setupBoardScanner() {
 
         restartBoardScan();
 
-        // static int wyrmDelay = 0;
-        // if (!wyrmDelay--) {
-        //     wyrmDelay = 1;
         processWyrms();
-        // }
+
 
         gameFrame = 0;
 
@@ -130,7 +127,11 @@ void setupBoardScanner() {
 
         if (showLava) {
 
-            if (gravity > 0 && lavaSurfaceTrixel && !(frame & 15))
+            static int ss = 0;
+            if (--ss < 0)
+                ss = 20;
+
+            if (gravity > 0 && lavaSurfaceTrixel && !ss)
                 lavaSurfaceTrixel -= gravity;
 
             // Surface lava "bubbles"
@@ -164,7 +165,7 @@ void setupBoardScanner() {
             }
         }
 
-        gameFrame++;
+        // gameFrame++;
         gravity = nextGravity;
 
         usableSWCHA = bufferedSWCHA;
@@ -376,12 +377,37 @@ void electric(unsigned char *p, unsigned char ch) {
     }
 }
 
+
+void setInsulator(unsigned char *p, bool active) {
+
+    // ADDAUDIO(SFX_ZAP);
+    // ADDAUDIO(SFX_ZAP2);
+
+    int dir = _1ROW;
+    p += dir;
+
+    if (!active) {
+        while (CharToType[GET(*p)] == TYPE_ELECTRIC) {
+            *p = CH_BLANK;
+            p += dir;
+        }
+    }
+
+    else {
+        while (Attribute[CharToType[GET(*p)]] & (ATT_DISSOLVES | ATT_BLANK)) {
+            *p = CH_ELECTRIC_0 + rangeRandom(4);
+            p += dir;
+        }
+    }
+}
+
+
 void disableInsulator(unsigned char *p) {
 
     ADDAUDIO(SFX_ZAP);
     ADDAUDIO(SFX_ZAP2);
 
-    FLASH(0x2C, 10);
+    // FLASH(0x2C, 10);
 
     //    bool disabled = false;
     int dir = (GET(*p) == CH_INSULATOR_TOP) ? _1ROW : -_1ROW;
@@ -409,6 +435,16 @@ void disableInsulator(unsigned char *p) {
 }
 
 
+bool onOff[_BOARD_COLS] = {true};
+
+void setInsulatorPattern() {
+
+    for (int i = 0; i < _BOARD_COLS; i++)
+        if (!rangeRandom(20))
+            onOff[i] ^= true;
+}
+
+
 void processCreatures() {
 
     switch (creature) {
@@ -416,7 +452,10 @@ void processCreatures() {
 
     case CH_INSULATOR_TOP: {
 
-    } break;
+        setInsulator(me, onOff[boardCol]);
+
+        break;
+    }
 
 
     case CH_OUTLET:
@@ -613,6 +652,10 @@ void restartBoardScan() {
         }
     }
 
+    // Change insulator pattern
+
+    setInsulatorPattern();
+
 
     if (!autoMoveFrameCount) {    // delay until fully in new square
 
@@ -640,7 +683,7 @@ void restartBoardScan() {
             initParticles();
 
             for (int i = 0; i < 10; i++)
-                nDots(1, playerX, playerY, PT_TWO, 50 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 30, 3);
+                nDots(1, playerX, playerY, PT_TWO, 30 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y + 2, 30, 3);
 
             startPlayerAnimation(ID_Die);
             waitRelease = true;
@@ -920,11 +963,11 @@ void processFallingThings() {
                     unsigned char *dR = dL + 2;
 
                     if (!CharToType[GET(*dR)]) {
-                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100, 7);
+                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
                     }
 
                     if (!CharToType[GET(*dL)]) {
-                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100, 7);
+                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
                     }
                 }
                 // else
@@ -1137,10 +1180,10 @@ void doRoll() {
 
                     int off = offset < 0 ? 4 : 0;
 
-                    nDots(1, boardCol, boardRow, PT_TWO, 15, offset * 2 + off, 4 * gravity, 0, 7);
-                    nDots(1, boardCol, boardRow, PT_TWO, 20, offset * 4 + off, 4 * gravity, 0, 7);
-                    nDots(1, boardCol, boardRow, PT_TWO, 25, offset * 6 + off, 7 * gravity, 0, 7);
-                    nDots(1, boardCol, boardRow, PT_TWO, 30, offset * 7 + off, 10 * gravity, 0, 7);
+                    nDots(1, boardCol, boardRow, PT_TWO, 15, offset * 2 + off, 4 * gravity, 0, 1);
+                    nDots(1, boardCol, boardRow, PT_TWO, 20, offset * 4 + off, 4 * gravity, 0, 1);
+                    nDots(1, boardCol, boardRow, PT_TWO, 25, offset * 6 + off, 7 * gravity, 0, 1);
+                    nDots(1, boardCol, boardRow, PT_TWO, 30, offset * 7 + off, 10 * gravity, 0, 1);
 
                     surroundingConglomerate(boardCol, boardRow);
                     return;

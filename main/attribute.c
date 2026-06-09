@@ -188,7 +188,7 @@ const unsigned int Attribute[TYPE_MAX] = {
     _ |PAD| _ |MLT| _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ |ROL , // 15 TYPE_CONVERT_GEODE_TO_DOGE
     _ | _ | _ | _ | _ |PH1|PIP| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 16 TYPE_PUSHER,
     _ | _ | _ | _ | _ |PH1|PIP| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 17 TYPE_PUSHER_VERT,
-    _ |PAD| _ | _ | _ |PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 18 TYPE_WYRM,
+    _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 18 TYPE_WYRM,
     _ |PAD|DGE|MLT| _ |PH2| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ |ROL , // 19 TYPE_GEODOGE,
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ |CRU| _  , // 20 TYPE_GEODOGE_FALLING,
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ |RKF| _ | _ | _ | _ | _ | _ | _ |SPC|PER| _ | _ | _ | _  , // 21 TYPE_LAVA,

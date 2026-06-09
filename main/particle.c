@@ -198,7 +198,7 @@ void drawMace() {
         tool[i].dir = tool[i - 1].dir;
 }
 
-void addTool(int x, int y, int age, unsigned char dir, unsigned short speed) {
+int addTool(int x, int y, int age, unsigned char dir, unsigned short speed) {
 
     for (int i = 0; i < TOOL_MAX; i++)
         if (!tool[i].age) {
@@ -209,8 +209,10 @@ void addTool(int x, int y, int age, unsigned char dir, unsigned short speed) {
             tool[i].speed = speed;
 
             tool[i].age = age;
-            return;
+            return i;
         }
+
+    return -1;
 }
 
 unsigned char *getBoardAddress(int x, int y) {
@@ -303,7 +305,15 @@ void drawGun() {
     int joy = (swcha ^ 0xFF) >> 4;
     int fireDir = joy ? angle[joy] : faceDirection == 1 ? 64 : 192;
 
-    addTool(x, y, 60, fireDir, 0xC0);
+    int idx = addTool(x, y, 60, fireDir, 0xC0);
+
+    // move away from body
+    if (idx >= 0) {
+        int s = tool[idx].dir >> 3;
+
+        tool[idx].x += (1 * tool[idx].speed * sin_cos[s]) >> 8;
+        tool[idx].y += (1 * tool[idx].speed * 2 * sin_cos[(s + 8) & 0x1f]) >> 8;
+    }
 }
 
 

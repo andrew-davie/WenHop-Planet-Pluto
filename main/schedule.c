@@ -19,7 +19,7 @@ void setSchedule(enum SCHEDULE nextGameSchedule) {
 
 void scheduleUnpackCave() {
 
-    while (availableIdleTime - 30000 > T1TC)    // <-- arbitrary time allowance for slowest cave decode
+    while (availableIdleTime - 10000 > T1TC)    // <-- arbitrary time allowance for slowest cave decode
         if (!decodeExplicitData(false)) {
 
             if (!totalDogePossible)

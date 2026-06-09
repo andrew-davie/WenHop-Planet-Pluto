@@ -254,7 +254,7 @@ void OS_Menu() {
 
     base2++;
 
-    static int sline = 0;
+    static enum MENU_OPTION sline = 0;
     sline++;
     if (sline >= 2)    //(int)(sizeof(smallWord) / sizeof(smallWord[0])))
         sline = 0;
