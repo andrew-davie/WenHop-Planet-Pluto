@@ -159,7 +159,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
         if (shapeHeight & SPRITE_DOUBLE) {
 
-            unsigned char *p0Colour = RAM + _BUF_GAME_COLUP0 + playerSpriteY + 1;
+            unsigned char *p0Colour = RAM + _BUF_GAME_COLUP0 + playerSpriteY;
             unsigned char *p0 = RAM + _BUF_GAME_GRP0 + playerSpriteY;
 
             unsigned char *p1Colour = p0Colour + _SCANLINES;

@@ -11,7 +11,7 @@ enum AnimationIdent {
     ID_Stand,       // 00
     ID_StandUp,     // 01
     ID_StandLR,     // 02
-    ID_Push,        // 03
+    ID_Mine,        // 03
     ID_Turn,        // 04
     ID_Die,         // 05
     ID_Walk,        // 06

@@ -24,10 +24,11 @@ SP_LINE_RE = re.compile(
     r'\s*$'
 )
 
-PATTERN_RE = re.compile(r'[X_]{2,}')
-
+PATTERN_RE     = re.compile(r'[X_]{2,}')
 ARRAY_START_RE = re.compile(r'const\s+unsigned\s+char\s+\w+\[\]\s*=\s*\{')
-SCALAR_RE = re.compile(r'^\s*(?:\w+\s*\|\s*)?(0x[0-9a-fA-F]+|\d+)\s*[,;]?\s*(?://.*)?$')
+ARRAY_NAME_RE  = re.compile(r'const\s+unsigned\s+char\s+(\w+)')
+SCALAR_RE      = re.compile(r'^\s*(?:\w+\s*\|\s*)?(0x[0-9a-fA-F]+|\d+)\s*[,;]?\s*(?://.*)?$')
+
 
 def pattern_to_emoji(pat: str, col_start: int, cx: int, is_centre_row: bool) -> str:
     result = []
@@ -91,6 +92,7 @@ def process_file(src: str) -> str:
 
     while i < len(lines):
         if ARRAY_START_RE.search(lines[i]):
+            block_start = i
             result.append(lines[i])
             i += 1
 
@@ -115,6 +117,11 @@ def process_file(src: str) -> str:
                 i += 1
 
             n_rows = len(sprite_lines)
+
+            if declared_rows != n_rows:
+                m = ARRAY_NAME_RE.search(lines[block_start])
+                name = m.group(1) if m else '?'
+                print(f"WARNING: {name}: declared {declared_rows} rows but found {n_rows}", file=sys.stderr)
 
             # Use declared_rows for coordinate math, but bounds-check against actual n_rows
             centre_row_from_top = (declared_rows - 1) - cy if 0 <= cy < declared_rows else -1

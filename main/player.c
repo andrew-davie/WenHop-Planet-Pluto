@@ -15,13 +15,15 @@ int autoMoveDeltaX;
 int autoMoveDeltaY;
 int autoMoveFrameCount;
 
-// Note: to auto-generate the graphical comments for each frame...
-// python3 tools/sprite_vis.py main/player.c
-
-
 // clang-format off
 
 const signed char AnimationDefault[] = {
+
+    // FRAME_STAND, 20,
+    // FRAME_MINE_UP_1, 52,
+    // FRAME_MINE_UP_0, 58,
+
+    // ACTION_LOOP,
 
     // 0,10,
     // 1,10,
@@ -100,7 +102,7 @@ const signed char AnimationStandLR[] = {
     FRAME_STAND, 255,
 };
 
-const signed char AnimationPush[] = {
+const signed char AnimationMine[] = {
 
     // ACTION_SFX, SFX_PICKAXE,
     ACTION_DOT, 4, 4,
@@ -466,7 +468,7 @@ const signed char *const AnimationVector[] = {
     AnimationDefault,     // 00 ID_Stand
     AnimationStandUp,     // 01 ID_StandUp
     AnimationStandLR,     // 02 ID_StandLR
-    AnimationPush,        // 03 ID_Push
+    AnimationMine,        // 03 ID_Mine
     AnimationTurn,        // 04 ID_Turn
     AnimationDie,         // 05 ID_Die
     AnimationWalk,        // 06 ID_Walk

@@ -58,9 +58,9 @@ const signed char animDeltaX[] = {
 
 const unsigned char mineAnimation[] = {
     ID_MineUp,
-    ID_Push,
+    ID_Mine,
     ID_MineDown,
-    ID_Push,
+    ID_Mine,
 };
 
 const unsigned char tapAnimation[] = {
@@ -458,6 +458,8 @@ bool checkLowPriorityMove(int dir) {
 #if 1    // disable push
     if (/*faceDirectionDef[dir] && */ (Attribute[destType] & (ATT_MINE | ATT_PIPE))) {
 
+        // FLASH(0x94, 4);
+
         if (++pushCounter > 1) {
 
             int anim = mineAnimation[dir];
@@ -480,8 +482,8 @@ bool checkLowPriorityMove(int dir) {
             if (Attribute[destType] & ATT_MINE) {
 
                 if (destType == TYPE_INSULATOR) {
-                    nDots(PARTICLE_COUNT, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40, 2);
-                    onOff[boardCol] = false;    // disableInsulator(meOffset);
+                    // nDots(PARTICLE_COUNT, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40,
+                    // 2); onOff[boardCol] = false;    // disableInsulator(meOffset); return true;
                 }
 
                 else {
@@ -619,7 +621,7 @@ void movePlayer(unsigned char *me) {
         if (playerAnimationID == ID_WalkUp || playerAnimationID == ID_MineUp)
             startPlayerAnimation(ID_StandUp);
 
-        else if (playerAnimationID == ID_Walk || playerAnimationID == ID_Push)
+        else if (playerAnimationID == ID_Walk)    // || playerAnimationID == ID_Push)
             startPlayerAnimation(ID_StandLR);
 
         else if (playerAnimationID == ID_WalkDown || playerAnimationID == ID_MineDown)
