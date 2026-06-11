@@ -1,5 +1,3 @@
-// Object attributes
-
 #include "attribute.h"
 
 const enum ObjectType CharToType[CH_MAX] = {
@@ -7,7 +5,7 @@ const enum ObjectType CharToType[CH_MAX] = {
     // see ChName for corresponding character name/number
     // may need to update worstRequiredTime if that's in use
 
-    TYPE_SPACE,                    // 000 CH_BLANK,
+    TYPE_BLANK,                    // 000 CH_BLANK,
     TYPE_DIRT,                     // 001 CH_DIRT,
     TYPE_BRICKWALL,                // 002 CH_BRICKWALL,
     TYPE_OUTBOX_PRE,               // 003 CH_DOORCLOSED,
@@ -126,37 +124,36 @@ const enum ObjectType CharToType[CH_MAX] = {
     TYPE_INSULATOR,                // 116 CH_INSULATOR_BOTTOM
 };
 
-// clang-format off
 
 enum AttributeAlias {
 
-    ROL = ATT_ROLL,                     // doge should roll off this object
-    CVT = ATT_CONVERT,                  // iff below surface, object converts to lava or water
-    XPD = ATT_EXPLODABLE,               // object is destroyed in explosions
-    PER = ATT_PERMEABLE,                // square is 'permeable' (not solid/not blank)
-    SPC = ATT_BLANK,                    // object is blank
-    DRT = ATT_DIRT,                     // object is dirt
-    GRB = ATT_GRAB,                     // doge
-    PSH = ATT_PUSH,
-    SQB = ATT_SQUASHABLE_TO_BLANKS,
-    HRD = ATT_HARD,                     // Hard. rocks create dust when falling onto
-    XIT = ATT_EXIT,
-    QUI = ATT_NOROCKNOISE,
-    RKF = ATT_BLANKISH,
-    MIN = ATT_MINE,
-    WTF = ATT_WATERFLOW,
-    CVY = ATT_CONVEYOR,
-    GND = ATT_GRIND,
-    PIP = ATT_PIPE,
-    PH4 = ATT_PHASE4,                   // processed every 4 frames
-    PH2 = ATT_PHASE2,                   // processed every 2 frames
-    PH1 = ATT_PHASE1,                   // processed every 1 frame
-    DIS = ATT_DISSOLVES,
-    MLT = ATT_MELTS,
-    DGE = ATT_GEODOGE,                  // a geodoge
-    PAD = ATT_PAD,                      // add dirt corners to this object square
-    CRU = ATT_CRUSHES,                  // object above crushes player
-    CNR = ATT_CORNER,                   // this object contributes to making a dirt corner
+    ROL = ATT_ROLL,                    // doge should roll off this object
+    CVT = ATT_CONVERT,                 // iff below surface, object converts to lava or water
+    XPD = ATT_EXPLODABLE,              // object is destroyed in explosions
+    PER = ATT_PERMEABLE,               // square is 'permeable' (not solid/not blank)
+    SPC = ATT_BLANK,                   // object is blank
+    DRT = ATT_DIRT,                    // object is dirt
+    GRB = ATT_GRAB,                    // doge
+    PSH = ATT_PUSH,                    //
+    SQB = ATT_SQUASHABLE_TO_BLANKS,    //
+    HRD = ATT_HARD,                    // Hard. rocks create dust when falling onto
+    XIT = ATT_EXIT,                    //
+    QUI = ATT_NOROCKNOISE,             //
+    RKF = ATT_BLANK,                   //
+    MIN = ATT_MINE,                    //
+    WTF = ATT_WATERFLOW,               //
+    CVY = ATT_CONVERT,                 //
+    GND = ATT_GRIND,                   //
+    PIP = ATT_PIPE,                    //
+    PH4 = ATT_PHASE4,                  // processed every 4 frames
+    PH2 = ATT_PHASE2,                  // processed every 2 frames
+    PH1 = ATT_PHASE1,                  // processed every 1 frame
+    DIS = ATT_DISSOLVES,               //
+    MLT = ATT_MELTS,                   //
+    DGE = ATT_GEODOGE,                 // a geodoge
+    PAD = ATT_PAD,                     // add dirt corners to this object square
+    CRU = ATT_CRUSHES,                 // object above crushes player
+    CNR = ATT_CORNER,                  // this object contributes to making a dirt corner
 };
 
 
@@ -170,7 +167,7 @@ const unsigned int Attribute[TYPE_MAX] = {
 
 // CNR PAD DGE MLT DIS PH* PIP GND CVY WTF MIN RKF QUI XIT HRD SQB PSH GRB DRT SPC PER XPD CVT CRU ROL
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+----+
-    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ |RKF|QUI| _ | _ | _ | _ | _ | _ |SPC|PER|XPD|CVT| _ | _  , // 00 TYPE_SPACE,
+    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ |RKF|QUI| _ | _ | _ | _ | _ | _ |SPC|PER|XPD|CVT| _ | _  , // 00 TYPE_BLANK,
    CNR| _ | _ | _ |DIS| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRT| _ |PER|XPD|CVT| _ | _  , // 01 TYPE_DIRT,
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 02 TYPE_BRICKWALL,
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 03 TYPE_OUTBOX_PRE,
@@ -212,11 +209,10 @@ const unsigned int Attribute[TYPE_MAX] = {
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ |XPD| _ | _ | _  , // 39 TYPE_DOGE_FALLING2
     _ |PAD| _ | _ |DIS|PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _  , // 40 TYPE_ROCK_PEBBLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 41 TYPE_ELECTRIC
-    _ | _ | _ | _ | _ |PH4| _ | _ | _ | _ |MIN| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 41 TYPE_INSULATOR
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ |MIN| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 41 TYPE_INSULATOR
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+----+
 
     // clang-format on
-
 };
 
 // EOF

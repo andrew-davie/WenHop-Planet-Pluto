@@ -18,6 +18,8 @@
 #include "scroll.h"
 
 #include "reverseBits.h"
+#include "sprites.h"
+
 
 #define SCORE_SCANLINES 21 /* todo: aritrary ATM */
 #define SPRITE_DEPTH 30

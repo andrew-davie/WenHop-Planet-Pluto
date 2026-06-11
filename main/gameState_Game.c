@@ -151,8 +151,8 @@ void VB_Game() {
 
         if (richter < 2)
             richter = 2;
-        if (richter > 4)
-            richter = 4;
+        if (richter > 3)
+            richter = 3;
 
         shakeX = (rangeRandom(richter + 1) - (richter >> 1)) << 16;
         shakeY = (rangeRandom(richter + 1) - (richter >> 1)) << 16;

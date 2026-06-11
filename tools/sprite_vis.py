@@ -12,14 +12,15 @@ import re
 import sys
 
 BLACK = '◼️'
-YELLOW = '🟨'
+YELLOW = '🟩'
 
 # Matches SP( pat1, pat2, ...) or SP2( pat1, ...) lines, with optional trailing // NN comment
 # Captures: indent, full SP/SP2 call (up to closing paren), trailing comma/semicolon, 
 # existing comment number if any.
+
 SP_LINE_RE = re.compile(
     r'^(?P<indent>\s*)'
-    r'(?P<call>SP2?\s*\([^)]*\))'
+    r'(?P<call>(?:ONE|TWO)\s*\(\s*[^)]*\))'
     r'(?P<tail>[,;]?)'
     r'\s*'
     r'(?://\s*(?P<num>\d+).*)?'
@@ -40,6 +41,8 @@ def process_line(line: str) -> str:
         return line
 
     call = m.group('call')
+    #call = re.sub(r'\b(ONE|TWO)\(', r'\1( ', call)
+
     # Find all bit patterns inside the parens
     inner = re.search(r'\((.+)\)', call, re.DOTALL)
     if not inner:
@@ -56,14 +59,14 @@ def process_line(line: str) -> str:
     num = m.group('num')
 
     num_part = f' {num}' if num is not None else ''
-    comment = f'// {num_part.strip()} {visual}' if num is not None else f'// {visual}'
+    comment = f'// {num_part.strip()}   |{visual}|' if num is not None else f'//   |{visual}|'
     # Tidy: "// 00 🟨..."
     if num is not None:
-        comment = f'// {int(num):02d} {visual}'
+        comment = f'// {int(num):02d}   |{visual}|'
 
     base = f'{indent}{call}{tail}'
     # Align comment: pad to column 50 (adjust if you like)
-    pad = max(1, 50 - len(base))
+    pad = max(1, 48 - len(base))
     return f'{base}{" " * pad}{comment}\n'
 
 

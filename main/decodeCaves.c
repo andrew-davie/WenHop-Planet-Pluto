@@ -58,32 +58,17 @@ int last_prng_b;
 
 void decodeCave(int cave) {
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
-#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-
-    // theCave = (struct CAVE_DEFINITION *)(((int)caveList[cave]) & 0xFFFF);
     theCave = (struct CAVE_DEFINITION *)caveList[cave];
 
-#pragma GCC diagnostic pop
-
     decodeState = DECODE_NONE;
-
 
     last_prng_a = theCave->randomInit[level];
     last_prng_b = last_prng_a++;
 
-    lockDisplay = theCave->flags & CAVEDEF_OVERVIEW;
-
-
-    // displayMode = lockDisplay ? DISPLAY_HALF : DISPLAY_NORMAL;
-
-    // tmp    doges = theCave->dogeRequired[level];
+    doges = theCave->dogeRequired[level];
 
     time = (theCave->timeToComplete[level] << 8) + 60;
     millingTime = theCave->millingTime * 60;
-
-    //    myMemsetInt((unsigned int *)(RAM + _BOARD), 0, (_BOARD_COLS * _BOARD_ROWS) / 4);
 
     decodingRow = 0;
     decodeFlasher = 21;

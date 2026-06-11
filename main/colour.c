@@ -403,7 +403,7 @@ void loadPalette() {
         rp[i] = (getRandom32() & 0xF0) | 6;
 
 
-    rp[3] += 2;
+    rp[3] += 4;
     //    currentPalette = 6;    // rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));    // tmp
 
     // if (currentPalette > sizeof(colourPool) / sizeof(colourPool[0]))

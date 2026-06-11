@@ -69,7 +69,7 @@ extern int armCycles;
 extern unsigned int rand;
 extern unsigned char colubk;
 extern int level;
-extern bool lockDisplay;
+// extern bool lockDisplay;
 extern int millingTime;    // negative = expired
 extern int doges;
 extern int time;

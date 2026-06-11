@@ -9,7 +9,7 @@ import re
 import sys
 import os
 
-SHADE = [' ', '.', ':', '+', 'o', 'O', '#', '@']
+SHADE = ['◼️', '🟦', '🟩', '🟥', '🟫', '🟪', '🟨', '⬜️']
 
 def pixel_char(r_bit, g_bit, b_bit):
     return SHADE[r_bit * 4 + g_bit * 2 + b_bit]

@@ -9,7 +9,7 @@ enum ObjectType {
     // update AnimateBase[] in animations.c
 
 
-    TYPE_SPACE,                    // 00      ASSUMED == 0 in code
+    TYPE_BLANK,                    // 00      ASSUMED == 0 in code
     TYPE_DIRT,                     // 01
     TYPE_BRICKWALL,                // 02
     TYPE_OUTBOX_PRE,               // 03

@@ -53,13 +53,13 @@ const unsigned char caveUseWall[] = {
 
     20,                             // milling
     10, 15,                         // doge $
-    5,                              // rain
+    0,                              // shake
 
-     10,  11,  50,  56,  8,         // randomiser[level]
+     17,  11,  50,  56,  8,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
     200, 200, 200, 200, 200,
 
-    WEAPON_PIPE,                    // 0
+    WEAPON_MACE,                    // 0
     WEAPON_PIPE,                    // 1
     WEAPON_PIPE,                    // 2
     WEAPON_PIPE,                    // 3
@@ -69,50 +69,59 @@ const unsigned char caveUseWall[] = {
 
     // Random objects
 
-    2,
-    // CH_BLANK, 60, 0, 240, 0, 20,
-    CH_GEODOGE, 30,40,40,40,40,
-    CH_ROCK, 60,40,40,40,40,
-    // CH_PEBBLE2, 20,40,40,40,40,
+    3,
+    CH_DIRT,10,20,20,20,20,
+    CH_GEODOGE, 80,40,40,40,40,
+    CH_ROCK, 50,40,40,40,40,
 
     // Start of cave draw
 
     DRAW_RECT,CH_BRICKWALL, 0,1,40,8,
-    CH_LAVA_SMALL, 39, 8,
-
-
 
     CH_INSULATOR_TOP, 6,2,
     CH_INSULATOR_BOTTOM, 6,7,
 
 
-        CH_INSULATOR_TOP, 11,2,
+    CH_INSULATOR_TOP, 11,2,
     CH_INSULATOR_BOTTOM, 11,7,
 
-    CH_INSULATOR_TOP, 13,2,
-    // CH_ELECTRIC_0, 13,12,
-    CH_INSULATOR_BOTTOM, 13,7,
+    CH_BRICKWALL, 14,2,
+    CH_INSULATOR_TOP, 14,3,
+    CH_INSULATOR_BOTTOM, 14,6,
+    CH_BRICKWALL, 14,7,
 
-
-    CH_INSULATOR_TOP, 15,2,
-    CH_INSULATOR_BOTTOM, 15,7,
 
     CH_INSULATOR_TOP, 17,2,
     CH_INSULATOR_BOTTOM, 17,7,
 
+    CH_BRICKWALL, 20,2,
+    CH_INSULATOR_TOP, 20,3,
+    CH_INSULATOR_BOTTOM, 20,6,
+    CH_BRICKWALL, 20,7,
 
+    CH_INSULATOR_TOP, 23,2,
+    CH_INSULATOR_BOTTOM, 23,7,
 
-    // DRAW_FILLED_RECT, CH_BRICKWALL, 11, 6, 12, 12, CH_BLANK,
-    // DRAW_FILLED_RECT, CH_GEODOGE, 12, 12, 10, 5, CH_GEODOGE,
+    CH_BRICKWALL, 26,2,
+    CH_INSULATOR_TOP, 26,3,
+    CH_INSULATOR_BOTTOM, 26,6,
+    CH_BRICKWALL, 26,7,
 
-    CH_DOORCLOSED, 18, 5,
+    CH_INSULATOR_TOP, 29,2,
+    CH_INSULATOR_BOTTOM, 29,7,
+    
+    CH_BRICKWALL, 32,2,
+    CH_BRICKWALL, 32,3,
+    CH_BRICKWALL, 32,4,
+    CH_INSULATOR_TOP, 32,5,
+    CH_INSULATOR_BOTTOM, 32,7,
+
+    DRAW_FILLED_RECT, CH_GEODOGE, 30, 2, 10, 5, CH_GEODOGE,
+
+    CH_DOORCLOSED, 38, 5,
     CH_MELLON_HUSK_BIRTH, 2, 3,
 
-    // CH_WYRM_HEAD_U, 21, 10,
-    // CH_WYRM_HEAD_U, 21, 11,
-    // CH_WYRM_HEAD_U, 21, 12,
-    // CH_WYRM_HEAD_U, 21, 13,
-    // CH_WYRM_HEAD_U, 21, 14,
+    CH_WYRM_HEAD_U, 38, 2,
 
     DRAW_EOF,
 
@@ -137,33 +146,29 @@ const unsigned char caveUseWall[] = {
     // clang-format on
 };
 
+//------------------------------------------------------------------------------
 
 const unsigned char caveWyrms[] = {
     // clang-format off
 
     20,     // milling
     10, 15, // doge $
-    5,      //              ,          // rain
+    0,          // weather
 
-    
     10, 11, 50, 56, 8, // randomiser[level]
-    25, 12, 12, 12, 12,
+    20, 12, 12, 12, 12,
     200, 200, 200, 200, 200,
     // 70,65,60,55,50,
 
     WEAPON_MACE,                    //0
-    WEAPON_ROPE,                    //1
-    WEAPON_ROPE,                    //2
-    WEAPON_ROPE,                    //3
-    WEAPON_ROPE,                    //4
+    WEAPON_MACE,                    //1
+    WEAPON_MACE,                    //2
+    WEAPON_MACE,                    //3
+    WEAPON_MACE,                    //4
 
     CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y, CH_BLANK, CH_BRICKWALL,
 
     0,
-    // CH_WYRM_HEAD_U, 60, 255, 0, 255, 10,
-    // CH_PEBBLE1, 5, 0, 240, 0, 20,
-    // CH_PEBBLE2, 5, 0, 240, 0, 20,
-    // CH_ROCK, 50, 0, 240, 0, 20,
 
     DRAW_FILLED_RECT,CH_STEELWALL,1,1,9,8,CH_GEODOGE,
     DRAW_FILLED_RECT,CH_BRICKWALL,4,4,3,3,CH_ROCK,
@@ -173,22 +178,30 @@ const unsigned char caveWyrms[] = {
     CH_DOORCLOSED, 5, 4,
     CH_MELLON_HUSK_BIRTH, 5, 5,
 
-//    0xFE, CH_WATER, 1, 20,
-    //0xFE, CH_LAVA_BLANK, 1, 20,
-
     DRAW_EOF,
 
     // EXTRAS
-    // LEVEL 0
-    DRAW_EOF, // LEVEL 1
-    DRAW_EOF, // LEVEL 2
-    DRAW_EOF, // LEVEL 3
-    DRAW_EOF, // LEVEL 4
+
+    // LEVEL 0...
+    DRAW_EOF,
+    // LEVEL 1...
+    
+    DRAW_EOF,
+    // LEVEL 2...
+
+    DRAW_EOF,
+    // LEVEL 3...
+
+    DRAW_EOF,
+    // LEVEL 4...
+    
     DRAW_EOF,
 
     'T', 'E', 'S', 'T', END_STRING
     // clang-format on
 };
+
+//------------------------------------------------------------------------------
 
 const unsigned char caveMace[] = {
     // clang-format off
@@ -267,7 +280,7 @@ const unsigned char caveTest[] = {
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_PARALLAX, STEEL, CH_DIRT,
+    0, STEEL, CH_DIRT,
 
     3,
     CH_BLANK, 60, 255, 0, 255, 10,
@@ -311,7 +324,7 @@ const unsigned char caveFast[] = {
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_PARALLAX, STEEL, DIRT,
+    0, STEEL, DIRT,
 
     0,
     // CH_BLANK, 60, 255, 0, 255, 10,
@@ -361,7 +374,7 @@ const unsigned char caveA[] = {
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_PARALLAX, STEEL, DIRT,
+    0, STEEL, DIRT,
 
     2,
     CH_BLANK, 60, 255, 0, 255, 10,
@@ -632,7 +645,7 @@ const unsigned char caveA2[] = {
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_PARALLAX, STEEL, CH_DIRT,
+    0, STEEL, CH_DIRT,
 
     5,
     CH_BLANK, 100, 10, 5, 0, 20,
@@ -733,7 +746,7 @@ const unsigned char caveA5[] = {
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_PARALLAX, STEEL, CH_BLANK,
+    0, STEEL, CH_BLANK,
 
     0,
     // CH_DIRT, 50, 10, 5, 0, 20,
@@ -811,7 +824,7 @@ const unsigned char caveA3[] = {
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_PARALLAX, STEEL, CH_BLANK,
+    0, STEEL, CH_BLANK,
 
     0,
 
@@ -1002,10 +1015,10 @@ const unsigned char caveA4[] = {
 
 const unsigned char *caveList[] = {
 
+    caveWyrms,      //
     caveUseWall,    //
     caveA2,         // best
     caveA4,         //
-    caveWyrms,      //
     caveA,          //
     // caveA3,         //
 

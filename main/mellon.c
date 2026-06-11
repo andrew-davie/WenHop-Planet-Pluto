@@ -51,9 +51,9 @@ const enum FaceDirectionX faceDirectionDef[] = {
 
 const signed char animDeltaX[] = {
     0,
-    -CHAR_TRIX_X * 5,
+    -CHAR_TRIX_X * 6,
     0,
-    -CHAR_TRIX_X * 5,
+    -CHAR_TRIX_X * 6,
 };
 
 const unsigned char mineAnimation[] = {

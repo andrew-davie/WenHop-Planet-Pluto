@@ -81,6 +81,7 @@ SRCS = \
  random.c \
  savekey.c \
  sound.c \
+ sprites.c \
  swipe.c \
  gameState_Copyright.c \
  gameState_CouchCompliant.c \

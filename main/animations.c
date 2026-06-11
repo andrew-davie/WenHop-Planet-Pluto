@@ -181,7 +181,7 @@ const unsigned char *const AnimateBase[TYPE_MAX] = {
     // Note that the type number is an ID, not ordinal. That's because the continuity may
     // be compromised by the conditional compilation. Beware.
 
-    0,                    // 00 TYPE_SPACE
+    0,                    // 00 TYPE_BLANK
     0,                    // 01 TYPE_DIRT
     0,                    // 02 TYPE_BRICKWALL
     0,                    // 03 TYPE_OUTBOX_PRE

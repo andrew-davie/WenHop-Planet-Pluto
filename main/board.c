@@ -43,7 +43,7 @@ void restartBoardScan();
 void processDoge();
 void processPebble();
 void processWater();
-void processLava();
+// void processLava();
 void processWaterFlow();
 void processCharBeltAndGrinder();
 void processOutlet();
@@ -55,6 +55,7 @@ void genericPushReverse(int offsetX, int offsetY);
 void chainReact_GeoDogeToDoge();
 void chainReact_Pipe();
 void doRoll();
+void setInsulator(unsigned char *p, bool active);
 
 //------------------------------------------------------------------------------
 
@@ -150,8 +151,8 @@ void setupBoardScanner() {
                 if (((sinus[(waves >> 0) & 15] & 3) != 0) || (gameFrame & 31) == 0) {
                     ++waves;
 
-                    if (!(frame & 63))
-                        lavaSurfaceTrixel--;
+                    //                  if (!(frame & 65535))
+                    //                        lavaSurfaceTrixel--;
                 }
 
                 lavaSurfaceTrixel += sinus[(waves >> 0) & 15];
@@ -283,11 +284,11 @@ void processTypes() {
         if (!rangeRandom(10))
             *me = CH_ELECTRIC_0 + rangeRandom(4);
 
-        if (Attribute[CharToType[GET(*(me + _1ROW))]] & (ATT_DISSOLVES | ATT_BLANK))
-            *(me + _1ROW) = CH_ELECTRIC_0 + rangeRandom(4);
+        // if (Attribute[CharToType[GET(*(me + _1ROW))]] & (ATT_DISSOLVES | ATT_BLANK))
+        //     *(me + _1ROW) = CH_ELECTRIC_0 + rangeRandom(4);
 
-        if (Attribute[CharToType[GET(*(me - _1ROW))]] & (ATT_DISSOLVES | ATT_BLANK))
-            *(me - _1ROW) = CH_ELECTRIC_0 + rangeRandom(4);
+        // if (Attribute[CharToType[GET(*(me - _1ROW))]] & (ATT_DISSOLVES | ATT_BLANK))
+        //     *(me - _1ROW) = CH_ELECTRIC_0 + rangeRandom(4);
 
         *me = CH_ELECTRIC_0 + ((*me + 1 - CH_ELECTRIC_0) & 3);
     } break;
@@ -368,14 +369,14 @@ void processTypes() {
     }
 }
 
-void electric(unsigned char *p, unsigned char ch) {
+// void electric(unsigned char *p, unsigned char ch) {
 
-    p -= _1ROW;
-    while (CharToType[GET(*p)] != TYPE_INSULATOR) {
-        *p = ch;
-        p -= _1ROW;
-    }
-}
+//     p -= _1ROW;
+//     while (CharToType[GET(*p)] != TYPE_INSULATOR) {
+//         *p = ch;
+//         p -= _1ROW;
+//     }
+// }
 
 
 void setInsulator(unsigned char *p, bool active) {
@@ -386,62 +387,91 @@ void setInsulator(unsigned char *p, bool active) {
     int dir = _1ROW;
     p += dir;
 
+
     if (!active) {
-        while (CharToType[GET(*p)] == TYPE_ELECTRIC) {
-            *p = CH_BLANK;
-            p += dir;
-        }
-    }
-
-    else {
-        while (Attribute[CharToType[GET(*p)]] & (ATT_DISSOLVES | ATT_BLANK)) {
-            *p = CH_ELECTRIC_0 + rangeRandom(4);
-            p += dir;
-        }
-    }
-}
-
-
-void disableInsulator(unsigned char *p) {
-
-    ADDAUDIO(SFX_ZAP);
-    ADDAUDIO(SFX_ZAP2);
-
-    // FLASH(0x2C, 10);
-
-    //    bool disabled = false;
-    int dir = (GET(*p) == CH_INSULATOR_TOP) ? _1ROW : -_1ROW;
-    p += dir;
-
-    if (CharToType[GET(*p)] == TYPE_ELECTRIC) {
-        while (CharToType[GET(*p)] == TYPE_ELECTRIC) {
-            //          disabled = true;
-            *p = CH_BLANK;
+        while (CharToType[GET(*p)] != TYPE_INSULATOR) {
+            if (CharToType[GET(*p)] == TYPE_ELECTRIC) {
+                *p = FLAG(CH_BLANK);
+                // break;
+            }
             p += dir;
         }
     }
 
     else {
 
-        // while (CharToType[GET(*p)] == TYPE_SPACE)
-        //     p += dir;
+        int x = boardCol;
+        int y = boardRow + 1;
 
-        if (Attribute[CharToType[GET(*p)]] & (ATT_DISSOLVES | ATT_BLANK))
-            *p = CH_ELECTRIC_0 + rangeRandom(4);
+        while (CharToType[GET(*p)] != TYPE_INSULATOR) {
+            unsigned int att = Attribute[CharToType[GET(*p)]];
+            if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES | ATT_BLANK)) {
 
-        else
-            FLASH(0x44, 2);
+                if (att & ATT_EXPLODABLE && !(att & ATT_BLANK))
+                    FLASH(0x28, 10);
+
+                *p = FLAG(CH_ELECTRIC_0 + rangeRandom(4));
+                nDots(20, x, y, PT_SPIRAL, 40 + rangeRandom(20), CHAR_CENTER_X, 0, 80, 7);
+                break;
+            }
+            p += dir;
+            y++;
+        }
     }
 }
+
+
+// void disableInsulator(unsigned char *p) {
+
+//     ADDAUDIO(SFX_ZAP);
+//     ADDAUDIO(SFX_ZAP2);
+
+//     // FLASH(0x2C, 10);
+
+//     //    bool disabled = false;
+//     int dir = (GET(*p) == CH_INSULATOR_TOP) ? _1ROW : -_1ROW;
+//     p += dir;
+
+//     if (CharToType[GET(*p)] == TYPE_ELECTRIC) {
+//         while (CharToType[GET(*p)] == TYPE_ELECTRIC) {
+//             //          disabled = true;
+//             *p = CH_BLANK;
+//             p += dir;
+//         }
+//     }
+
+//     else {
+
+//         // while (CharToType[GET(*p)] == TYPE_BLANK)
+//         //     p += dir;
+
+//         if (Attribute[CharToType[GET(*p)]] & (ATT_DISSOLVES | ATT_BLANK))
+//             *p = CH_ELECTRIC_0 + rangeRandom(4);
+
+//         else
+//             FLASH(0x44, 2);
+//     }
+// }
 
 
 bool onOff[_BOARD_COLS] = {true};
 
 void setInsulatorPattern() {
 
-    for (int i = 0; i < _BOARD_COLS; i++)
-        if (!rangeRandom(20))
-            onOff[i] ^= true;
+    static int s = 0;
+    s++;
+
+
+    for (int i = 0; i < _BOARD_COLS; i++) {
+
+        bool oc = sin_cos[(s + i * 20) & 31] < 128;
+
+        if (oc && !onOff[i]) {
+            ADDAUDIO(SFX_ZAP);
+            ADDAUDIO(SFX_ZAP2);
+        }
+        onOff[i] = oc;
+    }
 }
 
 
@@ -449,14 +479,9 @@ void processCreatures() {
 
     switch (creature) {
 
-
-    case CH_INSULATOR_TOP: {
-
+    case CH_INSULATOR_TOP:
         setInsulator(me, onOff[boardCol]);
-
         break;
-    }
-
 
     case CH_OUTLET:
         processOutlet();
@@ -652,6 +677,10 @@ void restartBoardScan() {
         }
     }
 
+
+    if (rangeRandom(256) < theCave->weather)
+        shakeTime = rangeRandom(20);
+
     // Change insulator pattern
 
     setInsulatorPattern();
@@ -688,7 +717,7 @@ void restartBoardScan() {
             startPlayerAnimation(ID_Die);
             waitRelease = true;
             lives--;
-            lockDisplay = false;
+            // lockDisplay = false;
 
             sound_max_volume = VOLUME_NONPLAYING;
         }
@@ -903,11 +932,13 @@ void processCharGeoDogeAndRock() {
 
         // TODO: allow rock to roll in earthquake or on gear
 
-        // if (ATTRIBUTE_BIT(*me, ATT_GEODOGE))
-        //     doRoll(me, CH_GEODOGE_FALLING);
-        // else {
+        //     if (shakeTime && !rangeRandom(20)) {
+        //         if (ATTRIBUTE_BIT(*me, ATT_GEODOGE))
+        //             doRoll(me, CH_GEODOGE_FALLING);
+        //         else {
 
-        //     doRoll(me, CH_ROCK_FALLING);
+        //             doRoll(me, CH_ROCK_FALLING);
+        //         }
         // }
     }
 }
@@ -1204,7 +1235,7 @@ void explode(unsigned char *where, unsigned char explosionShape) {
                    CH_BLANK, explosionShape, CH_BLANK, explosionShape};
 
 
-    for (int i = 0; i < sizeof(offset) / sizeof(offset[0]); i++) {
+    for (int i = 0; i < (int)(sizeof(offset) / sizeof(offset[0])); i++) {
         unsigned char *cell = where + offset[i];
         enum ObjectType type = CharToType[GET(*cell)];
         if (Attribute[type] & ATT_EXPLODABLE) {

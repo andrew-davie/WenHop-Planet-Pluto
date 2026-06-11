@@ -47,7 +47,7 @@ int armFrequency;    // 60 or 70
 int armCycles;
 
 int level;
-bool lockDisplay;
+// bool lockDisplay;
 int millingTime;    // negative = expired
 int doges;
 int time;

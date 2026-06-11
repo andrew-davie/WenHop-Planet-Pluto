@@ -22,7 +22,7 @@ unsigned int weaponLength = 0;
 void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
                     unsigned char colour, unsigned char dmask);
 
-#define TOOL_MAX 24
+#define TOOL_MAX 25
 
 struct TOOL {
 
@@ -71,6 +71,7 @@ void modifyCharAtTip(int x, int y) {
     if (Attribute[type] & ATT_EXPLODABLE) {
 
         if (type == TYPE_DOGE) {
+            doges--;
             *b = CH_BLANK | FLAG_THISFRAME;
             colour = rangeRandom(7) + 1;
         }
@@ -148,7 +149,7 @@ void drawMace() {
     else if (weaponLength < ROPE_PARTICLE_COUNT)
         weaponLength++;
 
-    int baseX = (playerX * CHAR_TRIX_X + CHAR_CENTER_X + ((faceDirection * autoMoveX) >> 2)) << 8;
+    int baseX = (playerX * CHAR_TRIX_X + CHAR_CENTER_X + 1 + ((faceDirection * autoMoveX) >> 2)) << 8;
     int baseY = ((playerY * CHAR_TRIX_Y + CHAR_CENTER_Y) << 8) + (autoMoveY * (256 / 3));
 
     int x = 0, y = 0;
@@ -474,8 +475,10 @@ void nDots(int count, int dripX, int dripY, int type, unsigned char age, int off
         int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, colour);
         if (idx >= 0) {
             particle[idx].speed = rangeRandom(speed);
-            if (type == PT_SPIRAL2)
+            if (type == PT_SPIRAL2) {
                 particle[idx].distance = rangeRandom(200) + 50;
+                particle[idx].dir = getRandom32();
+            }
         }
     }
 }

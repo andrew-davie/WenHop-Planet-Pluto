@@ -27,6 +27,7 @@ struct Particle {
 };
 
 extern struct Particle particle[PARTICLE_COUNT];
+extern const int sin_cos[32];
 
 void initParticles();
 void drawParticles();
