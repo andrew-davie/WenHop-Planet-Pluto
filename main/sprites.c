@@ -11,6 +11,7 @@
 // python3 tools/sprite_vis.py main/sprite.c
 // 🟥 indicates the frame center point
 //  if not present, then the center point is OUTSIDE the frame (usually -y)
+// the tool will also calculate the first byte (flags+size) from the data structure
 
 
 // clang-format off
@@ -1486,7 +1487,7 @@ const unsigned char shape_FRAME_WALK4[] = {
 const unsigned char shape_FRAME_SKELETON1[] = {
 
     SPRITE_DOUBLE | SPRITE_ABSCOLOUR | 20,
-    4,
+    SPRITE_DOUBLE | 20,
     0,
                                                 //      +---------------------------+
     TWO( _____XXX, X_______, BONE, BONE ),      // 00   |◼️◼️◼️◼️◼️🟩🟩🟩🟩◼️◼️◼️◼️◼️◼️◼️|
@@ -1516,7 +1517,7 @@ const unsigned char shape_FRAME_SKELETON1[] = {
 const unsigned char shape_FRAME_SKELETON2[] = {
 
     SPRITE_DOUBLE | SPRITE_ABSCOLOUR | 20,
-    4,
+    SPRITE_DOUBLE | 20,
     0,
                                                 //      +---------------------------+
     TWO( ____XXXX, ________, BONE, BONE ),      // 00   |◼️◼️◼️◼️🟩🟩🟩🟩◼️◼️◼️◼️◼️◼️◼️◼️|
@@ -1546,7 +1547,7 @@ const unsigned char shape_FRAME_SKELETON2[] = {
 const unsigned char shape_FRAME_SKELETON3[] = {
 
     SPRITE_DOUBLE | SPRITE_ABSCOLOUR | 16,
-    7,
+    SPRITE_DOUBLE | 16,
     0,
                                                 //      +---------------------------+
     TWO( _______X, XXX_____, BONE, BONE ),      // 00   |◼️◼️◼️◼️◼️◼️◼️🟩🟩🟩🟩◼️◼️◼️◼️◼️|
@@ -1572,7 +1573,7 @@ const unsigned char shape_FRAME_SKELETON3[] = {
 const unsigned char shape_FRAME_SKELETON4[] = {
 
     SPRITE_DOUBLE | SPRITE_ABSCOLOUR | 12,
-    8,
+    SPRITE_DOUBLE | 12,
     0,
                                                 //      +---------------------------+
     TWO( ________, XXXX____, BONE, BONE ),      // 00   |◼️◼️◼️◼️◼️◼️◼️◼️🟩🟩🟩🟩◼️◼️◼️◼️|

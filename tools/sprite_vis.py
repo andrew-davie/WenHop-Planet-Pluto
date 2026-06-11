@@ -28,6 +28,8 @@ PATTERN_RE     = re.compile(r'[X_]{2,}')
 ARRAY_START_RE = re.compile(r'const\s+unsigned\s+char\s+\w+\[\]\s*=\s*\{')
 ARRAY_NAME_RE  = re.compile(r'const\s+unsigned\s+char\s+(\w+)')
 SCALAR_RE      = re.compile(r'^\s*(?:\w+\s*\|\s*)?(0x[0-9a-fA-F]+|\d+)\s*[,;]?\s*(?://.*)?$')
+# Matches the first scalar line (byte 0) to allow rewriting it
+BYTE0_LINE_RE  = re.compile(r'^(?P<indent>\s*)(?:\w+\s*\|\s*)?(0x[0-9a-fA-F]+|\d+)(?P<tail>\s*[,;]?\s*(?://[^\n]*)?)$')
 
 
 def pattern_to_emoji(pat: str, col_start: int, cx: int, is_centre_row: bool) -> str:
@@ -85,6 +87,26 @@ def format_line(raw_line: str, cx: int, is_centre_row: bool) -> str:
     return f'{base}{" " * pad}{comment}\n'
 
 
+def rewrite_byte0(line: str, n_rows: int, use_double: bool) -> str:
+    m = BYTE0_LINE_RE.match(line.rstrip('\n'))
+    if not m:
+        return line
+    indent = m.group('indent')
+    tail   = m.group('tail').rstrip()
+    # Preserve trailing comma/semicolon but strip any existing comment
+    tail_clean = tail.strip()
+    comma = ''
+    for ch in tail_clean:
+        if ch in ',;':
+            comma = ch
+            break
+    if use_double:
+        value = f'SPRITE_DOUBLE | {n_rows}'
+    else:
+        value = str(n_rows)
+    return f'{indent}{value}{comma}\n'
+
+
 def process_file(src: str) -> str:
     lines  = src.splitlines(keepends=True)
     result = []
@@ -96,19 +118,22 @@ def process_file(src: str) -> str:
             result.append(lines[i])
             i += 1
 
-            # Collect scalars until first ONE/TWO line
-            scalars = []
+            # Collect scalar lines (before first ONE/TWO), recording their
+            # positions in result[] so we can rewrite byte 0 later.
+            scalars        = []
+            scalar_result_indices = []  # where each scalar line lands in result[]
+            pre_sprite_lines = []
             while i < len(lines) and not SP_LINE_RE.match(lines[i]):
                 m = SCALAR_RE.match(lines[i])
                 if m:
                     scalars.append(int(m.group(1), 0))
+                    scalar_result_indices.append(len(result))
                 result.append(lines[i])
+                pre_sprite_lines.append(lines[i])
                 i += 1
 
             cx = scalars[1] if len(scalars) > 1 else -1
             cy = scalars[2] if len(scalars) > 2 else -1
-            # Lower 6 bits of byte 0 give declared row count; upper bits are flags
-            declared_rows = (scalars[0] & 0x3F) if scalars else 0
 
             # Collect all ONE/TWO lines
             sprite_lines = []
@@ -116,14 +141,17 @@ def process_file(src: str) -> str:
                 sprite_lines.append(lines[i])
                 i += 1
 
-            n_rows = len(sprite_lines)
+            n_rows     = len(sprite_lines)
+            use_double = any('TWO' in l for l in sprite_lines)
 
-            if declared_rows != n_rows:
-                m = ARRAY_NAME_RE.search(lines[block_start])
-                name = m.group(1) if m else '?'
-                print(f"WARNING: {name}: declared {declared_rows} rows but found {n_rows}", file=sys.stderr)
+            # Rewrite byte 0 in result[]
+            if scalar_result_indices:
+                byte0_idx = scalar_result_indices[0]
+                result[byte0_idx] = rewrite_byte0(result[byte0_idx], n_rows, use_double)
 
-            # Use declared_rows for coordinate math, but bounds-check against actual n_rows
+            # Declared rows now comes from what we just wrote
+            declared_rows = n_rows  # by definition, since we just set it
+
             centre_row_from_top = (declared_rows - 1) - cy if 0 <= cy < declared_rows else -1
             if not (0 <= centre_row_from_top < n_rows):
                 centre_row_from_top = -1
