@@ -278,9 +278,27 @@ void processTypes() {
 
     switch (type) {
 
+    case TYPE_WEAPON: {
+
+        static unsigned char last = 0;
+        unsigned char this = *Animate[TYPE_WEAPON];
+        if (this == CH_BLANK && this != last)
+            nDots(1, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 50, 5);
+        last = this;
+
+
+        // fall
+
+        unsigned char *next = me + _1ROW;
+        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+            *next = FLAG(*me);
+            *me = FLAG(CH_BLANK);
+        }
+
+        break;
+    }
 
     case TYPE_ELECTRIC: {
-
         if (!rangeRandom(10))
             *me = CH_ELECTRIC_0 + rangeRandom(4);
 
@@ -295,7 +313,7 @@ void processTypes() {
 
     case TYPE_OUTBOX:
         FLASH(0x28, 10);
-        nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x100, 7);    // untested speed
+        nDots(10, boardCol, boardRow, PT_SPIRAL, 40, 2, 5, 0x40, 7);    // untested speed
         break;
 
     case TYPE_DOGE:
@@ -407,11 +425,11 @@ void setInsulator(unsigned char *p, bool active) {
             unsigned int att = Attribute[CharToType[GET(*p)]];
             if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES | ATT_BLANK)) {
 
-                if (att & ATT_EXPLODABLE && !(att & ATT_BLANK))
-                    FLASH(0x28, 10);
+                // if (att & ATT_EXPLODABLE && !(att & ATT_BLANK))
+                //     FLASH(0x28, 10);
 
                 *p = FLAG(CH_ELECTRIC_0 + rangeRandom(4));
-                nDots(20, x, y, PT_SPIRAL, 40 + rangeRandom(20), CHAR_CENTER_X, 0, 80, 7);
+                nDots(6, x, y, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
                 break;
             }
             p += dir;
@@ -576,6 +594,19 @@ void processCreatures() {
         break;
     }
 
+    case CH_ROCK_BONUS: {
+
+        unsigned char *next = me + _1ROW * gravity;
+        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+            *next = FLAG(*me);
+            *me = FLAG(CH_BLANK);
+            startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
+        }
+
+        break;
+    }
+
+
     case CH_ROCK:
         processCharGeoDogeAndRock();
         break;
@@ -679,7 +710,7 @@ void restartBoardScan() {
 
 
     if (rangeRandom(256) < theCave->weather)
-        shakeTime = rangeRandom(20);
+        setShake(rangeRandom(20));
 
     // Change insulator pattern
 
@@ -762,7 +793,7 @@ void processPebble() {
 
     for (int i = 0; i < 4; i++)
         if (TYPEOF(*(me + dirOffset[i])) == TYPE_MELLON_HUSK) {
-            chance = 0;
+            chance = 50;
             break;
         }
 
@@ -859,7 +890,7 @@ void processWaterFlow() {
                     // Water has hit something below
                     nDots(3, boardCol, boardRow, PT_TWO + PARTICLE_GRAVITY_FLAG, 40, 2 + rangeRandom(3), 11, 100, 7);
 #if ENABLE_SHAKE
-                // shakeTime = 20;
+                // setShake(20);
 #endif
             }
         }
@@ -916,6 +947,11 @@ void processCharGeoDogeAndRock() {
     // int typeofMe = CharToType[GET(*me)];
 
     if (Attribute[typeDown] & ATT_BLANK) {
+
+        // if (*me == CH_ROCK_BONUS) {
+        //     *me = FLAG(CH_WEAPON_MACE);
+        //     return;
+        // }
 
         if (ATTRIBUTE_BIT(*me, ATT_GEODOGE)) {
             *next = FLAG(CH_GEODOGE_FALLING_BOTTOM);
@@ -1077,7 +1113,7 @@ void genericPush(int offsetX, int offsetY) {
 
     //??
     if (playerPos == pushPos && (atEdge || !(attPushPosFurther & ATT_PERMEABLE))) {
-        // shakeTime = 20;
+        // setShake(20);
         FLASH(0x42, 8);
         startPlayerAnimation(ID_Xray);
         nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 50, 3, 4, 0x180, 7);

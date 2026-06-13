@@ -15,4 +15,6 @@ void startCharAnimation(int type, const unsigned char *idx);
 void processCharAnimations();
 void toggleGears(bool active);
 
+extern const unsigned char AnimateRockBonus[];
+
 // EOF

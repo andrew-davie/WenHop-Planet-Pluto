@@ -52,6 +52,8 @@ enum ObjectType {
     TYPE_ROCK_PEBBLE,              // 40
     TYPE_ELECTRIC,                 // 41
     TYPE_INSULATOR,                // 42
+    TYPE_WEAPON,                   // 43
+    TYPE_ROCK_BONUS,               // 44
 
     TYPE_MAX
 };
@@ -181,7 +183,9 @@ enum ChName {
     CH_ELECTRIC_3,                // 113
     CH_BROKEN_DIRT,               // 114
     CH_INSULATOR_TOP,             // 115
-    CH_INSULATOR_BOTTOM,          // 115
+    CH_INSULATOR_BOTTOM,          // 116
+    CH_WEAPON_MACE,               // 117
+    CH_ROCK_BONUS,                // 118
 
     // 127 is limit
 
@@ -226,8 +230,8 @@ DEFINE_ENUM_WITH_BIT_VALUES(TypeAttributes,
     ATT(MELTS),                 // 22
     ATT(GEODOGE),               // 23
     ATT(PAD),                   // 24
-    ATT(CRUSHES),               // 26
-    ATT(CORNER),                // 25
+    ATT(CRUSHES),               // 25
+    ATT(CORNER),                // 26
 );
 
 #define POS_CORNER 26

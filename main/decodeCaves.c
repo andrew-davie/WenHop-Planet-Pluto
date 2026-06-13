@@ -333,9 +333,23 @@ void DrawRect(objectType anObject, int x, int y, int aWidth, int aHeight) {
 
 void DrawFilledRect(objectType anObject, int x, int y, int aWidth, int aHeight, objectType aFillObject) {
 
-    for (int counter1 = aHeight - 2; counter1 > 0; counter1--)
-        DrawLine(aFillObject, x + 1, y + counter1, aWidth - 2, 2);
-    DrawRect(anObject, x, y, aWidth, aHeight);
+    if (anObject & 0x80) {
+
+        // 1st byte is flag + object type
+        // last is the chance of object being filled
+
+        for (int i = 0; i < aWidth; i++) {
+            for (int j = 0; j < aHeight; j++) {
+
+                if (!rangeRandom(aFillObject))
+                    StoreObject(x + i, y + j, anObject & 0x7F);
+            }
+        }
+    } else {
+        for (int counter1 = aHeight - 2; counter1 > 0; counter1--)
+            DrawLine(aFillObject, x + 1, y + counter1, aWidth - 2, 2);
+        DrawRect(anObject, x, y, aWidth, aHeight);
+    }
 }
 
 // EOF

@@ -1,5 +1,6 @@
 #include <stdbool.h>
 
+#include "board.h"
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
@@ -37,6 +38,9 @@ struct TOOL {
 struct TOOL tool[TOOL_MAX];
 
 
+int weapon;
+
+
 const int sin_cos[32] = {
     // clang-format off
     // Combined sin/cos table
@@ -49,6 +53,7 @@ const int sin_cos[32] = {
 
 
 void initTool() {
+    weapon = 0;
     for (int i = 0; i < TOOL_MAX; i++)
         tool[i].age = 0;
 }
@@ -81,9 +86,17 @@ void modifyCharAtTip(int x, int y) {
             colour = 1;
         }
 
+        else if (type == TYPE_ROCK_BONUS) {
+            *b = FLAG(CH_WEAPON_MACE);
+            colour = 7;
+
+        }
+
+
         else if (type == TYPE_GEODOGE) {
             *b = CH_DOGE_00 | FLAG_THISFRAME;
             colour = 3;
+            surroundingConglomerate(xchar, ychar);
         }
 
         else if (type == TYPE_DIRT) {
@@ -135,7 +148,7 @@ void drawMace() {
     if (T1TC > availableIdleTime - 3000)
         return;
 
-    if (playerDead || theCave->weapon[level] != WEAPON_MACE)
+    if (playerDead || !(weapon & WEAPON_MACE))
         return;
 
     if ((inpt4 & 0x80) && !weaponLength) {
@@ -377,7 +390,7 @@ void drawParticles() {
         if (particle[i].age) {
 
             int xOffset = (sin_cos[particle[i].dir >> 3] * particle[i].distance) >> 8;
-            int yOffset = (sin_cos[(particle[i].dir + 64) >> 3] * particle[i].distance * 3) >> 8;
+            int yOffset = (sin_cos[((particle[i].dir + 64) & 0xFF) >> 3] * particle[i].distance * 3) >> 8;
 
             int y = (particle[i].y + yOffset) >> 8;
             int x = (particle[i].x + xOffset) >> 8;

@@ -207,6 +207,15 @@ bool checkHighPriorityMove(int dir) {
             handled = true;
         }
 
+        // else if (type == TYPE_WEAPON) {
+
+        //     *meOffset = FLAG(CH_MELLON_HUSK);
+        //     *me = FLAG(CH_BLANK);
+        //     extern int weapon;
+        //     weapon = theCave->weapon[level];
+        //     return handled = true;
+        // }
+
         else if (type == TYPE_GRINDER || type == TYPE_GRINDER_1) {
             ADDAUDIO(SFX_EXPLODE_QUIET);
 
@@ -230,7 +239,7 @@ bool checkHighPriorityMove(int dir) {
 #if ENABLE_SHAKE
 
             if (!gearsActive)
-                shakeTime = 5;
+                setShake(5);
 #endif
 
         }
@@ -260,7 +269,7 @@ bool checkHighPriorityMove(int dir) {
                 ADDAUDIO(SFX_EXPLODE);
             }
 
-            shakeTime = 50;
+            setShake(50);
 
             nDots(3, playerX, playerY, PT_SPIRAL, 25, 3 + ((xdir[dir] * CHAR_TRIX_X) >> 1) + rangeRandom(5) - 2,
                   4 + ((ydir[dir] * CHAR_TRIX_Y) >> 1) + rangeRandom(5) - 2, 100, 2);
@@ -290,7 +299,7 @@ bool checkHighPriorityMove(int dir) {
                 nextGravity = -gravity;
                 FLASH(0xC5, 3);
 #if ENABLE_SHAKE
-                shakeTime = 20;
+                setShake(20);
 #endif
                 // ADDAUDIO(SFX_SCORE);
             }
@@ -306,6 +315,13 @@ bool checkHighPriorityMove(int dir) {
                 //     grabbed = true;
                 // if (grabbed)
                 nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
+            }
+
+            else if (type == TYPE_WEAPON) {
+
+                extern int weapon;
+                weapon = WEAPON_MACE;    // theCave->weapon[level];
+                FLASH(0xC6, 10);
             }
 
             playerX += xdir[dir];
@@ -460,6 +476,11 @@ bool checkLowPriorityMove(int dir) {
 
         // FLASH(0x94, 4);
 
+        if (!pushCounter)
+            if (destType == TYPE_ROCK_BONUS)
+                startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
+
+
         if (++pushCounter > 1) {
 
             int anim = mineAnimation[dir];
@@ -468,6 +489,8 @@ bool checkLowPriorityMove(int dir) {
 
             if (playerAnimationID != anim)
                 startPlayerAnimation(anim);
+
+
         } else {
             ADDAUDIO(SFX_SPACE);
             //            startPlayerAnimation(ID_Locked);          // works
@@ -492,8 +515,14 @@ bool checkLowPriorityMove(int dir) {
 
                     surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
 
+                    if (destType == TYPE_ROCK_BONUS) {
 
-                    if (destType == TYPE_ROCK) {
+                        *meOffset = FLAG(CH_WEAPON_MACE);
+
+                    }
+
+                    else if (destType == TYPE_ROCK) {
+
 
                         nDots(10, playerX, playerY, PT_ONE, 30,
                               xOffset[dir] + CHAR_CENTER_X /*+ rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1)*/,
@@ -621,7 +650,7 @@ void movePlayer(unsigned char *me) {
         if (playerAnimationID == ID_WalkUp || playerAnimationID == ID_MineUp)
             startPlayerAnimation(ID_StandUp);
 
-        else if (playerAnimationID == ID_Walk)    // || playerAnimationID == ID_Push)
+        else if (playerAnimationID == ID_Walk || playerAnimationID == ID_Mine)
             startPlayerAnimation(ID_StandLR);
 
         else if (playerAnimationID == ID_WalkDown || playerAnimationID == ID_MineDown)

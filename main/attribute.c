@@ -1,89 +1,89 @@
 #include "attribute.h"
 
-const enum ObjectType CharToType[CH_MAX] = {
+const enum ObjectType CharToType[] = {
 
     // see ChName for corresponding character name/number
     // may need to update worstRequiredTime if that's in use
 
-    TYPE_BLANK,                    // 000 CH_BLANK,
-    TYPE_DIRT,                     // 001 CH_DIRT,
-    TYPE_BRICKWALL,                // 002 CH_BRICKWALL,
-    TYPE_OUTBOX_PRE,               // 003 CH_DOORCLOSED,
-    TYPE_OUTBOX,                   // 004 CH_DOOROPEN_0,
-    TYPE_OUTBOX,                   // 005 CH_EXITBLANK,
-    TYPE_STEELWALL,                // 006 CH_STEELWALL,
-    TYPE_PEBBLE1,                  // 007 CH_PEBBLE1,
-    TYPE_PEBBLE1,                  // 008 CH_PEBBLE2,
-    TYPE_ROCK,                     // 009 CH_ROCK,
-    TYPE_ROCK_FALLING,             // 010 CH_ROCK_FALLING,
-    TYPE_DOGE,                     // 011 CH_DOGE_00,
-    TYPE_DOGE_FALLING,             // 012 CH_DOGE_FALLING,
-    TYPE_MELLON_HUSK_PRE,          // 013 CH_MELLON_HUSK_BIRTH,
-    TYPE_LAVA,                     // 014 CH_LAVA_BLANK,
-    TYPE_LAVA,                     // 015 CH_LAVA_SMALL,
-    TYPE_LAVA,                     // 016 CH_LAVA_MEDIUM,
-    TYPE_LAVA,                     // 017 CH_LAVA_LARGE,
-    TYPE_MELLON_HUSK,              // 018 CH_MELLON_HUSK,
-    TYPE_DOGE,                     // 019 CH_DOGE_01,
-    TYPE_DOGE,                     // 020 CH_DOGE_02,
-    TYPE_DOGE,                     // 021 CH_DOGE_03,
-    TYPE_DOGE,                     // 022 CH_DOGE_04,
-    TYPE_DOGE,                     // 023 CH_DOGE_05,
-    TYPE_DOGE,                     // 024 CH_DOGE_STATIC,
-    TYPE_PEBBLE_ROCK,              // 025 CH_PEBBLE_ROCK,
+    TYPE_BLANK,                    // 000 CH_BLANK
+    TYPE_DIRT,                     // 001 CH_DIRT
+    TYPE_BRICKWALL,                // 002 CH_BRICKWALL
+    TYPE_OUTBOX_PRE,               // 003 CH_DOORCLOSED
+    TYPE_OUTBOX,                   // 004 CH_DOOROPEN_0
+    TYPE_OUTBOX,                   // 005 CH_EXITBLANK
+    TYPE_STEELWALL,                // 006 CH_STEELWALL
+    TYPE_PEBBLE1,                  // 007 CH_PEBBLE1
+    TYPE_PEBBLE1,                  // 008 CH_PEBBLE2
+    TYPE_ROCK,                     // 009 CH_ROCK
+    TYPE_ROCK_FALLING,             // 010 CH_ROCK_FALLING
+    TYPE_DOGE,                     // 011 CH_DOGE_00
+    TYPE_DOGE_FALLING,             // 012 CH_DOGE_FALLING
+    TYPE_MELLON_HUSK_PRE,          // 013 CH_MELLON_HUSK_BIRTH
+    TYPE_LAVA,                     // 014 CH_LAVA_BLANK
+    TYPE_LAVA,                     // 015 CH_LAVA_SMALL
+    TYPE_LAVA,                     // 016 CH_LAVA_MEDIUM
+    TYPE_LAVA,                     // 017 CH_LAVA_LARGE
+    TYPE_MELLON_HUSK,              // 018 CH_MELLON_HUSK
+    TYPE_DOGE,                     // 019 CH_DOGE_01
+    TYPE_DOGE,                     // 020 CH_DOGE_02
+    TYPE_DOGE,                     // 021 CH_DOGE_03
+    TYPE_DOGE,                     // 022 CH_DOGE_04
+    TYPE_DOGE,                     // 023 CH_DOGE_05
+    TYPE_DOGE,                     // 024 CH_DOGE_STATIC
+    TYPE_PEBBLE_ROCK,              // 025 CH_PEBBLE_ROCK
     TYPE_ROCK_PEBBLE,              // 026 CH_ROCK_PEBBLE
     TYPE_ROCK_PEBBLE,              // 027 CH_ROCK_PEBBLE_1
-    TYPE_DUST_0,                   // 028 CH_DUST_0,
-    TYPE_DUST_0,                   // 029 CH_DUST_1,
-    TYPE_DUST_0,                   // 030 CH_DUST_2,
-    TYPE_GEODOGE,                  // 031 CH_CONGLOMERATE,
-    TYPE_GEODOGE,                  // 032 CH_CONGLOMERATE_1,
-    TYPE_GEODOGE,                  // 033 CH_CONGLOMERATE_2,
-    TYPE_GEODOGE,                  // 034 CH_CONGLOMERATE_3,
-    TYPE_GEODOGE,                  // 035 CH_CONGLOMERATE_4,
-    TYPE_GEODOGE,                  // 036 CH_CONGLOMERATE_5,
-    TYPE_GEODOGE,                  // 037 CH_CONGLOMERATE_6,
-    TYPE_GEODOGE,                  // 038 CH_CONGLOMERATE_7,
-    TYPE_GEODOGE,                  // 039 CH_CONGLOMERATE_8,
-    TYPE_GEODOGE,                  // 040 CH_CONGLOMERATE_9,
-    TYPE_GEODOGE,                  // 041 CH_CONGLOMERATE_10,
-    TYPE_GEODOGE,                  // 042 CH_CONGLOMERATE_11,
-    TYPE_GEODOGE,                  // 043 CH_CONGLOMERATE_12,
-    TYPE_GEODOGE,                  // 044 CH_CONGLOMERATE_13,
-    TYPE_GEODOGE,                  // 045 CH_CONGLOMERATE_14,
-    TYPE_GEODOGE,                  // 046 CH_CONGLOMERATE_15,
-    TYPE_DUST_ROCK,                // 047 CH_DUST_ROCK_0,
-    TYPE_DUST_ROCK,                // 048 CH_DUST_ROCK_1,
-    TYPE_DUST_ROCK,                // 049 CH_DUST_ROCK_2,
-    TYPE_CONVERT_GEODE_TO_DOGE,    // 050 CH_CONVERT_GEODE_TO_DOGE,
-    TYPE_PUSHER,                   // 051 CH_HORIZONTAL_BAR,
-    TYPE_PUSHER,                   // 052 CH_PUSH_LEFT,
-    TYPE_PUSHER,                   // 053 CH_PUSH_LEFT_REVERSE,
-    TYPE_PUSHER,                   // 054 CH_PUSH_RIGHT,
-    TYPE_PUSHER,                   // 055 CH_PUSH_RIGHT_REVERSE,
-    TYPE_PUSHER,                   // 056 CH_VERTICAL_BAR,
-    TYPE_PUSHER,                   // 057 CH_PUSH_UP,
-    TYPE_PUSHER,                   // 058 CH_PUSH_UP_REVERSE,
-    TYPE_PUSHER,                   // 059 CH_PUSH_DOWN,
-    TYPE_PUSHER,                   // 060 CH_PUSH_DOWN_REVERSE,
-    TYPE_WYRM,                     // 061 CH_WYRM_BODY,
-    TYPE_WYRM,                     // 062 CH_WYRM_VERT_BODY,
-    TYPE_WYRM,                     // 063 CH_WYRM_CORNER_LD,
-    TYPE_WYRM,                     // 064 CH_WYRM_CORNER_RD,
-    TYPE_WYRM,                     // 065 CH_WYRM_CORNER_LU,
-    TYPE_WYRM,                     // 066 CH_WYRM_CORNER_RU,
-    TYPE_WYRM,                     // 067 CH_WYRM_HEAD_U,
-    TYPE_WYRM,                     // 068 CH_WYRM_HEAD_R,
-    TYPE_WYRM,                     // 069 CH_WYRM_HEAD_D,
-    TYPE_WYRM,                     // 070 CH_WYRM_HEAD_L,
-    TYPE_GEODOGE_FALLING,          // 071 CH_GEODOGE_FALLING,
-    TYPE_FLIP_GRAVITY,             // 072 CH_FLIP_GRAVITY_0,
-    TYPE_FLIP_GRAVITY,             // 073 CH_FLIP_GRAVITY_1,
-    TYPE_FLIP_GRAVITY,             // 074 CH_FLIP_GRAVITY_2,
-    TYPE_BLOCK,                    // 075 CH_BLOCK,
-    TYPE_GRINDER,                  // 076 CH_GRINDER_0,
+    TYPE_DUST_0,                   // 028 CH_DUST_0
+    TYPE_DUST_0,                   // 029 CH_DUST_1
+    TYPE_DUST_0,                   // 030 CH_DUST_2
+    TYPE_GEODOGE,                  // 031 CH_CONGLOMERATE
+    TYPE_GEODOGE,                  // 032 CH_CONGLOMERATE_1
+    TYPE_GEODOGE,                  // 033 CH_CONGLOMERATE_2
+    TYPE_GEODOGE,                  // 034 CH_CONGLOMERATE_3
+    TYPE_GEODOGE,                  // 035 CH_CONGLOMERATE_4
+    TYPE_GEODOGE,                  // 036 CH_CONGLOMERATE_5
+    TYPE_GEODOGE,                  // 037 CH_CONGLOMERATE_6
+    TYPE_GEODOGE,                  // 038 CH_CONGLOMERATE_7
+    TYPE_GEODOGE,                  // 039 CH_CONGLOMERATE_8
+    TYPE_GEODOGE,                  // 040 CH_CONGLOMERATE_9
+    TYPE_GEODOGE,                  // 041 CH_CONGLOMERATE_10
+    TYPE_GEODOGE,                  // 042 CH_CONGLOMERATE_11
+    TYPE_GEODOGE,                  // 043 CH_CONGLOMERATE_12
+    TYPE_GEODOGE,                  // 044 CH_CONGLOMERATE_13
+    TYPE_GEODOGE,                  // 045 CH_CONGLOMERATE_14
+    TYPE_GEODOGE,                  // 046 CH_CONGLOMERATE_15
+    TYPE_DUST_ROCK,                // 047 CH_DUST_ROCK_0
+    TYPE_DUST_ROCK,                // 048 CH_DUST_ROCK_1
+    TYPE_DUST_ROCK,                // 049 CH_DUST_ROCK_2
+    TYPE_CONVERT_GEODE_TO_DOGE,    // 050 CH_CONVERT_GEODE_TO_DOGE
+    TYPE_PUSHER,                   // 051 CH_HORIZONTAL_BAR
+    TYPE_PUSHER,                   // 052 CH_PUSH_LEFT
+    TYPE_PUSHER,                   // 053 CH_PUSH_LEFT_REVERSE
+    TYPE_PUSHER,                   // 054 CH_PUSH_RIGHT
+    TYPE_PUSHER,                   // 055 CH_PUSH_RIGHT_REVERSE
+    TYPE_PUSHER,                   // 056 CH_VERTICAL_BAR
+    TYPE_PUSHER,                   // 057 CH_PUSH_UP
+    TYPE_PUSHER,                   // 058 CH_PUSH_UP_REVERSE
+    TYPE_PUSHER,                   // 059 CH_PUSH_DOWN
+    TYPE_PUSHER,                   // 060 CH_PUSH_DOWN_REVERSE
+    TYPE_WYRM,                     // 061 CH_WYRM_BODY
+    TYPE_WYRM,                     // 062 CH_WYRM_VERT_BODY
+    TYPE_WYRM,                     // 063 CH_WYRM_CORNER_LD
+    TYPE_WYRM,                     // 064 CH_WYRM_CORNER_RD
+    TYPE_WYRM,                     // 065 CH_WYRM_CORNER_LU
+    TYPE_WYRM,                     // 066 CH_WYRM_CORNER_RU
+    TYPE_WYRM,                     // 067 CH_WYRM_HEAD_U
+    TYPE_WYRM,                     // 068 CH_WYRM_HEAD_R
+    TYPE_WYRM,                     // 069 CH_WYRM_HEAD_D
+    TYPE_WYRM,                     // 070 CH_WYRM_HEAD_L
+    TYPE_GEODOGE_FALLING,          // 071 CH_GEODOGE_FALLING
+    TYPE_FLIP_GRAVITY,             // 072 CH_FLIP_GRAVITY_0
+    TYPE_FLIP_GRAVITY,             // 073 CH_FLIP_GRAVITY_1
+    TYPE_FLIP_GRAVITY,             // 074 CH_FLIP_GRAVITY_2
+    TYPE_BLOCK,                    // 075 CH_BLOCK
+    TYPE_GRINDER,                  // 076 CH_GRINDER_0
     TYPE_GRINDER_1,                // 077 CH_GRINDER_1
-    TYPE_HUB,                      // 078 CH_HUB,
+    TYPE_HUB,                      // 078 CH_HUB
     TYPE_WATER,                    // 079 CH_WATER_0
     TYPE_WATERFLOW_0,              // 080 CH_WATERFLOW_0
     TYPE_WATERFLOW_1,              // 081 CH_WATERFLOW_1
@@ -99,18 +99,18 @@ const enum ObjectType CharToType[CH_MAX] = {
     TYPE_PUSHER,                   // 091 CH_PUSH_DOWN2
     TYPE_CONVERT_GEODE_TO_DOGE,    // 092 CH_GEODOGE_CONVERT  (deprecated)
     TYPE_CONVERT_PIPE,             // 093 CH_CONVERT_PIPE
-    TYPE_WYRM,                     // 094 CH_WYRM_TAIL_U,
-    TYPE_WYRM,                     // 095 CH_WYRM_HEAD_R,
-    TYPE_WYRM,                     // 096 CH_WYRM_HEAD_D,
+    TYPE_WYRM,                     // 094 CH_WYRM_TAIL_U
+    TYPE_WYRM,                     // 095 CH_WYRM_HEAD_R
+    TYPE_WYRM,                     // 096 CH_WYRM_HEAD_D
     TYPE_WYRM,                     // 097 CH_WYRM_HEAD_L,
-    TYPE_DOGE_FALLING,             // 098 CH_DOGE_FALLING_TOP,
-    TYPE_DOGE_FALLING,             // 099 CH_DOGE_FALLING_BOTTOM,
-    TYPE_ROCK_FALLING,             // 100 CH_ROCK_FALLING_TOP,
-    TYPE_ROCK_FALLING,             // 101 CH_ROCK_FALLING_BOTTOM,
-    TYPE_GEODOGE_FALLING,          // 102 CH_GEODOGE_FALLING_TOP,
-    TYPE_GEODOGE_FALLING,          // 103 CH_GEODOGE_FALLING_BOTTOM,
-    TYPE_DOGE_FALLING2,            // 104 CH_DOGE_FALLING_TOP2,
-    TYPE_DOGE_FALLING2,            // 105 CH_DOGE_FALLING_BOTTOM2,
+    TYPE_DOGE_FALLING,             // 098 CH_DOGE_FALLING_TOP
+    TYPE_DOGE_FALLING,             // 099 CH_DOGE_FALLING_BOTTOM
+    TYPE_ROCK_FALLING,             // 100 CH_ROCK_FALLING_TOP
+    TYPE_ROCK_FALLING,             // 101 CH_ROCK_FALLING_BOTTOM
+    TYPE_GEODOGE_FALLING,          // 102 CH_GEODOGE_FALLING_TOP
+    TYPE_GEODOGE_FALLING,          // 103 CH_GEODOGE_FALLING_BOTTOM
+    TYPE_DOGE_FALLING2,            // 104 CH_DOGE_FALLING_TOP2
+    TYPE_DOGE_FALLING2,            // 105 CH_DOGE_FALLING_BOTTOM2
     TYPE_DOGE_FALLING2,            // 106 CH_DOGE_SIDE_1
     TYPE_DOGE_FALLING2,            // 107 CH_DOGE_SIDE_3
     TYPE_DOGE_FALLING2,            // 108 CH_DOGE_SIDE_2
@@ -122,7 +122,11 @@ const enum ObjectType CharToType[CH_MAX] = {
     TYPE_DIRT,                     // 114 CH_BROKEN_DIRT  (not actually used on board)
     TYPE_INSULATOR,                // 115 CH_INSULATOR_TOP
     TYPE_INSULATOR,                // 116 CH_INSULATOR_BOTTOM
+    TYPE_WEAPON,                   // 117 CH_WEAPON_MACE
+    TYPE_ROCK_BONUS,               // 118 CH_ROCK_BONUS
 };
+
+_Static_assert(sizeof(CharToType) / sizeof(CharToType[0]) == CH_MAX, "CharToType table wrong size");
 
 
 enum AttributeAlias {
@@ -157,7 +161,7 @@ enum AttributeAlias {
 };
 
 
-const unsigned int Attribute[TYPE_MAX] = {
+const unsigned int Attribute[] = {
 
 // see attribute.h "ObjectType"
 
@@ -209,10 +213,14 @@ const unsigned int Attribute[TYPE_MAX] = {
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ |XPD| _ | _ | _  , // 39 TYPE_DOGE_FALLING2
     _ |PAD| _ | _ |DIS|PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _  , // 40 TYPE_ROCK_PEBBLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 41 TYPE_ELECTRIC
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ |MIN| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 41 TYPE_INSULATOR
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ |MIN| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 42 TYPE_INSULATOR
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PER| _ | _ | _ | _  , // 43 TYPE_WEAPON
+    _ |PAD| _ |MLT| _ |PH1| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ |ROL , // 06 TYPE_ROCK_BONUS
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+----+
 
     // clang-format on
 };
+
+_Static_assert(sizeof(Attribute) / sizeof(Attribute[0]) == TYPE_MAX, "Attribute table wrong size");
 
 // EOF

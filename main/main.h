@@ -145,4 +145,7 @@ struct dataStreams {
 
 void initDataStreams(const struct dataStreams *streams, int streamCount);
 
+void setShake(int time);
+
+
 // EOF

@@ -3,7 +3,7 @@
 #include "decodeCaves.h"
 #include "decodecaves.h"
 #include "main.h"
-
+#include "particle.h"
 
 // #define LINE 0b01000000
 // #define FILLRECT 0b10000000
@@ -274,7 +274,7 @@ const unsigned char caveTest[] = {
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
 
-    WEAPON_NONE,                    //0
+    WEAPON_MACE,                    //0
     WEAPON_NONE,                    //1
     WEAPON_NONE,                    //2
     WEAPON_NONE,                    //3
@@ -922,7 +922,7 @@ const unsigned char caveA4[] = {
 
     20,    // milling
     1, 15, // doge $
-    5,     //              ,          // rain
+    0,     //              ,          // rain
     
     10,                             //0
     11,                             //1
@@ -948,30 +948,40 @@ const unsigned char caveA4[] = {
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_LOCK_Y, CH_BLANK, CH_DIRT,
+    CAVEDEF_LOCK_Y, CH_STEELWALL, CH_DIRT,
 
-    1,
+    2,
+    CH_GEODOGE, 100, 100, 100, 100, 100,
     CH_BLANK, 50, 10, 5, 0, 20,
+    CH_ROCK, 120, 10, 5, 0, 20,
 
-    DRAW_FILLED_RECT, CH_BRICKWALL, 10, 3, 20, 5, CH_DIRT,
+    DRAW_RECT, CH_BRICKWALL, 9, 2, 22, 7,
+    DRAW_FILLED_RECT, CH_DIRT, 10, 3, 20, 5,CH_DIRT,
+    DRAW_FILLED_RECT, 0x80|CH_ROCK, 10,3, 20, 5, 8,
+    DRAW_FILLED_RECT, 0x80|CH_GEODOGE, 10, 3, 18, 4, 6,
+    DRAW_FILLED_RECT, 0x80|CH_ROCK_BONUS, 10, 3, 18, 4, 6,
 
     //    LINER(CH_HORIZ_ZAP_0, 13,7,10,R)
     // LINER(CH_DOGE_00, 13,8,16,R)
     // LINER(CH_DOGE_00, 13,7,16,R)
-    LINER(CH_DOGE_00, 13, 4, 16, R)
+    //LINER(CH_GEODOGE, 13, 4, 16, R)
     //    0xFE, CH_FLIP_GRAVITY_0, 16,6,
     // 0xFE, CH_FLIP_GRAVITY_0, 22,8,
     // 0xFE, CH_FLIP_GRAVITY_0, 11,8,
     //    0xFE, CH_DOGE_00, 16,8,
     // 0xFE,
     // CH_ROCK, 1, 4,
-    CH_ELECTRIC_0, 12, 5,
-    CH_INSULATOR_BOTTOM,12,6,
+    // CH_ELECTRIC_0, 12, 5,
+    CH_INSULATOR_BOTTOM,12,7,
+    CH_INSULATOR_TOP,12,3,
+
+    CH_WEAPON_MACE, 13,6,
 
     CH_STEELWALL, 14, 5,
     CH_STEELWALL, 14, 6,
 
-    CH_PEBBLE1, 13, 5,
+    // CH_ROCK_BONUS,10,4,
+//    CH_PEBBLE1, 13, 5,
     // 0xFE, CH_DIRT, 11,6,
     // 0xFE, CH_DIRT, 11,8,
 
@@ -989,15 +999,13 @@ const unsigned char caveA4[] = {
     CH_MELLON_HUSK_BIRTH, 11, 4,
 
     // CH_INSULATOR_TOP,18,4,
-    CH_ELECTRIC_0, 18,4,
-    CH_ELECTRIC_0, 18,5,
     // CH_ELECTRIC_0, 18,6,
-    CH_INSULATOR_BOTTOM,18,6,
+    CH_INSULATOR_BOTTOM,18,7,
+    CH_INSULATOR_TOP,18,3,
  
-    CH_ELECTRIC_0, 24,4,
-    CH_ELECTRIC_0, 24,5,
     // CH_ELECTRIC_0, 18,6,
-    CH_INSULATOR_BOTTOM,24,6,
+    CH_INSULATOR_BOTTOM,24,7,
+    CH_INSULATOR_TOP,24,3,
 
     DRAW_EOF,
 
@@ -1015,11 +1023,11 @@ const unsigned char caveA4[] = {
 
 const unsigned char *caveList[] = {
 
+    caveA4,         //
+    caveA,          //
     caveWyrms,      //
     caveUseWall,    //
     caveA2,         // best
-    caveA4,         //
-    caveA,          //
     // caveA3,         //
 
     // caveMace,

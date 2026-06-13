@@ -7,6 +7,49 @@ char AnimCount[TYPE_MAX];
 
 // clang-format off
 
+const unsigned char AnimateWeapon[] = {
+
+    CH_WEAPON_MACE, 30,
+    CH_DOGE_04, 5,
+    CH_BLANK, 10,
+    ANIM_LOOP,
+};
+
+const unsigned char AnimateRockBonus[] = {
+
+    CH_ROCK,0,
+
+//    CH_WEAPON_MACE, 21,
+    // CH_ROCK, 9,
+    // CH_WEAPON_MACE, 9,
+    // CH_ROCK, 9,
+    // CH_WEAPON_MACE, 9,
+    // CH_ROCK, 9,
+  //  ANIM_LOOP,
+
+    CH_ROCK,12,
+
+    CH_WEAPON_MACE, 1,
+    CH_ROCK, 2,
+    CH_WEAPON_MACE, 1,
+    CH_ROCK, 2,
+    CH_WEAPON_MACE, 1,
+    CH_ROCK, 12,
+    CH_WEAPON_MACE, 1,
+    CH_ROCK, 2,
+    CH_WEAPON_MACE, 1,
+    CH_ROCK, 2,
+    CH_WEAPON_MACE, 1,
+    CH_ROCK, 12,
+    CH_WEAPON_MACE, 1,
+    CH_ROCK, 2,
+    CH_WEAPON_MACE, 1,
+    CH_ROCK, 2,
+    CH_WEAPON_MACE, 1,
+    ANIM_LOOP,
+};
+
+
 const unsigned char AnimateBelt[] = {
     CH_BELT_0, 12,
     CH_BELT_1, 12,
@@ -170,7 +213,7 @@ const unsigned char AnimMellonHusk[] = {
 
 // clang-format on
 
-const unsigned char *const AnimateBase[TYPE_MAX] = {
+const unsigned char *const AnimateBase[] = {
 
     // indexed by object TYPE (def: ObjectType in attribute.h)
     // =0 if object does not auto-animate
@@ -224,7 +267,12 @@ const unsigned char *const AnimateBase[TYPE_MAX] = {
     AnimateRockPebble,    // 40 TYPE_ROCK_PEBBLE (geodoge disintegrating)
     0,                    // 41 TYPE_ELECTRIC_0
     0,                    // 42 TYPE_INSULATOR
+    AnimateWeapon,        // 43 TYPE_WEAPON
+    AnimateRockBonus,     // 44 TYPE_ROCK_BONUS
 };
+
+_Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
+
 
 void initCharAnimations() {
 

@@ -9,6 +9,7 @@
 #include "decodecaves.h"
 #include "main.h"
 #include "mellon.h"
+#include "random.h"
 #include "reverseBits.h"
 #include "score.h"
 
@@ -678,6 +679,19 @@ void fillBit(int line, unsigned char b) {
 
 void doubleSizeScore(int x, int y, int letter, int col) {
 
+
+    static int let = 0;
+    let++;
+
+    if (let >= 10 << 4)
+        let = 0;
+
+    letter = (let >> 4);
+
+    col = (let >> 4) & 7;
+    x = 3;
+    y = 120;
+
     extern unsigned char charAtoZ[];
     unsigned char *sample = charAtoZ + (letter + 26) * 10;
 
@@ -780,7 +794,7 @@ void drawDoge() {
     if (doges < 0) {
         scoreLineNew[1] = DIGIT_PLUS;
         // scoreLineNew[0] = DIGIT_DOGE;
-        scoreLineColour[1] = scoreLineColour[0] = RGB_GREEN;
+        scoreLineColour[1] = scoreLineColour[0] = rangeRandom(8);
     }
     drawDecimal2(scoreLineNew + 2, scoreLineColour + 1, RGB_YELLOW, doges < 0 ? -doges : doges);
 }
@@ -825,6 +839,8 @@ void drawTheScore(int score) {
 }
 
 void drawScore() {
+
+    doubleSizeScore(0, 0, 'a', 7);
 
     static int scc = 0;
     scc++;

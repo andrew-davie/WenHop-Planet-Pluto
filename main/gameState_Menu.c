@@ -298,17 +298,6 @@ void OS_Menu() {
 
     //--------------------------------------------------------------------------
 
-    // static int shake = 0;
-    // static int shakeTime = 0;
-
-    // if (!shakeTime && !(getRandom32() & 31))
-    //     shakeTime = 20;
-
-    // if (shakeTime && !(frame & 3)) {
-    //     shakeTime--;
-    //     shake = getRandom32() & 3;
-    // }
-
     draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
                 gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 62, 0x96);
 

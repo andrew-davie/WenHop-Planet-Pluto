@@ -124,13 +124,20 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
         ypos += CHAR_Y - (shapeHeight & 0x3f);
 
-        int frameXOffset = *(const signed char *)spr++;
+        int frameXOffset = -*(const signed char *)spr++;
         int frameYOffset = *(const signed char *)spr++;
+
+        doges = frameXOffset;
 
         int lavaLine = (lavaSurfaceTrixel - (scrollY >> 16)) * 3;
         playerSpriteY = ypos - frameYOffset - 1;
 
-        int pX = (xpos) * 4 + (faceDirection * (frameXOffset + frameAdjustX + autoMoveX)) + 2;
+
+        int pX = (xpos) * 4 + (faceDirection * (8 + frameXOffset + frameAdjustX + autoMoveX)) + 3;
+
+        // if (shapeHeight & SPRITE_DOUBLE)
+        //     pX -= 8 * faceDirection;
+
 
         if (pulsePlayerColour) {
 
@@ -140,7 +147,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
             playerSpriteY += rangeRandom(ppc) - (ppc >> 1);
         }
 
-        if (playerSpriteY < 0 || playerSpriteY >= _SCANLINES - SPRITE_DEPTH || pX > 159)
+        if (playerSpriteY < 0 || playerSpriteY >= _SCANLINES - SPRITE_DEPTH || pX < -7 || pX > 159)
             return;
 
 

@@ -16,6 +16,7 @@ Gamax Software 2026 - Craig Daniels
 
 #include "main.h"
 
+#include "animations.h"
 #include "attribute.h"
 #include "colour.h"
 #include "gameState.h"
@@ -33,7 +34,18 @@ Gamax Software 2026 - Craig Daniels
 
 int shakeX;
 int shakeY;
+
+
 int shakeTime;
+
+
+void setShake(int time) {
+
+    shakeTime = time;
+    if (time)
+        startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
+}
+
 
 #endif
 

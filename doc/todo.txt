@@ -1,14 +1,12 @@
 todo:
 
+star swipe import from BD
+rain particles from BD
+planets!
+death skull
+weapon from board!!!  e.g., M = mace, R = ROPE, G = gun
 
-swipe import from BD
-colour particles
+x/y triggered pipe pushers
 
-potential issue with wyrm on stella (crash per earlier bug)
-
-slowdown on player move (13 frames!)
 rolling on hardware (spiceware)
-
-particle colours
-
 sound priority (process all, use loudest)

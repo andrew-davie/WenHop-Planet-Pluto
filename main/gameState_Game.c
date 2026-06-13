@@ -24,6 +24,7 @@
 #include "swipe.h"
 #include "wyrm.h"
 
+
 extern const unsigned char trackGridLockMelodyIntro[];
 extern const unsigned char trackGridLockBase[];
 
@@ -98,7 +99,7 @@ void initGameState_Game() {
 
 
 #if ENABLE_SHAKE
-    shakeTime = 0;
+    setShake(0);
     shakeX = 0;
     shakeY = 0;
 #endif
@@ -141,7 +142,7 @@ void VB_Game() {
 
     // if (!rangeRandom(100)) {
     //     FLASH(0x26, 3);
-    //     shakeTime = 20;
+    //     setShake(20);
     // }
 
     if (shakeTime) {

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-sprite_vis.py - Add emoji visualisation comments to SP/SP2 sprite macro lines.
+sprite_vis.py - Add emoji visualisation comments to ONE/TWO sprite macro lines.
 
 Usage:
     python3 sprite_vis.py input.c [output.c]
@@ -10,49 +10,77 @@ If output.c is omitted, modifies in place (writes to input.c).
 
 import re
 import sys
+from typing import Optional
 
 BLACK  = '◼️'
-YELLOW = '🟩'
-RED    = '🟥'
+YELLOW = '🟨'
+RED    = '🟢'
+BROWN  = '❌'
 
 SP_LINE_RE = re.compile(
     r'^(?P<indent>\s*)'
     r'(?P<call>(?:ONE|TWO)\s*\(\s*[^)]*\))'
     r'(?P<tail>[,;]?)'
     r'\s*'
-    r'(?://\s*(?P<num>\d+).*)?'
+    r'(?://.*)?'
     r'\s*$'
 )
 
+# Generated padding rows and border rows (stripped on re-run for idempotency)
+PADDING_ROW_RE = re.compile(r'^\s*//\s+\|[🟫🟩◼️🔴]+\|')
+BORDER_ROW_RE  = re.compile(r'^\s*//\s+\+-+\+')
+
 PATTERN_RE     = re.compile(r'[X_]{2,}')
 ARRAY_START_RE = re.compile(r'const\s+unsigned\s+char\s+\w+\[\]\s*=\s*\{')
-ARRAY_NAME_RE  = re.compile(r'const\s+unsigned\s+char\s+(\w+)')
-SCALAR_RE      = re.compile(r'^\s*(?:\w+\s*\|\s*)?(0x[0-9a-fA-F]+|\d+)\s*[,;]?\s*(?://.*)?$')
-# Matches the first scalar line (byte 0) to allow rewriting it
-BYTE0_LINE_RE  = re.compile(r'^(?P<indent>\s*)(?:\w+\s*\|\s*)?(0x[0-9a-fA-F]+|\d+)(?P<tail>\s*[,;]?\s*(?://[^\n]*)?)$')
+SCALAR_RE      = re.compile(r'^\s*(?:\w+\s*\|\s*)?(-?0x[0-9a-fA-F]+|-?\d+)\s*[,;]?\s*(?://.*)?$')
+BYTE0_LINE_RE  = re.compile(r'^(?P<indent>\s*)(?:\w+\s*\|\s*)?(-?0x[0-9a-fA-F]+|-?\d+)(?P<tail>\s*[,;]?\s*(?://[^\n]*)?)$')
+
+COMMENT_COL = 48   # column where '// NN' starts on sprite lines
 
 
-def pattern_to_emoji(pat: str, col_start: int, cx: int, is_centre_row: bool) -> str:
+# ---------------------------------------------------------------------------
+# Canvas rendering
+# ---------------------------------------------------------------------------
+
+def render_canvas_row(sprite_width: int,
+                      canvas_col_start: int, canvas_width: int,
+                      cx: int, is_centre_row: bool,
+                      pixel_data: Optional[list]) -> str:
     result = []
-    for i, c in enumerate(pat):
-        col = col_start + i
-        if is_centre_row and col == cx:
+    for col in range(canvas_col_start, canvas_col_start + canvas_width):
+        in_sprite_h = (0 <= col < sprite_width)
+        is_cx       = (col == cx)
+        if is_centre_row and is_cx:
             result.append(RED)
+        elif pixel_data is not None and in_sprite_h:
+            result.append(YELLOW if pixel_data[col] == 'X' else BLACK)
         else:
-            result.append(YELLOW if c == 'X' else BLACK)
+            result.append(BROWN)
     return ''.join(result)
 
 
-def build_visual(patterns: list[str], cx: int, is_centre_row: bool) -> str:
-    col = 0
-    parts = []
-    for pat in patterns:
-        parts.append(pattern_to_emoji(pat, col, cx, is_centre_row))
-        col += len(pat)
-    return ''.join(parts)
+def build_canvas_params(n_rows: int, sprite_width: int, cx: int, cy: int):
+    centre_row_from_top = (n_rows - 1) - cy
+
+    canvas_col_start = min(0, cx)
+    canvas_col_end   = max(sprite_width, cx + 1)
+    canvas_width     = canvas_col_end - canvas_col_start
+
+    extra_rows_above = max(0, -centre_row_from_top)
+    extra_rows_below = max(0, centre_row_from_top - (n_rows - 1))
+
+    return (canvas_col_start, canvas_width,
+            extra_rows_above, extra_rows_below,
+            centre_row_from_top)
 
 
-def format_line(raw_line: str, cx: int, is_centre_row: bool) -> str:
+# ---------------------------------------------------------------------------
+# Line formatting
+# ---------------------------------------------------------------------------
+
+def format_sprite_line(raw_line: str, cx: int, is_centre_row: bool, row_idx: int,
+                       canvas_col_start: int, canvas_width: int,
+                       sprite_width: int) -> str:
     m = SP_LINE_RE.match(raw_line)
     if not m:
         return raw_line
@@ -60,7 +88,6 @@ def format_line(raw_line: str, cx: int, is_centre_row: bool) -> str:
     call   = m.group('call')
     indent = m.group('indent')
     tail   = m.group('tail')
-    num    = m.group('num')
 
     inner = re.search(r'\((.+)\)', call, re.DOTALL)
     if not inner:
@@ -70,42 +97,58 @@ def format_line(raw_line: str, cx: int, is_centre_row: bool) -> str:
     if not patterns:
         return raw_line
 
-    # Suppress centre marker if cx is outside horizontal range
-    n_cols = sum(len(p) for p in patterns)
-    if cx < 0 or cx >= n_cols:
-        is_centre_row = False
+    flat = list(''.join(patterns))
+    flat = (flat + ['_'] * sprite_width)[:sprite_width]
 
-    visual = build_visual(patterns, cx, is_centre_row)
+    visual = render_canvas_row(sprite_width, canvas_col_start, canvas_width,
+                               cx, is_centre_row, flat)
 
-    if num is not None:
-        comment = f'// {int(num):02d}   |{visual}|'
-    else:
-        comment = f'//   |{visual}|'
-
-    base = f'{indent}{call}{tail}'
-    pad  = max(1, 48 - len(base))
+    comment = f'// {row_idx:02d}   |{visual}|'
+    base    = f'{indent}{call}{tail}'
+    pad     = max(1, COMMENT_COL - len(base))
     return f'{base}{" " * pad}{comment}\n'
 
+
+def format_padding_row(indent: str, cx: int, is_centre_row: bool,
+                       canvas_col_start: int, canvas_width: int,
+                       sprite_width: int, label: str) -> str:
+    """Comment-only line with // at COMMENT_COL, matching sprite lines."""
+    visual = render_canvas_row(sprite_width, canvas_col_start, canvas_width,
+                               cx, is_centre_row, None)
+    # sprite lines have '//' at COMMENT_COL, then ' NN   |visual|'
+    # padding rows: pad with spaces to COMMENT_COL, then '//       |visual|'
+    prefix = f'{indent}'
+    pad    = max(0, COMMENT_COL - len(prefix))
+    suffix = f'  {label}' if label else ''
+    return f'{prefix}{" " * pad}//      |{visual}|{suffix}\n'
+
+
+def format_border_row(indent: str, canvas_width: int) -> str:
+    """Horizontal border line matching canvas pixel width."""
+    dashes = '-' * (canvas_width * 16 // 10 + 1)
+    prefix = f'{indent}'
+    pad    = max(0, COMMENT_COL - len(prefix))
+    return f'{prefix}{" " * pad}//      +{dashes}+\n'
+
+
+# ---------------------------------------------------------------------------
+# Byte-0 rewriter
+# ---------------------------------------------------------------------------
 
 def rewrite_byte0(line: str, n_rows: int, use_double: bool) -> str:
     m = BYTE0_LINE_RE.match(line.rstrip('\n'))
     if not m:
         return line
-    indent = m.group('indent')
-    tail   = m.group('tail').rstrip()
-    # Preserve trailing comma/semicolon but strip any existing comment
-    tail_clean = tail.strip()
-    comma = ''
-    for ch in tail_clean:
-        if ch in ',;':
-            comma = ch
-            break
-    if use_double:
-        value = f'SPRITE_DOUBLE | {n_rows}'
-    else:
-        value = str(n_rows)
+    indent     = m.group('indent')
+    tail_clean = m.group('tail').rstrip().strip()
+    comma      = next((ch for ch in tail_clean if ch in ',;'), '')
+    value      = f'SPRITE_DOUBLE | {n_rows}' if use_double else str(n_rows)
     return f'{indent}{value}{comma}\n'
 
+
+# ---------------------------------------------------------------------------
+# Main processor
+# ---------------------------------------------------------------------------
 
 def process_file(src: str) -> str:
     lines  = src.splitlines(keepends=True)
@@ -114,51 +157,84 @@ def process_file(src: str) -> str:
 
     while i < len(lines):
         if ARRAY_START_RE.search(lines[i]):
-            block_start = i
             result.append(lines[i])
             i += 1
 
-            # Collect scalar lines (before first ONE/TWO), recording their
-            # positions in result[] so we can rewrite byte 0 later.
-            scalars        = []
-            scalar_result_indices = []  # where each scalar line lands in result[]
-            pre_sprite_lines = []
+            # Collect scalar header lines (before first ONE/TWO), skipping
+            # any previously generated padding or border rows
+            scalars               = []
+            scalar_result_indices = []
             while i < len(lines) and not SP_LINE_RE.match(lines[i]):
+                if PADDING_ROW_RE.match(lines[i]) or BORDER_ROW_RE.match(lines[i]):
+                    i += 1  # discard old generated rows
+                    continue
                 m = SCALAR_RE.match(lines[i])
                 if m:
                     scalars.append(int(m.group(1), 0))
                     scalar_result_indices.append(len(result))
                 result.append(lines[i])
-                pre_sprite_lines.append(lines[i])
                 i += 1
 
             cx = scalars[1] if len(scalars) > 1 else -1
             cy = scalars[2] if len(scalars) > 2 else -1
 
-            # Collect all ONE/TWO lines
+            # Collect all ONE/TWO lines, stripping old padding/border rows
             sprite_lines = []
-            while i < len(lines) and SP_LINE_RE.match(lines[i]):
-                sprite_lines.append(lines[i])
+            while i < len(lines) and (SP_LINE_RE.match(lines[i])
+                                      or PADDING_ROW_RE.match(lines[i])
+                                      or BORDER_ROW_RE.match(lines[i])):
+                if SP_LINE_RE.match(lines[i]):
+                    sprite_lines.append(lines[i])
                 i += 1
 
-            n_rows     = len(sprite_lines)
-            use_double = any('TWO' in l for l in sprite_lines)
+            n_rows       = len(sprite_lines)
+            use_double   = any('TWO' in l for l in sprite_lines)
+            sprite_width = 16 if use_double else 8
 
-            # Rewrite byte 0 in result[]
+            # Rewrite byte 0
             if scalar_result_indices:
-                byte0_idx = scalar_result_indices[0]
-                result[byte0_idx] = rewrite_byte0(result[byte0_idx], n_rows, use_double)
+                result[scalar_result_indices[0]] = rewrite_byte0(
+                    result[scalar_result_indices[0]], n_rows, use_double)
 
-            # Declared rows now comes from what we just wrote
-            declared_rows = n_rows  # by definition, since we just set it
+            # Canvas geometry
+            (canvas_col_start, canvas_width,
+             extra_rows_above, extra_rows_below,
+             centre_row_from_top) = build_canvas_params(n_rows, sprite_width, cx, cy)
 
-            centre_row_from_top = (declared_rows - 1) - cy if 0 <= cy < declared_rows else -1
-            if not (0 <= centre_row_from_top < n_rows):
-                centre_row_from_top = -1
+            # Grab indent from first sprite line
+            indent_m = SP_LINE_RE.match(sprite_lines[0]) if sprite_lines else None
+            indent   = indent_m.group('indent') if indent_m else '    '
 
+            # Top border
+            result.append(format_border_row(indent, canvas_width))
+
+            # Extra rows ABOVE the sprite
+            for k in range(extra_rows_above):
+                canvas_row = k - extra_rows_above
+                is_cr      = (canvas_row == centre_row_from_top)
+                label      = '← centre' if is_cr else ''
+                result.append(format_padding_row(
+                    indent, cx, is_cr,
+                    canvas_col_start, canvas_width, sprite_width, label))
+
+            # Sprite rows
             for row_idx, sline in enumerate(sprite_lines):
-                is_centre_row = (row_idx == centre_row_from_top)
-                result.append(format_line(sline, cx, is_centre_row))
+                is_cr = (row_idx == centre_row_from_top)
+                result.append(format_sprite_line(
+                    sline, cx, is_cr, row_idx,
+                    canvas_col_start, canvas_width, sprite_width))
+
+            # Extra rows BELOW the sprite
+            for k in range(extra_rows_below):
+                canvas_row = n_rows + k
+                is_cr      = (canvas_row == centre_row_from_top)
+                label      = '← centre' if is_cr else ''
+                result.append(format_padding_row(
+                    indent, cx, is_cr,
+                    canvas_col_start, canvas_width, sprite_width, label))
+
+            # Bottom border
+            result.append(format_border_row(indent, canvas_width))
 
         else:
             result.append(lines[i])
@@ -166,6 +242,10 @@ def process_file(src: str) -> str:
 
     return ''.join(result)
 
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
 
 def main():
     if len(sys.argv) < 2:

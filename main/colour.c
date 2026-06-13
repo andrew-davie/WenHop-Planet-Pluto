@@ -27,7 +27,7 @@ int roller;
 
 
 void interleaveChronoColour(int *r) {
-    if (++*r > saveKeyEnableICC)
+    if (++*r > 2)    // saveKeyEnableICC)
         *r = 0;
 }
 
@@ -396,21 +396,21 @@ const unsigned char colourPool[][4] = {
 
 void loadPalette() {
 
-    //    unsigned char *c = (unsigned char *)colourPool;
+    unsigned char *c = (unsigned char *)colourPool;
 
     unsigned char rp[4];
     for (int i = 0; i < 4; i++)
         rp[i] = (getRandom32() & 0xF0) | 6;
 
-
-    rp[3] += 4;
-    //    currentPalette = 6;    // rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));    // tmp
+    rp[3] += 6;
+    //    currentPalette = rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));    // tmp
 
     // if (currentPalette > sizeof(colourPool) / sizeof(colourPool[0]))
     //     currentPalette = 0;
 
 
     //  c += ((currentPalette) << 2);
+    //  setBackgroundPalette(colourPool[currentPalette]);
     setBackgroundPalette(rp);
 }
 

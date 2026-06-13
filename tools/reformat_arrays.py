@@ -50,7 +50,7 @@ def reformat_array_body(bytes_list, indent):
         art = row_ascii(r, g, b)
         b0, b1, b2 = format_byte(r), format_byte(g), format_byte(b)
         comma = ',' #''' if row == 9 else ','
-        lines.append(f'{indent}    {b0}, {b1}, {b2}{comma}  // {row:1d} |{art}|')
+        lines.append(f'{indent}    {b0}, {b1}, {b2}{comma}  // {row:02d} |{art}|')
     return lines
 
 

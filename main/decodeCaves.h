@@ -3,10 +3,11 @@
 enum WEAPON {
 
     WEAPON_NONE = 0,
-    WEAPON_PIPE,
-    WEAPON_ROPE,
-    WEAPON_MACE,
-    WEAPON_GUN,
+
+    WEAPON_PIPE = (1 << 0),
+    WEAPON_ROPE = (1 << 1),
+    WEAPON_MACE = (1 << 2),
+    WEAPON_GUN = (1 << 03),
 };
 
 
