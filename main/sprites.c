@@ -91,7 +91,7 @@ const unsigned char shape_FRAME_16[] = {
 };
 
 
-const unsigned char shape_FRAME_17[] = {
+const unsigned char shape_FRAME_MINE_DOWN_0[] = {
 
     SPRITE_DOUBLE | 28,
     4,
@@ -129,7 +129,7 @@ const unsigned char shape_FRAME_17[] = {
 };
 
 
-const unsigned char shape_FRAME_18[] = {
+const unsigned char shape_FRAME_MINE_DOWN_1[] = {
 
     SPRITE_DOUBLE | 29,
     3,
@@ -985,7 +985,7 @@ const unsigned char shape_FRAME_45[] = {
 };
 
 
-const unsigned char shape_FRAME_47[] = {
+const unsigned char shape_FRAME_DIE_0[] = {
 
     SPRITE_DOUBLE | 26,
     7,
@@ -1021,7 +1021,7 @@ const unsigned char shape_FRAME_47[] = {
 };
 
 
-const unsigned char shape_FRAME_48[] = {
+const unsigned char shape_FRAME_DIE_1[] = {
 
     SPRITE_DOUBLE | 26,
     7,
@@ -1057,7 +1057,7 @@ const unsigned char shape_FRAME_48[] = {
 };
 
 
-const unsigned char shape_FRAME_49[] = {
+const unsigned char shape_FRAME_DIE_2[] = {
 
     SPRITE_DOUBLE | 23,
     7,
@@ -1090,7 +1090,7 @@ const unsigned char shape_FRAME_49[] = {
 };
 
 
-const unsigned char shape_FRAME_50[] = {
+const unsigned char shape_FRAME_DIE_3[] = {
 
     SPRITE_DOUBLE | 16,
     7,
@@ -1116,7 +1116,7 @@ const unsigned char shape_FRAME_50[] = {
 };
 
 
-const unsigned char shape_FRAME_51[] = {
+const unsigned char shape_FRAME_DIE_4[] = {
 
     SPRITE_DOUBLE | 13,
     7,
@@ -1957,82 +1957,6 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 };
 
 
-const unsigned char shape_FRAME_MINE_DOWN_0[] = {
-
-    SPRITE_DOUBLE | 27,
-    4,
-    4,
-                                                //      +--------------------------+
-    TWO( __XXXX__, ________, HMT0, BONE ),      // 00   |◼️◼️🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XXXXXX_, ________, HMT0, BONE ),      // 01   |◼️🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XXXXXX_, ________, HMT0, BONE ),      // 02   |◼️🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XXXXXXXX, ________, HMT0, BONE ),      // 03   |🟨🟨🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XXXXXXXX, ________, HMT1, BONE ),      // 04   |🟨🟨🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XXX___XX, ________, HMT1, BONE ),      // 05   |🟨🟨🟨◼️◼️◼️🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XXXX___X, ________, HMT1, HMT0 ),      // 06   |🟨🟨🟨🟨◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XX_X___X, ________, HMT1, HMT0 ),      // 07   |🟨🟨◼️🟨◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XX_____X, ________, HMT2, HMT0 ),      // 08   |🟨🟨◼️◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XX_____X, ________, HMT2, HMT1 ),      // 09   |🟨🟨◼️◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XX___X_, ________, HMT2, HMT1 ),      // 10   |◼️🟨🟨◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XX___X_, ________, HMT3, HMT1 ),      // 11   |◼️🟨🟨◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( __XXXX__, ________, HMT3, HMT2 ),      // 12   |◼️◼️🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ______X_, ________, BDY0, HMT2 ),      // 13   |◼️◼️◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XXXXXX_, ________, BDY0, HMT2 ),      // 14   |◼️🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XXX__XX, ________, BDY1, HMT3 ),      // 15   |◼️🟨🟨🟨◼️◼️🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _X_XX__X, ________, BDY1, HMT3 ),      // 16   |◼️🟨◼️🟨🟨◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( __X_XXXX, ________, BDY1, BDY1 ),      // 17   |◼️◼️🟨◼️🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ___X_XX_, ________, BDY2, BDY1 ),      // 18   |◼️◼️◼️🟨◼️🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( __X____X, ___X____, HMT1, BONE ),      // 19   |◼️◼️🟨◼️◼️◼️◼️🟨◼️◼️◼️🟨◼️◼️◼️◼️|
-    TWO( _XXXXXXX, X__XX___, HMT1, BONE ),      // 20   |◼️🟨🟨🟨🟨🟨🟨🟨🟨◼️◼️🟨🟨◼️◼️◼️|
-    TWO( XX_XXX_X, X__XX___, HMT2, BONE ),      // 21   |🟨🟨◼️🟨🟨🟨◼️🟨🟨◼️◼️🟨🟨◼️◼️◼️|
-    TWO( _X______, _X_X____, HMT2, BONE ),      // 22   |◼️🟨◼️◼️🟢◼️◼️◼️◼️🟨◼️🟨◼️◼️◼️◼️|
-    TWO( ________, _XX_____, BDY2, BONE ),      // 23   |◼️◼️◼️◼️◼️◼️◼️◼️◼️🟨🟨◼️◼️◼️◼️◼️|
-    TWO( ________, __X_____, HMT1, BONE ),      // 24   |◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️|
-    TWO( ________, _X______, HMT2, BONE ),      // 25   |◼️◼️◼️◼️◼️◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️|
-    TWO( ________, X_______, HMT0, BONE ),      // 26   |◼️◼️◼️◼️◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️|
-                                                //      +--------------------------+
-};
-
-
-const unsigned char shape_FRAME_MINE_DOWN_1[] = {
-
-    SPRITE_DOUBLE | 29,
-    3,
-    4,
-                                                //      +--------------------------+
-    TWO( __XXXX__, ________, HMT0, HMT0 ),      // 00   |◼️◼️🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XXXXXX_, ________, HMT0, HMT0 ),      // 01   |◼️🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XXXXXX_, ________, HMT0, HMT0 ),      // 02   |◼️🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XXXXXX_, ________, HMT1, HMT1 ),      // 03   |◼️🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XXXXXXXX, ________, HMT1, HMT1 ),      // 04   |🟨🟨🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XX_X__XX, ________, HMT1, HMT1 ),      // 05   |🟨🟨◼️🟨◼️◼️🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XXX___XX, ________, HMT1, HMT1 ),      // 06   |🟨🟨🟨◼️◼️◼️🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( X_X____X, ________, HMT1, HMT2 ),      // 07   |🟨◼️🟨◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( X______X, ________, HMT1, HMT2 ),      // 08   |🟨◼️◼️◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( X______X, ________, HMT2, HMT2 ),      // 09   |🟨◼️◼️◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _X____X_, ________, HMT2, BDY1 ),      // 10   |◼️🟨◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _X____X_, ________, HMT2, BDY1 ),      // 11   |◼️🟨◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( __XXXX__, ________, HMT2, BDY1 ),      // 12   |◼️◼️🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ________, ________, BDY1, BDY1 ),      // 13   |◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XXXXXX_, ________, BDY0, BDY2 ),      // 14   |◼️🟨🟨🟨🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XX___X_, ________, BDY1, BDY2 ),      // 15   |◼️🟨🟨◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( __XX_XX_, ________, BDY2, BDY2 ),      // 16   |◼️◼️🟨🟨◼️🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( __XX_XX_, ________, BDY2, BDY2 ),      // 17   |◼️◼️🟨🟨◼️🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ___X_X__, ________, BDY2, BDY2 ),      // 18   |◼️◼️◼️🟨◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( __X_X_X_, ________, BDY2, BDY2 ),      // 19   |◼️◼️🟨◼️🟨◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _XXX_XXX, ________, BDY2, BDY2 ),      // 20   |◼️🟨🟨🟨◼️🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( XX_X_X_X, X_______, HMT1, HMT1 ),      // 21   |🟨🟨◼️🟨◼️🟨◼️🟨🟨◼️◼️◼️◼️◼️◼️◼️|
-    TWO( _X_____X, ________, HMT2, HMT2 ),      // 22   |◼️🟨◼️◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ____X___, ________, BONE, BONE ),      // 23   |◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ____X___, ________, BONE, BONE ),      // 24   |◼️◼️◼️🟢🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ____X___, ________, BONE, BONE ),      // 25   |◼️◼️◼️◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ____XX_X, ________, BONE, BONE ),      // 26   |◼️◼️◼️◼️🟨🟨◼️🟨◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ____XXX_, ________, BONE, BONE ),      // 27   |◼️◼️◼️◼️🟨🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-    TWO( ___XX___, ________, BONE, BONE ),      // 28   |◼️◼️◼️🟨🟨◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
-                                                //      +--------------------------+
-};
-
-
 // clang-format on
 
 const unsigned char *const spriteShape[] = {
@@ -2066,36 +1990,33 @@ const unsigned char *const spriteShape[] = {
     shape_FRAME_MINE_DOWN_1,    // 26
     shape_FRAME_15,             // 27
     shape_FRAME_16,             // 28
-    shape_FRAME_17,             // 29
-    shape_FRAME_18,             // 30
-    shape_FRAME_19,             // 31
-    shape_FRAME_20,             // 32
-    shape_FRAME_21,             // 33
-    shape_FRAME_24,             // 34
-    shape_FRAME_25,             // 35
-    shape_FRAME_26,             // 36
-    shape_FRAME_27,             // 37
-    shape_FRAME_28,             // 38
-    shape_FRAME_29,             // 39
-    shape_FRAME_30,             // 40
-    shape_FRAME_31,             // 41
-    shape_FRAME_32,             // 42
-    shape_FRAME_33,             // 43
-    shape_FRAME_34,             // 44
-    shape_FRAME_35,             // 45
-    shape_FRAME_36,             // 46
-    shape_FRAME_37,             // 47
-    shape_FRAME_38,             // 48
-    shape_FRAME_40,             // 49
-    shape_FRAME_41,             // 50
-    shape_FRAME_42,             // 51
-    shape_FRAME_44,             // 52
-    shape_FRAME_45,             // 53
-    shape_FRAME_47,             // 54
-    shape_FRAME_48,             // 55
-    shape_FRAME_49,             // 56
-    shape_FRAME_50,             // 57
-    shape_FRAME_51,             // 58
+    shape_FRAME_20,             // 29
+    shape_FRAME_21,             // 30
+    shape_FRAME_24,             // 31
+    shape_FRAME_25,             // 32
+    shape_FRAME_26,             // 33
+    shape_FRAME_27,             // 34
+    shape_FRAME_28,             // 35
+    shape_FRAME_29,             // 36
+    shape_FRAME_30,             // 37
+    shape_FRAME_31,             // 38
+    shape_FRAME_32,             // 39
+    shape_FRAME_33,             // 40
+    shape_FRAME_34,             // 41
+    shape_FRAME_35,             // 42
+    shape_FRAME_36,             // 43
+    shape_FRAME_37,             // 44
+    shape_FRAME_38,             // 45
+    shape_FRAME_40,             // 46
+    shape_FRAME_41,             // 47
+    shape_FRAME_42,             // 48
+    shape_FRAME_44,             // 49
+    shape_FRAME_45,             // 50
+    shape_FRAME_DIE_0,          // 51
+    shape_FRAME_DIE_1,          // 52
+    shape_FRAME_DIE_2,          // 53
+    shape_FRAME_DIE_3,          // 54
+    shape_FRAME_DIE_4,          // 55
 };
 
 _Static_assert(sizeof(spriteShape) / sizeof(spriteShape[0]) == FRAME_MAX, "spriteShape table wrong size");

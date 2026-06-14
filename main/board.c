@@ -7,6 +7,7 @@
 #include "animations.h"
 #include "attribute.h"
 #include "board.h"
+#include "caveData.h"
 #include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
@@ -122,6 +123,7 @@ void setupBoardScanner() {
 
 
         gameFrame = 0;
+        gameTick++;
 
         ++selectorCounter;
         //        activated = isActive[++selectorCounter & 3];
@@ -282,8 +284,8 @@ void processTypes() {
 
         static unsigned char last = 0;
         unsigned char this = *Animate[TYPE_WEAPON];
-        if (this == CH_BLANK && this != last)
-            nDots(1, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 50, 5);
+        if (this == CH_DOGE_04 && this != last)
+            nDots(10, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 50, 5);
         last = this;
 
 
@@ -291,9 +293,12 @@ void processTypes() {
 
         unsigned char *next = me + _1ROW;
         if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
-            *next = FLAG(*me);
-            *me = FLAG(CH_BLANK);
+            *next = FLAG(CH_WEAPON_MACE_FALLING_BOTTOM);
+            *me = FLAG(CH_WEAPON_MACE_FALLING_TOP);
+
+            nDots(5, boardCol, boardRow, PT_TWO, 40, CHAR_CENTER_X, CHAR_CENTER_Y, 40, 2);
         }
+
 
         break;
     }
@@ -361,7 +366,7 @@ void processTypes() {
 
     case TYPE_GEODOGE:
 
-        if (!rangeRandom(250)) {
+        if ((!theCave->flags & CAVEDEF_STAR_STATIC) && !rangeRandom(250)) {
             *me = FLAG(CH_ROCK_PEBBLE_1);
             // FLASH(0x42, 10);
             //  nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
@@ -485,8 +490,8 @@ void setInsulatorPattern() {
         bool oc = sin_cos[(s + i * 20) & 31] < 128;
 
         if (oc && !onOff[i]) {
-            ADDAUDIO(SFX_ZAP);
-            ADDAUDIO(SFX_ZAP2);
+            // ADDAUDIO(SFX_ZAP);
+            // ADDAUDIO(SFX_ZAP2);
         }
         onOff[i] = oc;
     }
@@ -605,6 +610,15 @@ void processCreatures() {
 
         break;
     }
+
+
+    case CH_WEAPON_MACE_FALLING_TOP:
+        *me = FLAG(CH_DUST_ROCK_0);
+        break;
+
+    case CH_WEAPON_MACE_FALLING_BOTTOM:
+        *me = FLAG(CH_WEAPON_MACE);
+        break;
 
 
     case CH_ROCK:

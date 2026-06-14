@@ -52,36 +52,33 @@ enum FRAME {
     FRAME_MINE_DOWN_1,    // 26
     FRAME_15,             // 27
     FRAME_16,             // 28
-    FRAME_17,             // 29
-    FRAME_18,             // 30
-    FRAME_19,             // 31
-    FRAME_20,             // 32
-    FRAME_21,             // 33
-    FRAME_24,             // 34
-    FRAME_25,             // 35
-    FRAME_26,             // 36
-    FRAME_27,             // 37
-    FRAME_28,             // 38
-    FRAME_29,             // 39
-    FRAME_30,             // 40
-    FRAME_31,             // 41
-    FRAME_32,             // 42
-    FRAME_33,             // 43
-    FRAME_34,             // 44
-    FRAME_35,             // 45
-    FRAME_36,             // 46
-    FRAME_37,             // 47
-    FRAME_38,             // 48
-    FRAME_40,             // 49
-    FRAME_41,             // 50
-    FRAME_42,             // 51
-    FRAME_44,             // 52
-    FRAME_45,             // 53
-    FRAME_47,             // 54
-    FRAME_48,             // 55
-    FRAME_49,             // 56
-    FRAME_50,             // 57
-    FRAME_51,             // 58
+    FRAME_20,             // 29
+    FRAME_21,             // 30
+    FRAME_24,             // 31
+    FRAME_25,             // 32
+    FRAME_26,             // 33
+    FRAME_27,             // 34
+    FRAME_28,             // 35
+    FRAME_29,             // 36
+    FRAME_30,             // 37
+    FRAME_31,             // 38
+    FRAME_32,             // 39
+    FRAME_33,             // 40
+    FRAME_34,             // 41
+    FRAME_35,             // 42
+    FRAME_36,             // 43
+    FRAME_37,             // 44
+    FRAME_38,             // 45
+    FRAME_40,             // 46
+    FRAME_41,             // 47
+    FRAME_42,             // 48
+    FRAME_44,             // 49
+    FRAME_45,             // 50
+    FRAME_DIE_0,          // 51
+    FRAME_DIE_1,          // 52
+    FRAME_DIE_2,          // 53
+    FRAME_DIE_3,          // 54
+    FRAME_DIE_4,          // 55
 
     FRAME_MAX,
 

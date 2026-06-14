@@ -1,17 +1,20 @@
+#include "animations.h"
+#include "cavedata.h"
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
 
+#include "animations.h"
 #include "attribute.h"
 #include "caveData.h"
 #include "characterset.h"
 #include "decodecaves.h"
 #include "main.h"
 #include "mellon.h"
+#include "particle.h"
 #include "random.h"
 #include "scroll.h"
 #include "wyrm.h"
-
 
 /* **************************************** */
 /* Types */
@@ -77,6 +80,13 @@ void decodeCave(int cave) {
     theCaveData = (&(theCave->objectData)) + theCave->objectCount * 6;
 
     decodeState = DECODE_START;
+
+
+    if (theCave->flags & CAVEDEF_STAR_STATIC)
+        startCharAnimation(TYPE_WEAPON, AnimateWeapon + 7);
+
+    if (theCave->flags & CAVEDEF_START_WITH_WEAPON)
+        weapon = theCave->weapon[level];
 }
 
 unsigned char cmd;

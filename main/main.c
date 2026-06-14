@@ -87,6 +87,8 @@ unsigned char swcha;
 
 int gameSpeed;
 int gameFrame;
+int gameTick;
+
 
 int boardRow;
 int boardCol;

@@ -623,6 +623,8 @@ const unsigned char _CHAR_LAVA_MEDIUM[CHAR_Y] = {
 
 
 
+
+
 //     0b00000, // 00 <
 //     0b00000, // 01
 //     0b00000, // 02
@@ -732,6 +734,8 @@ const unsigned char _CHAR_WATER_3[CHAR_Y] = {
 
 
 const unsigned char _CHAR_WATERFLOW_0[] = {
+
+
 
 
 
@@ -1603,6 +1607,34 @@ const unsigned char _CHAR_WEAPON_MACE[CHAR_Y] = {
 };
 
 
+const unsigned char _CHAR_WEAPON_MACE_TOP[CHAR_Y] = {
+
+    0b00000, 0b00000, 0b00000,  // 00 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 01 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 02 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 03 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 04 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 05 |◼️◼️◼️◼️◼️|
+    0b00100, 0b00100, 0b00100,  // 06 |◼️◼️⬜️◼️◼️|
+    0b00100, 0b00100, 0b00100,  // 07 |◼️◼️⬜️◼️◼️|
+    0b10101, 0b11111, 0b11111,  // 08 |⬜️🟥⬜️🟥⬜️|
+    0b01110, 0b11111, 0b11111,  // 09 |🟥⬜️⬜️⬜️🟥|
+};
+
+const unsigned char _CHAR_WEAPON_MACE_BOTTOM[CHAR_Y] = {
+
+    0b00100, 0b01110, 0b01110,  // 00 |◼️🟥⬜️🟥◼️|
+    0b00100, 0b01110, 0b01110,  // 01 |◼️🟥⬜️🟥◼️|
+    0b01010, 0b01010, 0b01010,  // 02 |◼️⬜️◼️⬜️◼️|
+    0b01010, 0b01010, 0b01010,  // 03 |◼️⬜️◼️⬜️◼️|
+    0b00000, 0b00000, 0b00000,  // 04 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 05 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 06 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 07 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 08 |◼️◼️◼️◼️◼️|
+    0b00000, 0b00000, 0b00000,  // 09 |◼️◼️◼️◼️◼️|
+};
+
 const unsigned char _CHAR_DOGE_05[CHAR_Y] = {
 
     0b00000, 0b00000, 0b00000,  // 00 |◼️◼️◼️◼️◼️|
@@ -1653,7 +1685,6 @@ const unsigned char _CHAR_WYRM_2[CHAR_Y] = {
 // clang-format on
 
 const unsigned char *const charSet[] = {
-
 
 
     // see ChName @ attribute.h
@@ -1776,7 +1807,9 @@ const unsigned char *const charSet[] = {
     _CHAR_INSULATOR_TOP,             // 115 CH_INSULATOR_TOP
     _CHAR_INSULATOR_BOTTOM,          // 116 CH_INSULATOR_BOTTOM
     _CHAR_WEAPON_MACE,               // 117 CH_WEAPON_MACE
-    _CHAR_ROCK,                      // 118 CH_ROCK_BONUS
+    _CHAR_WEAPON_MACE_TOP,           // 118 CH_WEAPON_MACE_TOP
+    _CHAR_WEAPON_MACE_BOTTOM,        // 119 CH_WEAPON_MACE_BOTTOM
+    _CHAR_ROCK,                      // 120 CH_ROCK_BONUS
 };
 
 _Static_assert(sizeof(charSet) / sizeof(charSet[0]) == CH_MAX, "charSet table wrong size");

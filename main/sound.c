@@ -328,8 +328,8 @@ void initAudio(bool killTracks) {
 
 void startMusic() {
 
-    // loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
-    // loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
+    loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
+    loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
 }
 
 void killAudio(enum AudioID id) {

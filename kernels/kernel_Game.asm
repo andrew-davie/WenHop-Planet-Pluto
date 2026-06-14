@@ -103,22 +103,22 @@ div15Loop           sbc #15
                     sta WSYNC
                     sta HMOVE
 
-                    lda #0
-                    sta CTRLPF
+                    ldx #0
+                    stx CTRLPF
 
 ;                    lda #%101
-                    sta NUSIZ0
-                    sta NUSIZ1
+                    stx NUSIZ0
+                    stx NUSIZ1
 
-                    sta COLUBK
-                    sta COLUPF
-                    sta COLUP0
-                    sta COLUP1
-                    sta GRP0
-                    sta GRP1
-                    sta PF0
-                    sta PF1
-                    sta PF2
+                    stx COLUBK
+                    stx COLUPF
+                    stx COLUP0
+                    stx COLUP1
+                    stx GRP0
+                    stx GRP1
+                    stx PF0
+                    stx PF1
+                    stx PF2
                     rts
 
 

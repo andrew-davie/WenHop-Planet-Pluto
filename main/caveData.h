@@ -8,6 +8,8 @@ extern unsigned char caveFlags;
 #define CAVEDEF_LOCK_X 4
 #define CAVEDEF_LOCK_Y 2
 #define CAVEDEF_NOBORDER 1
+#define CAVEDEF_STAR_STATIC 8
+#define CAVEDEF_START_WITH_WEAPON 16
 
 
 #define DRAW_EOF 255

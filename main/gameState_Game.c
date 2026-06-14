@@ -96,6 +96,7 @@ void initGameState_Game() {
 
     gameSpeed = 6;
     gameFrame = gameSpeed;    // force rollover
+    gameTick = 0;
 
 
 #if ENABLE_SHAKE
@@ -116,8 +117,8 @@ void initGameState_Game() {
 
 
     sound_volume = VOLUME_PLAYING;
-    loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
-    loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
+    // loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
+    // loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
 }
 
 

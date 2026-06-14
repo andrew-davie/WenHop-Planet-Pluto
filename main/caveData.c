@@ -76,6 +76,9 @@ const unsigned char caveUseWall[] = {
 
     // Start of cave draw
 
+
+    CH_ROCK_BONUS, 7,3,
+
     DRAW_RECT,CH_BRICKWALL, 0,1,40,8,
 
     CH_INSULATOR_TOP, 6,2,
@@ -166,7 +169,7 @@ const unsigned char caveWyrms[] = {
     WEAPON_MACE,                    //3
     WEAPON_MACE,                    //4
 
-    CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y, CH_BLANK, CH_BRICKWALL,
+    CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y|CAVEDEF_START_WITH_WEAPON, CH_BLANK, CH_BRICKWALL,
 
     0,
 
@@ -917,6 +920,101 @@ const unsigned char caveA3[] = {
 };
 
 
+const unsigned char starsAndStripes[] = {
+    // clang-format off
+
+    20,    // milling
+    1, 15, // doge $
+    0,     //              ,          // rain
+    
+    10,                             //0
+    11,                             //1
+    50,                             //2
+    56,                             //3
+    8,                              //4 randomiser[level]
+
+    15,                             //0
+    15,                             //1
+    15,                             //2
+    15,                             //3
+    15,                             //4
+    
+    20,                             //0
+    200,                            //1
+    200,                            //2
+    200,                            //3
+    200,                            //4
+
+    WEAPON_MACE,                    //0
+    WEAPON_NONE,                    //1
+    WEAPON_NONE,                    //2
+    WEAPON_NONE,                    //3
+    WEAPON_NONE,                    //4
+
+    CAVEDEF_STAR_STATIC|CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y, CH_BRICKWALL, CH_DIRT,
+
+    0,
+    //CH_WEAPON_MACE, 50,10,10,10,10,
+
+    DRAW_FILLED_RECT, CH_BRICKWALL, 1,1,9,8, CH_DOGE_00,
+    DRAW_FILLED_RECT, 0x80|CH_WEAPON_MACE, 2, 2, 7, 6, 8,
+
+
+    // LINER(CH_STEELWALL, 12,0,20,2)
+    // LINER(CH_STEELWALL, 12,2,20,2)
+    // LINER(CH_STEELWALL, 12,4,20,2)
+    // LINER(CH_STEELWALL, 12,6,20,2)
+    // LINER(CH_STEELWALL, 12,8,20,2)
+    // LINER(CH_STEELWALL, 12,10,20,2)
+    // LINER(CH_STEELWALL, 12,12,20,2)
+    // LINER(CH_STEELWALL, 12,14,20,2)
+
+    // DRAW_FILLED_RECT, CH_DIRT, 0, 0, 8, 8,CH_DIRT,
+
+    // CH_WEAPON_MACE, 1,1,
+    // CH_WEAPON_MACE, 3,1,
+    // CH_WEAPON_MACE, 5,1,
+    // CH_WEAPON_MACE, 7,1,
+    // CH_WEAPON_MACE, 9,1,
+    // CH_WEAPON_MACE, 11,1,
+
+    // CH_WEAPON_MACE, 2,2,
+    // CH_WEAPON_MACE, 4,2,
+    // CH_WEAPON_MACE, 5,2,
+    // CH_WEAPON_MACE, 8,2,
+    // CH_WEAPON_MACE, 10,2,
+
+    // CH_WEAPON_MACE, 1,3,
+    // CH_WEAPON_MACE, 3,3,
+    // CH_WEAPON_MACE, 5,3,
+    // CH_WEAPON_MACE, 7,3,
+    // CH_WEAPON_MACE, 9,3,
+    // CH_WEAPON_MACE, 11,3,
+
+    // CH_WEAPON_MACE, 2,4,
+    // CH_WEAPON_MACE, 4,4,
+    // CH_WEAPON_MACE, 5,4,
+    // CH_WEAPON_MACE, 8,4,
+    // CH_WEAPON_MACE, 10,4,
+
+        CH_MELLON_HUSK_BIRTH, 2, 2,
+
+
+    DRAW_EOF,
+
+    // EXTRAS
+    // LEVEL 0
+    DRAW_EOF, // LEVEL 1
+    DRAW_EOF, // LEVEL 2
+    DRAW_EOF, // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,
+
+    'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
+    // clang-format on
+};
+
+
 const unsigned char caveA4[] = {
     // clang-format off
 
@@ -948,18 +1046,21 @@ const unsigned char caveA4[] = {
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_LOCK_Y, CH_STEELWALL, CH_DIRT,
+    CAVEDEF_LOCK_Y, CH_DIRT, CH_DIRT,
 
     2,
     CH_GEODOGE, 100, 100, 100, 100, 100,
     CH_BLANK, 50, 10, 5, 0, 20,
     CH_ROCK, 120, 10, 5, 0, 20,
 
-    DRAW_RECT, CH_BRICKWALL, 9, 2, 22, 7,
-    DRAW_FILLED_RECT, CH_DIRT, 10, 3, 20, 5,CH_DIRT,
-    DRAW_FILLED_RECT, 0x80|CH_ROCK, 10,3, 20, 5, 8,
-    DRAW_FILLED_RECT, 0x80|CH_GEODOGE, 10, 3, 18, 4, 6,
-    DRAW_FILLED_RECT, 0x80|CH_ROCK_BONUS, 10, 3, 18, 4, 6,
+    LINER(CH_STEELWALL, 0, 21, 40, 2)   // protective catch-all wall bottom
+
+    DRAW_RECT, CH_BRICKWALL, 8, 1, 22, 8,
+    DRAW_FILLED_RECT, CH_DIRT, 9, 2, 20, 6,CH_DIRT,
+    DRAW_FILLED_RECT, 0x80|CH_BLANK, 9, 2, 18, 5, 2,
+    DRAW_FILLED_RECT, 0x80|CH_ROCK, 9,2, 20, 6, 20,
+    DRAW_FILLED_RECT, 0x80|CH_GEODOGE, 9, 2, 18, 5, 6,
+    DRAW_FILLED_RECT, 0x80|CH_ROCK_BONUS, 9, 2, 18, 5, 26,
 
     //    LINER(CH_HORIZ_ZAP_0, 13,7,10,R)
     // LINER(CH_DOGE_00, 13,8,16,R)
@@ -973,7 +1074,7 @@ const unsigned char caveA4[] = {
     // CH_ROCK, 1, 4,
     // CH_ELECTRIC_0, 12, 5,
     CH_INSULATOR_BOTTOM,12,7,
-    CH_INSULATOR_TOP,12,3,
+    CH_INSULATOR_TOP,12,2,
 
     CH_WEAPON_MACE, 13,6,
 
@@ -998,14 +1099,15 @@ const unsigned char caveA4[] = {
 
     CH_MELLON_HUSK_BIRTH, 11, 4,
 
+
     // CH_INSULATOR_TOP,18,4,
     // CH_ELECTRIC_0, 18,6,
     CH_INSULATOR_BOTTOM,18,7,
-    CH_INSULATOR_TOP,18,3,
+    CH_INSULATOR_TOP,18,2,
  
     // CH_ELECTRIC_0, 18,6,
     CH_INSULATOR_BOTTOM,24,7,
-    CH_INSULATOR_TOP,24,3,
+    CH_INSULATOR_TOP,24,2,
 
     DRAW_EOF,
 
@@ -1023,11 +1125,12 @@ const unsigned char caveA4[] = {
 
 const unsigned char *caveList[] = {
 
-    caveA4,         //
-    caveA,          //
-    caveWyrms,      //
-    caveUseWall,    //
-    caveA2,         // best
+    caveUseWall,        //
+    caveA4,             //
+    starsAndStripes,    //
+    caveWyrms,          //
+    caveA,              //
+    caveA2,             // best
     // caveA3,         //
 
     // caveMace,

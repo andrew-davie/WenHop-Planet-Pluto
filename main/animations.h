@@ -16,5 +16,6 @@ void processCharAnimations();
 void toggleGears(bool active);
 
 extern const unsigned char AnimateRockBonus[];
+extern const unsigned char AnimateWeapon[];
 
 // EOF

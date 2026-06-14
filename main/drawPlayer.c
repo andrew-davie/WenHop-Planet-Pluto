@@ -72,6 +72,9 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
     myMemsetInt((unsigned int *)(RAM + _BUF_GAME_GRP0), 0, _BUFFER_SIZE * 2 / 4);
 
+    if (gameTick < 2)
+        return;    // coalesce initial geodoge
+
     static int root = 0;
     root++;
 
@@ -126,8 +129,6 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
         int frameXOffset = -*(const signed char *)spr++;
         int frameYOffset = *(const signed char *)spr++;
-
-        doges = frameXOffset;
 
         int lavaLine = (lavaSurfaceTrixel - (scrollY >> 16)) * 3;
         playerSpriteY = ypos - frameYOffset - 1;

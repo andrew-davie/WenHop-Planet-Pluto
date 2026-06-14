@@ -1,5 +1,6 @@
 #include <stdbool.h>
 
+#include "cavedata.h"
 #include "defines_dasm.h"
 
 
@@ -7,8 +8,10 @@
 
 #include "animations.h"
 #include "attribute.h"
+#include "caveData.h"
 #include "characterset.h"
 #include "colour.h"
+#include "decodeCaves.h"
 #include "main.h"
 #include "reverseBits.h"
 #include "score.h"
@@ -158,7 +161,7 @@ const unsigned char _CHAR_INNER_CORNER_15[] = {
 };
 
 
-const unsigned char *const roundedCorner[] = {
+const unsigned char *const roundedCorner[16] = {
 
     _CHAR_BLANK,              // 00
     _CHAR_BLANK,              // 01 U
@@ -230,6 +233,10 @@ const unsigned int arenas[] = {
 
 void drawScreen() {    // --> cycles 62870 (@20230616)
 
+    if (gameTick < 2)
+        return;    // allow geodoge to coalesce
+
+
     int sY = scrollY;
     int sX = scrollX;
 
@@ -271,6 +278,8 @@ void drawScreen() {    // --> cycles 62870 (@20230616)
 
         for (int half = 0; half < 2; half++) {
 
+            unsigned char leftMask = !half && theCave->flags & CAVEDEF_LOCK_X ? 0b11100000 : 0b11110000;
+
             grabCharacters();
 
             unsigned char *pf0 = RAM + arenas[half] + scanline;
@@ -289,7 +298,7 @@ void drawScreen() {    // --> cycles 62870 (@20230616)
 
                 *(pf0 + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)px];
                 *(pf0 + _BUFFER_SIZE) = px >> 8;
-                *pf0++ = reverseBits[px >> 16];
+                *pf0++ = reverseBits[px >> 16] & leftMask;
             }
         }
 

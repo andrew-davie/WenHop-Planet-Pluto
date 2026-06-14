@@ -123,7 +123,9 @@ const enum ObjectType CharToType[] = {
     TYPE_INSULATOR,                // 115 CH_INSULATOR_TOP
     TYPE_INSULATOR,                // 116 CH_INSULATOR_BOTTOM
     TYPE_WEAPON,                   // 117 CH_WEAPON_MACE
-    TYPE_ROCK_BONUS,               // 118 CH_ROCK_BONUS
+    TYPE_WEAPON_FALLING,           // 118 CH_WEAPON_MACE_TOP
+    TYPE_WEAPON_FALLING,           // 119 CH_WEAPON_MACE_BOTTOM
+    TYPE_ROCK_BONUS,               // 120 CH_ROCK_BONUS
 };
 
 _Static_assert(sizeof(CharToType) / sizeof(CharToType[0]) == CH_MAX, "CharToType table wrong size");
@@ -187,7 +189,7 @@ const unsigned int Attribute[] = {
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ |CRU| _  , // 13 TYPE_ROCK_FALLING,
     _ |PAD| _ | _ | _ |PH2| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |SPC|PER|XPD| _ | _ | _  , // 14 TYPE_DUST_ROCK,
     _ |PAD| _ |MLT| _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ |ROL , // 15 TYPE_CONVERT_GEODE_TO_DOGE
-    _ | _ | _ | _ | _ |PH1|PIP| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 16 TYPE_PUSHER,
+    _ | _ | _ | _ | _ |PH4|PIP| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 16 TYPE_PUSHER,
     _ | _ | _ | _ | _ |PH1|PIP| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 17 TYPE_PUSHER_VERT,
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 18 TYPE_WYRM,
     _ |PAD|DGE|MLT| _ |PH2| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ |ROL , // 19 TYPE_GEODOGE,
@@ -214,7 +216,8 @@ const unsigned int Attribute[] = {
     _ |PAD| _ | _ |DIS|PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _  , // 40 TYPE_ROCK_PEBBLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 41 TYPE_ELECTRIC
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ |MIN| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 42 TYPE_INSULATOR
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PER| _ | _ | _ | _  , // 43 TYPE_WEAPON
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |GRB| _ | _ |PER| _ | _ | _ | _  , // 43 TYPE_WEAPON
+    _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ |CRU| _  , // 20 TYPE_WEAPON_FALLING
     _ |PAD| _ |MLT| _ |PH1| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ |ROL , // 06 TYPE_ROCK_BONUS
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+----+
 

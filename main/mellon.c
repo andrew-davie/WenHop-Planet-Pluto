@@ -3,6 +3,7 @@
 #include "animations.h"
 #include "attribute.h"
 #include "board.h"
+#include "caveData.h"
 #include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
@@ -310,6 +311,12 @@ bool checkHighPriorityMove(int dir) {
             //     lockDisplay = false;
             // }
 
+            if (type == TYPE_WEAPON) {
+
+                weapon = theCave->weapon[level];
+                nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
+            }
+
             else if (Attribute[destType] & ATT_GRAB) {
                 grabDoge(/* meOffset */);
                 //     grabbed = true;
@@ -317,12 +324,6 @@ bool checkHighPriorityMove(int dir) {
                 nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
             }
 
-            else if (type == TYPE_WEAPON) {
-
-                extern int weapon;
-                weapon = WEAPON_MACE;    // theCave->weapon[level];
-                FLASH(0xC6, 10);
-            }
 
             playerX += xdir[dir];
             playerY += ydir[dir];
@@ -472,7 +473,8 @@ bool checkLowPriorityMove(int dir) {
     enum ObjectType destType = CharToType[GET(*meOffset)];
 
 #if 1    // disable push
-    if (/*faceDirectionDef[dir] && */ (Attribute[destType] & (ATT_MINE | ATT_PIPE))) {
+    if (/*faceDirectionDef[dir] && */ (!(theCave->flags & CAVEDEF_STAR_STATIC)) &&
+        (Attribute[destType] & (ATT_MINE | ATT_PIPE))) {
 
         // FLASH(0x94, 4);
 

@@ -796,7 +796,7 @@ void drawDoge() {
         // scoreLineNew[0] = DIGIT_DOGE;
         scoreLineColour[1] = scoreLineColour[0] = rangeRandom(8);
     }
-    drawDecimal2(scoreLineNew + 2, scoreLineColour + 1, RGB_YELLOW, doges < 0 ? -doges : doges);
+    drawDecimal2(scoreLineNew + 2, scoreLineColour + 1, rangeRandom(8), doges < 0 ? -doges : doges);
 }
 
 void drawTime() {
@@ -840,7 +840,7 @@ void drawTheScore(int score) {
 
 void drawScore() {
 
-    doubleSizeScore(0, 0, 'a', 7);
+    //    doubleSizeScore(0, 0, 'a', 7);
 
     static int scc = 0;
     scc++;
@@ -869,7 +869,7 @@ void drawScore() {
     switch (scoreCycle) {
     case SCORELINE_TIME:
     case SCORELINE_SCORE:
-        drawDoge();
+        //        drawDoge();
         //        drawTime();
         //        break;
         // drawTheScore(actualScore);

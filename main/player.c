@@ -284,11 +284,27 @@ const signed char AnimationXray[] = {
 
 const signed char AnimationSkeleton[] = {
 
-    FRAME_SKELETON1, 28,
-    FRAME_SKELETON2, 8,
-    FRAME_SKELETON3, 8,
-    FRAME_SKELETON4, 8,
-    FRAME_SKELETON5, 8,
+
+    FRAME_STAND, 6,
+    FRAME_DIE_0, 6,
+    FRAME_STAND, 6,
+    FRAME_DIE_0, 6,
+    FRAME_STAND, 6,
+    FRAME_DIE_0, 6,
+
+
+    FRAME_DIE_0, 20,
+    FRAME_DIE_1, 6,
+    FRAME_DIE_2, 6,
+    FRAME_DIE_3, 6,
+    FRAME_DIE_4, 6,
+
+
+    // FRAME_SKELETON1, 28,
+    // FRAME_SKELETON2, 8,
+    // FRAME_SKELETON3, 8,
+    // FRAME_SKELETON4, 8,
+    // FRAME_SKELETON5, 8,
 
     FRAME_BLANK, 255,
     //    ACTION_LOOP,

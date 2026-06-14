@@ -13,6 +13,8 @@ const unsigned char AnimateWeapon[] = {
     CH_DOGE_04, 5,
     CH_BLANK, 10,
     ANIM_LOOP,
+
+    CH_WEAPON_MACE,0,
 };
 
 const unsigned char AnimateRockBonus[] = {
@@ -268,6 +270,7 @@ const unsigned char *const AnimateBase[] = {
     0,                    // 41 TYPE_ELECTRIC_0
     0,                    // 42 TYPE_INSULATOR
     AnimateWeapon,        // 43 TYPE_WEAPON
+    0,                    // 44 TYPE_WEAPON_FALLING
     AnimateRockBonus,     // 44 TYPE_ROCK_BONUS
 };
 

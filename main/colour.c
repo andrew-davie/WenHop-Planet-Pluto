@@ -27,7 +27,7 @@ int roller;
 
 
 void interleaveChronoColour(int *r) {
-    if (++*r > 2)    // saveKeyEnableICC)
+    if (++*r > saveKeyEnableICC)
         *r = 0;
 }
 
@@ -107,8 +107,38 @@ void setPFColours(unsigned char *colours) {
     }
 }
 
-#define FRANGE (0x100 / _BOARD_ROWS)
-void setBackgroundPalette(unsigned char *c) {
+
+#define BG_LINES_RCP (0x10000 / (_BOARD_ROWS - 1))
+
+// void build_bg_gradient(unsigned char start_col, unsigned char end_col) {
+
+//     int start_hue = (start_col >> 4) & 0xF;
+//     int start_lum = start_col & 0x7;
+//     int end_hue   = (end_col >> 4) & 0xF;
+//     int end_lum   = end_col & 0x7;
+
+//     int hue_fp   = (int)start_hue << 16;
+//     int lum_fp   = (int)start_lum << 16;
+//     int hue_step = (int)(end_hue - start_hue) * BG_LINES_RCP;
+//     int lum_step = (int)(end_lum - start_lum) * BG_LINES_RCP;
+
+//     for (int i = 0; i < _BOARD_ROWS; i++) {
+//         int hue = (hue_fp >> 16) & 0xF;
+//         int lum = (lum_fp >> 16) & 0x7;
+//         bgPalette[i] = (unsigned char)((hue << 4) | lum);
+//         hue_fp += hue_step;
+//         lum_fp += lum_step;
+//     }
+// }
+
+
+#define FRANGE (0x100 / (_BOARD_ROWS - 1))
+void setBackgroundPalette(unsigned char *cx) {
+
+    unsigned char c[4];
+    for (int i = 0; i < 4; i++)
+        c[i] = cx[i];
+
 
     if (_tvSystem == _TV_SYSTEM_SECAM) {
         int colour = convertColour(c[2]);
@@ -118,6 +148,26 @@ void setBackgroundPalette(unsigned char *c) {
 
     else {
 
+
+#if 0
+        // int start_hue = (c[2] >> 4) & 0xF;
+        // int start_lum = c[2] & 0x7;
+        // int end_hue = (c[3] >> 4) & 0xF;
+        // int end_lum = c[3] & 0x7;
+
+        // int hue_fp = (int)start_hue << 16;
+        // int lum_fp = (int)start_lum << 16;
+        // int hue_step = (int)(end_hue - start_hue) * BG_LINES_RCP;
+        // int lum_step = (int)(end_lum - start_lum) * BG_LINES_RCP;
+
+        // for (int i = 0; i < _BOARD_ROWS; i++) {
+        //     int hue = (hue_fp >> 16) & 0xF;
+        //     int lum = (lum_fp >> 16) & 0x7;
+        //     bgPalette[i] = (unsigned char)((hue << 4) | lum);
+        //     hue_fp += hue_step;
+        //     lum_fp += lum_step;
+        // }
+#else
         int c1 = c[2] & 0xF0;
         int c2 = c[3] & 0xF0;
         int i1 = c[2] & 0xF;
@@ -136,6 +186,7 @@ void setBackgroundPalette(unsigned char *c) {
             i1 += iStep;
             c1 += cStep;
         }
+#endif
     }
 
     fgPalette[0] = convertColour(c[0]);
@@ -145,17 +196,17 @@ void setBackgroundPalette(unsigned char *c) {
 
 void setPalette() {
 
-    int shift = 16;
 
     //  interleaveColour();
 
     unsigned char bgCol = colubk;    // tmp flashTime ? ARENA_COLOUR : 0;
+    const int shift = 16;
 
     int i = 0;
     unsigned char *pfCol = RAM + _BUF_GAME_COLUPF;
     unsigned char *bkCol = RAM + _BUF_GAME_COLUBK;
 
-    int bgCharLine = (scrollY >> shift) * 3;
+    int bgCharLine = (scrollY >> 16) * 3;
     int pfCharLine = 0;
 
     while (bgCharLine >= CHAR_Y) {
@@ -168,8 +219,8 @@ void setPalette() {
 
     unsigned char rollColour[5];
 
-    rollColour[0] = rollColour[3] = fgPalette[1];
-    rollColour[1] = rollColour[4] = bgPalette[pfCharLine];
+    rollColour[0] = rollColour[3] = bgPalette[pfCharLine];
+    rollColour[1] = rollColour[4] = fgPalette[1];
     rollColour[2] = fgPalette[0];
 
     int roll = roller;
@@ -206,7 +257,7 @@ void setPalette() {
         bgCharLine += 3;
         if (bgCharLine >= CHAR_Y) {
             bgCharLine = 0;
-            rollColour[1] = rollColour[4] = bgPalette[++pfCharLine];
+            rollColour[0] = rollColour[3] = bgPalette[++pfCharLine];
         }
 
         i += 3;
@@ -239,158 +290,114 @@ void setPalette() {
 
 
 const unsigned char colourPool[][4] = {
-    // clang-format off
 
-    {0xC4, 0x28, 0xB8, 0xB8},    // 00
-    {0x98, 0x24, 0x86, 0x46},    // 01
-    {0x16, 0x96, 8, 2},          // 02
-    {0xA6, 0x24, 0x32, 0x52},    // 03
-    {0x88, 0xD6, 20, 20},        // 04
-    {0xA6, 0xC4, 0x46, 0x22},    // 05
-    {0x98, 0x24, 4, 4},          // 06
-    {0x26, 0xD4, 0x84, 0xE4},    // 07
+#if 0
 
-    /*;    dc 0xB6, 0x28, 0x82, 0x82
-    ;    dc 10, 12, 8, 8
-
-        ; 7
-        dc 0x44, 0xA6, 0xC6, 0xE6
-    ;    dc 0x4A, 0xB4, 0x64, 0x64 ;0x66, 0xB4, 0xC2, 0xC2
-    ;    dc 10, 12, 8, 8
-
-        ; 8
-        dc 0x96, 0x24, 0xF6, 0xC6
-    ;    dc 0x68, 0x76, 0x54, 0x54 ;0xB4, 0x24, 0x32, 0x32
-    ;    dc 10, 12, 8, 8
-
-        ; 9=J
-        dc 0x26, 0x46, 0x98, 0x66
-    ;    dc 0x96, 0x84, 0x82, 0x82
-    ;    dc 10, 12, 8, 8
-
-        ; 10=K
-        dc 0x36, 0x94, 0xC6, 0xb4
-     ;   dc 0x46, 0x32, 0xA2, 0xA2
-     ;   dc 10, 12, 8, 8
-
-        ; 11=L
-        dc 0x06, 0x34, 0x96, 0xB4
-     ;   dc 0xEA, 0x46, 0x94, 0x94
-     ;   dc 10, 12, 8, 8
-
-        ; 12
-        dc 0xD6, 0x34, 0xA6, 0x74
-     ;   dc 0x96, 0x46, 0xA2, 0xA2
-     ;   dc 8, 4, 10, 10
-
-        ; 13
-        dc 0x38, 0xD4, 0x44, 0xC4
-     ;   dc 0x66, 0x72, 0x92, 0x92
-     ;   dc 10, 8, 12, 12
-
-        ; 14 tan rock purple soil aqua doge good glint
-        dc 0x38, 0xA4, 0x64, 0x44
-     ;   dc 0x96, 0x68, 0x92, 0x92 ;0x66, 0x72, 0x92, 0x92
-     ;   dc 4, 8, 10, 10
-
-        ; 15 purple rock light blue doge green mortar good glint
-        dc 0x78, 0xC4, 0x26, 0xB4
-     ;   dc 0x4A, 0x94, 0xA4, 0xA4 ;0x66, 0x72, 0x92, 0x92
-     ;   dc 0xA0, 0x08, 0x04, 0x04
+    {0x08, 0x46, 0x52, 0x56},    //
 
 
+#else
 
 
+    // 0
+    {0x04, 0x08, 0x0A, 0x0A},    //
+    {0x06, 0x34, 0x96, 0xB6},    //
+    {0x06, 0xD4, 0xA6, 0x96},    //
+    {0x08, 0x04, 0x0A, 0x0A},    //
+    {0x08, 0x46, 0x52, 0x56},    //
+    {0x0A, 0x36, 0xA4, 0xA6},    //
 
+    // 1
+    {0x14, 0xA4, 0x04, 0x06},    //
+    {0x16, 0x96, 0x08, 0x06},    //
 
-    ;     ;0
+    // 2
+    {0x26, 0x36, 0xA8, 0x46},    //
+    {0x26, 0x46, 0x98, 0x66},    //
+    {0x26, 0x66, 0x98, 0xB8},    //
+    {0x26, 0xD4, 0x54, 0x06},    //
+    {0x26, 0xD4, 0x84, 0xE6},    //
+    {0x28, 0x06, 0x52, 0x56},    //
+    {0x2A, 0xA8, 4, 6},          //
 
-    ; ;    dc $14, 0xA4, 4, 4
-    ;     dc 0x2A, 0xA8, 4, 4
-    ; ;    dc 12, 10, 14, 14
+    // 3
+    {0x34, 0x56, 0xC6, 0x06},    //
+    {0x34, 0xD4, 0x54, 0x06},    //
+    {0x36, 0x94, 0xC6, 0xb6},    //
+    {0x36, 0xA6, 0x54, 0x56},    //
+    {0x36, 0xD6, 0x56, 0x56},    //
+    {0x38, 0xA6, 0x66, 0x46},    //
+    {0x38, 0xD6, 0x46, 0xC6},    //
+    {0x3A, 0x96, 0x46, 0x46},    //
+    {0x3A, 0xA6, 0x56, 0x56},    //
 
-    ;     ;1
-    ; ;    dc 0x56, 0x24, 0xD2, 0xC2
-    ;     dc 0xA6, 0x26, 0xD4, 0xD4
-    ; ;    dc 10, 12, 8, 8
+    // 4
+    {0x46, 0xA6, 0xC6, 0xE6},    //
+    {0x46, 0xD6, 0xB8, 0x88},    //
+    {0x46, 0x96, 0xC6, 0xC6},    //
+    {0x46, 0xA6, 0xA6, 0xA6},    //
+    {0x48, 0xA6, 0xC6, 0xC6},    //
+    {0x4A, 0x96, 0xA6, 0xA6},    //
+    {0x4A, 0xB6, 0x66, 0x66},    //
 
-    ;     ; 2
-    ; ;    dc 0x58, 0yD8, 0x28, 0xC4
-    ;     dc  0x08, 0x46, 0x52, 0x52 ;0yD6, 0x36, 18, 18
-    ; ;    dc 6, 10, 12, 12
+    // 5
+    {0x50, 0x08, 0x06, 0x06},    // interesting
+    {0x56, 0x26, 0xD6, 0xC6},    //
+    {0x56, 0xC6, 0x36, 0x26},    //
+    {0x58, 0xD8, 0x28, 0xC6},    //
 
-    ;     ; 3*
-    ; ;    dc 0x56, 0yC4, 0x36, 0x22
-    ;     dc 0x2A, 0x48, 0x34, 0x34 ;0xA4, 0xC4, 0x34, 0x34
-    ; ;    dc 10, 12, 4, 4
+    // 6
+    {0x66, 0xB6, 0xC6, 0xC6},    //
+    {0x68, 0x76, 0x56, 0x56},    //
 
-    ;     ; 4
-    ; ;    dc 0xA8, 0x24, 4, 4
-    ;     dc 0x94, 0x36, 2, 2
-    ; ;    dc 10, 12, 8, 8
+    // 7
+    {0x78, 0xC6, 0x26, 0xB6},    //
 
-    ;     ; 5*
-    ;     dc 0x26, 0xD4, 0x54, 0x04     ; NTSC  BOO's preferred
-    ; ;        dc 0x34, 0xA4, 0x52, 0x52
-    ; ;    dc 0x34, 0xD4, 0x54, 0x04
+    // 8
+    {0x88, 0xD6, 0x16, 0x16},    //
 
-    ; ;x    dc 0xA8, 0x36, 0x92, 0x92
-    ; ;    dc 10, 12, 8, 8
+    // 9
+    {0x96, 0x26, 0xD6, 0xD6},    //
+    {0x96, 0x36, 6, 6},          //
+    {0x96, 0x26, 0xF6, 0xC6},    //
+    {0x96, 0x28, 0x56, 0x56},    //
+    {0x96, 0x46, 0xA6, 0xA6},    //
+    {0x98, 0x26, 6, 6},          //
+    {0x98, 0x26, 0x86, 0x46},    //
 
-    ;     ; 6
-    ; ;    dc 0xA8, 0x24, 0x56, 0x36
-    ;     dc 0x96, 0x28, 0x52, 0x52
-    ; ;    dc 10, 12, 8, 8
+    // A
+    {0xA6, 0xC6, 0x36, 0x36},    //
+    {0xA6, 0x26, 0x36, 0x56},    //
+    {0xA6, 0x26, 0xF6, 0xC6},    //
+    {0xA6, 0x26, 0xD6, 0xD6},    //
+    {0xA6, 0x36, 0x56, 0x56},    //
+    {0xA6, 0x48, 0xA6, 0xA6},    //
+    {0xA6, 0xC6, 0x46, 0x26},    //
+    {0xA8, 0x26, 6, 6},          //
+    {0xA8, 0x26, 0x56, 0x36},    //
+    {0xA8, 0x36, 0x96, 0x96},    //
+    {0xA8, 0xC6, 0x26, 0x96},    //
 
-    ;     ; 7
-    ; ;    dc 0x34, 0x56, 0yC6, 0x06
-    ;     dc 0x3A, 0x94, 0x44, 0x44 ;0x46, 0x94, 0yC2, 0yC2
-    ; ;    dc 10, 12, 8, 8
+    // B
+    {0xB6, 0x26, 0x36, 0x36},    //
+    {0xB6, 0x28, 0xB6, 0xB6},    //
 
-    ;     ; 8
-    ; ;    dc 0xA6, 0x24, 0yF6, 0yC6
-    ;     dc 0x48, 0xA6, 0xC4, 0xC4 ;0x94, 0x24, 0xD2, 0xD2
-    ; ;    dc 10, 12, 8, 8
+    // C
+    {0xC6, 0x28, 0xB8, 0xB8},    //
 
-    ;     ; 9=J
-    ; ;    dc 0x26, 0x36, 0xA8, 0x46
-    ;     dc 0xA6, 0x54, 0x52, 0x52
-    ; ;    dc 10, 12, 8, 8
+    // D
+    {0xD6, 0x36, 0xA6, 0x76},    //
+    {0xD6, 0x36, 18, 18},        //
+    {0xD6, 0xD6, 0x56, 0xA6},    //
+    {0xD8, 0x56, 0x46, 0x36},    //
+    {0xD8, 0xD6, 0x36, 0xC6},    //
 
-    ;     ; 10=K
-    ; ;    dc 0xD6, 0xA4, 0yC6, 0x94
-    ; ;    dc 0x36, 0xD2, 0x52, 0x52
-    ;     dc 0x28, 0x06, 0x52, 0x52
-    ; ;    dc 10, 12, 8, 8
+    // E
+    {0xEA, 0x46, 0x96, 0x96},    //
 
-    ;     ; 11=L
-    ; ;    dc 0y06, 0xD4, 0xA6, 0x94
-    ;     dc 0x0A, 0x36, 0xA4, 0xA4
-    ; ;    dc 10, 12, 8, 8
+#endif
 
-    ;     ; 12
-    ; ;    dc 0yD6, 0xD4, 0x56, 0xA4
-    ;     dc 0xA6, 0x36, 0x52, 0x52
-    ; ;    dc 8, 4, 10, 10
-
-    ;     ; 13
-    ;     dc 0xD8, 0xD4, 0x34, 0xC4
-    ; ;x    dc 0x46, 0xA2, 0xA2, 0xA2
-    ; ;    dc 10, 8, 12, 12
-
-    ;     ; 14 tan rock purple soil aqua doge good glint
-    ; ;    dc 0xD8, 0x54, 0x44, 0x34
-    ;     dc ooCOMPATIBLE_COMPATIBLE_PALETTE + 0xA6, 0x48, 0xA2, 0xA2 ;0x46, 0xA2, 0xA2, 0xA2
-    ; ;    dc 4, 8, 10, 10
-
-    ;     ; 15 purple rock light blue doge green mortar googlint *
-    ;     dc ooCOMPATIBLE_COMPATIBLE_PALETTE + 0xA8, 0xC4, 0x26, 0x94
-    ; ;x    dc 0x3A, 0xA4, 0x54, 0x54 ;0x46, 0xA2, 0xA2, 0xA2
-    ; ;    dc 0x50, 0y08, 0y04, 0y04
-
-    */
-    // clang-format on
-
+    // F
 };
 
 
@@ -398,20 +405,26 @@ void loadPalette() {
 
     unsigned char *c = (unsigned char *)colourPool;
 
-    unsigned char rp[4];
-    for (int i = 0; i < 4; i++)
-        rp[i] = (getRandom32() & 0xF0) | 6;
+    // unsigned char rp[4];
 
-    rp[3] += 6;
-    //    currentPalette = rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));    // tmp
+    // rp[3] = rp[2] + 4;
+    currentPalette = rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));
+
+
+    // for (int i = 0; i < 4; i++)
+    //     rp[i] = colourPool[currentPalette][i];
+
+    // rp[3] = rp[2] + 0x30;
+    // if (!(rp[3] & 0xF0))
+    //     rp[3] += 0x10;
+
 
     // if (currentPalette > sizeof(colourPool) / sizeof(colourPool[0]))
     //     currentPalette = 0;
 
 
-    //  c += ((currentPalette) << 2);
-    //  setBackgroundPalette(colourPool[currentPalette]);
-    setBackgroundPalette(rp);
+    c += ((currentPalette) << 2);
+    setBackgroundPalette(c);
 }
 
 // EOF

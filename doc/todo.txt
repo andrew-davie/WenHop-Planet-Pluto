@@ -5,8 +5,14 @@ rain particles from BD
 planets!
 death skull
 weapon from board!!!  e.g., M = mace, R = ROPE, G = gun
-
 x/y triggered pipe pushers
-
 rolling on hardware (spiceware)
 sound priority (process all, use loudest)
+fade in/out with intensity from Gridlock
+suicide/timer/level end logic
+
+process all sfx to ensure we don't get delayed soundx!!
+
+
+OK< lots of changes have been made; let's do an update in git/github!
+
