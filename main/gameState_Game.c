@@ -5,6 +5,7 @@
 
 #include "animations.h"
 #include "board.h"
+#include "caveData.h"
 #include "colour.h"
 #include "decodeCaves.h"
 #include "drawPlayer.h"
@@ -107,7 +108,7 @@ void initGameState_Game() {
 
 
     gravity = 1;
-    nextGravity = 1;
+    nextGravity = gravity;
 
     lavaSurfaceTrixel = 10000;
     showLava = false;
@@ -203,6 +204,7 @@ void OS_Game() {
     // else
     //     doges = 99;
 
+    (*caveList[cave].handler)();
 
     setScoreCycle(SCORELINE_SCORE);    // tmp
 

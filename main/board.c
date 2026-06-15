@@ -1,5 +1,6 @@
 #include <stdbool.h>
 
+#include "decodecaves.h"
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
@@ -34,7 +35,9 @@ int explodeRadius;
 unsigned char creature;
 enum ObjectType type;
 int conveyorDirection;
-
+int activeStar;
+int lastActiveStar;
+bool single;
 
 void convertWaterAndLavaObjects();
 void processTypes();
@@ -104,6 +107,8 @@ void initBoard() {
     waterDir = 0;
     explodeCount = 0;
     conveyorDirection = -1;    // ?
+    activeStar = lastActiveStar = 0;
+    single = false;
 }
 
 
@@ -121,9 +126,21 @@ void setupBoardScanner() {
 
         processWyrms();
 
-
         gameFrame = 0;
         gameTick++;
+
+        lastActiveStar = activeStar;
+        activeStar = 0;
+
+        if (!single && !totalDogePossible) {
+            single = true;
+            FLASH(0xC8, 10);
+            startCharAnimation(TYPE_STAR, AnimateStar);
+        }
+
+        // if (!totalDogePossible)
+        //     FLASH(0xC2, 10);
+
 
         ++selectorCounter;
         //        activated = isActive[++selectorCounter & 3];
@@ -276,25 +293,57 @@ void convertWaterAndLavaObjects() {
         *me = showLava ? CH_LAVA_BLANK : CH_WATER;
 }
 
+
 void processTypes() {
 
     switch (type) {
 
-    case TYPE_WEAPON: {
 
-        static unsigned char last = 0;
-        unsigned char this = *Animate[TYPE_WEAPON];
-        if (this == CH_DOGE_04 && this != last)
-            nDots(10, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 50, 5);
-        last = this;
+    case TYPE_STAR_EXPLODE: {
+
+        activeStar++;
+        if (*Animate[TYPE_STAR_EXPLODE] == CH_DUST_0) {
+
+            ADDAUDIO(SFX_EXPLODE);
+            // FLASH(0x26, 8);
+            nDots(20, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 80, 7);
+            *me = FLAG(CH_DUST_0);
+        }
+
+        else {
+            nDots(1, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 50, 5);
+        }
+        break;
+    }
+
+    case TYPE_STAR: {
+
+        static int activeDelay = 0;
+        static int delay = 30;
 
 
+        if (!lastActiveStar) {
+
+            if (--activeDelay < 0) {
+                activeDelay = (delay >> 1) + 1;
+
+                ADDAUDIO(SFX_SPACE);
+                // ADDAUDIO(SFX_DOGE3);
+            }
+
+            if (--delay < 0) {
+                *me = FLAG(CH_STAR_EXPLODE);
+                startCharAnimation(TYPE_STAR_EXPLODE, AnimateStarExplode);
+                delay = 30;
+                break;
+            }
+        }
         // fall
 
         unsigned char *next = me + _1ROW;
         if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
-            *next = FLAG(CH_WEAPON_MACE_FALLING_BOTTOM);
-            *me = FLAG(CH_WEAPON_MACE_FALLING_TOP);
+            *next = FLAG(CH_STAR_FALLING_BOTTOM);
+            *me = FLAG(CH_STAR_FALLING_TOP);
 
             nDots(5, boardCol, boardRow, PT_TWO, 40, CHAR_CENTER_X, CHAR_CENTER_Y, 40, 2);
         }
@@ -366,7 +415,7 @@ void processTypes() {
 
     case TYPE_GEODOGE:
 
-        if ((!theCave->flags & CAVEDEF_STAR_STATIC) && !rangeRandom(250)) {
+        if ((!(theCave->flags & CAVEDEF_STAR_STATIC)) && !rangeRandom(250)) {
             *me = FLAG(CH_ROCK_PEBBLE_1);
             // FLASH(0x42, 10);
             //  nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
@@ -612,12 +661,12 @@ void processCreatures() {
     }
 
 
-    case CH_WEAPON_MACE_FALLING_TOP:
+    case CH_STAR_FALLING_TOP:
         *me = FLAG(CH_DUST_ROCK_0);
         break;
 
-    case CH_WEAPON_MACE_FALLING_BOTTOM:
-        *me = FLAG(CH_WEAPON_MACE);
+    case CH_STAR_FALLING_BOTTOM:
+        *me = FLAG(CH_STAR);
         break;
 
 
@@ -643,6 +692,7 @@ void processCreatures() {
 
     case CH_DOGE_SIDE_3:
     case CH_DOGE_SIDE_4:
+
         *me = FLAG(CH_DOGE_FALLING_TOP);
         *(me + gravity * _1ROW) = FLAG(CH_DOGE_FALLING_BOTTOM);
         break;
@@ -963,7 +1013,7 @@ void processCharGeoDogeAndRock() {
     if (Attribute[typeDown] & ATT_BLANK) {
 
         // if (*me == CH_ROCK_BONUS) {
-        //     *me = FLAG(CH_WEAPON_MACE);
+        //     *me = FLAG(CH_STAR);
         //     return;
         // }
 
@@ -1247,7 +1297,8 @@ void doRoll() {
             enum ObjectType sideType = CharToType[GET(*side)];
             if (Attribute[sideType] & ATT_BLANK) {
 
-                enum ObjectType sideDownType = CharToType[GET(*(side + _1ROW))];
+                unsigned char *sideDown = side + gravity * _1ROW;
+                enum ObjectType sideDownType = CharToType[GET(*sideDown)];
                 if (Attribute[sideDownType] & ATT_BLANK) {
 
                     if (offset > 0) {
@@ -1258,6 +1309,8 @@ void doRoll() {
                         *me = FLAG(CH_DOGE_SIDE_2);
                         *(me + offset) = FLAG(CH_DOGE_SIDE_4);
                     }
+
+                    *(sideDown) = FLAG(CH_BLANK);
 
                     int off = offset < 0 ? 4 : 0;
 
@@ -1289,6 +1342,10 @@ void explode(unsigned char *where, unsigned char explosionShape) {
         unsigned char *cell = where + offset[i];
         enum ObjectType type = CharToType[GET(*cell)];
         if (Attribute[type] & ATT_EXPLODABLE) {
+
+            if (CharToType[GET(*cell)] == TYPE_DOGE)
+                totalDogePossible--;
+
             *cell = shape[i];
             if (explosionShape == CH_DOGE_00)
                 totalDogePossible++;

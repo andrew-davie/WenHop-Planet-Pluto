@@ -36,7 +36,7 @@ const signed char AnimationStandLR[] = {
 
 const signed char AnimationMine[] = {
 
-    // ACTION_SFX, SFX_PICKAXE,
+    ACTION_SFX, SFX_PICKAXE,
     ACTION_DOT, 4, 4,
     FRAME_PUSH, 8,
     FRAME_PUSH2, 5,
@@ -57,6 +57,7 @@ const signed char AnimationTapPush[] = {
 
 const signed char AnimationMineUp[] = {
 
+    ACTION_SFX, SFX_PICKAXE,
     // ACTION_SFX, SFX_PICKAXE,
  //   ACTION_DOT, 0, 0,
     FRAME_MINE_UP_1, 12,
@@ -66,6 +67,7 @@ const signed char AnimationMineUp[] = {
 
 const signed char AnimationMineDown[] = {
 
+    ACTION_SFX, SFX_PICKAXE,
     //    FRAME_MINE_DOWN_0, 2,
     // ACTION_SFX, SFX_PICKAXE,
     ACTION_DOT, 1, 12,

@@ -122,10 +122,11 @@ const enum ObjectType CharToType[] = {
     TYPE_DIRT,                     // 114 CH_BROKEN_DIRT  (not actually used on board)
     TYPE_INSULATOR,                // 115 CH_INSULATOR_TOP
     TYPE_INSULATOR,                // 116 CH_INSULATOR_BOTTOM
-    TYPE_WEAPON,                   // 117 CH_WEAPON_MACE
-    TYPE_WEAPON_FALLING,           // 118 CH_WEAPON_MACE_TOP
-    TYPE_WEAPON_FALLING,           // 119 CH_WEAPON_MACE_BOTTOM
+    TYPE_STAR,                     // 117 CH_STAR
+    TYPE_STAR_FALLING,             // 118 CH_STAR_TOP
+    TYPE_STAR_FALLING,             // 119 CH_STAR_BOTTOM
     TYPE_ROCK_BONUS,               // 120 CH_ROCK_BONUS
+    TYPE_STAR_EXPLODE,             // 121 CH_STAR_EXPLODE
 };
 
 _Static_assert(sizeof(CharToType) / sizeof(CharToType[0]) == CH_MAX, "CharToType table wrong size");
@@ -216,9 +217,10 @@ const unsigned int Attribute[] = {
     _ |PAD| _ | _ |DIS|PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _  , // 40 TYPE_ROCK_PEBBLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 41 TYPE_ELECTRIC
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ |MIN| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL , // 42 TYPE_INSULATOR
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |GRB| _ | _ |PER| _ | _ | _ | _  , // 43 TYPE_WEAPON
-    _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ |CRU| _  , // 20 TYPE_WEAPON_FALLING
-    _ |PAD| _ |MLT| _ |PH1| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ |ROL , // 06 TYPE_ROCK_BONUS
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |GRB| _ | _ |PER| _ | _ | _ | _  , // 43 TYPE_STAR
+    _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ | _  , // 44 TYPE_STAR_FALLING
+    _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 45 TYPE_STAR_EXPLODING
+    _ |PAD| _ |MLT| _ |PH1| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ |ROL , // 46 TYPE_ROCK_BONUS
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+----+
 
     // clang-format on

@@ -790,13 +790,18 @@ void drawSpeedRun() {
 }
 
 void drawDoge() {
-
+    return;
     if (doges < 0) {
         scoreLineNew[1] = DIGIT_PLUS;
         // scoreLineNew[0] = DIGIT_DOGE;
         scoreLineColour[1] = scoreLineColour[0] = rangeRandom(8);
     }
-    drawDecimal2(scoreLineNew + 2, scoreLineColour + 1, rangeRandom(8), doges < 0 ? -doges : doges);
+
+    int offset = 2;
+    if (RAM[_P0_X] < 80)
+        offset = 8;
+
+    drawDecimal2(scoreLineNew + offset, scoreLineColour + offset, rangeRandom(8), doges < 0 ? -doges : doges);
 }
 
 void drawTime() {
@@ -869,7 +874,7 @@ void drawScore() {
     switch (scoreCycle) {
     case SCORELINE_TIME:
     case SCORELINE_SCORE:
-        //        drawDoge();
+        drawDoge();
         //        drawTime();
         //        break;
         // drawTheScore(actualScore);

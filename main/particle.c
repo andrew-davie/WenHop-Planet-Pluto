@@ -87,7 +87,7 @@ void modifyCharAtTip(int x, int y) {
         }
 
         else if (type == TYPE_ROCK_BONUS) {
-            *b = FLAG(CH_WEAPON_MACE);
+            *b = FLAG(CH_STAR);
             colour = 7;
 
         }

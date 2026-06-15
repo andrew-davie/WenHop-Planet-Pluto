@@ -5,7 +5,6 @@
 
 extern bool onOff[_BOARD_COLS];
 
-
 void setupBoardScanner();
 void processBoardSquares();
 void initBoard();

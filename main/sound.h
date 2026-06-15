@@ -31,11 +31,11 @@ enum AudioID {
     SFX_COUNTDOWN2,       // 02  time expiring
     SFX_PICKAXE,          // 03
     SFX_DOGE2,            // 04
-    SFX_WHOOSH,           // 05
-    SFX_BLIP,             // 06
-    SFX_EXTRA,            // 07
-    SFX_EXIT,             // 08
-    SFX_EXPLODE,          // 09
+    SFX_EXPLODE,          // 05
+    SFX_WHOOSH,           // 06
+    SFX_BLIP,             // 07
+    SFX_EXTRA,            // 08
+    SFX_EXIT,             // 09
     SFX_ZAP,              // 10
     SFX_ZAP2,             // 11
     SFX_EXPLODE_QUIET,    // 12

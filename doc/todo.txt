@@ -12,7 +12,9 @@ fade in/out with intensity from Gridlock
 suicide/timer/level end logic
 
 process all sfx to ensure we don't get delayed soundx!!
+idle animations
 
 
-OK< lots of changes have been made; let's do an update in git/github!
+bye
+
 

@@ -1,5 +1,6 @@
 #include "cavedata.h"
 #include "attribute.h"
+#include "colour.h"
 #include "decodeCaves.h"
 #include "decodecaves.h"
 #include "main.h"
@@ -954,10 +955,10 @@ const unsigned char starsAndStripes[] = {
     CAVEDEF_STAR_STATIC|CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y, CH_BRICKWALL, CH_DIRT,
 
     0,
-    //CH_WEAPON_MACE, 50,10,10,10,10,
+    //CH_STAR, 50,10,10,10,10,
 
     DRAW_FILLED_RECT, CH_BRICKWALL, 1,1,9,8, CH_DOGE_00,
-    DRAW_FILLED_RECT, 0x80|CH_WEAPON_MACE, 2, 2, 7, 6, 8,
+    DRAW_FILLED_RECT, 0x80|CH_STAR, 2, 2, 7, 6, 8,
 
 
     // LINER(CH_STEELWALL, 12,0,20,2)
@@ -971,31 +972,31 @@ const unsigned char starsAndStripes[] = {
 
     // DRAW_FILLED_RECT, CH_DIRT, 0, 0, 8, 8,CH_DIRT,
 
-    // CH_WEAPON_MACE, 1,1,
-    // CH_WEAPON_MACE, 3,1,
-    // CH_WEAPON_MACE, 5,1,
-    // CH_WEAPON_MACE, 7,1,
-    // CH_WEAPON_MACE, 9,1,
-    // CH_WEAPON_MACE, 11,1,
+    // CH_STAR, 1,1,
+    // CH_STAR, 3,1,
+    // CH_STAR, 5,1,
+    // CH_STAR, 7,1,
+    // CH_STAR, 9,1,
+    // CH_STAR, 11,1,
 
-    // CH_WEAPON_MACE, 2,2,
-    // CH_WEAPON_MACE, 4,2,
-    // CH_WEAPON_MACE, 5,2,
-    // CH_WEAPON_MACE, 8,2,
-    // CH_WEAPON_MACE, 10,2,
+    // CH_STAR, 2,2,
+    // CH_STAR, 4,2,
+    // CH_STAR, 5,2,
+    // CH_STAR, 8,2,
+    // CH_STAR, 10,2,
 
-    // CH_WEAPON_MACE, 1,3,
-    // CH_WEAPON_MACE, 3,3,
-    // CH_WEAPON_MACE, 5,3,
-    // CH_WEAPON_MACE, 7,3,
-    // CH_WEAPON_MACE, 9,3,
-    // CH_WEAPON_MACE, 11,3,
+    // CH_STAR, 1,3,
+    // CH_STAR, 3,3,
+    // CH_STAR, 5,3,
+    // CH_STAR, 7,3,
+    // CH_STAR, 9,3,
+    // CH_STAR, 11,3,
 
-    // CH_WEAPON_MACE, 2,4,
-    // CH_WEAPON_MACE, 4,4,
-    // CH_WEAPON_MACE, 5,4,
-    // CH_WEAPON_MACE, 8,4,
-    // CH_WEAPON_MACE, 10,4,
+    // CH_STAR, 2,4,
+    // CH_STAR, 4,4,
+    // CH_STAR, 5,4,
+    // CH_STAR, 8,4,
+    // CH_STAR, 10,4,
 
         CH_MELLON_HUSK_BIRTH, 2, 2,
 
@@ -1076,7 +1077,7 @@ const unsigned char caveA4[] = {
     CH_INSULATOR_BOTTOM,12,7,
     CH_INSULATOR_TOP,12,2,
 
-    CH_WEAPON_MACE, 13,6,
+    CH_STAR, 13,6,
 
     CH_STEELWALL, 14, 5,
     CH_STEELWALL, 14, 6,
@@ -1123,14 +1124,28 @@ const unsigned char caveA4[] = {
     // clang-format on
 };
 
-const unsigned char *caveList[] = {
 
-    caveUseWall,        //
-    caveA4,             //
-    starsAndStripes,    //
-    caveWyrms,          //
-    caveA,              //
-    caveA2,             // best
+void none() {
+}
+
+void spec() {
+
+    // FLASH(0x94, 4);
+}
+
+
+const struct caveHandler caveList[] = {
+
+    // cave definition, condition handler
+
+    {starsAndStripes, spec},    //
+    // {caveUseWall, none},        //
+    // {caveA4, none},             //
+    // {caveWyrms, none},          //
+    // {caveA, none},              //
+    // {caveA2, none},             //
+
+
     // caveA3,         //
 
     // caveMace,

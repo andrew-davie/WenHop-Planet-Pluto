@@ -152,13 +152,53 @@ void grabDoge() {
         exitTrigger = true;
         //        FLASH(0x08, 8);     //open door
         ADDAUDIO(SFX_EXIT);
-    }
-    //  else
-    //     ADDAUDIO(SFX_DOGE2);
+    } else
+        ADDAUDIO(SFX_DOGE2);
 }
 
 int playerSlow = 0;
 int tapDelay = 0;
+
+
+void moveHusk(int dir, unsigned char *me, unsigned char *meOffset) {
+
+    unsigned char destType = CharToType[GET(*meOffset)];
+
+    *me = FLAG(CH_BLANK);
+    *meOffset = FLAG(CH_MELLON_HUSK);
+
+    if (destType == TYPE_PEBBLE1)
+        nDots(4, playerX, playerY, PT_ONE, 10, CHAR_CENTER_X, CHAR_CENTER_Y, 10, 7);
+
+
+    if (Attribute[destType] & ATT_DIRT) {
+        startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK]);
+
+        int xsize, ysize;
+        int xoff, yoff;
+
+
+        for (int i = 0; i < 12; i++) {
+
+            if (ydir[dir]) {
+                ysize = 4;
+                xsize = CHAR_TRIX_X - 1;
+                xoff = rangeRandom(xsize) + 1;    // rangeRandom(xsize);
+                yoff = (ydir[dir] < 0) ? 1 + rangeRandom(ysize)
+                                       : 9 - ysize + rangeRandom(ysize);    // + rangeRandom(ysize);
+            } else {
+                ysize = CHAR_TRIX_Y - 1;
+                xsize = 0;
+                yoff = rangeRandom(ysize) + 1;    // rangeRandom(xsize);
+                xoff = (xdir[dir] < 0) ? 1 + rangeRandom(xsize)
+                                       : 4 - xsize + rangeRandom(xsize);    // + rangeRandom(ysize);
+            }
+            nDots(1, playerX, playerY, PT_ONE, 30, xoff, yoff, 30, 2);    // OK
+        }
+    } else
+        startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK] + 8);
+}
+
 
 bool checkHighPriorityMove(int dir) {
 
@@ -170,6 +210,9 @@ bool checkHighPriorityMove(int dir) {
     unsigned char joyBit = joyDirectBit[dir] << 4;
     if (usableSWCHA & joyBit)
         return false;
+
+    getRandom32();
+
 
     if (faceDirectionDef[dir] && faceDirection != faceDirectionDef[dir]) {
         pushCounter = 0;    // so we get an animation during turn
@@ -278,6 +321,43 @@ bool checkHighPriorityMove(int dir) {
             return true;
         }
 
+        else if (destType == TYPE_STAR) {
+
+            if (!totalDogePossible) {
+
+                ADDAUDIO(SFX_ZAP2);
+                ADDAUDIO(SFX_WHOOSH);
+                weapon = theCave->weapon[level];
+                nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
+                // FLASH(0x2A, 4);
+
+                playerX += xdir[dir];
+                playerY += ydir[dir];
+
+                moveHusk(dir, me, meOffset);
+
+                int dir2 = (gravity < 0) ? dir ^ 2 : dir;
+
+                if (playerAnimationID != WalkAnimation[dir2])
+                    startPlayerAnimation(WalkAnimation[dir2]);
+
+                if (!autoMoveFrameCount) {
+
+                    autoMoveFrameCount = ((gameSpeed) << playerSlow);
+
+                    autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
+                    autoMoveY = autoMoveDeltaY = -(ydir[dir] * (CHAR_TRIX_Y * 4)) >> playerSlow;
+                }
+
+                handled = true;
+            }
+
+            else {
+                FLASH(0x40, 10);
+                ADDAUDIO(SFX_ROCK);
+            }
+        }
+
 
         else if (Attribute[destType] & (ATT_BLANK | ATT_PERMEABLE | ATT_GRAB | ATT_EXIT)) {
 
@@ -311,13 +391,7 @@ bool checkHighPriorityMove(int dir) {
             //     lockDisplay = false;
             // }
 
-            if (type == TYPE_WEAPON) {
-
-                weapon = theCave->weapon[level];
-                nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
-            }
-
-            else if (Attribute[destType] & ATT_GRAB) {
+            if (Attribute[destType] & ATT_GRAB) {
                 grabDoge(/* meOffset */);
                 //     grabbed = true;
                 // if (grabbed)
@@ -332,40 +406,9 @@ bool checkHighPriorityMove(int dir) {
 
             if (!exitMode) {
 
-                *me = FLAG(CH_BLANK);
-                *meOffset = FLAG(CH_MELLON_HUSK);
-
-                if (destType == TYPE_PEBBLE1)
-                    nDots(4, playerX, playerY, PT_ONE, 10, CHAR_CENTER_X, CHAR_CENTER_Y, 10, 7);
-
-
-                if (Attribute[destType] & ATT_DIRT) {
-                    startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK]);
-
-                    int xsize, ysize;
-                    int xoff, yoff;
-
-
-                    for (int i = 0; i < 12; i++) {
-
-                        if (ydir[dir]) {
-                            ysize = 4;
-                            xsize = CHAR_TRIX_X - 1;
-                            xoff = rangeRandom(xsize) + 1;    // rangeRandom(xsize);
-                            yoff = (ydir[dir] < 0) ? 1 + rangeRandom(ysize)
-                                                   : 9 - ysize + rangeRandom(ysize);    // + rangeRandom(ysize);
-                        } else {
-                            ysize = CHAR_TRIX_Y - 1;
-                            xsize = 0;
-                            yoff = rangeRandom(ysize) + 1;    // rangeRandom(xsize);
-                            xoff = (xdir[dir] < 0) ? 1 + rangeRandom(xsize)
-                                                   : 4 - xsize + rangeRandom(xsize);    // + rangeRandom(ysize);
-                        }
-                        nDots(1, playerX, playerY, PT_ONE, 30, xoff, yoff, 30, 2);    // OK
-                    }
-                } else
-                    startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK] + 8);
+                moveHusk(dir, me, meOffset);
             }
+
 
             // Fix bar stuff
 
@@ -492,6 +535,9 @@ bool checkLowPriorityMove(int dir) {
             if (playerAnimationID != anim)
                 startPlayerAnimation(anim);
 
+            if (destType == TYPE_INSULATOR)
+                ADDAUDIO(SFX_ZAP2);
+
 
         } else {
             ADDAUDIO(SFX_SPACE);
@@ -501,17 +547,22 @@ bool checkLowPriorityMove(int dir) {
 
         if (pushCounter > 8) {
 
+
             static signed char xOffset[] = {0, CHAR_TRIX_X, 0, -CHAR_TRIX_X};
             static signed char yOffset[] = {-(CHAR_CENTER_Y >> 1), 0, CHAR_CENTER_Y >> 1, 0};
 
             if (Attribute[destType] & ATT_MINE) {
 
                 if (destType == TYPE_INSULATOR) {
+
+
                     // nDots(PARTICLE_COUNT, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40,
                     // 2); onOff[boardCol] = false;    // disableInsulator(meOffset); return true;
                 }
 
                 else {
+
+
                     addScore(VALUE_BREAK_GEODE);
                     *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
 
@@ -519,12 +570,16 @@ bool checkLowPriorityMove(int dir) {
 
                     if (destType == TYPE_ROCK_BONUS) {
 
-                        *meOffset = FLAG(CH_WEAPON_MACE);
+                        ADDAUDIO(SFX_DOGE2);
+
+                        *meOffset = FLAG(CH_STAR);
 
                     }
 
                     else if (destType == TYPE_ROCK) {
 
+
+                        ADDAUDIO(SFX_ROCK);
 
                         nDots(10, playerX, playerY, PT_ONE, 30,
                               xOffset[dir] + CHAR_CENTER_X /*+ rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1)*/,
@@ -532,9 +587,12 @@ bool checkLowPriorityMove(int dir) {
                         nDots(10, playerX, playerY, PT_ONE, 15,
                               xOffset[dir] + CHAR_CENTER_X + rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1),
                               rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + yOffset[dir] + CHAR_CENTER_Y, 50, 3);
-                    } else
+                    } else {
+                        ADDAUDIO(SFX_DOGE);
+
                         nDots(6, playerX, playerY, PT_TWO, 30, xOffset[dir] + CHAR_CENTER_X,
                               yOffset[dir] + CHAR_CENTER_Y, 40, 7);
+                    }
                 }
             }
 

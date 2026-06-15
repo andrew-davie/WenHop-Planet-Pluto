@@ -1806,10 +1806,11 @@ const unsigned char *const charSet[] = {
     _CHAR_BROKEN_DIRT,               // 114 CH_BROKEN_DIRT
     _CHAR_INSULATOR_TOP,             // 115 CH_INSULATOR_TOP
     _CHAR_INSULATOR_BOTTOM,          // 116 CH_INSULATOR_BOTTOM
-    _CHAR_WEAPON_MACE,               // 117 CH_WEAPON_MACE
-    _CHAR_WEAPON_MACE_TOP,           // 118 CH_WEAPON_MACE_TOP
-    _CHAR_WEAPON_MACE_BOTTOM,        // 119 CH_WEAPON_MACE_BOTTOM
+    _CHAR_WEAPON_MACE,               // 117 CH_STAR
+    _CHAR_WEAPON_MACE_TOP,           // 118 CH_STAR_TOP
+    _CHAR_WEAPON_MACE_BOTTOM,        // 119 CH_STAR_BOTTOM
     _CHAR_ROCK,                      // 120 CH_ROCK_BONUS
+    _CHAR_WEAPON_MACE,               // 121 CH_STAR_EXPLODE
 };
 
 _Static_assert(sizeof(charSet) / sizeof(charSet[0]) == CH_MAX, "charSet table wrong size");

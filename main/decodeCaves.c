@@ -61,7 +61,7 @@ int last_prng_b;
 
 void decodeCave(int cave) {
 
-    theCave = (struct CAVE_DEFINITION *)caveList[cave];
+    theCave = (struct CAVE_DEFINITION *)caveList[cave].cave;
 
     decodeState = DECODE_NONE;
 
@@ -83,7 +83,7 @@ void decodeCave(int cave) {
 
 
     if (theCave->flags & CAVEDEF_STAR_STATIC)
-        startCharAnimation(TYPE_WEAPON, AnimateWeapon + 7);
+        startCharAnimation(TYPE_STAR, AnimateStar + 7);
 
     if (theCave->flags & CAVEDEF_START_WITH_WEAPON)
         weapon = theCave->weapon[level];

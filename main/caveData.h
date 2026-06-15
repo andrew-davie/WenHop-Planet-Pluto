@@ -1,6 +1,12 @@
 #pragma once
 
-extern const unsigned char *caveList[];
+struct caveHandler {
+    const unsigned char *cave;
+    void (*const handler)();
+};
+
+
+extern const struct caveHandler caveList[];
 extern const int caveCount;
 extern unsigned char caveFlags;
 

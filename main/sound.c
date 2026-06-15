@@ -111,7 +111,7 @@ const unsigned char sampleDirt[] = {
 };
 
 const unsigned char sampleSpace[] = {
-    8, 2, 2, 4, CMD_STOP,
+    8, 2, 2, 2, CMD_STOP,
 };
 
 const unsigned char sampleBlip[] = {
@@ -267,11 +267,11 @@ const struct AudioTable AudioSamples[SFX_MAX] = {
     {sample10987654321, 200, AUDIO_LOCKED},                             // SFX_COUNTDOWN2
     {samplePick, 200, 0},                                               // SFX_PICKAXE
     {sampleSFX, 200, 0},                                                // SFX_DOGE2
+    {sampleExplode, 128, 0},                                            // SFX_EXPLODE
     {sampleWhoosh, 127, 0},                                             // SFX_WHOOSH
     {sampleBlip, 125, 0},                                               // SFX_BLIP
     {sampleExxtra, 110, 0},                                             // SFX_EXTRA
     {sampleExit, 99, 0},                                                // SFX_EXIT
-    {sampleExplode, 99, 0},                                             // SFX_EXPLODE
     {sampleZap, 98, AUDIO_ATTENUATE},                                   // SFX_ZAP
     {sampleZap2, 98, 0},                                                // SFX_ZAP2
     {sampleExplodeQuiet, 97, 0},                                        // SFX_EXPLODE_QUIET
@@ -328,8 +328,8 @@ void initAudio(bool killTracks) {
 
 void startMusic() {
 
-    loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
-    loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
+    // loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
+    // loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
 }
 
 void killAudio(enum AudioID id) {
@@ -343,8 +343,9 @@ void killAudio(enum AudioID id) {
 void processSoundEffects() {
 
     for (unsigned int id = 0; id < SFX_MAX; id++) {
-
         if (audioRequest[id]) {
+
+            audioRequest[id] = false;
 
 #if ENABLE_SOUND
 
@@ -355,8 +356,10 @@ void processSoundEffects() {
                         dup = true;
                         break;
                     }
-                if (dup)
+                if (dup) {
+                    audioRequest[id] = false;
                     continue;
+                }
             }
 
             int lowest = -1;
@@ -389,14 +392,7 @@ void processSoundEffects() {
                 sfx[lowest].delay = AudioSamples[id].sample[3];
 
                 sfx[lowest].attenuation = (AudioSamples[id].flags & AUDIO_ATTENUATE) ? rangeRandom(128) | 128 : 255;
-
-                audioRequest[id] = false;
             }
-
-            else
-                break;    // sounds full or higher priority, ignore any more lower
-                          // priority sounds
-
 #endif
         }
     }
