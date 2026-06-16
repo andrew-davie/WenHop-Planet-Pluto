@@ -365,7 +365,7 @@ void (*const verticalBlank[GS_MAX])() = {
 
 void runARM_VerticalBlank() {
 
-    availableIdleTime = 80000;    // RAM[_INTIM]  * armCycles;
+    availableIdleTime = 50000;    // RAM[_INTIM]  * armCycles;
 
     if (gameState == nextGameState) {
         (*verticalBlank[gameState])();
@@ -398,7 +398,7 @@ int whichKernel[GS_MAX] = {
     _KERNEL_COPYRIGHT,         // 4 GS_COUCH_COMPLIANT (re-used COPYRIGHT)
     _KERNEL_MENU,              // 5 GS_MENU
     _KERNEL_GAME,              // 6 GS_GAME
-    _KERNEL_SKULL,             // 8 GS_SKULL
+    _KERNEL_SKULL,             // 7 GS_SKULL
 };
 
 int intim;
@@ -406,7 +406,7 @@ int intim;
 
 void runARM_Overscan() {
 
-    availableIdleTime = 80000;    // RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
+    availableIdleTime = 50000;    // RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
 
     if (gameState != nextGameState) {
 

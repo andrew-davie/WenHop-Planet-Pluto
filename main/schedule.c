@@ -41,8 +41,12 @@ void scheduledTasks() {
 
     (*scheduleFunc[gameSchedule])();
 
-    while (T1TC < availableIdleTime)
-        ;
+    if (T1TC > availableIdleTime)
+        while (true)
+            ;
+
+    // while (T1TC < availableIdleTime)
+    //     ;
 }
 
 
