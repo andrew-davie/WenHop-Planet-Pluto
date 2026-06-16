@@ -12,6 +12,7 @@ enum GAME_STATE {
     GS_COUCH_COMPLIANT,    // 4
     GS_MENU,               // 5
     GS_GAME,               // 6
+    GS_SKULL,              // 7
 
     GS_MAX
 
@@ -41,5 +42,8 @@ void initGameState_Game();
 void VB_Game();
 void OS_Game();
 
+void initGameState_Skull();
+void VB_Skull();
+void OS_Skull();
 
 // EOF

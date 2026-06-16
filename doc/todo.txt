@@ -14,6 +14,9 @@ suicide/timer/level end logic
 process all sfx to ensure we don't get delayed soundx!!
 idle animations
 
+bonus levels - you get 3 attempts at each 
+
+LIFE planets
 
 bye
 

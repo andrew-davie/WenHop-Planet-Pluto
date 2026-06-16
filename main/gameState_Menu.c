@@ -19,6 +19,7 @@ int flashTime2;
 // int cave;
 // int level;
 int menuLineTVType;
+int tempName;
 
 #define LETTER_HEIGHT 10
 
@@ -26,6 +27,20 @@ enum MENU_OPTION {
 
     MENU_OPTION_CAVE,
     MENU_OPTION_LEVEL,
+};
+
+
+const char showCaveName[][6] = {
+    {";;MARS"},    //
+    {"URANUS"},    //
+    {"SATURN"},    //
+    {"FOUR  "},    //
+    {"FIVE  "},    //
+    {"SIX   "},    //
+    {"SEVEN "},    //
+    {"EIGHT "},    //
+    {"NINE  "},    //
+    {"X     "},    //
 };
 
 
@@ -76,10 +91,12 @@ void initKernel_Menu() {
         showCave = 0;
 
     cave = showCave;
-    level = 0;
+    level = 4;    // tmp;
     menuLineTVType = 0;
 
     colubk = 0;
+
+    tempName = rangeRandom(sizeof(showCaveName) / sizeof(showCaveName[0]));
 
     // ARENA_COLOUR = 0;
 
@@ -214,19 +231,6 @@ void VB_Menu() {
 // };
 
 
-const char showCave[][6] = {
-    {";;MARS"},    //
-    {"URANUS"},    //
-    {"SATURN"},    //
-    {"FOUR  "},    //
-    {"FIVE  "},    //
-    {"SIX   "},    //
-    {"SEVEN "},    //
-    {"EIGHT "},    //
-    {"NINE  "},    //
-    {"X     "},    //
-};
-
 // const char TV[][6] = {
 
 //     {";;NTSC"},    //
@@ -237,11 +241,16 @@ const char showCave[][6] = {
 
 const char Level[][6] = {
 
-    {";;WIMP"},    //
-    {";;BOZO"},    //
-    {";;HERO"},    //
-    {"TRAGIC"},    //
-    {"MANIAC"},    //
+    {""},          //
+    {"ARCTIC"},    //
+    {"LAVA;;"},    //
+    {"MOUNTS"},    //
+    {"COASTS"},    //
+    {"TROPIC"},    //
+    {"JUNGLE"},    //
+    {"PLAINS"},    //
+    {"OCEAN;"},    //
+    {"POLE;;"},    //
 };
 
 
@@ -269,7 +278,10 @@ void OS_Menu() {
     switch (sline) {
 
     case MENU_OPTION_CAVE:
-        dLine = showCave[cave];
+        //        dLine = showCave[cave];
+
+        dLine = showCaveName[tempName];
+
         break;
 
     case MENU_OPTION_LEVEL:

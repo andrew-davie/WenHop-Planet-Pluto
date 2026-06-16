@@ -17,6 +17,8 @@ extern unsigned char caveFlags;
 #define CAVEDEF_STAR_STATIC 8
 #define CAVEDEF_START_WITH_WEAPON 16
 
+#define CAVEDEF_BONUS (CAVEDEF_LOCK_X | CAVEDEF_LOCK_Y)
+
 
 #define DRAW_EOF 255
 #define DRAW_FILLED_RECT 254

@@ -103,6 +103,31 @@ END_BUFFERS SET *
 
 ;-------------------------------------------------------------------------------
 
+
+    SEG.U GS_SKULL
+    ORG _BUFFERS
+
+    DEFBUF 2, SKULL_JUMP
+
+_SKULL_BUFFERS_START = *
+
+    DEFBUF 1, SKULL_COLUBK
+    DEFBUF 1, SKULL_COLUPF
+    DEFBUF 1, SKULL_COLUP0
+
+    DEFBUF 4, SKULL_PF
+    DEFBUF 6, SKULL_GRP
+
+_SKULL_BUFFERS_SIZE = * - _SKULL_BUFFERS_START
+
+    ; end of grouping (10)
+
+    if * > END_BUFFERS
+END_BUFFERS SET *
+    endif
+
+;-------------------------------------------------------------------------------
+
     SEG.U GS_MENU
     ORG _BUFFERS
 

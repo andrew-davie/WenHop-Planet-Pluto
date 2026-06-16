@@ -8,6 +8,9 @@ BANK1_START
 BANK_kernelCopyright = BANK1
     include "kernels/kernel_Copyright.asm"
 
+BANK_kernelSkull = BANK1
+    include "kernels/kernel_Skull.asm"
+
 BANK_kernelCouchCompliant = BANK1
     include "kernels/kernel_CouchCompliant.asm"
 

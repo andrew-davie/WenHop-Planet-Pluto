@@ -255,12 +255,13 @@ void setGameState(enum GAME_STATE state) {
 void (*const initialiseGameState[GS_MAX])() = {
 
     Null,                            // 0
-    initGameState_DetectConsole,     // 1
-    initGameState_Copyright,         // 2
-    initGameState_Rainbow,           // 3
-    initGameState_CouchCompliant,    // 4
-    initGameState_Menu,              // 5
-    initGameState_Game,              // 6
+    initGameState_DetectConsole,     // 1  GS_DETECT_CONSOLE
+    initGameState_Copyright,         // 2  GS_COPYRIGHT
+    initGameState_Rainbow,           // 3  GS_RAINBOW
+    initGameState_CouchCompliant,    // 4  GS_COUCH_COMPLIANT
+    initGameState_Menu,              // 5  GS_MENU
+    initGameState_Game,              // 6  GS_GAME
+    initGameState_Skull,             // 7  GS_SKULL
 };
 
 void (*const initialiseKernel[_KERNEL_MAX])() = {
@@ -271,6 +272,7 @@ void (*const initialiseKernel[_KERNEL_MAX])() = {
     initKernel_CouchCompliant,    // 3
     initKernel_Menu,              // 4
     initKernel_Game,              // 5
+    initKernel_Skull,             // 6
 };
 
 //------------------------------------------------------------------------------
@@ -357,12 +359,13 @@ void (*const verticalBlank[GS_MAX])() = {
     VB_CouchCompliant,    // 4
     VB_Menu,              // 5
     VB_Game,              // 6
+    VB_Skull,             // 7
 
 };
 
 void runARM_VerticalBlank() {
 
-    availableIdleTime = RAM[_INTIM] * armCycles;
+    availableIdleTime = 80000;    // RAM[_INTIM]  * armCycles;
 
     if (gameState == nextGameState) {
         (*verticalBlank[gameState])();
@@ -383,6 +386,7 @@ void (*const overscan[GS_MAX])() = {
     OS_CouchCompliant,    // 4  GS_COUCH_COMPLIANT
     OS_Menu,              // 5  GS_MENU
     OS_Game,              // 6  GS_GAME
+    OS_Skull,             // 7  GS_SKULL
 };
 
 int whichKernel[GS_MAX] = {
@@ -394,6 +398,7 @@ int whichKernel[GS_MAX] = {
     _KERNEL_COPYRIGHT,         // 4 GS_COUCH_COMPLIANT (re-used COPYRIGHT)
     _KERNEL_MENU,              // 5 GS_MENU
     _KERNEL_GAME,              // 6 GS_GAME
+    _KERNEL_SKULL,             // 8 GS_SKULL
 };
 
 int intim;
@@ -401,7 +406,7 @@ int intim;
 
 void runARM_Overscan() {
 
-    availableIdleTime = RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
+    availableIdleTime = 80000;    // RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
 
     if (gameState != nextGameState) {
 

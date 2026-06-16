@@ -924,9 +924,9 @@ const unsigned char caveA3[] = {
 const unsigned char starsAndStripes[] = {
     // clang-format off
 
-    20,    // milling
-    1, 15, // doge $
-    0,     //              ,          // rain
+    20,                             // milling
+    1, 15,                          // doge $
+    0,                              // rain
     
     10,                             //0
     11,                             //1
@@ -936,8 +936,8 @@ const unsigned char starsAndStripes[] = {
 
     15,                             //0
     15,                             //1
-    15,                             //2
-    15,                             //3
+    10,                             //2
+    10,                             //3
     15,                             //4
     
     20,                             //0
@@ -946,70 +946,83 @@ const unsigned char starsAndStripes[] = {
     200,                            //3
     200,                            //4
 
-    WEAPON_MACE,                    //0
+    WEAPON_NONE,                    //0
     WEAPON_NONE,                    //1
-    WEAPON_NONE,                    //2
+    WEAPON_MACE,                    //2
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_STAR_STATIC|CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y, CH_BRICKWALL, CH_DIRT,
+    CAVEDEF_START_WITH_WEAPON|CAVEDEF_STAR_STATIC|CAVEDEF_BONUS, CH_BRICKWALL, CH_DIRT,
 
     0,
-    //CH_STAR, 50,10,10,10,10,
-
     DRAW_FILLED_RECT, CH_BRICKWALL, 1,1,9,8, CH_DOGE_00,
     DRAW_FILLED_RECT, 0x80|CH_STAR, 2, 2, 7, 6, 8,
 
 
-    // LINER(CH_STEELWALL, 12,0,20,2)
-    // LINER(CH_STEELWALL, 12,2,20,2)
-    // LINER(CH_STEELWALL, 12,4,20,2)
-    // LINER(CH_STEELWALL, 12,6,20,2)
-    // LINER(CH_STEELWALL, 12,8,20,2)
-    // LINER(CH_STEELWALL, 12,10,20,2)
-    // LINER(CH_STEELWALL, 12,12,20,2)
-    // LINER(CH_STEELWALL, 12,14,20,2)
-
-    // DRAW_FILLED_RECT, CH_DIRT, 0, 0, 8, 8,CH_DIRT,
-
-    // CH_STAR, 1,1,
-    // CH_STAR, 3,1,
-    // CH_STAR, 5,1,
-    // CH_STAR, 7,1,
-    // CH_STAR, 9,1,
-    // CH_STAR, 11,1,
-
-    // CH_STAR, 2,2,
-    // CH_STAR, 4,2,
-    // CH_STAR, 5,2,
-    // CH_STAR, 8,2,
-    // CH_STAR, 10,2,
-
-    // CH_STAR, 1,3,
-    // CH_STAR, 3,3,
-    // CH_STAR, 5,3,
-    // CH_STAR, 7,3,
-    // CH_STAR, 9,3,
-    // CH_STAR, 11,3,
-
-    // CH_STAR, 2,4,
-    // CH_STAR, 4,4,
-    // CH_STAR, 5,4,
-    // CH_STAR, 8,4,
-    // CH_STAR, 10,4,
-
-        CH_MELLON_HUSK_BIRTH, 2, 2,
-
 
     DRAW_EOF,
+
 
     // EXTRAS
+
+    // -------------------------------------------------------
     // LEVEL 0
-    DRAW_EOF, // LEVEL 1
-    DRAW_EOF, // LEVEL 2
-    DRAW_EOF, // LEVEL 3
-    DRAW_EOF, // LEVEL 4
+    CH_MELLON_HUSK_BIRTH, 2, 2,
     DRAW_EOF,
+    
+    // -------------------------------------------------------
+    // LEVEL 1
+
+    DRAW_FILLED_RECT, 0x80|CH_ROCK, 2, 2, 7, 6, 8,
+    CH_MELLON_HUSK_BIRTH, 4, 2,
+    DRAW_EOF,
+    
+    // -------------------------------------------------------
+    // LEVEL 2
+    DRAW_FILLED_RECT, CH_BLANK, 2, 2, 7, 6,CH_BLANK,
+
+    CH_ROCK,2,2,
+    CH_ROCK,8,2,
+    LINER(CH_STAR,3,2,5,2)
+    CH_DIRT,2,3,CH_DIRT,8,3,
+
+    CH_ROCK,3,3,
+    CH_ROCK,7,3,
+    LINER(CH_DOGE_00,4,3,3,2)
+    CH_DIRT,3,4,CH_DIRT,7,4,
+
+    CH_ROCK,4,4,
+    CH_ROCK,6,4,
+    CH_DOGE_00,5,4,
+    CH_GEODOGE,4,5,CH_GEODOGE,6,5,
+    
+    CH_ROCK,5,5,
+
+    //   DRAW_FILLED_RECT, CH_STAR, 2, 2, 7, 6,
+//    DRAW_FILLED_RECT, CH_BLANK, 3, 3, 4, 3,
+    CH_MELLON_HUSK_BIRTH, 5,6,
+    LINER(CH_BLANK, 2,7,7,2)
+    CH_DOORCLOSED, 5,7,
+    DRAW_EOF,
+    
+    // -------------------------------------------------------
+    // LEVEL 3
+
+    LINER(CH_STAR,2,2,5,2)
+    DRAW_FILLED_RECT,CH_ROCK, 2,3,7,2, CH_ROCK,
+    CH_MELLON_HUSK_BIRTH, 2,6,
+    CH_DOORCLOSED, 5,2,
+
+    DRAW_EOF,
+    
+    // -------------------------------------------------------
+    // LEVEL 4
+
+
+    CH_MELLON_HUSK_BIRTH, 2, 2,
+
+    DRAW_EOF,
+
 
     'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
     // clang-format on
@@ -1139,11 +1152,11 @@ const struct caveHandler caveList[] = {
     // cave definition, condition handler
 
     {starsAndStripes, spec},    //
-    // {caveUseWall, none},        //
-    // {caveA4, none},             //
-    // {caveWyrms, none},          //
-    // {caveA, none},              //
-    // {caveA2, none},             //
+    {caveUseWall, none},        //
+    {caveA4, none},             //
+    {caveWyrms, none},          //
+    {caveA, none},              //
+    {caveA2, none},             //
 
 
     // caveA3,         //

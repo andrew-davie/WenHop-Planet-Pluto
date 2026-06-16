@@ -89,6 +89,7 @@ SRCS = \
  gameState_Game.c \
  gameState_Menu.c \
  gameState_Rainbow.c \
+ gameState_Skull.c \
  menuCharacterSet.c \
  particle.c \
  reverseBits.c \
@@ -271,7 +272,7 @@ $(TOOLS_BIN)/$(WAV2RAW): $(TOOLS_SRC)/$(WAV2RAW).c
 ###############################################################################
 # Graphics
 
-gfx: GRID6 IMG
+gfx: GRID6 IMG SKULL
 
 GRID6: gfx/grid/*.gif
 	(cd gfx/grid & python3 tools/1bpp.py -o grid6 gfx/grid/*.gif)
@@ -280,6 +281,10 @@ GRID6: gfx/grid/*.gif
 .PHONY: IMG
 IMG:
 	python3 tools/pcc.py -o icc/icc $(IMAGES)
+
+.PHONY: SKULL
+SKULL: main/skull/gfx/iCC_skull.gif
+	$(MAKE) -C main/skull/gfx
 
 ###############################################################################
 # Cleaning

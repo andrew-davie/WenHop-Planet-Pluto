@@ -14,6 +14,7 @@ KNO                 SET KNO + 1
     KERNEL COUCH_COMPLIANT      ; 3
     KERNEL MENU                 ; 4
     KERNEL GAME                 ; 5
+    KERNEL SKULL                ; 6
 
     KERNEL MAX
 
@@ -32,6 +33,7 @@ kernelBank_L
                     .byte <BANK_kernelCopyright         ; 3 KERNEL_COUCH_COMPLIANT (re-uses COPYRIGHT)
                     .byte <BANK_kernelMenu              ; 4 KERNEL_MENU
                     .byte <BANK_kernelGame              ; 4 KERNEL_GAME
+                    .byte <BANK_kernelSkull              ; 4 KERNEL_SKULL
 
                     ; >>> VB
                     .byte <BANK_kernelDetectConsole
@@ -40,6 +42,7 @@ kernelBank_L
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelMenu
                     .byte <BANK_kernelGame
+                    .byte <BANK_kernelSkull
 
                     ; >>> OS
                     .byte <BANK_kernelDetectConsole
@@ -48,6 +51,7 @@ kernelBank_L
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelMenu
                     .byte <BANK_kernelGame
+                    .byte <BANK_kernelSkull
 .END
 
 kernelRoutine_L
@@ -57,6 +61,7 @@ kernelRoutine_L
                     .byte <kernelCopyright
                     .byte <kernelMenu
                     .byte <kernelGame
+                    .byte <kernelSkull
 
                     .byte <VB_kernelDetectConsole
                     .byte <VB_kernelRainbow
@@ -64,6 +69,7 @@ kernelRoutine_L
                     .byte <VB_kernelCopyright
                     .byte <VB_kernelMenu
                     .byte <VB_kernelGame
+                    .byte <VB_kernelSkull
 
                     .byte <OS_kernelDetectConsole
                     .byte <OS_kernelRainbow
@@ -71,6 +77,7 @@ kernelRoutine_L
                     .byte <OS_kernelCopyright
                     .byte <OS_kernelMenu
                     .byte <OS_kernelGame
+                    .byte <OS_kernelSkull
 
 kernelRoutine_H
                     .byte >kernelDetectConsole
@@ -79,6 +86,7 @@ kernelRoutine_H
                     .byte >kernelCopyright
                     .byte >kernelMenu
                     .byte >kernelGame
+                    .byte >kernelSkull
 
                     .byte >VB_kernelDetectConsole
                     .byte >VB_kernelRainbow
@@ -86,6 +94,7 @@ kernelRoutine_H
                     .byte >VB_kernelCopyright
                     .byte >VB_kernelMenu
                     .byte >VB_kernelGame
+                    .byte >VB_kernelSkull
 
                     .byte >OS_kernelDetectConsole
                     .byte >OS_kernelRainbow
@@ -93,6 +102,7 @@ kernelRoutine_H
                     .byte >OS_kernelCopyright
                     .byte >OS_kernelMenu
                     .byte >VB_kernelGame
+                    .byte >VB_kernelSkull
 
 ;-------------------------------------------------------------------------------
 
