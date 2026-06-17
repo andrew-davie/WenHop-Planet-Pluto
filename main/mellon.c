@@ -29,12 +29,6 @@ bool handled;
 bool gearsActive;
 bool gearsWaitRelease;
 
-enum JOYSTICK_DIRECTION {
-    JOYSTICK_UP = 1,
-    JOYSTICK_DOWN = 2,
-    JOYSTICK_LEFT = 4,
-    JOYSTICK_RIGHT = 8,
-};
 
 const enum JOYSTICK_DIRECTION joyDirectBit[] = {
     JOYSTICK_UP,

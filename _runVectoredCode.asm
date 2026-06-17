@@ -101,8 +101,8 @@ kernelRoutine_H
                     .byte >OS_kernelCopyright
                     .byte >OS_kernelCopyright
                     .byte >OS_kernelMenu
-                    .byte >VB_kernelGame
-                    .byte >VB_kernelSkull
+                    .byte >OS_kernelGame
+                    .byte >OS_kernelSkull
 
 ;-------------------------------------------------------------------------------
 

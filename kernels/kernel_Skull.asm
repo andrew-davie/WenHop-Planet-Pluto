@@ -96,7 +96,6 @@ kernelSkull
 
     ; runVectoredCode[kernel] comes here
 
-
 _skullLoop                                           ;@3
 
                     lda #_DS_SKULL_PF1_LEFT_DATA
@@ -108,73 +107,38 @@ _skullLoop                                           ;@3
                     lda #_DS_SKULL_GRP0B_DATA
                     sta GRP0                        ; 5
 
-                    lda #_DS_SKULL_GRP1C_DATA        ; 2
+                    lda #_DS_SKULL_GRP1C_DATA       ; 2
                     tay                             ; 2
 
                     lda #_DS_SKULL_PF2_LEFT_DATA
                     sta PF2                         ; 5
 
-                    lda #_DS_SKULL_GRP0C_DATA        ; 2
+                    lda #_DS_SKULL_GRP0C_DATA       ; 2
                     tax                             ; 2
                     lda #_DS_SKULL_PF1_RIGHT_DATA
                     sta PF1                         ; 5
 
-                    lda #_DS_SKULL_PF2_RIGHT_DATA    ; 2
+                    lda #_DS_SKULL_PF2_RIGHT_DATA   ; 2
                     nop                             ; 2
                     sta PF2                         ; 3
 
-                    lda #_DS_SKULL_GRP1B_DATA        ; 2
+                    lda #_DS_SKULL_GRP1B_DATA       ; 2
                     sta GRP1                        ; 3
                     stx GRP0                        ; 3
                     sty GRP1                        ; 3
                     sta GRP0                        ; 3
 
-                    lda #_DS_SKULL_COLUP0_DATA       ; 2
+                    lda #_DS_SKULL_COLUP0_DATA      ; 2
                     sta COLUP0                      ; 3
                     sta.w COLUP1                    ; 4
 
-                    lda #_DS_SKULL_COLUPF_DATA       ; 2
+                    lda #_DS_SKULL_COLUPF_DATA      ; 2
                     sta COLUPF                      ; 3
-;@76=0
+; @76 == 0
 
                     jmp 0                           ; @3 --> start of line again
 
-
-; _skullLoop          ;sta WSYNC
-
-;                     lda #_DS_SK_COLUPF_DATA
-;                     sta COLUPF
-
-;                     lda #_DS_SK_COLUBK_DATA
-;                     sta COLUBK
-
-;                     lda #_DS_SK_GRP0A_DATA
-;                     sta GRP0
-;                     lda #_DS_SK_GRP1A_DATA
-;                     sta.w GRP1
-;                     lda #_DS_SK_GRP0B_DATA
-;                     sta GRP0
-;                     lda #_DS_SK_GRP1C_DATA
-;                     ;nop
-;                     sta SK_temp
-;                     lda #_DS_SK_GRP0C_DATA
-;                     tax
-;                     lda #_DS_SK_GRP1B_DATA
-;                     nop
-;                     ldy SK_temp
-;                     sta GRP1
-;                     stx GRP0
-;                     sty GRP1
-;                     sta GRP0
-
-;                     lda #_DS_SK_COLUP0_DATA
-;                     sta COLUP0
-;                     sta COLUP1
-
-;                     jmp 0
-
-
-_skullExit
+_skullExit          sta WSYNC
                     rts
 
 

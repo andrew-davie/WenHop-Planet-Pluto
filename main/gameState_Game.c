@@ -87,7 +87,6 @@ void initGameState_Game() {
 
     exitMode = 0;    // --> initNextlife
 
-
     decodeCave(cave);    // TODO: in initNextLife instead
     loadPalette();
 
@@ -170,10 +169,10 @@ void VB_Game() {
 
     //    if (frame > 20000)
     if (RAM[_SWCHB] != 0x3F)
-        setGameState(GS_MENU);    // GS_COUCH_COMPLIANT);
+        setGameState(GS_SKULL);    // GS_COUCH_COMPLIANT);
 
     processCharAnimations();
-    setPalette();
+    setPalette(_BUF_GAME_COLUBK);
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
@@ -199,6 +198,7 @@ void OS_Game() {
     setScoreCycle(SCORELINE_SCORE);    // tmp
 
     interleaveChronoColour(&roller);
+    adjustLuminance();
     setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
 
     updatePlayerAnimation();
@@ -214,7 +214,7 @@ void OS_Game() {
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;
 
-    // tmp   scheduledTasks();
+    scheduledTasks();
 }
 
 // EOF

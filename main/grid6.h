@@ -24,3 +24,5 @@ extern const unsigned char gfx_grid_savekey_gif[8][6];
 #define gfx_grid_savekey_gif_HEIGHT 8
 extern const unsigned char gfx_grid_savekey_reset_gif[6][6];
 #define gfx_grid_savekey_reset_gif_HEIGHT 6
+extern const unsigned char gfx_grid_suchislife_gif[20][6];
+#define gfx_grid_suchislife_gif_HEIGHT 20

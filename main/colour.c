@@ -18,6 +18,7 @@ unsigned char fgPalette[2];
 static int lastPfCharLine;
 static int lastBgCharLine;
 int currentPalette;
+int luminance;
 
 int flashTime = 1;
 
@@ -48,6 +49,29 @@ unsigned char secamConvert(unsigned char col) {
     return c;
 }
 
+
+unsigned char adjustBrightness(unsigned char colour) {
+
+    // Remember if iCC is operating, we will see blended colours (with black/no pixel)
+    // So even if we set all white, we WILL see shades of grey.  So we can fade to black OK
+    // But we cannot fade to white - only fade to bright.
+
+    int lum = (colour & 0xF) + luminance;
+
+    if (lum < 0) {
+        lum = 0;
+        colour = 0;
+    }
+
+    if (lum > 14) {
+        colour = 0;
+        lum = 14;
+    }
+
+    return (colour & 0xF0) | lum;
+}
+
+
 unsigned char convertColour(unsigned char colour) {
     switch (tvSystem) {
 
@@ -66,7 +90,7 @@ unsigned char convertColour(unsigned char colour) {
         break;
     }
 
-    return colour;
+    return adjustBrightness(colour);
 }
 
 void pulseBackgroundColour(unsigned char colour, int time) {
@@ -105,6 +129,16 @@ void setPFColours(unsigned char *colours) {
             roller = 0;
         colours[i] = pfConvertedColour[roller];
     }
+}
+
+
+void adjustLuminance() {
+
+    if (luminance < 0)
+        luminance++;
+
+    if (luminance > 0)
+        luminance = 0;    // MAJOR error
 }
 
 
@@ -194,7 +228,7 @@ void setBackgroundPalette(unsigned char *cx) {
 }
 
 
-void setPalette() {
+void setPalette(int buf) {
 
 
     //  interleaveColour();
@@ -203,8 +237,8 @@ void setPalette() {
     const int shift = 16;
 
     int i = 0;
-    unsigned char *pfCol = RAM + _BUF_GAME_COLUPF;
-    unsigned char *bkCol = RAM + _BUF_GAME_COLUBK;
+    unsigned char *pfCol = RAM + buf;
+    unsigned char *bkCol = RAM + buf;
 
     int bgCharLine = (scrollY >> 16) * 3;
     int pfCharLine = 0;
@@ -293,7 +327,7 @@ const unsigned char colourPool[][4] = {
 
 #if 0
 
-    {0x08, 0x46, 0x52, 0x56},    //
+//    {0x06, 0x38, 0xA4, 0xA6},    //
 
 
 #else
@@ -403,28 +437,11 @@ const unsigned char colourPool[][4] = {
 
 void loadPalette() {
 
+    luminance = 0;
+
     unsigned char *c = (unsigned char *)colourPool;
-
-    // unsigned char rp[4];
-
-    // rp[3] = rp[2] + 4;
     currentPalette = rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));
-
-
-    // for (int i = 0; i < 4; i++)
-    //     rp[i] = colourPool[currentPalette][i];
-
-    // rp[3] = rp[2] + 0x30;
-    // if (!(rp[3] & 0xF0))
-    //     rp[3] += 0x10;
-
-
-    // if (currentPalette > sizeof(colourPool) / sizeof(colourPool[0]))
-    //     currentPalette = 0;
-
-
-    c += ((currentPalette) << 2);
-    setBackgroundPalette(c);
+    setBackgroundPalette(c + (currentPalette << 2));
 }
 
 // EOF

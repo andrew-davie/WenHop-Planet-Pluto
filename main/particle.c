@@ -23,7 +23,7 @@ unsigned int weaponLength = 0;
 void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
                     unsigned char colour, unsigned char dmask);
 
-#define TOOL_MAX 25
+#define TOOL_MAX 60
 
 struct TOOL {
 
@@ -152,7 +152,7 @@ void drawMace() {
         return;
 
     if ((inpt4 & 0x80) && !weaponLength) {
-        weaponLength = 0;
+        //        weaponLength = 0;
         return;
     }
 
@@ -201,12 +201,42 @@ void drawMace() {
 
     modifyCharAtTip(baseX + x, baseY + y);
 
-    static unsigned char wantedDirection = 0;
+    static unsigned char wantedDirection = 96;
 
-    if (tool[0].dir == wantedDirection)
-        wantedDirection = getRandom32();
 
-    tool[0].dir = turn_toward(tool[0].dir, wantedDirection, 5);
+    // Weapon runs randomly if player not locked
+    // Otherwise direction controls it
+    int hard = 0;
+    static const int xy[] = {1, -1, _1ROW, -_1ROW};
+
+    unsigned char *man = RAM + _BOARD + playerY * _1ROW + playerX;
+    for (int dir = 0; dir < 4; dir++) {
+        unsigned char type = CharToType[GET(*(man + xy[dir]))];
+        if (type == TYPE_OUTBOX || Attribute[CharToType[GET(*(man + xy[dir]))]] & ATT_HARD)
+            hard++;
+    }
+
+    if (hard == 4) {
+
+
+        if (!(swcha & (JOYSTICK_LEFT << 4)))
+            wantedDirection -= 4;
+        else if (!(swcha & (JOYSTICK_RIGHT << 4)))
+            wantedDirection += 4;
+
+        else
+            wantedDirection += rangeRandom(15) - 7;
+
+        tool[0].dir = wantedDirection;
+
+
+    } else {
+        FLASH(0x28, 2);
+        if (tool[0].dir == wantedDirection)
+            wantedDirection = getRandom32();
+        tool[0].dir = turn_toward(tool[0].dir, wantedDirection, 4);
+    }
+
 
     for (int i = weaponLength - 1; i > 0; i--)
         tool[i].dir = tool[i - 1].dir;

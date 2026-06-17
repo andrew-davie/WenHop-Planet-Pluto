@@ -365,7 +365,7 @@ void (*const verticalBlank[GS_MAX])() = {
 
 void runARM_VerticalBlank() {
 
-    availableIdleTime = 50000;    // RAM[_INTIM]  * armCycles;
+    availableIdleTime = RAM[_INTIM] * armCycles;
 
     if (gameState == nextGameState) {
         (*verticalBlank[gameState])();
@@ -406,7 +406,7 @@ int intim;
 
 void runARM_Overscan() {
 
-    availableIdleTime = 50000;    // RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
+    availableIdleTime = RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
 
     if (gameState != nextGameState) {
 

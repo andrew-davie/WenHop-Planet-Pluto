@@ -7,6 +7,7 @@
 ; the code that jumps to the RAM copy of this code.
 ; DO NOT RUN *THIS* CODE AS IT WILL CRASH. JUMP TO THE RAM VERSION!
 
+
 JUMP_CODE_START
 jumpCode       	    cmp BANK1           ; hotspot bank-switch
                     jsr 0               ; selfmod

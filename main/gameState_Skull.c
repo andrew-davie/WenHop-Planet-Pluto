@@ -11,10 +11,11 @@
 #include "random.h"
 #include "reverseBits.h"
 #include "savekey.h"
+// #include "skull/main/main.h"
 #include "sound.h"
 
 #define CHAMP_VOL 100
-#define DURATION_SKULL 100
+#define DURATION_SKULL 180
 #define PRESENTS_LUM 8
 #define FADE_SPEED 17000
 #define FADE_SHIFT 16
@@ -381,49 +382,15 @@ void initKernel_Skull() {
 
     killRepeatingAudio();
 
-    //    flashTime2 = 0;
-
-    // static int showCave = -1;
-    // if (++showCave >= caveCount)
-    //     showCave = 0;
-
-    // cave = showCave;
-    // level = 4;    // tmp;
-    // menuLineTVType = 0;
-
     colubk = 0;
 
-    // tempName = rangeRandom(sizeof(showCaveName) / sizeof(showCaveName[0]));
-
-    // ARENA_COLOUR = 0;
-
-    // if (rageQuit) {
-    //     rageQuit = false;
-    //     SAY(__WORD_RAGEQUIT);
-    //     FLASH(0x48, 8);
-    // }
-
-
-    //    bufferedSWCHA = 0xFF;
-    //    waitRelease = true;
     sound_max_volume = VOLUME_MAX;
 
     myMemsetInt((unsigned int *)(RAM + _SKULL_BUFFERS_START), 0, _SKULL_BUFFERS_SIZE / 4);
 
 
-    // draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0,    //
-    //             gfx_grid_menu_planet_gif, gfx_grid_menu_planet_gif_HEIGHT, 94 + 30, 6);
-
-    // draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0,    //
-    //             gfx_grid_SKULL_bravado_gif, gfx_grid_SKULL_bravado_gif_HEIGHT, 120 + 30, 6);
-
-    // menuLine = 0;
-    // base2 = 0;
-    // pushCount = 0;
-
-    //    chooseColourScheme();
-
-    //    mustWatchDelay = MUSTWATCH_SKULL;
+    draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0,    //
+                gfx_grid_suchislife_gif, gfx_grid_suchislife_gif_HEIGHT, 175, 0xF4);
 }
 
 
@@ -452,10 +419,7 @@ void initGameState_Skull() {
     // loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
     // loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
 
-    // myMemsetInt((unsigned int *)(RAM + _BUF_SKULL_GRP), 0, _BUFFER_SIZE * 6 / 4);
-    // myMemsetInt((unsigned int *)(RAM + _BUF_SKULL_COLUBK), 0, _BUFFER_SIZE / 4);
-
-    //    presentsColour = 2 << FADE_SHIFT;
+    myMemsetInt((unsigned int *)(RAM + _BUF_SKULL_PF), 0, _BUFFER_SIZE * 10 / 4);
 
     frame = 0;
 }
@@ -463,33 +427,37 @@ void initGameState_Skull() {
 
 const unsigned char componentskulljawa[] = {
 
-    12 * 3,     0b00000110, 0b10000000, 0b00000100,    // 0
-    0b10000111, 0b01000000, 0b00000110,                // 1
-    0b10010011, 0b00010100, 0b01000110,                // 2
-    0b11111111, 0b00000000, 0b11010110,                // 3
-    0b11011101, 0b00000010, 0b11111110,                // 4
-    0b11111111, 0b00000000, 0b11111110,                // 5
-    0b01111000, 0b10000100, 0b11111110,                // 6
-    0b00101000, 0b11011110, 0b11111100,                // 7
-    0b00001100, 0b11111000, 0b11111100,                // 8
-    0b11001000, 0b11111000, 0b11111100,                // 9
-    0b00011000, 0b11001100, 0b11111000,                // 10
-    0b10101000, 0b11010000, 0b01111000,                // 11
+    12 * 3,    //
+
+    0b00000110, 0b10000000, 0b00000100,    // 0
+    0b10000111, 0b01000000, 0b00000110,    // 1
+    0b10010011, 0b00010100, 0b01000110,    // 2
+    0b11111111, 0b00000000, 0b11010110,    // 3
+    0b11011101, 0b00000010, 0b11111110,    // 4
+    0b11111111, 0b00000000, 0b11111110,    // 5
+    0b01111000, 0b10000100, 0b11111110,    // 6
+    0b00101000, 0b11011110, 0b11111100,    // 7
+    0b00001100, 0b11111000, 0b11111100,    // 8
+    0b11001000, 0b11111000, 0b11111100,    // 9
+    0b00011000, 0b11001100, 0b11111000,    // 10
+    0b10101000, 0b11010000, 0b01111000,    // 11
 };
 
 const unsigned char componentskulljawb[] = {
 
-    11 * 3,     0b00000001, 0b00000001, 0b00000000,    // 0
-    0b00000001, 0b00000000, 0b00000001,                // 1
-    0b00000000, 0b00000001, 0b00000001,                // 2
-    0b00000001, 0b00000001, 0b00000001,                // 3
-    0b00000010, 0b00000001, 0b00000001,                // 4
-    0b00000010, 0b00000001, 0b00000001,                // 5
-    0b00000011, 0b00000001, 0b00000001,                // 6
-    0b00000011, 0b00000000, 0b00000001,                // 7
-    0b00000000, 0b00000000, 0b00000001,                // 8
-    0b00000000, 0b00000000, 0b00000001,                // 9
-    0b00000001, 0b00000001, 0b00000000,                // 10
+    11 * 3,    //
+
+    0b00000001, 0b00000001, 0b00000000,    // 0
+    0b00000001, 0b00000000, 0b00000001,    // 1
+    0b00000000, 0b00000001, 0b00000001,    // 2
+    0b00000001, 0b00000001, 0b00000001,    // 3
+    0b00000010, 0b00000001, 0b00000001,    // 4
+    0b00000010, 0b00000001, 0b00000001,    // 5
+    0b00000011, 0b00000001, 0b00000001,    // 6
+    0b00000011, 0b00000000, 0b00000001,    // 7
+    0b00000000, 0b00000000, 0b00000001,    // 8
+    0b00000000, 0b00000000, 0b00000001,    // 9
+    0b00000001, 0b00000001, 0b00000000,    // 10
 };
 
 // clang-format on
@@ -516,10 +484,10 @@ void drawPalette(const unsigned char *palette) {
 
 void doDrawBitmap(const unsigned char *shape, int x, int y) {
 
-    unsigned char *pf1L = RAM + _BUF_SKULL_PF + y;
-    unsigned char *pf2L = pf1L + _SCANLINES;
-    unsigned char *pf2R = pf2L + _SCANLINES;
-    unsigned char *pf1R = pf2R + _SCANLINES;
+    unsigned char *pf_FL = RAM + _BUF_SKULL_PF + y;
+    unsigned char *pf_CL = pf_FL + _SCANLINES;
+    unsigned char *pf_CR = pf_CL + _SCANLINES;
+    unsigned char *pf_FR = pf_CR + _SCANLINES;
 
     int size = shape[0];
     const unsigned char *bf = shape + 1;
@@ -545,18 +513,18 @@ void doDrawBitmap(const unsigned char *shape, int x, int y) {
             gfx.bGraphic = bf[baseRoll] << x;
 
 
-            *pf1L = (*pf1L & mask.mask2[3]) | gfx.g[3];
-            *pf1R = (*pf1R & reverseBits[mask.mask2[0]]) | reverseBits[gfx.g[0]];
-            *pf2R = (*pf2R & mask.mask2[1]) | gfx.g[1];
-            *pf2L = (*pf2L & reverseBits[mask.mask2[2]]) | reverseBits[gfx.g[2]];
+            *pf_FL = (*pf_FL & mask.mask2[3]) | gfx.g[3];                              // far left
+            *pf_CL = (*pf_CL & reverseBits[mask.mask2[2]]) | reverseBits[gfx.g[2]];    // center left
+            *pf_CR = (*pf_CR & mask.mask2[1]) | gfx.g[1];                              // center right
+            *pf_FR = (*pf_FR & reverseBits[mask.mask2[0]]) | reverseBits[gfx.g[0]];    // far right
 
             if (++baseRoll > 2)
                 baseRoll = 0;
 
-            pf1L++;
-            pf1R++;
-            pf2L++;
-            pf2R++;
+            pf_FL++;
+            pf_CL++;
+            pf_FR++;
+            pf_CR++;
         }
 
         bf += 3;
@@ -564,30 +532,26 @@ void doDrawBitmap(const unsigned char *shape, int x, int y) {
 }
 
 
-static int firstTime = 500;
-
 void drawICCSkull() {
 
 #define GAME_RESET_PRESSED (!(SWCHB & 0x01))
 #define GAME_SELECT_PRESSED (!(SWCHB & 0x02))
 
+    static int skully = 6;
 
-    if (firstTime) {    //|| (GAME_RESET_PRESSED && GAME_SELECT_PRESSED)) {
 
-        // if (firstTime)
-        //     firstTime--;
+    if (true) {    //|| (GAME_RESET_PRESSED && GAME_SELECT_PRESSED)) {
 
-        static int skully = 15;
 
-        //        unsigned char skullPalette[] = {0x54, 0x66, 0x28}; // green eyes!
-        unsigned char skullPalette[] = {0xF2, 0xF4, 0xF6};
+        const unsigned char skullPalette[] = {0xF6, 0xF6, 0xF8};    // green eyes!
+        // unsigned char skullPalette[] = {0xF6, 0xF6, 0xF6};
         drawPalette(skullPalette);
 
         if (rndm)
             rndm -= (rndm >> 6) + 1;
 
         if (!rangeRandom(60)) {
-            skully = rangeRandom(3) * 3;
+            skully = 6 + rangeRandom(3) * 3;
             rndm += 1000;
         }
 
@@ -635,15 +599,17 @@ void drawICCSkull() {
         }
 
 
-        int laugh = 0;
+        static int laugh = 0;
 
-        if (!laugh && !rangeRandom(200))
-            laugh = rangeRandom(40);
-        else
+        if (!laugh && !rangeRandom(40))
+            laugh = 30 + rangeRandom(120);
+
+
+        if (laugh)
             --laugh;
 
 
-        int jawy = laugh ? (sinoid[sin & 15] >> 1) * 3 : 0;
+        int jawy = laugh ? ((sinoid[sin & 15] * 3) >> 2) * 3 : 0;
 
         doDrawBitmap(componentskulljawa, 11, skully + 141 - 3 + jawy);
         doDrawBitmap(componentskulljawb, 19, skully + 129 + jawy);
@@ -678,154 +644,22 @@ void VB_Skull() {
     initDataStreams_Skull();
     drawICCSkull();
 
-    if (frame > DURATION_SKULL)
-        setGameState(GS_GAME);
+    FLASH(0x28, 10);
 
-
-    //     if (frame < DURATION_COPYRIGHT) {
-
-    // #define CGSPACER 4
-    // #define TOP (_SCANLINES / 2 - BAND - 15)
-    // #define CGP (gfx_grid_champgames_champ_gif_HEIGHT)
-    // #define BAND (CGP + CGSPACER * 2)
-
-
-    //         unsigned char *l = RAM + _BUF_SKULL_PF;
-    //         unsigned char *r = l + _SCANLINES;
-    //         unsigned char *c = RAM + _BUF_SKULL_COLUPF;
-    //         unsigned char *spc = RAM + _BUF_SKULL_COLUP0;
-    //         unsigned char *bk = RAM + _BUF_SKULL_COLUBK;
-
-    //         for (int i = 0; i < _SCANLINES; i++)
-    //             c[i] = bk[i] = colubk;
-
-    //         l += TOP;
-    //         r += TOP;
-    //         c += TOP;
-
-    //         for (int sl = TOP; sl < TOP + 2 * BAND; sl++) {
-
-    //             *l++ = 255;
-    //             *r++ = 255;
-    //             *spc++ = 0x6;
-
-    //             if (tvSystem == _TV_SYSTEM_NTSC)
-    //                 *c++ = convertColour(sl < TOP + BAND ? 0x90 : 0x40);
-    //             else
-    //                 *c++ = convertColour(sl < TOP + BAND ? 0x92 : 0x42);
-    //         }
-
-    //         // for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++) {
-    //         //     *l++ = *r++ = *c++ = *spc++ = 0;
-    //         // }
-
-
-    //         draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0, gfx_grid_champgames_champ_gif,
-    //                     gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 8);
-    //         draw6Bitmap(_BUF_SKULL_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_games_gif,
-    //                     gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 8);
-
-
-    //         if (frame > 60) {
-    //             // if (presentsColour < (PRESENTS_LUM << FADE_SHIFT))
-    //             //     presentsColour += FADE_SPEED;
-
-    //             draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0, gfx_grid_champgames_presents_gif,
-    //                         gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, (15 >> FADE_SHIFT));
-    //         }
-
-    //         if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 70) {
-    //             int col = convertColour(frame & 16 ? 0x16 : 0x12);
-
-    //             draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0, gfx_grid_savekey_gif, gfx_grid_savekey_gif_HEIGHT,
-    //                         _SCANLINES - 11 - gfx_grid_savekey_gif_HEIGHT, col);
-
-    //             if (RAM[_SK_RESET]) {
-    //                 draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0, gfx_grid_savekey_reset_gif,
-    //                             gfx_grid_savekey_reset_gif_HEIGHT,
-    //                             _SCANLINES - 16 - gfx_grid_savekey_gif_HEIGHT - gfx_grid_savekey_reset_gif_HEIGHT,
-    //                             6);
-
-    //                 // if (!(frame & 15))
-    //                 //     ADDAUDIO(SFX_SELECTION);
-    //             }
-    //         }
-    //     }
-
-    //     else {
-
-    //         // setGameState(GS_GAME);
-    //         setGameState(GS_COUCH_COMPLIANT);
-    //     }
+    if (frame > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
+        setGameState(GS_MENU);
 }
-
-void clearBuffer(int *buffer, int size) {
-
-    for (int i = 0; i < size; i++)
-        *buffer++ = 0;    // getRandom32();
-}
-
 
 void OS_Skull() {
 
     interleaveChronoColour(&roller);
     setPFColours((unsigned char *)(RAM + _BUF_SKULL_COLUPF));
-
-    clearBuffer((int *)(RAM + _BUF_SKULL_PF), (4 * _SCANLINES / 4));
-
-    //    myMemset((unsigned char *)(RAM + _BUF_SKULL_PF), 0, _SCANLINES);
-
-    // base2++;
-
-    // static enum MENU_OPTION sline = 0;
-    // sline++;
-    // if (sline >= 2)    //(int)(sizeof(smallWord) / sizeof(smallWord[0])))
-    //     sline = 0;
-
-    // int y = sline * 28 + 96;
-
-    // if (flashTime2)
-    //     --flashTime2;
-
-    // const char *dLine = 0;
-
-    // switch (sline) {
-
-    // case MENU_OPTION_CAVE:
-    //     //        dLine = showCave[cave];
-
-    //     dLine = showCaveName[tempName];
-
-    //     break;
-
-    // case MENU_OPTION_LEVEL:
-    //     dLine = Level[level];
-    //     break;
-
-    //     // case MENU_OPTION_TVSYSTEM:
-    //     //     dLine = TV[menuLineTVType];
-    //     //     break;
-    // }
-
-    // //    drawSmallString(y, smallWord[sline]);
-
-    // int colour = sline == menuLine ? (flashTime2 & 4) ? 0x0A : ((base2 << 2) & 0xF0) | 0x16 : 0x26;
-
-    // drawString(0, y + 8 + 30, dLine, colour);
+    setPalette(_BUF_SKULL_COLUBK);
 
 
-    //--------------------------------------------------------------------------
-    // Draw ICC menu PF background
-
-
-    extern const unsigned char gfx_image_WenHop_png[66][4][3];
-
-    // drawPFSkull(_BUF_SKULL_PF, gfx_image_WenHop_png);
-
-    //--------------------------------------------------------------------------
-
-    // draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0,    //
-    //             gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 62, 0x96);
+    unsigned int *p = (unsigned int *)(RAM + _BUF_SKULL_PF);
+    for (int i = 0; i < _BUFFER_SIZE; i++)    // 4 buffers @ int
+        *p++ = 0;                             // getRandom32();
 }
 
 // EOF

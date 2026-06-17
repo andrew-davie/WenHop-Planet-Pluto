@@ -1,7 +1,7 @@
 #pragma once
 
-#define PARTICLE_COUNT 24
-#define ROPE_PARTICLE_COUNT 24
+#define PARTICLE_COUNT 42
+#define ROPE_PARTICLE_COUNT 42
 #define PARTICLE_SPIRAL_ANGULAR_SPEED 6
 
 enum ParticleType {

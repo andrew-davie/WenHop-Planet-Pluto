@@ -1147,14 +1147,18 @@ void spec() {
 }
 
 
+void empty() {
+}
+
+
 const struct caveHandler caveList[] = {
 
     // cave definition, condition handler
 
+    {caveWyrms, empty},         //
     {starsAndStripes, spec},    //
     {caveUseWall, none},        //
     {caveA4, none},             //
-    {caveWyrms, none},          //
     {caveA, none},              //
     {caveA2, none},             //
 

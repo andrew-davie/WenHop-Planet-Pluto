@@ -61,7 +61,6 @@ _gameLoop ; @3
                     lda #_DS_GAME_COLUP1_DATA
                     sta COLUP1                      ; 5 @76
 
-
                     jmp 0                           ; 3
 
 _gameExit           lda #0
@@ -71,6 +70,7 @@ _gameExit           lda #0
                     rts
 
 ;-------------------------------------------------------------------------------
+
 
 VB_kernelGame
 

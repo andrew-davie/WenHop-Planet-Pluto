@@ -12,6 +12,13 @@ extern int frameAdjustY;
 
 extern unsigned int pushCounter;
 
+enum JOYSTICK_DIRECTION {
+    JOYSTICK_UP = 1,
+    JOYSTICK_DOWN = 2,
+    JOYSTICK_LEFT = 4,
+    JOYSTICK_RIGHT = 8,
+};
+
 enum FaceDirectionX {
     FACE_LEFT = -1,
     FACE_RIGHT = 1,

@@ -96,7 +96,7 @@ _menuLoop                                           ;@3
                     jmp 0                           ; @3 --> start of line again
 
 
-_menuExit
+_menuExit           sta WSYNC
                     rts
 
 
