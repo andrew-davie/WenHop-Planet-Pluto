@@ -128,6 +128,33 @@ END_BUFFERS SET *
 
 ;-------------------------------------------------------------------------------
 
+
+    SEG.U GS_GLOBE
+    ORG _BUFFERS
+
+    DEFBUF 2, GLOBE_JUMP
+
+_GLOBE_BUFFERS_START = *
+
+    DEFBUF 1, GLOBE_COLUBK
+    DEFBUF 1, GLOBE_COLUPF
+    DEFBUF 2, GLOBE_COLUP0
+
+    DEFBUF 6, GLOBE_PF
+    DEFBUF 6, GLOBE_GRP
+
+_GLOBE_BUFFERS_SIZE = * - _GLOBE_BUFFERS_START
+
+    echo "GLOBE buffers = ",[_GLOBE_BUFFERS_SIZE]d, "bytes"
+
+    ; end of grouping (10)
+
+    if * > END_BUFFERS
+END_BUFFERS SET *
+    endif
+
+;-------------------------------------------------------------------------------
+
     SEG.U GS_MENU
     ORG _BUFFERS
 

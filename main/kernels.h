@@ -13,5 +13,6 @@ void initKernel_CouchCompliant();
 void initKernel_Menu();
 void initKernel_Game();
 void initKernel_Skull();
+void initKernel_Globe();
 
 // EOF

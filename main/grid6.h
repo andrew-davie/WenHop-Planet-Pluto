@@ -14,6 +14,12 @@ extern const unsigned char gfx_grid_compliant_gif[7][6];
 #define gfx_grid_compliant_gif_HEIGHT 7
 extern const unsigned char gfx_grid_couch_compliant_gif[26][6];
 #define gfx_grid_couch_compliant_gif_HEIGHT 26
+extern const unsigned char gfx_grid_lorem1_gif[8][6];
+#define gfx_grid_lorem1_gif_HEIGHT 8
+extern const unsigned char gfx_grid_lorem2_gif[8][6];
+#define gfx_grid_lorem2_gif_HEIGHT 8
+extern const unsigned char gfx_grid_lorem3_gif[8][6];
+#define gfx_grid_lorem3_gif_HEIGHT 8
 extern const unsigned char gfx_grid_menu_bravado_gif[12][6];
 #define gfx_grid_menu_bravado_gif_HEIGHT 12
 extern const unsigned char gfx_grid_menu_planet_gif[8][6];

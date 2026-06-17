@@ -20,6 +20,9 @@ BANK_kernelMenu = BANK1
 BANK_kernelGame = BANK1
     include "kernels/kernel_game.asm"
 
+BANK_kernelGlobe = BANK1
+    include "kernels/kernel_Globe.asm"
+
 ;-------------------------------------------------------------------------------
 
 

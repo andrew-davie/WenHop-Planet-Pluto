@@ -72,6 +72,7 @@ SRCS = \
  custom.c \
  decodeCaves.c \
  draw.c \
+ drawPlanet.c \
  drawPlayer.c \
  drawScreen.c \
  joystick.c \
@@ -83,6 +84,7 @@ SRCS = \
  sound.c \
  sprites.c \
  swipe.c \
+ \
  gameState_Copyright.c \
  gameState_CouchCompliant.c \
  gameState_DetectConsole.c \
@@ -90,6 +92,8 @@ SRCS = \
  gameState_Menu.c \
  gameState_Rainbow.c \
  gameState_Skull.c \
+ gameState_Globe.c \
+ \
  menuCharacterSet.c \
  particle.c \
  reverseBits.c \
@@ -100,6 +104,8 @@ SRCS = \
  wyrm.c \
  \
  grid6.c
+
+
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)

@@ -3,7 +3,7 @@ todo:
 star swipe import from BD
 rain particles from BD
 planets!
-death skull
+
 weapon from board!!!  e.g., M = mace, R = ROPE, G = gun
 x/y triggered pipe pushers
 rolling on hardware (spiceware)

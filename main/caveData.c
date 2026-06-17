@@ -1155,18 +1155,18 @@ const struct caveHandler caveList[] = {
 
     // cave definition, condition handler
 
+    // {caveA3, none},    //
+    // {caveMace, none},
+    {caveTest, none},
+
+    {caveUseWall, none},    //
+    {caveA4, none},         //
+    {caveA, none},          //
+    {caveA2, none},         //
+
     {caveWyrms, empty},         //
     {starsAndStripes, spec},    //
-    {caveUseWall, none},        //
-    {caveA4, none},             //
-    {caveA, none},              //
-    {caveA2, none},             //
 
-
-    // caveA3,         //
-
-    // caveMace,
-    //    caveTest,
     //    caveFast,
     //    caveA5,  // bad
 };

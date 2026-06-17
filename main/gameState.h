@@ -13,6 +13,7 @@ enum GAME_STATE {
     GS_MENU,               // 5
     GS_GAME,               // 6
     GS_SKULL,              // 7
+    GS_GLOBE,              // 8
 
     GS_MAX
 
@@ -46,4 +47,7 @@ void initGameState_Skull();
 void VB_Skull();
 void OS_Skull();
 
+void initGameState_Globe();
+void VB_Globe();
+void OS_Globe();
 // EOF

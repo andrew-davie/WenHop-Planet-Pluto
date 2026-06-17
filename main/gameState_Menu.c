@@ -196,7 +196,7 @@ void VB_Menu() {
     initDataStreams_Menu();
 
 
-    if (frame > 250)
+    if (frame > 25)
         setGameState(GS_GAME);
 }
 

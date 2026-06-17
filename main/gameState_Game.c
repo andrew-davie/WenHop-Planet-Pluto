@@ -169,7 +169,7 @@ void VB_Game() {
 
     //    if (frame > 20000)
     if (RAM[_SWCHB] != 0x3F)
-        setGameState(GS_SKULL);    // GS_COUCH_COMPLIANT);
+        setGameState(GS_GLOBE);    // GS_COUCH_COMPLIANT);
 
     processCharAnimations();
     setPalette(_BUF_GAME_COLUBK);

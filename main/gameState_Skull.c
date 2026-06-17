@@ -582,8 +582,8 @@ void drawICCSkull() {
         for (int i = 0; i < 4; i++)
             doDrawBitmap(shape2[i], i * 8, 18 + yoff2[i] + 21 - bone1y);
 
-        unsigned char *p = RAM + _BUF_SKULL_PF + 1 * _SCANLINES + 60 + skully;
-        unsigned char *q = RAM + _BUF_SKULL_PF + 2 * _SCANLINES + 60 + skully;
+        unsigned char *p = RAM + _BUF_SKULL_PF + 1 * _BUFFER_SIZE + 60 + skully;
+        unsigned char *q = RAM + _BUF_SKULL_PF + 2 * _BUFFER_SIZE + 60 + skully;
 
         for (int block = 0; block < 42; block++) {
             *p++ = 0;
