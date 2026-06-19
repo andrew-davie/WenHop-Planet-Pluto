@@ -16,7 +16,7 @@ idle animations
 
 bonus levels - you get 3 attempts at each 
 
-LIFE planets
+conway's LIFE planets
 
 bye
 

@@ -3,6 +3,7 @@
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
+#include "colour.h"
 
 #include "animations.h"
 #include "attribute.h"
@@ -144,7 +145,7 @@ const short int line85[] = {
 };
 
 
-int pscrollSpeed = 0x1500;
+int pscrollSpeed = 0x1240;
 
 
 unsigned int stepSize = 0x100;
@@ -154,13 +155,13 @@ unsigned int stepSize2 = 0x100;
 unsigned int mult = (int)(1.25 * 0x100);
 unsigned int div = (int)(0x100 / 1.25);
 
-int scalex = 0xA0;    // 3D0;
-int dir = -2;
+int scalex = 0x60;    // 3D0;
+int dir = 0;
 
 void initPlanet() {
 
-    scalex = 0x300;
-    dir = 1;
+    scalex = 0xb0;
+    dir = 0;
 }
 
 
@@ -271,13 +272,25 @@ void drawPlanet(int half) {
 
 
         int mask = pix85[equiv];
+        int roll = roller;
 
         for (int icc = 0; icc < 3; icc++) {
 
+
             absScanline++;
 
-            int p = (*image[0]++ << 20 | *image[1]++ << 16 | *image[2]++ << 12 | *image[3]++ << 8 | *image[4]++ << 4 |
-                     *image[5]++) >>
+            // int p = (*image[0]++ << 20 | *image[1]++ << 16 | *image[2]++ << 12 | *image[3]++ << 8 | *image[4]++ << 4
+            // |
+            //          *image[5]++) >>
+            //         shift;
+
+
+            int p = (*(image[0] + roll) << 20       //
+                     | *(image[1] + roll) << 16     //
+                     | *(image[2] + roll) << 12     //
+                     | *(image[3] + roll) << 8      //
+                     | *(image[4] + roll) << 4 |    //
+                     *(image[5] + roll)) >>
                     shift;
 
             int p2 = 0;
@@ -422,7 +435,14 @@ void drawPlanet(int half) {
                 *pf1++ = p3 >> 8;
                 *pf2++ = reverseBits[p3 & 0xFF];
             }
+
+
+            if (++roll > 2)
+                roll = 0;
         }
+
+        for (int i = 0; i < 6; i++)
+            image[i] += 3;
 
         equivalentLine += stepSize;
         equiv = equivalentLine >> 8;

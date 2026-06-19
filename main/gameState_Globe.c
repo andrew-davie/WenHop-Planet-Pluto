@@ -170,10 +170,10 @@ void VB_Globe() {
     draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 54, 0x8);
     draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 36 + 30,
                 0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base + 36 + 42,
-                0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 36 + 54,
-                0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base + 36 + 42,
+    //             0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 36 + 54,
+    //             0x8);
 }
 
 void OS_Globe() {

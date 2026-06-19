@@ -103,7 +103,9 @@ SRCS = \
  spinningPlanet.c \
  wyrm.c \
  \
- grid6.c
+ grid6.c \
+ \
+ spinningGlobe/jupiter.c
 
 
 
@@ -119,12 +121,16 @@ vpath %.c $(BASE) $(CUSTOM)
 vpath %.S $(BASE) $(CUSTOM)
 
 %.o: %.c %.h $(BASE)/$(DASM_TO_C)
+	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
 
 %.o: %.S
 	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
 
-
+spinningGlobe/%.o: $(BASE)/spinningGlobe/%.c $(BASE)/$(DASM_TO_C)
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
+	
 ###############################################################################
 # Default target (first in file) will build with 'make'
 
