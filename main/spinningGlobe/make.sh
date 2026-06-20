@@ -7,4 +7,5 @@ python3 ./cset.py --no-dither --trixel-height 10 --trixel-width 5 --adaptive-pal
 python3 ./cset.py --no-dither --trixel-height 10 --trixel-width 5 --adaptive-palette --black-threshold 20 --brightness 1.0 --max-chars 128 textures/blood2.png 20 4
 python3 ./cset.py --no-dither --trixel-height 10 --trixel-width 5 --adaptive-palette --black-threshold 20 --brightness 1.0 --max-chars 128 textures/pangea.png 20 4
 python3 ./cset.py --no-dither --trixel-height 10 --trixel-width 5 --adaptive-palette --black-threshold 20 --brightness 1.0 --max-chars 128 textures/moon.png 20 4
+python3 ./cset.py --no-dither --trixel-height 10 --trixel-width 5 --adaptive-palette --black-threshold 20 --brightness 1.0 --max-chars 128 textures/titan.png 20 4
 python3 ./cset.py --trixel-height 10 --trixel-width 5 --adaptive-palette --black-threshold 20 --brightness 1.0 --max-chars 128 textures/neptune.jpg 20 4

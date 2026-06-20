@@ -74,7 +74,7 @@ void decodeCave(int cave) {
     millingTime = theCave->millingTime * 60;
 
     decodingRow = 0;
-    decodeFlasher = 21;
+    decodeFlasher = 1;    // 21;
     totalDogePossible = 0;
 
     theCaveData = (&(theCave->objectData)) + theCave->objectCount * 6;
@@ -266,6 +266,12 @@ int decodeExplicitData(int /*sfx*/) {
 }
 
 void StoreObject(int x, int y, objectType anObject) {
+
+    // guard rails (debugging) ...
+    if (x < 0 || x > _BOARD_COLS        //
+        || y < 0 || y >= _BOARD_ROWS    //
+        || anObject < 0 || anObject >= CH_MAX)
+        return;    // MAJOR bug but recover (?)
 
     unsigned char *me = RAM + _BOARD + x + y * _1ROW;
     unsigned char type = TYPEOF(anObject);

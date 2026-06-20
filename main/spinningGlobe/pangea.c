@@ -7,6 +7,8 @@
 /* Byte bit layout: bit4=col0(left) .. bit0=col4(right), bits7-5 unused. */
 /* Map: byte0=width(chars, +10 wrap buffer), byte1=height(chars), then row-major indices. */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-const-variable"
 static const unsigned char pangea_palette[8][3] = {
     {   0,   0,   0 },  /* 0: origin */
     {   0,  44,  92 },  /* 1: +P1 */
@@ -17,7 +19,10 @@ static const unsigned char pangea_palette[8][3] = {
     { 114, 132, 100 },  /* 6: +P2+P3 */
     {  76, 103,  97 },  /* 7: +P1+P2+P3 */
 };
+#pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-const-variable"
 /* NTSC Atari 2600 companion palette: nearest TIA register values for
  * palette primaries (indices 1, 2, 4 — the single-bit entries). */
 const unsigned char pangea_ntsc_palette[3] = {
@@ -25,6 +30,7 @@ const unsigned char pangea_ntsc_palette[3] = {
     0xD2,  /* palette[2] = (52,88,24) */
     0x08,  /* palette[4] = (176,176,176) */
 };
+#pragma GCC diagnostic pop
 
 static const unsigned char pangea_char_000[30] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static const unsigned char pangea_char_001[30] = { 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0 };

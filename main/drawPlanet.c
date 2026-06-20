@@ -19,17 +19,13 @@
 #include "spinningGlobe/bloodworld.h"
 #include "spinningGlobe/earth.h"
 #include "spinningGlobe/green1.h"
-#include "spinningGlobe/jupiter.h"
 #include "spinningGlobe/mercury.h"
 #include "spinningGlobe/moon.h"
 #include "spinningGlobe/neptune.h"
-#include "spinningGlobe/p1.h"
 #include "spinningGlobe/pangea.h"
-#include "spinningGlobe/purple1.h"
-#include "spinningGlobe/ridged.h"
-#include "spinningGlobe/sun.h"
 #include "spinningGlobe/titan.h"
 
+extern void initStars();
 
 struct GLOBE {
     const unsigned char *map;
@@ -94,21 +90,18 @@ const unsigned char ridged_ntsc_palette_override[3] = {
 };
 
 
+// TODO: run spinningGlobe/make.sh to re-gen the planet data
+//       run python3 spinningGlobe/planet-gen.py to create new planet images
+
 const struct GLOBE planets[] = {
     {earth_map, earth_charset, earth_ntsc_palette_override},
-    // {ridged_map, ridged_charset, ridged_ntsc_palette_override},
     {neptune_map, neptune_charset, neptune_ntsc_palette_override},
-    //    {purple1_map, purple1_charset, purple1_ntsc_palette},
     {green1_map, green1_charset, green1_ntsc_palette_override},
     {pangea_map, pangea_charset, pangea_ntsc_palette_override},
     {bloodworld_map, bloodworld_charset, bloodworld_ntsc_palette_override},
     {blood2_map, blood2_charset, blood2_ntsc_palette_override},
     {titan_map, titan_charset, titan_ntsc_palette},
     {moon_map, moon_charset, moon_ntsc_palette_override},
-    // {jupiter_map, jupiter_charset, jupiter_ntsc_palette_override},
-    // {neptune_map, neptune_charset, neptune_ntsc_palette_override},
-    // //    {mercury_map, mercury_charset, mercury_ntsc_palette},
-    // {sun_map, sun_charset, sun_ntsc_palette},
 };
 
 
@@ -281,6 +274,8 @@ const unsigned char *initPlanet(int planet) {
     body = planet;
     ptime = 1000;
 
+    initStars();
+
     return planets[body].palette;
 }
 
@@ -307,6 +302,8 @@ void drawPlanet(int half) {
 
         if (++body >= sizeof(planets) / sizeof(planets[0]))
             body = 0;
+
+        initStars();
 
         extern const unsigned char *thePalette;
         thePalette = planets[body].palette;

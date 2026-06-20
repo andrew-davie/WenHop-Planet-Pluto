@@ -10,7 +10,9 @@
 ###############################################################################
 # Instance-unique paths -- where are things located on your system?
 
-TOOLCHAIN 	= ~/Documents/software/gcc-arm-none-eabi/bin/arm-none-eabi
+#TOOLCHAIN 	= ~/Documents/software/gcc-arm-none-eabi/bin/arm-none-eabi
+
+TOOLCHAIN = /Users/boo/Documents/software/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/arm-none-eabi
 DASM 		= ~/Documents/software/Atari\ 2600/dasm/bin/dasm
 GOPHER 		= ~/Documents/software/Atari\ 2600/Gopher2600/
 GOPHERNAME  = gopher2600_darwin_arm64
@@ -106,19 +108,13 @@ SRCS = \
  grid6.c \
  \
  spinningGlobe/titan.c \
- spinningGlobe/ridged.c \
- spinningGlobe/purple1.c \
  spinningGlobe/green1.c \
  spinningGlobe/blood2.c \
  spinningGlobe/bloodworld.c \
  spinningGlobe/pangea.c \
- spinningGlobe/p1.c \
- spinningGlobe/mercury.c \
- spinningGlobe/sun.c \
  spinningGlobe/neptune.c \
  spinningGlobe/earth.c \
  spinningGlobe/moon.c \
- spinningGlobe/jupiter.c
 
 
 
@@ -319,11 +315,16 @@ TRANSIENTS = $(CUSTOMTARGETS) \
 			 $(OUTPUT)/* \
 			 $(BASE)/$(DASM_TO_C) \
 			 $(TOOLS_BIN)/* \
+			 *.o \
+			 *.d \
 			 icc/*
 
 .PHONY: clean
 clean:
 	rm -f $(TRANSIENTS)
+	find . -name "*.o" -delete
+	find . -name "*.d" -delete
+
 
 ###############################################################################
 

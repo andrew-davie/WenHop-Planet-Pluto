@@ -7,6 +7,8 @@
 /* Byte bit layout: bit4=col0(left) .. bit0=col4(right), bits7-5 unused. */
 /* Map: byte0=width(chars, +10 wrap buffer), byte1=height(chars), then row-major indices. */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-const-variable"
 static const unsigned char earth_palette[8][3] = {
     {   0,   0,   0 },  /* 0: origin */
     {  28,  76, 120 },  /* 1: +P1 */
@@ -17,7 +19,10 @@ static const unsigned char earth_palette[8][3] = {
     { 164, 164, 164 },  /* 6: +P2+P3 */
     { 119, 135, 149 },  /* 7: +P1+P2+P3 */
 };
+#pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-const-variable"
 /* NTSC Atari 2600 companion palette: nearest TIA register values for
  * palette primaries (indices 1, 2, 4 — the single-bit entries). */
 const unsigned char earth_ntsc_palette[3] = {
@@ -25,6 +30,7 @@ const unsigned char earth_ntsc_palette[3] = {
     0x04,  /* palette[2] = (108,108,108) */
     0x0C,  /* palette[4] = (220,220,220) */
 };
+#pragma GCC diagnostic pop
 
 static const unsigned char earth_char_000[30] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static const unsigned char earth_char_001[30] = { 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0, 31, 0, 0 };
