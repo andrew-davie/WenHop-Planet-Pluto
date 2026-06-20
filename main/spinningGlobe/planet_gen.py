@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+./#!/usr/bin/env python3
 """
 planet_gen.py — Random planet texture map generator
 Outputs equirectangular (2:1) PNG maps ready for sphere-wrapping.

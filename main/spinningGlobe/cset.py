@@ -11,14 +11,15 @@ emitted as a C source file, for a display mode where:
     scanline 2 = B), so a trixel encodes one of 8 colours (the 8 corners
     of the RGB colour cube: black, red, green, blue, yellow, magenta,
     cyan, white).
-  - a character is 5 pixels wide x 10 trixels deep -> 5 x 30 scanlines.
+  - a character is TRIXEL_W pixels wide x 10 trixels deep -> TRIXEL_W x 30
+    scanlines.  TRIXEL_W defaults to 5 and is set via --trixel-width.
   - a character is stored as 10 trixel-rows, each row = 3 bytes (R,G,B).
-    Each byte uses 5 of its bits (bits 4..0), one bit per column,
-    bit4 = leftmost column (col 0) .. bit0 = rightmost column (col 4).
+    Each byte uses TRIXEL_W of its bits (bits TRIXEL_W-1..0), one bit per
+    column, bit(TRIXEL_W-1) = leftmost column (col 0) .. bit0 = rightmost.
     -> 10 * 3 = 30 bytes per character.
   - characters are numbered 0..255 (max charset size 256). The charset is
     built unbounded first -- seeded with the 8 solid colours, then one exact
-    character per unique 5x10 cell pattern found in the image, so nothing is
+    character per unique cell pattern found in the image, so nothing is
     approximated yet -- then reduced down to the requested budget by
     repeatedly finding the globally closest matching pair of non-locked
     characters and replacing both with the dominant (higher-usage) one,
@@ -35,7 +36,7 @@ emitted as a C source file, for a display mode where:
 
 Usage:
     python3 img2tiles.py <image> <char_width> <char_height>
-                          [--max-chars N] [--output FILE.c]
+                          [--trixel-width N] [--max-chars N] [--output FILE.c]
                           [--recon-scale N] [--no-recon]
                           [--adaptive-palette]
 """
@@ -47,8 +48,8 @@ import sys
 import numpy as np
 from PIL import Image
 
-TRIXEL_W = 5     # pixels wide per character
-TRIXEL_H = 10    # trixels deep per character
+TRIXEL_W = 5     # pixels wide per character — default; overridden by --trixel-width
+TRIXEL_H = 10    # trixels deep per character — default; overridden by --trixel-height
 SCANLINES_PER_TRIXEL = 3
 WRAP_COLUMNS = 10  # extra character-columns appended for wrap-around
 NUM_LOCKED = 8    # the 8 solid-colour seed characters are always locked
@@ -160,15 +161,18 @@ _NTSC_RGB = np.array([
 
 def nearest_ntsc(rgb, exclude=()) -> int:
     """Return the TIA register byte (0x00..0xFE, even) for the nearest NTSC colour.
-    TIA values in *exclude* are skipped, preventing duplicate assignments."""
+    TIA values in *exclude* are skipped, preventing duplicate assignments.
+    TIA values 0x00–0x0E (hue 0, greyscale — no colour information) are always skipped."""
     r, g, b = int(rgb[0]), int(rgb[1]), int(rgb[2])
     diff = _NTSC_RGB.astype(np.int32) - np.array([r, g, b], dtype=np.int32)
     dists = (diff ** 2).sum(axis=1)
     for idx in np.argsort(dists):
         tia = int(idx) * 2
+        # if tia < 16:          # skip hue 0 (greyscale, TIA 0x00–0x0E)
+        #     continue
         if tia not in exclude:
             return tia
-    return 0  # fallback (unreachable with 128-entry palette)
+    return 16  # fallback: first coloured TIA value (unreachable under normal use)
 
 
 def _nearest_palette_entry(palette: np.ndarray, target) -> int:
@@ -543,12 +547,13 @@ def quantize_to_trixel_grid(img: Image.Image, px_w: int, px_h: int,
 # ---------------------------------------------------------------------------
 
 def cell_to_bytes30(cell: np.ndarray):
-    """cell: (10,5) array of 0-7 colour indices -> list of 30 bytes (R,G,B per row)."""
+    """cell: (TRIXEL_H, TRIXEL_W) array of 0-7 colour indices -> list of 30 bytes (R,G,B per row).
+    Each byte uses TRIXEL_W bits: bit(TRIXEL_W-1)=col0 (left) .. bit0=col(TRIXEL_W-1) (right)."""
     out = []
     for row in cell:
         rbyte = gbyte = bbyte = 0
         for col, val in enumerate(row):
-            shift = 4 - col  # col0 -> bit4 ... col4 -> bit0
+            shift = TRIXEL_W - 1 - col  # col0 -> bit(TRIXEL_W-1) .. col(TRIXEL_W-1) -> bit0
             rbyte |= ((int(val) >> 0) & 1) << shift
             gbyte |= ((int(val) >> 1) & 1) << shift
             bbyte |= ((int(val) >> 2) & 1) << shift
@@ -557,17 +562,17 @@ def cell_to_bytes30(cell: np.ndarray):
 
 
 def flat_to_bytes30(flat: np.ndarray):
-    """flat: (50,) array of 0-7 colour indices -> list of 30 bytes."""
+    """flat: (TRIXEL_H * TRIXEL_W,) array of 0-7 colour indices -> list of 30 bytes."""
     return cell_to_bytes30(flat.reshape(TRIXEL_H, TRIXEL_W))
 
 
 def bytes30_to_grid(b30):
-    """Inverse of cell_to_bytes30: 30 bytes -> (10,5) array of 0-7 colour indices."""
+    """Inverse of cell_to_bytes30: 30 bytes -> (TRIXEL_H, TRIXEL_W) array of 0-7 colour indices."""
     grid = np.zeros((TRIXEL_H, TRIXEL_W), dtype=np.uint8)
     for row in range(TRIXEL_H):
         rb, gb, bb = b30[row * 3], b30[row * 3 + 1], b30[row * 3 + 2]
         for col in range(TRIXEL_W):
-            shift = 4 - col
+            shift = TRIXEL_W - 1 - col  # col0 -> bit(TRIXEL_W-1) .. col(TRIXEL_W-1) -> bit0
             r = (rb >> shift) & 1
             g = (gb >> shift) & 1
             b = (bb >> shift) & 1
@@ -611,6 +616,8 @@ def reduce_charset(grids: list, weights: list, target_size: int,
     if dist_table is None:
         dist_table = DIST8
 
+    cell_size = TRIXEL_H * TRIXEL_W  # trixels per character cell
+
     n = len(grids)
     if n <= target_size:
         return list(range(n)), {}
@@ -618,7 +625,7 @@ def reduce_charset(grids: list, weights: list, target_size: int,
     total_merges_needed = n - target_size
     capacity = n + total_merges_needed + 1
 
-    grid_mat = np.zeros((capacity, 50), dtype=np.uint8)
+    grid_mat = np.zeros((capacity, cell_size), dtype=np.uint8)
     grid_mat[:n] = np.stack(grids)
 
     alive = np.zeros(capacity, dtype=bool)
@@ -627,7 +634,7 @@ def reduce_charset(grids: list, weights: list, target_size: int,
     locked = np.zeros(capacity, dtype=bool)
     locked[:min(num_locked, n)] = True
 
-    # zero_content[k]: all 50 trixels are palette index 0 (origin/darkest corner).
+    # zero_content[k]: all trixels are palette index 0 (origin/darkest corner).
     # Non-origin chars exclude these from their nn candidate pool.
     zero_content = np.zeros(capacity, dtype=bool)
     zero_content[:n] = (grid_mat[:n].sum(axis=1) == 0)
@@ -647,7 +654,7 @@ def reduce_charset(grids: list, weights: list, target_size: int,
         chunk_idxs = np.arange(start, min(start + CHUNK, n))
         chunk_grids = grid_mat[chunk_idxs]
         dist_block = np.zeros((len(chunk_idxs), n), dtype=np.int64)
-        for k in range(50):
+        for k in range(cell_size):
             col_vals = grid_mat[:n, k]
             row_vals = chunk_grids[:, k]
             dist_block += dist_table[row_vals[:, None], col_vals[None, :]]
@@ -695,7 +702,7 @@ def reduce_charset(grids: list, weights: list, target_size: int,
                 if ci.size == 0:
                     nn_idx[k] = -1; nn_dist[k] = -1; continue
                 pk = dist_table[grid_mat[k]]
-                dk = pk[np.arange(50)[None, :], grid_mat[ci]].sum(axis=1)
+                dk = pk[np.arange(cell_size)[None, :], grid_mat[ci]].sum(axis=1)
                 p = int(np.argmin(dk))
                 nn_idx[k] = ci[p]; nn_dist[k] = int(dk[p])
             if verbose and (merges_done % 200 == 0 or merges_done == total_merges_needed):
@@ -738,14 +745,14 @@ def reduce_charset(grids: list, weights: list, target_size: int,
 
         if m_cands_idx.size > 0:
             per_pos = dist_table[merged_grid]
-            d_m_all = per_pos[np.arange(50)[None, :], grid_mat[m_cands_idx]].sum(axis=1)
+            d_m_all = per_pos[np.arange(cell_size)[None, :], grid_mat[m_cands_idx]].sum(axis=1)
             best_all = int(np.argmin(d_m_all))
             nn_idx[m] = m_cands_idx[best_all]
             nn_dist[m] = int(d_m_all[best_all])
 
             if active_idx.size > 0:
                 cand = grid_mat[active_idx]
-                d_m = per_pos[np.arange(50)[None, :], cand].sum(axis=1)
+                d_m = per_pos[np.arange(cell_size)[None, :], cand].sum(axis=1)
 
                 cur_nn = nn_idx[active_idx]
                 cur_nd = nn_dist[active_idx]
@@ -768,7 +775,7 @@ def reduce_charset(grids: list, weights: list, target_size: int,
                         nn_idx[k] = -1; nn_dist[k] = -1; continue
                     cand_k = grid_mat[others_idx]
                     per_pos_k = dist_table[grid_mat[k]]
-                    d_k = per_pos_k[np.arange(50)[None, :], cand_k].sum(axis=1)
+                    d_k = per_pos_k[np.arange(cell_size)[None, :], cand_k].sum(axis=1)
                     pos = int(np.argmin(d_k))
                     nn_idx[k] = others_idx[pos]; nn_dist[k] = int(d_k[pos])
         else:
@@ -793,7 +800,7 @@ def build_reconstruction(charset_bytes, extended_map, total_width, char_height,
     """Decode the emitted charset+map data back into a full-resolution RGB image."""
     if palette is None:
         palette = CUBE_RGB
-    decoded = [bytes30_to_grid(b) for b in charset_bytes]  # list of (10,5) uint8
+    decoded = [bytes30_to_grid(b) for b in charset_bytes]  # list of (TRIXEL_H, TRIXEL_W) uint8
     px_h = char_height * TRIXEL_H
     px_w = total_width * TRIXEL_W
     recon = np.zeros((px_h, px_w, 3), dtype=np.uint8)
@@ -816,6 +823,10 @@ def main():
     ap.add_argument("image", help="input image (any format Pillow can read)")
     ap.add_argument("char_width", type=int, help="map width in characters (excludes wrap buffer)")
     ap.add_argument("char_height", type=int, help="map height in characters")
+    ap.add_argument("--trixel-width", type=int, default=5,
+                     help="character width in pixels/bits per byte (1-8, default 5)")
+    ap.add_argument("--trixel-height", type=int, default=10,
+                     help="character height in trixels (1+, default 10)")
     ap.add_argument("--max-chars", type=int, default=128,
                      help="maximum charset size, 8-256 (default 128)")
     ap.add_argument("--output", default=None, help="output .c filename (default: <image-stem>.c)")
@@ -842,6 +853,11 @@ def main():
                           "RGB cube. Improves colour accuracy for images whose dominant "
                           "colours are not aligned with the R/G/B axes (e.g. seascapes, "
                           "earth tones). Emits a prefix_palette[8][3] table in the C output.")
+    ap.add_argument("--primary-spread", type=float, default=0.0,
+                     help="adaptive palette only: push P1 (dark primary) toward black "
+                          "and P3 (bright primary) toward white before NTSC snapping, "
+                          "widening the palette gamut. 0.0 = no spread (default), "
+                          "1.0 = full push to black/white. Try 0.2–0.5.")
     ap.add_argument("--black-threshold", type=int, default=30,
                      help="adaptive palette only: max per-channel RMS distance to black "
                           "for palette index 0 to be used. Pixels further from black than "
@@ -849,8 +865,17 @@ def main():
                           "Lower = stricter (fewer pixels use black). Default: 30.")
     args = ap.parse_args()
 
+    # Apply --trixel-width / --trixel-height to module-level globals used by all helpers.
+    global TRIXEL_W, TRIXEL_H
+    TRIXEL_W = args.trixel_width
+    TRIXEL_H = args.trixel_height
+
     if args.char_width <= 0 or args.char_height <= 0:
         sys.exit("error: char_width and char_height must be positive")
+    if not (1 <= TRIXEL_W <= 8):
+        sys.exit("error: --trixel-width must be between 1 and 8")
+    if TRIXEL_H < 1:
+        sys.exit("error: --trixel-height must be at least 1")
     if not (NUM_LOCKED <= args.max_chars <= 256):
         sys.exit("error: --max-chars must be between %d and 256" % NUM_LOCKED)
     if args.recon_scale <= 0:
@@ -922,6 +947,14 @@ def main():
         luma3 = centers3 @ np.array([0.299, 0.587, 0.114])
         ord3  = np.argsort(luma3)
         c1, c2, c3 = centers3[ord3[0]], centers3[ord3[1]], centers3[ord3[2]]
+
+        # Primary spread: push P1 toward black and P3 toward white.
+        # P2 (mid) is left alone.
+        if args.primary_spread > 0.0:
+            s = args.primary_spread
+            c1 = np.clip(c1 * (1.0 - s), 0, 255)
+            c3 = np.clip(c3 + (255.0 - c3) * s, 0, 255)
+
         print("k-means k=3 primaries (before NTSC snap):")
         print("  P1 (dark)  %3d,%3d,%3d" % (int(c1[0]), int(c1[1]), int(c1[2])))
         print("  P2 (mid)   %3d,%3d,%3d" % (int(c2[0]), int(c2[1]), int(c2[2])))
@@ -975,7 +1008,8 @@ def main():
 
     # Phase 1: unbounded charset build, seeded with the 8 solid colours so
     # any flat region gets a perfect match immediately.
-    grids   = [np.full(50, c, dtype=np.uint8) for c in range(8)]
+    cell_size = TRIXEL_H * TRIXEL_W
+    grids   = [np.full(cell_size, c, dtype=np.uint8) for c in range(8)]
     weights = [0] * 8
     seen    = {tuple(int(v) for v in g): idx for idx, g in enumerate(grids)}
     orig_map_indices = []
@@ -1024,6 +1058,9 @@ def main():
     out_path = args.output or (stem + ".c")
     out_stem = os.path.splitext(out_path)[0]
 
+    # Build the byte bit-layout comment string dynamically.
+    _unused_bits = ("bits7-%d unused" % TRIXEL_W) if TRIXEL_W < 8 else "all 8 bits used"
+
     lines = []
     lines.append("/* Auto-generated by img2tiles.py from \"%s\" */" % os.path.basename(args.image))
     if palette is not None:
@@ -1031,10 +1068,13 @@ def main():
         lines.append("/* Index bits: bit0=P1, bit1=P2, bit2=P3 (P1/P2/P3 = single-bit primaries). */")
     else:
         lines.append("/* Fixed palette: 8 RGB-cube corners.  Index bits: bit0=R, bit1=G, bit2=B. */")
-    lines.append("/* Character: 5 pixels wide x 10 trixels deep (30 scanlines). */")
+    lines.append("/* Character: %d pixels wide x %d trixels deep (%d scanlines). */"
+                  % (TRIXEL_W, TRIXEL_H, TRIXEL_H * SCANLINES_PER_TRIXEL))
     lines.append("/* Trixel: 1 pixel wide x 3 scanlines deep, 3-bit palette index. */")
-    lines.append("/* Character storage: 10 trixel-rows x 3 bytes (bit0-plane, bit1-plane, bit2-plane) = 30 bytes. */")
-    lines.append("/* Byte bit layout: bit4=col0(left) .. bit0=col4(right), bits7-5 unused. */")
+    lines.append("/* Character storage: %d trixel-rows x 3 bytes (bit0-plane, bit1-plane, bit2-plane) = %d bytes. */"
+                  % (TRIXEL_H, TRIXEL_H * SCANLINES_PER_TRIXEL))
+    lines.append("/* Byte bit layout: bit%d=col0(left) .. bit0=col%d(right), %s. */"
+                  % (TRIXEL_W - 1, TRIXEL_W - 1, _unused_bits))
     lines.append("/* Map: byte0=width(chars, +%d wrap buffer), byte1=height(chars), then row-major indices. */" % WRAP_COLUMNS)
     lines.append("")
 
@@ -1057,7 +1097,7 @@ def main():
     ntsc_b = nearest_ntsc(pal_src[4], used_ntsc); used_ntsc.add(ntsc_b)
     lines.append("/* NTSC Atari 2600 companion palette: nearest TIA register values for")
     lines.append(" * palette primaries (indices 1, 2, 4 — the single-bit entries). */")
-    lines.append("static const unsigned char %s_ntsc_palette[3] = {" % prefix)
+    lines.append("const unsigned char %s_ntsc_palette[3] = {" % prefix)
     lines.append("    0x%02X,  /* palette[1] = (%d,%d,%d) */"
                   % (ntsc_r, int(pal_src[1][0]), int(pal_src[1][1]), int(pal_src[1][2])))
     lines.append("    0x%02X,  /* palette[2] = (%d,%d,%d) */"
@@ -1070,16 +1110,19 @@ def main():
     for i, b in enumerate(charset_bytes):
         name = "%s_char_%03d" % (prefix, i)
         body = ", ".join(str(v) for v in b)
-        lines.append("static const unsigned char %s[30] = { %s };" % (name, body))
+        lines.append("static const unsigned char %s[%d] = { %s };"
+                      % (name, TRIXEL_H * SCANLINES_PER_TRIXEL, body))
     lines.append("")
 
-    lines.append("static const unsigned char * const %s_charset[%d] = {" % (prefix, len(charset_bytes)))
-    for i in range(len(charset_bytes)):
+    n_chars  = len(charset_bytes)
+    map_size = 2 + len(extended_map)
+    lines.append("const unsigned char * const %s_charset[%d] = {" % (prefix, n_chars))
+    for i in range(n_chars):
         lines.append("    %s_char_%03d," % (prefix, i))
     lines.append("};")
     lines.append("")
 
-    lines.append("const unsigned char %s_map[%d] = {" % (prefix, 2 + len(extended_map)))
+    lines.append("const unsigned char %s_map[%d] = {" % (prefix, map_size))
     lines.append("    %d, %d," % (total_width, args.char_height))
     for ry in range(args.char_height):
         row = extended_map[ry * total_width:(ry + 1) * total_width]
@@ -1089,6 +1132,32 @@ def main():
 
     with open(out_path, "w") as f:
         f.write("\n".join(lines) + "\n")
+
+    # --- emit header file ---
+    hlines = []
+    hlines.append("/* Auto-generated by img2tiles.py from \"%s\" */" % os.path.basename(args.image))
+    hlines.append("#pragma once")
+    hlines.append("")
+    hlines.append("#define %s_CHARSET_SIZE %d" % (prefix.upper(), n_chars))
+    hlines.append("#define %s_MAP_SIZE     %d" % (prefix.upper(), map_size))
+    hlines.append("#define %s_CHAR_WIDTH   %d" % (prefix.upper(), TRIXEL_W))
+    hlines.append("#define %s_CHAR_HEIGHT  %d" % (prefix.upper(), TRIXEL_H))
+    hlines.append("#define %s_CHAR_BYTES   %d" % (prefix.upper(), TRIXEL_H * SCANLINES_PER_TRIXEL))
+    hlines.append("")
+    hlines.append("/* NTSC TIA register values for primaries [1], [2], [4] */")
+    hlines.append("extern const unsigned char %s_ntsc_palette[3];" % prefix)
+    hlines.append("")
+    hlines.append("/* Charset: %d characters, each %d bytes */"
+                   % (n_chars, TRIXEL_H * SCANLINES_PER_TRIXEL))
+    hlines.append("extern const unsigned char * const %s_charset[%d];" % (prefix, n_chars))
+    hlines.append("")
+    hlines.append("/* Map: byte[0]=width, byte[1]=height, then row-major char indices */")
+    hlines.append("extern const unsigned char %s_map[%d];" % (prefix, map_size))
+    hlines.append("")
+    hlines.append("")
+    h_path = out_stem + ".h"
+    with open(h_path, "w") as f:
+        f.write("\n".join(hlines) + "\n")
 
     # --- reconstructed preview PNG ---
     recon_path = None
@@ -1108,6 +1177,8 @@ def main():
     n_merges = n_unique - len(charset_bytes)
     print("input image       : %s" % args.image)
     print("palette           : %s" % ("adaptive (k-means)" if palette is not None else "fixed RGB cube"))
+    print("char size (pixels) : %d wide x %d tall (%d trixels x %d scanlines)"
+          % (TRIXEL_W, TRIXEL_H * SCANLINES_PER_TRIXEL, TRIXEL_H, TRIXEL_H * SCANLINES_PER_TRIXEL))
     print("map size (chars)   : %d x %d (input %d wide + %d wrap buffer)"
           % (total_width, args.char_height, args.char_width, WRAP_COLUMNS))
     print("trixel resolution  : %d x %d" % (px_w, px_h))

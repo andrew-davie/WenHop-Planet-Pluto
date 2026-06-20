@@ -1,7 +1,7 @@
 #pragma once
 
 extern void drawPlanet(int half);
-extern void initPlanet();
+extern const unsigned char *initPlanet(int planet);
 
 
 // EOF

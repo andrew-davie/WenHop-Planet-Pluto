@@ -15,6 +15,103 @@
 #include "scroll.h"
 // #include "defines.h"
 
+#include "spinningGlobe/blood2.h"
+#include "spinningGlobe/bloodworld.h"
+#include "spinningGlobe/earth.h"
+#include "spinningGlobe/green1.h"
+#include "spinningGlobe/jupiter.h"
+#include "spinningGlobe/mercury.h"
+#include "spinningGlobe/moon.h"
+#include "spinningGlobe/neptune.h"
+#include "spinningGlobe/p1.h"
+#include "spinningGlobe/pangea.h"
+#include "spinningGlobe/purple1.h"
+#include "spinningGlobe/ridged.h"
+#include "spinningGlobe/sun.h"
+#include "spinningGlobe/titan.h"
+
+
+struct GLOBE {
+    const unsigned char *map;
+    const unsigned char *const *charSet;
+    const unsigned char *palette;
+};
+
+
+const unsigned char neptune_ntsc_palette_override[3] = {
+    0x92, /* palette[1] = (28,56,144) */
+    0x94, /* palette[2] = (56,84,168) */
+    0x96, /* palette[4] = (80,116,188) */
+};
+
+const unsigned char jupiter_ntsc_palette_override[3] = {
+    0x4C, /* palette[1] = (108,108,108) */
+    0x18, /* palette[2] = (144,144,144) */
+    0x2A, /* palette[4] = (176,176,176) */
+};
+
+const unsigned char earth_ntsc_palette_override[3] = {
+    0x94, /* palette[1] = (28,76,120) */
+    0xD6, /* palette[2] = (104,112,52) */
+    0xEA, /* palette[4] = (212,188,248) */
+};
+
+const unsigned char moon_ntsc_palette_override[3] = {
+    0x14, /* palette[1] = (108,108,108) */
+    0xE4, /* palette[2] = (144,144,144) */
+    0xE2, /* palette[4] = (176,176,176) */
+};
+
+
+const unsigned char bloodworld_ntsc_palette_override[3] = {
+    0x40, /* palette[1] = (68,40,0) */
+    0x42, /* palette[2] = (100,72,24) */
+    0xC6, /* palette[4] = (144,144,144) */
+};
+
+const unsigned char pangea_ntsc_palette_override[3] = {
+    0x84, /* palette[1] = (0,44,92) */
+    0xD4, /* palette[2] = (64,64,64) */
+    0x32, /* palette[4] = (176,176,176) */
+};
+
+const unsigned char blood2_ntsc_palette_override[3] = {
+    0x42, /* palette[1] = (68,40,0) */
+    0x44, /* palette[2] = (132,104,48) */
+    0x34, /* palette[4] = (176,176,176) */
+};
+
+const unsigned char green1_ntsc_palette_override[3] = {
+    0xB2, /* palette[1] = (0,60,44) */
+    0xD6, /* palette[2] = (32,92,32) */
+    0xC4, /* palette[4] = (108,108,108) */
+};
+
+const unsigned char ridged_ntsc_palette_override[3] = {
+    0x12, /* palette[1] = (0,44,92) */
+    0xDA, /* palette[2] = (64,64,64) */
+    0xCA, /* palette[4] = (144,144,144) */
+};
+
+
+const struct GLOBE planets[] = {
+    {earth_map, earth_charset, earth_ntsc_palette_override},
+    // {ridged_map, ridged_charset, ridged_ntsc_palette_override},
+    {neptune_map, neptune_charset, neptune_ntsc_palette_override},
+    //    {purple1_map, purple1_charset, purple1_ntsc_palette},
+    {green1_map, green1_charset, green1_ntsc_palette_override},
+    {pangea_map, pangea_charset, pangea_ntsc_palette_override},
+    {bloodworld_map, bloodworld_charset, bloodworld_ntsc_palette_override},
+    {blood2_map, blood2_charset, blood2_ntsc_palette_override},
+    {titan_map, titan_charset, titan_ntsc_palette},
+    {moon_map, moon_charset, moon_ntsc_palette_override},
+    // {jupiter_map, jupiter_charset, jupiter_ntsc_palette_override},
+    // {neptune_map, neptune_charset, neptune_ntsc_palette_override},
+    // //    {mercury_map, mercury_charset, mercury_ntsc_palette},
+    // {sun_map, sun_charset, sun_ntsc_palette},
+};
+
+
 // duplicate from defines_cdfj.h
 // Raw queue pointers
 extern void *DDR;
@@ -24,128 +121,141 @@ extern void *DDR;
 
 
 const int pix85[] = {
-    0b000000000000000000000000000000,    // 0
-    0b000000000000100001000000010000,    // 3
-    0b000000000001001001000100000100,    // 6
-    0b000000000001010010010010000100,    // 9
-    0b000000000001010010010010000100,    // 12
-    0b000000000001010101001001000010,    // 15
-    0b000000000010101010010100100010,    // 18
-    0b000000000010101010010100100010,    // 21
-    0b000000000010101011001010010010,    // 24
-    0b000000000010101011001010010010,    // 27
-    0b000000000010101011001010010010,    // 30
-    0b000000000010110101101010010001,    // 33
-    0b000000000010110101101010010001,    // 36
-    0b000000000010110101101010010001,    // 39
-    0b000000000010111011010101010001,    // 42
-    0b000000000010111011010101010001,    // 45
-    0b000000000010111011010101010001,    // 48
-    0b000000000010111011010101010001,    // 51
-    0b000000000010111011010101010001,    // 54
-    0b000000000011011101101011001001,    // 57
-    0b000000000011011101101011001001,    // 60
-    0b000000000011011101101011001001,    // 63
-    0b000000000011011101101011001001,    // 66
-    0b000000000011011101101011001001,    // 69
-    0b000000000011011101101011001001,    // 72
-    0b000000000011011101101011001001,    // 75
-    0b000000000011011101101011001001,    // 78
-    0b000000000011011101101011001001,    // 81
-    0b000000000011011101101011001001,    // 84
-    0b000000000011011101101011001001,    // 87
-    0b000000000011011101101011001001,    // 90
-    0b000000000011011101101011001001,    // 93
-    0b000000000011011101101011001001,    // 96
-    0b000000000011011101101011001001,    // 99
-    0b000000000011011101101011001001,    // 102
-    0b000000000011011101101011001001,    // 105
-    0b000000000011011101101011001001,    // 108
-    0b000000000011011101101011001001,    // 111
-    0b000000000011011101101011001001,    // 114
-    0b000000000010111011010101010001,    // 117
-    0b000000000010111011010101010001,    // 120
-    0b000000000010111011010101010001,    // 123
-    0b000000000010111011010101010001,    // 126
-    0b000000000010111011010101010001,    // 129
-    0b000000000010110101101010010001,    // 132
-    0b000000000010110101101010010001,    // 135
-    0b000000000010110101101010010001,    // 138
-    0b000000000010101011001010010010,    // 141
-    0b000000000010101011001010010010,    // 144
-    0b000000000010101010010100100010,    // 147
-    0b000000000010101010010100100010,    // 150
-    0b000000000001010101001001000010,    // 153
-    0b000000000001010101001001000010,    // 156
-    0b000000000001010010010010000100,    // 159
-    0b000000000001001001000100000100,    // 162
-    0b000000000001000100001000001000,    // 165
-    0b000000000000100001000000010000,    // 168
+    0b000000000000000000000000000000,    // 00  0
+    0b000000000000100001000000010000,    // 01  3
+    0b000000000001001001000100000100,    // 02  6
+    0b000000000001010010010010000100,    // 03  9
+    0b000000000001010010010010000100,    // 04  12
+    0b000000000001010101001001000010,    // 05  15
+    0b000000000010101010010100100010,    // 06  18
+    0b000000000010101010010100100010,    // 07  21
+    0b000000000010101011001010010010,    // 08  24
+    0b000000000010101011001010010010,    // 09  27
+    0b000000000010101011001010010010,    // 10  30
+    0b000000000010110101101010010001,    // 11  33
+    0b000000000010110101101010010001,    // 12  36
+    0b000000000010110101101010010001,    // 13  39
+    0b000000000010111011010101010001,    // 14  42
+    0b000000000010111011010101010001,    // 15  45
+    0b000000000010111011010101010001,    // 16  48
+    0b000000000010111011010101010001,    // 17  51
+    0b000000000010111011010101010001,    // 18  54
+    0b000000000011011101101011001001,    // 19  57
+    0b000000000011011101101011001001,    // 20  60
+    0b000000000011011101101011001001,    // 21  63
+    0b000000000011011101101011001001,    // 22  66
+    0b000000000011011101101011001001,    // 23  69
+    0b000000000011011101101011001001,    // 24  72
+    0b000000000011011101101011001001,    // 25  75
+    0b000000000011011101101011001001,    // 26  78
+    0b000000000011011101101011001001,    // 27  81
+    0b000000000011011101101011001001,    // 28  84
+    0b000000000011011101101011001001,    // 29  87
+    0b000000000011011101101011001001,    // 30  90
+    0b000000000011011101101011001001,    // 31  93
+    0b000000000011011101101011001001,    // 32  96
+    0b000000000011011101101011001001,    // 33  99
+    0b000000000011011101101011001001,    // 34  102
+    0b000000000011011101101011001001,    // 35  105
+    0b000000000011011101101011001001,    // 36  108
+    0b000000000011011101101011001001,    // 37  111
+    0b000000000011011101101011001001,    // 38  114
+    0b000000000010111011010101010001,    // 39  117
+    0b000000000010111011010101010001,    // 40  120
+    0b000000000010111011010101010001,    // 41  123
+    0b000000000010111011010101010001,    // 42  126
+    0b000000000010111011010101010001,    // 43  129
+    0b000000000010110101101010010001,    // 44  132
+    0b000000000010110101101010010001,    // 45  135
+    0b000000000010110101101010010001,    // 46  138
+    0b000000000010101011001010010010,    // 47  141
+    0b000000000010101011001010010010,    // 48  144
+    0b000000000010101010010100100010,    // 49  147
+    0b000000000010101010010100100010,    // 50  150
+    0b000000000001010101001001000010,    // 51  153
+    0b000000000001010101001001000010,    // 52  156
+    0b000000000001010010010010000100,    // 53  159
+    0b000000000001001001000100000100,    // 54  162
+    0b000000000001000100001000001000,    // 55  165
+    0b000000000000100001000000010000,    // 56  168
 };
+
+
+// Table maps line index to line number in texture
+// Generated by spinningGlobe/scale.py
+// texture height = chars * trix/char * 3 - fudge (which makes the bottom align)
+// sub-position is always 3 (CC)
+
+
+// Number of table entries (57 for original): 57
+// Texture height in pixels:                  108
+// Character cell height in scanlines:        30
+// Sub-position step [3]:
+// Array name [line85]:
 
 const short int line85[] = {
     0,      // 0
-    47,     // 3
-    73,     // 6
-    85,     // 9
-    105,    // 12
-    114,    // 15
-    131,    // 18
-    140,    // 21
-    149,    // 24
-    163,    // 27
-    172,    // 30
-    178,    // 33
-    192,    // 36
-    198,    // 39
-    204,    // 42
-    213,    // 45
-    227,    // 48
-    233,    // 51
-    236,    // 54
-    242,    // 57
-    256,    // 60
-    262,    // 63
-    268,    // 66
-    274,    // 69
-    288,    // 72
-    291,    // 75
-    297,    // 78
-    303,    // 81
-    309,    // 84
-    323,    // 87
-    326,    // 90
-    332,    // 93
-    338,    // 96
-    352,    // 99
-    358,    // 102
-    364,    // 105
-    367,    // 108
-    373,    // 111
-    387,    // 114
-    393,    // 117
-    399,    // 120
-    405,    // 123
-    419,    // 126
-    425,    // 129
-    431,    // 132
-    448,    // 135
-    454,    // 138
-    460,    // 141
-    469,    // 144
-    483,    // 147
-    492,    // 150
-    501,    // 153
-    518,    // 156
-    527,    // 159
-    547,    // 162
-    562,    // 165
-    588,    // 168
-    -1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    9,      // 1
+    12,     // 2
+    15,     // 3
+    18,     // 4
+    21,     // 5
+    21,     // 6
+    24,     // 7
+    27,     // 8
+    27,     // 9
+    27,     // 10
+    32,     // 11
+    35,     // 12
+    35,     // 13
+    38,     // 14
+    38,     // 15
+    41,     // 16
+    41,     // 17
+    44,     // 18
+    44,     // 19
+    47,     // 20
+    47,     // 21
+    47,     // 22
+    50,     // 23
+    50,     // 24
+    53,     // 25
+    53,     // 26
+    53,     // 27
+    56,     // 28
+    56,     // 29
+    59,     // 30
+    59,     // 31
+    59,     // 32
+    64,     // 33
+    64,     // 34
+    67,     // 35
+    67,     // 36
+    70,     // 37
+    70,     // 38
+    70,     // 39
+    73,     // 40
+    73,     // 41
+    76,     // 42
+    76,     // 43
+    79,     // 44
+    79,     // 45
+    82,     // 46
+    82,     // 47
+    85,     // 48
+    88,     // 49
+    88,     // 50
+    91,     // 51
+    91,     // 52
+    96,     // 53
+    99,     // 54
+    105,    // 55
+    114,    // 56
+    -1,  -1, -1, -1, -1, -1, -1,
 };
 
 
-int pscrollSpeed = 0x1240;
+int pscrollSpeed = 0xD00;
 
 
 unsigned int stepSize = 0x100;
@@ -155,25 +265,52 @@ unsigned int stepSize2 = 0x100;
 unsigned int mult = (int)(1.25 * 0x100);
 unsigned int div = (int)(0x100 / 1.25);
 
-int scalex = 0x60;    // 3D0;
-int dir = 0;
+int scalex;
+int dir;
+int body;
+int ptime;
 
-void initPlanet() {
+#define MINSCALE 0xB8
+#define MAXSCALE 0x140
 
-    scalex = 0xb0;
-    dir = 0;
+const unsigned char *initPlanet(int planet) {
+
+    scalex = MAXSCALE << 8;    // 0x200 << 8;
+    dir = -120;                //-150;
+
+    body = planet;
+    ptime = 1000;
+
+    return planets[body].palette;
 }
 
 
 void drawPlanet(int half) {
 
+
+    const unsigned char *map = planets[body].map;
+    const unsigned char *const *charset = planets[body].charSet;
+    const unsigned char *palette = planets[body].palette;
+
+
+    // 0x40,0x200
+
     scalex += dir;
-    if (dir < 0 && scalex < 0x40) {
+    if (dir < 0 && scalex < MINSCALE << 8) {
         dir = -dir;
     }
 
-    if (dir > 0 && scalex > 0x200)
+    if (--ptime < 0 || (dir > 0 && scalex > MAXSCALE << 8)) {
         dir = -dir;
+
+        ptime = 1000;
+
+        if (++body >= sizeof(planets) / sizeof(planets[0]))
+            body = 0;
+
+        extern const unsigned char *thePalette;
+        thePalette = planets[body].palette;
+    }
 
     // scalex--;
     // half: 0 for left, 5 for right
@@ -196,8 +333,8 @@ void drawPlanet(int half) {
             scalex -= 5;
     }
 
-    stepSize = (0x100 * ((scalex * mult) >> 8)) >> 8;
-    stepSize2 = (0x100 * ((scalex * div) >> 8)) >> 8;
+    stepSize = (0x100 * ((scalex * mult) >> 8)) >> 16;
+    stepSize2 = (0x100 * ((scalex * div) >> 8)) >> 16;
 
     // if (sizerDelay > 1 && (SWCHA & 0x20)) {
     //     sizerDelay = 0;
@@ -205,12 +342,14 @@ void drawPlanet(int half) {
     //         stepSize -= 10;
     // }
 
+#define TEX 20
+
     scrollX += pscrollSpeed;
-    if (scrollX >= (30 << 16)) {
-        scrollX -= (30 << 16);
+    if (scrollX >= (TEX << 16)) {
+        scrollX -= (TEX << 16);
     }
     if (scrollX < 0) {
-        scrollX += 30 << 16;    //+= (20 << 16);
+        scrollX += TEX << 16;    //+= (20 << 16);
     }
 
 
@@ -226,10 +365,12 @@ void drawPlanet(int half) {
 
     int shift = 4 - ((scrollX >> 14) & 3);
     int frac = scrollX >> 16;
-    unsigned char *xchar;
+    const unsigned char *xchar;
     const unsigned char *image[6];
     int lastBottom = _SCANLINES;
 
+
+    int yz = (_SCANLINES >> 1);
 
     // int base = half ? _BUF_GLOBE_PF : (_BUF_GLOBE_PF + 3 * _BUFFER_SIZE);
 
@@ -246,9 +387,11 @@ void drawPlanet(int half) {
     int startScanline = 0;
 
 
-    for (absScanline = startScanline; absScanline < _SCANLINES && line85[equiv] >= 0;) {
+    for (absScanline = startScanline; absScanline < _SCANLINES - 3 && line85[equiv] >= 0;) {
 
-        xchar = RAM + _BOARD + (half + frac) + _BOARD_COLS * (line85[equiv] >> 5);
+        // xchar = RAM + _BOARD + (half + frac) + _BOARD_COLS * (line85[equiv] >> 5);
+        xchar = map + (half + frac) + map[0] * (line85[equiv] >> 5) + 2;
+
 
 #if 0
 #define GRAB(i)                                                                                                        \
@@ -261,7 +404,7 @@ void drawPlanet(int half) {
 
 #define GRAB(i)                                                                                                        \
     piece = *xchar++;                                                                                                  \
-    image[i] = charSet[piece] + (line85[equiv] & 31);
+    image[i] = charset[piece] + (line85[equiv] & 31);
 
         GRAB(0);
         GRAB(1);
@@ -425,13 +568,13 @@ void drawPlanet(int half) {
 
                 *pf2++ = p3 >> 16;
                 *pf1++ = reverseBits[(p3 >> 8) & 0xFF];
-                *pf0++ = p3;
+                //                *pf0++ = p3;
             }
 
             else {
 
 
-                *pf0++ = reverseBits[p3 >> 16];
+                //              *pf0++ = reverseBits[p3 >> 16];
                 *pf1++ = p3 >> 8;
                 *pf2++ = reverseBits[p3 & 0xFF];
             }
@@ -450,7 +593,7 @@ void drawPlanet(int half) {
 
     int thisBottom = absScanline;
 
-    while (absScanline < lastBottom && absScanline < _SCANLINES) {
+    while (absScanline /*< lastBottom && absScanline*/ < _SCANLINES) {
         *pf0++ = 0;
         *pf1++ = 0;
         *pf2++ = 0;

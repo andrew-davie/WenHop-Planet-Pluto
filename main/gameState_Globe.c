@@ -23,6 +23,8 @@
 #define FADE_SHIFT 16
 
 static int base = _SCANLINES;
+const unsigned char *thePalette;
+
 
 void initDataStreams_Globe() {
 
@@ -85,7 +87,7 @@ void initKernel_Globe() {
 
     killRepeatingAudio();
 
-    initPlanet();
+    thePalette = initPlanet(0);
     base = _SCANLINES;
 
     sound_max_volume = VOLUME_MAX;
@@ -113,18 +115,6 @@ void drawPFGlobe(int buffer, const unsigned char image[66][4][3]) {
 }
 
 
-void initGameState_Globe() {
-
-    // sound_volume = VOLUME_NONPLAYING;
-    // loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
-    // loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
-
-    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, _BUFFER_SIZE * 10 / 4);
-
-    frame = 0;
-}
-
-
 void drawPaletteGlobe(const unsigned char *palette) {
 
     unsigned char *p = RAM + _BUF_GLOBE_COLUPF;
@@ -139,16 +129,34 @@ void drawPaletteGlobe(const unsigned char *palette) {
     }
 
     for (int i = 0; i < _SCANLINES; i += 3) {
-        p[i] = pal[0];
-        p[i + 1] = pal[1];
-        p[i + 2] = pal[2];
+        p[i] = pal[1];
+        p[i + 1] = pal[2];
+        p[i + 2] = pal[0];
     }
+}
+
+
+void initGameState_Globe() {
+
+    // sound_volume = VOLUME_NONPLAYING;
+    // loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
+    // loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
+
+    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, _BUFFER_SIZE * 10 / 4);
+
+    //    extern unsigned char *moon_ntsc_palette;
+
+    // const unsigned char moon_ntsc_palette[] = {0, 0, 0, 0};
+    // drawPaletteGlobe(thePalette);
+
+    frame = 0;
 }
 
 
 void VB_Globe() {
 
     initDataStreams_Globe();
+    drawPaletteGlobe(thePalette);
 
     if (frame > DURATION_GLOBE && (RAM[_SWCHB] != 0x3F))
         setGameState(GS_MENU);
@@ -159,28 +167,82 @@ void VB_Globe() {
     //             80, 0x28);
 
 
-    if (base > 80)
-        base--;
+    // if (base > 80)
+    //     base--;
 
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, base,
+    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 170,
                 0xC6);
 
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 30, 0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base + 42, 0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 54, 0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 36 + 30,
-                0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base + 36 + 42,
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 30, 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base + 42, 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 54, 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 36 + 30,
+    // 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base
+    // + 36 + 42,
     //             0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 36 + 54,
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base
+    // + 36 + 54,
     //             0x8);
 }
+
+
+bool drawBit2(int x, int y, unsigned char colour) {
+    colour = 7;
+
+    colour |= colour << 3;
+    colour >>= roller;
+
+    int scrollY = 0;
+    int scrollX = 0;
+
+    int line = (y - ((scrollY) >> 16)) * 3;
+    if (line < 0 || line >= _SCANLINES - 3)
+        return false;
+
+    int col = 4 + x - ((scrollX /** CHAR_TRIX_X*/) >> 16);
+    if (col < 0 || col > SCREEN_TRIX_X - 1)
+        return false;
+
+    unsigned char *base = _BUF_GLOBE_PF + RAM + line;
+
+    if (col >= 20) {
+        col -= 20;
+        base += 3 * _BUFFER_SIZE;
+    }
+
+    base += ((col + 4) >> 3) * _BUFFER_SIZE;
+
+    int shift;
+    if (col < 4)
+        shift = col + 4;
+
+    else if (col < 12)
+        shift = 11 - col;
+
+    else
+        shift = (col - 12);
+
+    int bit = 1 << shift;
+
+    unsigned char mask0 = (colour) << shift;
+    unsigned char mask1 = (colour >> 1) << shift;
+    unsigned char mask2 = (colour >> 2) << shift;
+
+
+    base[0] = (base[0] & ~bit) | (bit & mask0);
+    base[1] = (base[1] & ~bit) | (bit & mask1);
+    base[2] = (base[2] & ~bit) | (bit & mask2);
+
+    return true;
+}
+
 
 void OS_Globe() {
 
     interleaveChronoColour(&roller);
     setPFColours((unsigned char *)(RAM + _BUF_GLOBE_COLUPF));
-    setPalette(_BUF_GLOBE_COLUBK);
+    // setPalette(_BUF_GLOBE_COLUBK);
 
     // unsigned char *p = RAM + _BUF_GLOBE_COLUBK;
     // unsigned int *q = (unsigned int *)(RAM + _BUF_GLOBE_PF);
@@ -191,11 +253,16 @@ void OS_Globe() {
     // unsigned int *p = (unsigned int *)(RAM + _BUF_GLOBE_PF);
     // for (int i = 0; i < _BUFFER_SIZE; i++)    // 4 buffers @ int
     //     *p++ = 0;                             // getRandom32();
-    unsigned int *p = (unsigned int *)(RAM + _BUF_GLOBE_GRP);
-    for (int i = 0; i < 6 * _BUFFER_SIZE / 4; i++)
-        *p++ = 0;
+    // unsigned int *p = (unsigned int *)(RAM + _BUF_GLOBE_GRP);
+    // for (int i = 0; i < 6 * _BUFFER_SIZE / 4; i++)
+    //     *p++ = 0;
 
-    drawPlanet(0);
+
+    for (int i = 0; i < 20; i++)
+        drawBit2(rangeRandom(32), rangeRandom(32), 7);
+
+
+    // drawPlanet(0);
 }
 
 // EOF

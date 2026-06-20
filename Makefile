@@ -105,6 +105,19 @@ SRCS = \
  \
  grid6.c \
  \
+ spinningGlobe/titan.c \
+ spinningGlobe/ridged.c \
+ spinningGlobe/purple1.c \
+ spinningGlobe/green1.c \
+ spinningGlobe/blood2.c \
+ spinningGlobe/bloodworld.c \
+ spinningGlobe/pangea.c \
+ spinningGlobe/p1.c \
+ spinningGlobe/mercury.c \
+ spinningGlobe/sun.c \
+ spinningGlobe/neptune.c \
+ spinningGlobe/earth.c \
+ spinningGlobe/moon.c \
  spinningGlobe/jupiter.c
 
 
@@ -130,7 +143,7 @@ vpath %.S $(BASE) $(CUSTOM)
 spinningGlobe/%.o: $(BASE)/spinningGlobe/%.c $(BASE)/$(DASM_TO_C)
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
-	
+
 ###############################################################################
 # Default target (first in file) will build with 'make'
 
