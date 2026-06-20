@@ -1,25 +1,18 @@
-#include "drawplanet.h"
 
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
+
 #include "colour.h"
-
-#include "animations.h"
-#include "attribute.h"
-#include "reverseBits.h"
-
+#include "drawplanet.h"
 #include "main.h"
-// #include "defines_from_dasm_for_c.h"
-#include "characterset.h"
+#include "reverseBits.h"
 #include "scroll.h"
-// #include "defines.h"
 
 #include "spinningGlobe/blood2.h"
 #include "spinningGlobe/bloodworld.h"
 #include "spinningGlobe/earth.h"
 #include "spinningGlobe/green1.h"
-#include "spinningGlobe/mercury.h"
 #include "spinningGlobe/moon.h"
 #include "spinningGlobe/neptune.h"
 #include "spinningGlobe/pangea.h"
@@ -103,14 +96,6 @@ const struct GLOBE planets[] = {
     {titan_map, titan_charset, titan_ntsc_palette},
     {moon_map, moon_charset, moon_ntsc_palette_override},
 };
-
-
-// duplicate from defines_cdfj.h
-// Raw queue pointers
-extern void *DDR;
-#ifndef RAM
-#define RAM ((unsigned char *)DDR)
-#endif
 
 
 const int pix85[] = {
@@ -309,8 +294,6 @@ void drawPlanet(int half) {
         thePalette = planets[body].palette;
     }
 
-    // scalex--;
-    // half: 0 for left, 5 for right
 
     scrollY = 0;
 
@@ -333,11 +316,6 @@ void drawPlanet(int half) {
     stepSize = (0x100 * ((scalex * mult) >> 8)) >> 16;
     stepSize2 = (0x100 * ((scalex * div) >> 8)) >> 16;
 
-    // if (sizerDelay > 1 && (SWCHA & 0x20)) {
-    //     sizerDelay = 0;
-    //     if (stepSize > 0x1000)
-    //         stepSize -= 10;
-    // }
 
 #define TEX 20
 
@@ -350,16 +328,6 @@ void drawPlanet(int half) {
     }
 
 
-    // if (sizerDelay++ > 2) {
-    //     sizer+= sizerDirection;
-    //     if (sizer > 10 || sizer < 0) {
-    //         sizer -= sizerDirection;
-    //         sizerDirection = -sizerDirection;
-    //     }
-    //     sizerDelay = 0;
-    // }
-
-
     int shift = 4 - ((scrollX >> 14) & 3);
     int frac = scrollX >> 16;
     const unsigned char *xchar;
@@ -369,7 +337,6 @@ void drawPlanet(int half) {
 
     int yz = (_SCANLINES >> 1);
 
-    // int base = half ? _BUF_GLOBE_PF : (_BUF_GLOBE_PF + 3 * _BUFFER_SIZE);
 
     unsigned char *pf0 = RAM + _BUF_GLOBE_PF + (half ? 0 : (3 * _BUFFER_SIZE));
     unsigned char *pf1 = pf0 + _BUFFER_SIZE;
@@ -386,18 +353,7 @@ void drawPlanet(int half) {
 
     for (absScanline = startScanline; absScanline < _SCANLINES - 3 && line85[equiv] >= 0;) {
 
-        // xchar = RAM + _BOARD + (half + frac) + _BOARD_COLS * (line85[equiv] >> 5);
         xchar = map + (half + frac) + map[0] * (line85[equiv] >> 5) + 2;
-
-
-#if 0
-#define GRAB(i)                                                                                                        \
-    piece = *xchar++;                                                                                                  \
-    type = CharToType[piece];                                                                                          \
-    if (Animate[type])                                                                                                 \
-        piece = (*Animate[type])[AnimIdx[type].index];                                                                 \
-    image[i] = *charSet[piece] + (line85[equiv] & 31);
-#endif
 
 #define GRAB(i)                                                                                                        \
     piece = *xchar++;                                                                                                  \
@@ -418,12 +374,6 @@ void drawPlanet(int half) {
 
 
             absScanline++;
-
-            // int p = (*image[0]++ << 20 | *image[1]++ << 16 | *image[2]++ << 12 | *image[3]++ << 8 | *image[4]++ << 4
-            // |
-            //          *image[5]++) >>
-            //         shift;
-
 
             int p = (*(image[0] + roll) << 20       //
                      | *(image[1] + roll) << 16     //
@@ -587,15 +537,6 @@ void drawPlanet(int half) {
         equivalentLine += stepSize;
         equiv = equivalentLine >> 8;
     }
-
-    int thisBottom = absScanline;
-
-    while (absScanline /*< lastBottom && absScanline*/ < _SCANLINES) {
-        *pf0++ = 0;
-        *pf1++ = 0;
-        *pf2++ = 0;
-        absScanline++;
-    }
-
-    lastBottom = thisBottom;
 }
+
+// EOF

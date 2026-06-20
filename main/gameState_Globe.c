@@ -33,8 +33,6 @@ struct STARS {
     unsigned char colour;
 } stars[20];
 
-bool drawBit2(int x, int y, unsigned char colour);
-
 
 void initStars() {
 
@@ -136,59 +134,18 @@ void initGameState_Globe() {
 }
 
 
-void VB_Globe() {
-
-    initDataStreams_Globe();
-    drawPaletteGlobe(thePalette);
-
-    if (frame > DURATION_GLOBE && (RAM[_SWCHB] != 0x3F))
-        setGameState(GS_MENU);
-
-    drawPlanet(5);
-
-    for (unsigned int i = 0; i < sizeof(stars) / sizeof(stars[0]); i++)
-        drawBit2(stars[i].x, stars[i].y, stars[i].colour);
-
-
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_couch_compliant_gif, gfx_grid_couch_compliant_gif_HEIGHT,
-    //             80, 0x28);
-
-
-    // if (base > 80)
-    //     base--;
-
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 170,
-    //             0xC6);
-
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 30, 0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base + 42, 0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 54, 0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 36 + 30,
-    // 0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base
-    // + 36 + 42,
-    //             0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base
-    // + 36 + 54,
-    //             0x8);
-}
-
-
-bool drawBit2(int x, int y, unsigned char colour) {
+void drawBit2(int x, int y, unsigned char colour) {
 
     colour |= colour << 3;
     colour >>= roller;
 
-    int scrollY = 0;
-    int scrollX = 0;
-
-    int line = (y - ((scrollY) >> 16)) * 3;
+    int line = y * 3;
     if (line < 0 || line >= _SCANLINES - 3)
-        return false;
+        return;
 
-    int col = x - ((scrollX /** CHAR_TRIX_X*/) >> 16);
+    int col = x;
     if (col < 0 || col > SCREEN_TRIX_X - 1)
-        return false;
+        return;
 
     unsigned char *base = _BUF_GLOBE_PF + RAM + line;
 
@@ -218,13 +175,50 @@ bool drawBit2(int x, int y, unsigned char colour) {
 
     if (!((base[0] | base[1] | base[2]) & bit)) {
 
-
         base[0] = (base[0] & ~bit) | (bit & mask0);
         base[1] = (base[1] & ~bit) | (bit & mask1);
         base[2] = (base[2] & ~bit) | (bit & mask2);
     }
+}
 
-    return true;
+
+void VB_Globe() {
+
+    initDataStreams_Globe();
+    drawPaletteGlobe(thePalette);
+
+    if (frame > DURATION_GLOBE && (RAM[_SWCHB] != 0x3F))
+        setGameState(GS_MENU);
+
+    drawPlanet(5);
+
+    for (unsigned int i = 0; i < sizeof(stars) / sizeof(stars[0]); i++)
+        drawBit2(stars[i].x, stars[i].y, stars[i].colour);
+
+    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 170,
+                0xC6);
+
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_couch_compliant_gif, gfx_grid_couch_compliant_gif_HEIGHT,
+    //             80, 0x28);
+
+
+    // if (base > 80)
+    //     base--;
+
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 170,
+    //             0xC6);
+
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 30, 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base + 42, 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 54, 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 36 + 30,
+    // 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base
+    // + 36 + 42,
+    //             0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base
+    // + 36 + 54,
+    //             0x8);
 }
 
 
@@ -233,9 +227,7 @@ void OS_Globe() {
     interleaveChronoColour(&roller);
     setPFColours((unsigned char *)(RAM + _BUF_GLOBE_COLUPF));
 
-    // unsigned int *p = (unsigned int *)(RAM + _BUF_GLOBE_PF);
-    // for (int i = 0; i < 6 * _BUFFER_SIZE / 4; i++)
-    //     *p++ = 0;
+    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
 
     drawPlanet(0);
 }
