@@ -125,7 +125,7 @@ void drawPaletteGlobe(const unsigned char *palette) {
 
 void initGameState_Globe() {
 
-    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, _BUFFER_SIZE * 10 / 4);
+    myMemsetInt((unsigned int *)(RAM + _GLOBE_BUFFERS_START), 0, _GLOBE_BUFFERS_SIZE / 4);
 
     draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 170,
                 0xC6);
@@ -195,8 +195,8 @@ void VB_Globe() {
     for (unsigned int i = 0; i < sizeof(stars) / sizeof(stars[0]); i++)
         drawBit2(stars[i].x, stars[i].y, stars[i].colour);
 
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 170,
-                0xC6);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 170,
+    //             0xC6);
 
     // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_couch_compliant_gif, gfx_grid_couch_compliant_gif_HEIGHT,
     //             80, 0x28);
@@ -225,9 +225,10 @@ void VB_Globe() {
 void OS_Globe() {
 
     interleaveChronoColour(&roller);
-    setPFColours((unsigned char *)(RAM + _BUF_GLOBE_COLUPF));
-
     myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
+
+    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 170,
+                0xC6);
 
     drawPlanet(0);
 }
