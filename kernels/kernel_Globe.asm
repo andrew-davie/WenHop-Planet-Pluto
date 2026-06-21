@@ -90,8 +90,8 @@ VB_kernelGlobe
                     sta WSYNC
                     sta HMOVE
 
-                    ldx #$FC
-                    stx PF2                    
+                    ; ldx #$FC
+                    ; stx PF2                    
 
                     rts
 

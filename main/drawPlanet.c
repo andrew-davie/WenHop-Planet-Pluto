@@ -13,6 +13,7 @@
 #include "spinningGlobe/bloodworld.h"
 #include "spinningGlobe/earth.h"
 #include "spinningGlobe/green1.h"
+#include "spinningGlobe/lava.h"
 #include "spinningGlobe/moon.h"
 #include "spinningGlobe/neptune.h"
 #include "spinningGlobe/pangea.h"
@@ -65,9 +66,9 @@ const unsigned char pangea_ntsc_palette_override[3] = {
 };
 
 const unsigned char blood2_ntsc_palette_override[3] = {
-    0x42, /* palette[1] = (68,40,0) */
-    0x44, /* palette[2] = (132,104,48) */
-    0x34, /* palette[4] = (176,176,176) */
+    0xF6, /* palette[1] = (68,40,0) */
+    0x94, /* palette[2] = (132,104,48) */
+    0x64, /* palette[4] = (176,176,176) */
 };
 
 const unsigned char green1_ntsc_palette_override[3] = {
@@ -82,11 +83,36 @@ const unsigned char ridged_ntsc_palette_override[3] = {
     0xCA, /* palette[4] = (144,144,144) */
 };
 
+const unsigned char lava_ntsc_palette_override[3] = {
+    0xE0, /* palette[1] = (44,48,0) */
+    0x30, /* palette[2] = (132,24,0) */
+    0x34, /* palette[4] = (172,80,48) */
+};
 
 // TODO: run spinningGlobe/make.sh to re-gen the planet data
 //       run python3 spinningGlobe/planet-gen.py to create new planet images
 
+// To add a planet
+
+//  a) put planet texture map in spinningGlobes/textures director (e.g., newplanet.jpg)
+//  b) run cset.py from spinningGlobes directory
+//     suggested params:
+//     --no-dither
+//     --trixel-height 10 --trixel-width 5
+//      --adaptive-palette --black-threshold 20
+//      --brightness 1.0
+//     --max-chars 128 textures/titan.png 20 4
+//  c) optionally add planet to spinningGlobes/make.sh
+//
+//  Note: a reconstructed image is placed in spinningGlobes (newplanet_recon.png)
+
+//  1) enter filename in makefile SRCS list (e.g., spinningGlobes/newplanet.c)
+//  2) enter map, charset, palette entries in planets[] table below
+//     note: the palette can be replaced (copy from newplanet.c to above, and append _override)
+//  3) "#include spinningGlobe/newplanet.h" at the top of displayPlanet.c
+
 const struct GLOBE planets[] = {
+    {lava_map, lava_charset, lava_ntsc_palette_override},
     {earth_map, earth_charset, earth_ntsc_palette_override},
     {neptune_map, neptune_charset, neptune_ntsc_palette_override},
     {green1_map, green1_charset, green1_ntsc_palette_override},
