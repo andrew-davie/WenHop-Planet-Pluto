@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="09715811-3b5d-4d4e-bce5-e6709461026e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/tools/alphanumeric.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/../Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../kernels/kernel_Globe.asm" beforeDir="false" afterPath="$PROJECT_DIR$/../kernels/kernel_Globe.asm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/draw.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/draw.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/draw.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/draw.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/drawPlanet.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/drawPlanet.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/gameState_Globe.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/gameState_Globe.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/sound.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/sound.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/sound.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/sound.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/earth.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/earth.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/earth.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/earth.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/scale.py" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/scale.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 5
+}]]></component>
+  <component name="ProjectId" id="3FUCQSNAwqcxX4mlRNvXGRLcW2d" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto/gfx"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-41e8cd69c857-64d779b69b7a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26927.90" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="09715811-3b5d-4d4e-bce5-e6709461026e" name="Changes" comment="" />
+      <created>1782120244831</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1782120244831</updated>
+    </task>
+    <servers />
+  </component>
+</project>

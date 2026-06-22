@@ -53,6 +53,7 @@ enum AudioID {
     SFX_BUBBLER,          // 24
     SFX_DRIP2,            // 25
     SFX_UNCOVER,          // 26
+    SFX_KEYPRESS,         // 27
 
 #if _ENABLE_LAVA2
     SFX_LAVA,    // 25

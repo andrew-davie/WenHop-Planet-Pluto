@@ -43,7 +43,7 @@ const unsigned char jupiter_ntsc_palette_override[3] = {
 const unsigned char earth_ntsc_palette_override[3] = {
     0x94, /* palette[1] = (28,76,120) */
     0xD6, /* palette[2] = (104,112,52) */
-    0xEA, /* palette[4] = (212,188,248) */
+    0x0A, /* palette[4] = (212,188,248) */
 };
 
 const unsigned char moon_ntsc_palette_override[3] = {
@@ -112,8 +112,8 @@ const unsigned char lava_ntsc_palette_override[3] = {
 //  3) "#include spinningGlobe/newplanet.h" at the top of displayPlanet.c
 
 const struct GLOBE planets[] = {
-    {lava_map, lava_charset, lava_ntsc_palette_override},
     {earth_map, earth_charset, earth_ntsc_palette_override},
+    {lava_map, lava_charset, lava_ntsc_palette_override},
     {neptune_map, neptune_charset, neptune_ntsc_palette_override},
     {green1_map, green1_charset, green1_ntsc_palette_override},
     {pangea_map, pangea_charset, pangea_ntsc_palette_override},
@@ -191,70 +191,71 @@ const int pix85[] = {
 // sub-position is always 3 (CC)
 
 
-// Number of table entries (57 for original): 57
-// Texture height in pixels:                  108
+// Number of table entries (57 for original):
+// Texture height in pixels:                  120
 // Character cell height in scanlines:        30
 // Sub-position step [3]:
 // Array name [line85]:
+// Mapping - (s)pherical or (l)inear [s]:
 
 const short int line85[] = {
     0,      // 0
     9,      // 1
-    12,     // 2
-    15,     // 3
-    18,     // 4
-    21,     // 5
-    21,     // 6
-    24,     // 7
+    15,     // 2
+    18,     // 3
+    21,     // 4
+    24,     // 5
+    24,     // 6
+    27,     // 7
     27,     // 8
-    27,     // 9
-    27,     // 10
-    32,     // 11
-    35,     // 12
-    35,     // 13
-    38,     // 14
-    38,     // 15
-    41,     // 16
-    41,     // 17
-    44,     // 18
-    44,     // 19
-    47,     // 20
-    47,     // 21
-    47,     // 22
-    50,     // 23
-    50,     // 24
-    53,     // 25
-    53,     // 26
-    53,     // 27
-    56,     // 28
-    56,     // 29
-    59,     // 30
-    59,     // 31
-    59,     // 32
-    64,     // 33
-    64,     // 34
-    67,     // 35
-    67,     // 36
-    70,     // 37
-    70,     // 38
-    70,     // 39
-    73,     // 40
-    73,     // 41
-    76,     // 42
-    76,     // 43
-    79,     // 44
-    79,     // 45
-    82,     // 46
-    82,     // 47
-    85,     // 48
-    88,     // 49
-    88,     // 50
-    91,     // 51
-    91,     // 52
-    96,     // 53
-    99,     // 54
-    105,    // 55
-    114,    // 56
+    32,     // 9
+    35,     // 10
+    38,     // 11
+    38,     // 12
+    41,     // 13
+    41,     // 14
+    44,     // 15
+    44,     // 16
+    47,     // 17
+    47,     // 18
+    50,     // 19
+    50,     // 20
+    53,     // 21
+    53,     // 22
+    56,     // 23
+    56,     // 24
+    56,     // 25
+    59,     // 26
+    59,     // 27
+    64,     // 28
+    64,     // 29
+    67,     // 30
+    67,     // 31
+    70,     // 32
+    70,     // 33
+    73,     // 34
+    73,     // 35
+    76,     // 36
+    76,     // 37
+    76,     // 38
+    79,     // 39
+    79,     // 40
+    82,     // 41
+    85,     // 42
+    85,     // 43
+    88,     // 44
+    88,     // 45
+    91,     // 46
+    91,     // 47
+    96,     // 48
+    99,     // 49
+    99,     // 50
+    102,    // 51
+    105,    // 52
+    108,    // 53
+    111,    // 54
+    114,    // 55
+    128,    // 56
     -1,  -1, -1, -1, -1, -1, -1,
 };
 
@@ -274,13 +275,13 @@ int dir;
 int body;
 int ptime;
 
-#define MINSCALE 0xB8
-#define MAXSCALE 0x140
+#define MINSCALE 0x90
+#define MAXSCALE 0x180
 
 const unsigned char *initPlanet(int planet) {
 
     scalex = MAXSCALE << 8;    // 0x200 << 8;
-    dir = -120;                //-150;
+    dir = -40;                 //-150;
 
     body = planet;
     ptime = 1000;
@@ -288,6 +289,24 @@ const unsigned char *initPlanet(int planet) {
     initStars();
 
     return planets[body].palette;
+}
+
+
+int nextPlanet() {
+
+    if (++body >= sizeof(planets) / sizeof(planets[0]))
+        body = 0;
+
+    initStars();
+    scalex = MAXSCALE << 8;    // 0x200 << 8;
+    dir = -60;                 //-150;
+
+    ptime = 1000;
+
+    extern const unsigned char *thePalette;
+    thePalette = planets[body].palette;
+
+    return body;
 }
 
 
@@ -306,18 +325,11 @@ void drawPlanet(int half) {
         dir = -dir;
     }
 
-    if (--ptime < 0 || (dir > 0 && scalex > MAXSCALE << 8)) {
+    if ((dir > 0 && scalex > MAXSCALE << 8)) {
         dir = -dir;
 
-        ptime = 1000;
-
-        if (++body >= sizeof(planets) / sizeof(planets[0]))
-            body = 0;
-
-        initStars();
-
-        extern const unsigned char *thePalette;
-        thePalette = planets[body].palette;
+        //     ptime = 1000;
+        //     nextPlanet();
     }
 
 

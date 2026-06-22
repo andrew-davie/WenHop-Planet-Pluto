@@ -131,8 +131,13 @@ const unsigned char sampleLava[] = {
 };
 #endif
 
+
 const unsigned char sampleExxtra[] = {
+    //clang-format off
+
     12, 5, 4, 10, 12, 7, 4, 10, 12, 5, 4, 10, 12, 7, 4, 10, 12, 5, 4, 10, 12, 7, 4, 10, CMD_STOP,
+
+    // clang-format
 };
 
 const unsigned char sampleUncovered[] = {
@@ -142,6 +147,16 @@ const unsigned char sampleUncovered[] = {
 const unsigned char samplePush[] = {
     8, 4, 4, 12, CMD_STOP,
 };
+
+const unsigned char sampleKeypress[] = {
+    // clang-format off
+
+     9, 6, 5, 1,
+    CMD_STOP,
+
+    // clang-format on
+};
+
 
 const unsigned char sampleExplode[] = {
     // clang-format off
@@ -289,11 +304,14 @@ const struct AudioTable AudioSamples[SFX_MAX] = {
     {sampleBubbler, 7, AUDIO_LOCKED | AUDIO_SINGLETON | AUDIO_KILL},    // SFX_BUBBLER
     {sampleDrip, 5, 0},                                                 // SFX_DRIP2
     {sampleUncover, 2, AUDIO_LOCKED | AUDIO_KILL},                      // SFX_UNCOVER
+    {sampleKeypress, 2, 0},                                             // SFX_KEYPRESS
 
 #if _ENABLE_LAVA2
     {sampleLava, 2, true},    // 25 SFX_LAVA
 #endif
 };
+
+_Static_assert(sizeof(AudioSamples) / sizeof(AudioSamples[0]) == SFX_MAX, "AudioSamples table wrong size");
 
 
 bool audioRequest[SFX_MAX];
@@ -403,7 +421,7 @@ void processSoundEffects() {
         struct Audio *sfxx = &sfx[i];
         sfxx->handled = false;
 
-        if (sfxx->id && !--sfxx->delay) {
+        if (sfxx->id && !sfxx->delay--) {
 
             const struct AudioTable *s = &AudioSamples[sfxx->id];
             sfxx->index += 4;

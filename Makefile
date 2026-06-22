@@ -116,6 +116,9 @@ SRCS = \
  spinningGlobe/neptune.c \
  spinningGlobe/earth.c \
  spinningGlobe/moon.c \
+ \
+ ../gfx/alphanumeric.c \
+ ../gfx/fontcompact.c
 
 
 
@@ -141,6 +144,10 @@ spinningGlobe/%.o: $(BASE)/spinningGlobe/%.c $(BASE)/$(DASM_TO_C)
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
 
+../gfx/%.o: ../gfx/%.c $(BASE)/$(DASM_TO_C)
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
+
 ###############################################################################
 # Default target (first in file) will build with 'make'
 
@@ -161,7 +168,7 @@ ifneq ($(EMULATOR),)
 	pkill -f $(GOPHERNAME) || true
 
 ifeq ($(EMULATOR), gopher)
-	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv PAL60 -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
+	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv NTSC -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
 endif
 
 ifeq ($(EMULATOR), stella)

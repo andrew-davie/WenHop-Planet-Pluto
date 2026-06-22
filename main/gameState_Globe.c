@@ -22,14 +22,16 @@
 #define FADE_SPEED 17000
 #define FADE_SHIFT 16
 
-static int base = _SCANLINES;
+static int id_y, ystep;
 const unsigned char *thePalette;
-
+int infoPhase;
+int wait;
+int planet;
 
 struct STARS {
 
-    unsigned char x;
-    unsigned char y;
+    unsigned int x;
+    unsigned int y;
     unsigned char colour;
 } stars[20];
 
@@ -37,8 +39,8 @@ struct STARS {
 void initStars() {
 
     for (unsigned int i = 0; i < sizeof(stars) / sizeof(stars[0]); i++) {
-        stars[i].x = rangeRandom(40);
-        stars[i].y = rangeRandom(66);
+        stars[i].x = rangeRandom(40) << 8;
+        stars[i].y = rangeRandom(66) << 8;
         stars[i].colour = rangeRandom(7) + 1;
     }
 }
@@ -94,7 +96,12 @@ void initKernel_Globe() {
     killRepeatingAudio();
 
     thePalette = initPlanet(0);
-    base = _SCANLINES;
+    id_y = _SCANLINES << 3;
+    ystep = -26;
+
+    infoPhase = 0;
+    wait = 100;
+    planet = 0;
 
     sound_max_volume = VOLUME_MAX;
 
@@ -123,12 +130,80 @@ void drawPaletteGlobe(const unsigned char *palette) {
 }
 
 
+const char *planetInfo[] = {
+    //    "Mostly|harmless.",     // 3
+    "Squabbling|rock whose|dominant|species spent|millennia|figuring out|how to leave|and, mostly|didn't bother.",
+    "The name was|chosen by|committee,|and somehow|it was the|kindest|option on|the table",    // 8
+    "Dim flatulent|gas giant that|smells like|regret and|exists solely|to remind|"
+    "near systems|what failure|looks like.",    // 6
+
+
+    "Permanently| shrouded in| a haze that|  scientists| politely call|    'organic| particulate'|"
+    "and everyone|   else calls|       filth.",    // 0
+    "  Named after|      the first|   explorer to|    land there,|     "
+    "  who...|  immediately|    wished "
+    "he|       hadn't.",    // 1
+    "A liquid world,| and trust us,|   you do not|want to know|    what the|     "
+    "liquid "
+    "is.",                                                             // 2
+    "Hot and|bothered.",                                               // 4
+    "Tribble|trouble}",                                                // 5
+    "Wet grey lump|that even its|own moons|try to stay|away from.",    // 7
+};
+
+const char *planetInfoName[] = {
+    "EARTH",      // 3
+    "SPUTUM",     // 8
+    "NEPTUNE",    // 5
+
+
+    "BRIMSTON",      // 4
+    "SKUMVEIL",      // 0
+    "GRUNTHOS",      // 1
+    "SWILL",         // 2
+    "LICHONI",       // 6
+    "MUCKSPHERE",    // 7
+};
+
+const char *planetPhysics[] = {
+    "6900 km|g 9.81 m/s^",    // 3
+
+    "1500 km|g 4,8 m/s^",     // 0
+    "9874 km|g 1.5 m/s^",     // 1
+    "14566 km|g 4.3 m/s^",    // 2
+    "42000 km|222.4 m/s^",    // 4
+    "89000 km11.15 m/s^",     // 5
+    "6800 km|2.3 m/s^",       // 6
+    "12400 km|16.8 m/s^",     // 7
+    "4522 km|22,2 m/2^",      // 8
+};
+
+
+int infoIdx;
+
+const struct PLANETINFO {
+
+    int font;
+    int x;
+    int y;
+    const char *blurb;
+} info[] = {
+
+    {0, 0, 40, "EARTH"},
+    {1, 0, 55, "Tribble Trouble"},
+};
+
+
 void initGameState_Globe() {
 
     myMemsetInt((unsigned int *)(RAM + _GLOBE_BUFFERS_START), 0, _GLOBE_BUFFERS_SIZE / 4);
 
-    base = 78;
+    infoIdx = -1;
 
+    // initAsciiStringDraw(1, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
+    //                     planetInfo[rangeRandom(sizeof(planetInfo) / sizeof(planetInfo[0]))], 0, 30);
+
+    initAsciiStringDraw(0, 0xA, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfoName[planet], 0, 28);
     frame = 0;
 }
 
@@ -146,14 +221,14 @@ void drawBit2(int x, int y, unsigned char colour) {
     if (col < 0 || col > SCREEN_TRIX_X - 1)
         return;
 
-    unsigned char *base = _BUF_GLOBE_PF + RAM + line;
+    unsigned char *basex = _BUF_GLOBE_PF + RAM + line;
 
     if (col >= 20) {
-        col -= 20;
-        base += 3 * _BUFFER_SIZE;
+        col = 39 - col;
+        basex += 3 * _BUFFER_SIZE;
     }
 
-    base += ((col + 4) >> 3) * _BUFFER_SIZE;
+    basex += ((col + 4) >> 3) * _BUFFER_SIZE;
 
     int shift;
     if (col < 4)
@@ -172,11 +247,11 @@ void drawBit2(int x, int y, unsigned char colour) {
     unsigned char mask2 = (colour >> 2) << shift;
 
 
-    if (!((base[0] | base[1] | base[2]) & bit)) {
+    if (!((basex[0] | basex[1] | basex[2]) & bit)) {
 
-        base[0] = (base[0] & ~bit) | (bit & mask0);
-        base[1] = (base[1] & ~bit) | (bit & mask1);
-        base[2] = (base[2] & ~bit) | (bit & mask2);
+        basex[0] = (basex[0] & ~bit) | (bit & mask0);
+        basex[1] = (basex[1] & ~bit) | (bit & mask1);
+        basex[2] = (basex[2] & ~bit) | (bit & mask2);
     }
 }
 
@@ -191,8 +266,43 @@ void VB_Globe() {
 
     drawPlanet(5);
 
-    for (unsigned int i = 0; i < sizeof(stars) / sizeof(stars[0]); i++)
-        drawBit2(stars[i].x, stars[i].y, stars[i].colour);
+    for (unsigned int i = 0; i < sizeof(stars) / sizeof(stars[0]); i++) {
+        drawBit2(stars[i].x >> 8, stars[i].y >> 8, stars[i].colour);
+
+        // if (!rangeRandom(120))
+        //     stars[i].colour = rangeRandom(7) + 1;
+        // stars[i].x += 80;
+        // stars[i].y += 60;
+    }
+
+
+    if (frame > 50 && !(frame & 3)) {
+
+        if (!drawNextChar()) {
+
+            switch (infoPhase) {
+            case 0:
+                initAsciiStringDraw(0, 0x04, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetPhysics[planet], 0, 38);
+                break;
+
+            case 1:
+                initAsciiStringDraw(1, 0xC8, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfo[planet], 0, 56);
+                break;
+
+            default:
+                if (!--wait) {
+                    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
+                    planet = nextPlanet();
+                    initAsciiStringDraw(0, 0xA, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfoName[planet], 0, 28);
+                    infoPhase = -1;
+                    wait = 100;
+                }
+                break;
+            }
+
+            infoPhase++;
+        }
+    }
 }
 
 
@@ -201,24 +311,32 @@ void OS_Globe() {
     interleaveChronoColour(&roller);
     myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
 
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 170,
-    //             0xC6);
-
     drawPlanet(0);
 
-    int base = 78;
+    // if (frame > 6000)
 
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, base,
-                0xC6);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 30, 0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base + 42, 0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 54, 0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, base + 36 + 30,
-                0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, base + 36 + 42,
-                0x8);
-    draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, base + 36 + 54,
-                0x8);
+
+    id_y += ystep;
+
+
+    if ((ystep < 0 && id_y < (60 << 3)) || (ystep > 0 && id_y > (65 << 3)))
+        ystep = -(ystep >> 2);
+
+
+    int b22 = id_y >> 3;
+    // if (b22 < 78)
+    //     b22 = 78;
+
+
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, b22,
+    //             0xC6);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, b22 + 30, 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, b22 + 42, 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, b22 + 54, 0x8);
+    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, b22 + 36 + 30,
+    // 0x8); draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, b22 + 36 +
+    // 42, 0x8); draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, b22 +
+    // 36 + 54, 0x8);
 }
 
 // EOF

@@ -55,7 +55,7 @@ positionSpritesGlobe
 
 
 
-OS_kernelGlobe  rts
+OS_kernelGlobe      rts
 
 
 VB_kernelGlobe
@@ -70,18 +70,7 @@ VB_kernelGlobe
                     stx ENAM0
                     stx ENAM1
                     stx COLUBK
-                    ; stx COLUP0
-                    ; stx COLUP1
                     stx COLUPF
-
-                    ; ldx #>_colubk
-                    ; stx DSPTR
-                    ; ldx #<_colubk
-                    ; stx DSPTR
-                    ; lda #DSCOMM 
-                    ; sta COLUBK
-                    ; sta COLUPF
-
 
                     ldx #%00000001
                     stx CTRLPF              ; reflect PF
@@ -89,9 +78,6 @@ VB_kernelGlobe
                     jsr positionSpritesGlobe
                     sta WSYNC
                     sta HMOVE
-
-                    ; ldx #$FC
-                    ; stx PF2                    
 
                     rts
 
