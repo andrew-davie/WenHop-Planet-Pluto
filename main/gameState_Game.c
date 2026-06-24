@@ -164,8 +164,8 @@ void VB_Game() {
         shakeX = shakeY = 0;
 #endif
 
-    extern int actualScore;
-    actualScore = RAM[_SWCHB];
+    // extern int actualScore;
+    // actualScore = RAM[_SWCHB];
 
     //    if (frame > 20000)
     if (RAM[_SWCHB] != 0x3F)

@@ -19,9 +19,12 @@
 #include "spinningGlobe/pangea.h"
 #include "spinningGlobe/titan.h"
 
+#define DSP -200
+
 extern void initStars();
 
 struct GLOBE {
+    int retrograde;
     const unsigned char *map;
     const unsigned char *const *charSet;
     const unsigned char *palette;
@@ -111,16 +114,17 @@ const unsigned char lava_ntsc_palette_override[3] = {
 //     note: the palette can be replaced (copy from newplanet.c to above, and append _override)
 //  3) "#include spinningGlobe/newplanet.h" at the top of displayPlanet.c
 
-const struct GLOBE planets[] = {
-    {earth_map, earth_charset, earth_ntsc_palette_override},
-    {lava_map, lava_charset, lava_ntsc_palette_override},
-    {neptune_map, neptune_charset, neptune_ntsc_palette_override},
-    {green1_map, green1_charset, green1_ntsc_palette_override},
-    {pangea_map, pangea_charset, pangea_ntsc_palette_override},
-    {bloodworld_map, bloodworld_charset, bloodworld_ntsc_palette_override},
-    {blood2_map, blood2_charset, blood2_ntsc_palette_override},
-    {titan_map, titan_charset, titan_ntsc_palette},
-    {moon_map, moon_charset, moon_ntsc_palette_override},
+const struct GLOBE planets[10] = {
+    {1, earth_map, earth_charset, earth_ntsc_palette_override},
+    {-1, lava_map, lava_charset, lava_ntsc_palette_override},
+    {1, neptune_map, neptune_charset, neptune_ntsc_palette_override},
+    {-1, green1_map, green1_charset, green1_ntsc_palette_override},
+    {-1, pangea_map, pangea_charset, pangea_ntsc_palette_override},
+    {1, bloodworld_map, bloodworld_charset, bloodworld_ntsc_palette_override},
+    {1, blood2_map, blood2_charset, blood2_ntsc_palette_override},
+    {1, titan_map, titan_charset, titan_ntsc_palette},
+    {-1, moon_map, moon_charset, moon_ntsc_palette_override},
+    {-1, moon_map, moon_charset, moon_ntsc_palette_override},    // TODO: dup
 };
 
 
@@ -191,7 +195,7 @@ const int pix85[] = {
 // sub-position is always 3 (CC)
 
 
-// Number of table entries (57 for original):
+// Number of table entries (57 for original): 57
 // Texture height in pixels:                  120
 // Character cell height in scanlines:        30
 // Sub-position step [3]:
@@ -259,8 +263,9 @@ const short int line85[] = {
     -1,  -1, -1, -1, -1, -1, -1,
 };
 
+#define PSS 0
 
-int pscrollSpeed = 0xD00;
+int pscrollSpeed = PSS;    // 0x8800;    // C80;    // 0xA00;
 
 
 unsigned int stepSize = 0x100;
@@ -271,85 +276,75 @@ unsigned int mult = (int)(1.25 * 0x100);
 unsigned int div = (int)(0x100 / 1.25);
 
 int scalex;
-int dir;
+int planetDir, dirTarget;
 int body;
-int ptime;
 
-#define MINSCALE 0x90
-#define MAXSCALE 0x180
 
-const unsigned char *initPlanet(int planet) {
+#define SCALE_FAR (0x140 << 8)                     // 262144
+#define SCALE_NEAR (0xC8 << 8)                     // 216
+#define MIDPOINT ((SCALE_FAR + SCALE_NEAR) / 2)    // ~131180
+#define DIVISOR 12000
 
-    scalex = MAXSCALE << 8;    // 0x200 << 8;
-    dir = -40;                 //-150;
+#define MINSCALE SCALE_NEAR
+#define MAXSCALE SCALE_FAR
+
+
+void initPlanet(int planet) {
+
+    scalex = MAXSCALE;
+    planetDir = 0;
+    pscrollSpeed = PSS;
 
     body = planet;
-    ptime = 1000;
 
     initStars();
 
-    return planets[body].palette;
+    extern const unsigned char *thePalette;
+    thePalette = planets[body].palette;
 }
 
 
 int nextPlanet() {
 
-    if (++body >= sizeof(planets) / sizeof(planets[0]))
+    if (++body >= (int)(sizeof(planets) / sizeof(planets[0])))
         body = 0;
 
-    initStars();
-    scalex = MAXSCALE << 8;    // 0x200 << 8;
-    dir = -60;                 //-150;
-
-    ptime = 1000;
-
-    extern const unsigned char *thePalette;
-    thePalette = planets[body].palette;
-
+    initPlanet(body);
     return body;
 }
 
 
 void drawPlanet(int half) {
 
-
     const unsigned char *map = planets[body].map;
     const unsigned char *const *charset = planets[body].charSet;
-    const unsigned char *palette = planets[body].palette;
+    // const unsigned char *palette = planets[body].palette;
+
+    planetDir += ((MIDPOINT - scalex) * (0x10000 / DIVISOR)) >> 16;
+    scalex += planetDir;
 
 
-    // 0x40,0x200
-
-    scalex += dir;
-    if (dir < 0 && scalex < MINSCALE << 8) {
-        dir = -dir;
-    }
-
-    if ((dir > 0 && scalex > MAXSCALE << 8)) {
-        dir = -dir;
-
-        //     ptime = 1000;
-        //     nextPlanet();
-    }
+    if (pscrollSpeed < 0x1100)
+        pscrollSpeed += 30;
 
 
     scrollY = 0;
 
 
-    if (!(swcha & (0x40 << 4)))
-        pscrollSpeed += 100;
-    if (!(swcha & (0x80 << 4)))
-        pscrollSpeed -= 100;
+    // if (!(swcha & (0x40 << 4)))
+    //     pscrollSpeed += 100;
+    // if (!(swcha & (0x80 << 4)))
+    //     pscrollSpeed -= 100;
 
-    if (!(swcha & 0x20)) {
-        if (scalex < 0x300)
-            scalex += 5;
-    }
+    // if (!(swcha & 0x20)) {
+    //     if (scalex < 0x300)
+    //         scalex += 5;
+    // }
 
-    if (!(swcha & 0x10)) {
-        if (scalex > 0x15)
-            scalex -= 5;
-    }
+    // if (!(swcha & 0x10)) {
+    //     if (scalex > 0x15)
+    //         scalex -= 5;
+    // }
 
     stepSize = (0x100 * ((scalex * mult) >> 8)) >> 16;
     stepSize2 = (0x100 * ((scalex * div) >> 8)) >> 16;
@@ -357,7 +352,7 @@ void drawPlanet(int half) {
 
 #define TEX 20
 
-    scrollX += pscrollSpeed;
+    scrollX += planets[body].retrograde * pscrollSpeed;
     if (scrollX >= (TEX << 16)) {
         scrollX -= (TEX << 16);
     }
@@ -370,10 +365,10 @@ void drawPlanet(int half) {
     int frac = scrollX >> 16;
     const unsigned char *xchar;
     const unsigned char *image[6];
-    int lastBottom = _SCANLINES;
+    // int lastBottom = _SCANLINES;
 
 
-    int yz = (_SCANLINES >> 1);
+    // int yz = (_SCANLINES >> 1);
 
 
     unsigned char *pf0 = RAM + _BUF_GLOBE_PF + (half ? 0 : (3 * _BUFFER_SIZE));
@@ -384,12 +379,14 @@ void drawPlanet(int half) {
     int equiv = 0;
     int absScanline = 0;
     unsigned char piece;
-    unsigned int type;
+    // unsigned int type;
 
     int startScanline = 0;
 
-
     for (absScanline = startScanline; absScanline < _SCANLINES - 3 && line85[equiv] >= 0;) {
+
+        if (equiv > 56)
+            equiv = 56;    // tmp
 
         xchar = map + (half + frac) + map[0] * (line85[equiv] >> 5) + 2;
 

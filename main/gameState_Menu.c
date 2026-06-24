@@ -30,7 +30,7 @@ enum MENU_OPTION {
 };
 
 
-const char showCaveName[][6] = {
+__attribute__((nonstring)) const char showCaveName[][6] = {
     {";;MARS"},    //
     {"URANUS"},    //
     {"SATURN"},    //
@@ -239,7 +239,7 @@ void VB_Menu() {
 //     {";SECAM"},    //
 // };
 
-const char Level[][6] = {
+__attribute__((nonstring)) const char Level[][6] = {
 
     {""},          //
     {"ARCTIC"},    //

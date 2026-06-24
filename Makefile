@@ -13,7 +13,8 @@
 #TOOLCHAIN 	= ~/Documents/software/gcc-arm-none-eabi/bin/arm-none-eabi
 
 TOOLCHAIN = /Users/boo/Documents/software/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/arm-none-eabi
-DASM 		= ~/Documents/software/Atari\ 2600/dasm/bin/dasm
+# DASM 		= ~/Documents/software/Atari\ 2600/dasm/bin/dasm
+DASM 		= python3 ~/Documents/software/Atari\ 2600/pydasm/dasm.py
 GOPHER 		= ~/Documents/software/Atari\ 2600/Gopher2600/
 GOPHERNAME  = gopher2600_darwin_arm64
 STELLA 		= /Applications/Stella.app
@@ -118,7 +119,8 @@ SRCS = \
  spinningGlobe/moon.c \
  \
  ../gfx/alphanumeric.c \
- ../gfx/fontcompact.c
+ ../gfx/fontcompact.c \
+ ../gfx/fontlarge.c \
 
 
 

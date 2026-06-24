@@ -16,6 +16,8 @@
 #include "drawplanet.h"
 #include "sound.h"
 
+#include "../gfx/fontcompact.h"
+
 #define CHAMP_VOL 100
 #define DURATION_GLOBE 50
 #define PRESENTS_LUM 8
@@ -33,7 +35,7 @@ struct STARS {
     unsigned int x;
     unsigned int y;
     unsigned char colour;
-} stars[20];
+} stars[10];
 
 
 void initStars() {
@@ -65,9 +67,7 @@ void initDataStreams_Globe() {
         {_DS_GLOBE_AUDF0, _BUF_AUDF},
 
         {_DS_GLOBE_COLUPF, _BUF_GLOBE_COLUPF},
-
         {_DS_GLOBE_COLUP0, _BUF_GLOBE_COLUP0},
-        {_DS_GLOBE_COLUP1, _BUF_GLOBE_COLUP0 + _BUFFER_SIZE},
 
         {_DS_GLOBE_GRP0A, _BUF_GLOBE_GRP + 0 * _BUFFER_SIZE},
         {_DS_GLOBE_GRP1A, _BUF_GLOBE_GRP + 1 * _BUFFER_SIZE},
@@ -95,17 +95,15 @@ void initKernel_Globe() {
 
     killRepeatingAudio();
 
-    thePalette = initPlanet(0);
+    planet = 0;
+    initPlanet(planet);
     id_y = _SCANLINES << 3;
     ystep = -26;
 
     infoPhase = 0;
     wait = 100;
-    planet = 0;
 
     sound_max_volume = VOLUME_MAX;
-
-    //    myMemsetInt((unsigned int *)(RAM + _GLOBE_BUFFERS_START), 0, _GLOBE_BUFFERS_SIZE / 4);
 }
 
 
@@ -130,80 +128,81 @@ void drawPaletteGlobe(const unsigned char *palette) {
 }
 
 
-const char *planetInfo[] = {
-    //    "Mostly|harmless.",     // 3
-    "Squabbling|rock whose|dominant|species spent|millennia|figuring out|how to leave|and, mostly|didn't bother.",
-    "The name was|chosen by|committee,|and somehow|it was the|kindest|option on|the table",    // 8
-    "Dim flatulent|gas giant that|smells like|regret and|exists solely|to remind|"
-    "near systems|what failure|looks like.",    // 6
+const char *planetInfo[10] = {
+    // clang-format off
 
+    "=\"Squabbling|=rock whose|=dominant|=species spent|=millennia|=figuring out|=how to leave|=and, mostly,|=didn't bother#",
+    "=\">The name was|=chosen by|=committee,|=and somehow|=it was the|=kindest|=option on|=the table#",                         // 8
+    "=\"Dim flatulent|=gas giant that|=smells like|=regret and|=exists solely|=to remind|=near systems|=what failure|=looks like#",    // 6
+    "=\"Permanently|=shrouded in|=a haze that|=scientists|=politely call|='organic|=particulate'|=and everyone|=else calls|=filth#",    // 0
+    "=\"Named after|=the first|=explorer to|=land there,|=who...|=immediately...|=wished he|=hadn't#",    // 1
+    "=\"A liquid world,|=and trust us,|=you do not|=want to know|=what the|=liquid is#",        // 2
+    "=\"Hot and|=bothered#",                                               // 4
+    "=\"Tribble|=trouble#",                                                // 5
+    "=\"Wet grey lump|=that even its|=own moons|=try to stay|=away from#",    // 7
+    "=\"Mostly|=harmless#",     // 3
 
-    "Permanently| shrouded in| a haze that|  scientists| politely call|    'organic| particulate'|"
-    "and everyone|   else calls|       filth.",    // 0
-    "  Named after|      the first|   explorer to|    land there,|     "
-    "  who...|  immediately|    wished "
-    "he|       hadn't.",    // 1
-    "A liquid world,| and trust us,|   you do not|want to know|    what the|     "
-    "liquid "
-    "is.",                                                             // 2
-    "Hot and|bothered.",                                               // 4
-    "Tribble|trouble}",                                                // 5
-    "Wet grey lump|that even its|own moons|try to stay|away from.",    // 7
-};
-
-const char *planetInfoName[] = {
-    "EARTH",      // 3
-    "SPUTUM",     // 8
-    "NEPTUNE",    // 5
-
-
-    "BRIMSTON",      // 4
-    "SKUMVEIL",      // 0
-    "GRUNTHOS",      // 1
-    "SWILL",         // 2
-    "LICHONI",       // 6
-    "MUCKSPHERE",    // 7
-};
-
-const char *planetPhysics[] = {
-    "6900 km|g 9.81 m/s^",    // 3
-
-    "1500 km|g 4,8 m/s^",     // 0
-    "9874 km|g 1.5 m/s^",     // 1
-    "14566 km|g 4.3 m/s^",    // 2
-    "42000 km|222.4 m/s^",    // 4
-    "89000 km11.15 m/s^",     // 5
-    "6800 km|2.3 m/s^",       // 6
-    "12400 km|16.8 m/s^",     // 7
-    "4522 km|22,2 m/2^",      // 8
+    // clang-format on
 };
 
 
-int infoIdx;
+const char *review[] = {
+    ">+++++",    // 0
+    ">*++++",    // 1
+    ">**+++",    // 2
+    ">***++",    // 3
+    ">****+",    // 4
+    ">*****",    // 5
+};
 
-const struct PLANETINFO {
+const char *planetInfoName[10] = {
+    ">EARTH",       // 0
+    ">SPUTUM",      // 1
+    ">NEPTUNE",     // 2
+    ">BRIMSTON",    // 3
+    ">SKUMVEIL",    // 4
+    ">GRUNTHOS",    // 5
+    ">SWILL",       // 6
+    ">LICHONI",     // 7
+    ">MUCKSPON",    // 8
+    ">TODO",        // 9
+};
 
-    int font;
-    int x;
-    int y;
-    const char *blurb;
-} info[] = {
+unsigned char planetNameColour[10] = {8, 8, 8, 8, 8, 8, 8, 8, 8, 8};
 
-    {0, 0, 40, "EARTH"},
-    {1, 0, 55, "Tribble Trouble"},
+unsigned char pic;
+
+unsigned char planetInfoColour[10] = {
+    0x18,    // 0
+    0x28,    // 1
+    0x38,    // 2
+    0x48,    // 3
+    0x58,    // 4
+    0x68,    // 5
+    0x78,    // 6
+    0x88,    // 7
+    0x88,    // 8
+    0x88,    // 9
+};
+
+const char *planetPhysics[10] = {
+    ">6900 km}>9.81 m/s^",      // 3
+    ">1500 km}>4.8 m/s^",       // 0
+    ">9874 km}>1.5 m/s^",       // 1
+    ">14566 km}>4.3 m/s^",      // 2
+    ">42000 km}>222.4 m/s^",    // 4
+    ">89000 km}>11.15 m/s^",    // 5
+    ">6800 km}>2.3 m/s^",       // 6
+    ">12400 km}>16.8 m/s^",     // 7
+    ">4522 km}>22.2 m/s^",      // 8
+    ">4522 km}>22.2 m/s^",      // 9
 };
 
 
 void initGameState_Globe() {
 
     myMemsetInt((unsigned int *)(RAM + _GLOBE_BUFFERS_START), 0, _GLOBE_BUFFERS_SIZE / 4);
-
-    infoIdx = -1;
-
-    // initAsciiStringDraw(1, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
-    //                     planetInfo[rangeRandom(sizeof(planetInfo) / sizeof(planetInfo[0]))], 0, 30);
-
-    initAsciiStringDraw(0, 0xA, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfoName[planet], 0, 28);
+    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_COLUP0), 0x58585858, _BUFFER_SIZE / 4);
     frame = 0;
 }
 
@@ -255,6 +254,9 @@ void drawBit2(int x, int y, unsigned char colour) {
     }
 }
 
+extern int planetDir;
+int lastpd;
+int rev;
 
 void VB_Globe() {
 
@@ -268,39 +270,66 @@ void VB_Globe() {
 
     for (unsigned int i = 0; i < sizeof(stars) / sizeof(stars[0]); i++) {
         drawBit2(stars[i].x >> 8, stars[i].y >> 8, stars[i].colour);
-
-        // if (!rangeRandom(120))
-        //     stars[i].colour = rangeRandom(7) + 1;
-        // stars[i].x += 80;
-        // stars[i].y += 60;
     }
 
+    if (!drawNextChar() && !--wait) {
+        switch (infoPhase++) {
 
-    if (frame > 50 && !(frame & 3)) {
+        case 0:
+            initAsciiStringDraw(2, planetNameColour[planet] + 2, 8, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
+                                planetInfoName[planet], 0, 160);
+            wait = 10;
+            break;
 
-        if (!drawNextChar()) {
+        case 1:
+            initAsciiStringDraw(1, planetNameColour[planet] - 2, 1, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
+                                planetPhysics[planet], 0, 176);
+            wait = 50;
+            pic = ((rangeRandom(15) + 1) << 4) | 8;
+            break;
 
-            switch (infoPhase) {
-            case 0:
-                initAsciiStringDraw(0, 0x04, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetPhysics[planet], 0, 38);
-                break;
+        case 2: {
 
-            case 1:
-                initAsciiStringDraw(1, 0xC8, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfo[planet], 0, 56);
-                break;
-
-            default:
-                if (!--wait) {
-                    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
-                    planet = nextPlanet();
-                    initAsciiStringDraw(0, 0xA, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfoName[planet], 0, 28);
-                    infoPhase = -1;
-                    wait = 100;
-                }
-                break;
+            int lines = 1;
+            unsigned char *p = planetInfo[planet];
+            while (*p) {
+                if (*p == '|' || *p == '}')
+                    lines++;
+                p++;
             }
 
-            infoPhase++;
+            initAsciiStringDraw(1, 0xD8 /*planetInfoColour[planet]*/, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
+                                planetInfo[planet], 0, (142 - (lines * FONTCOMPACT_FONT_HEIGHT)) >> 1);
+            wait = 50;
+            rev = rangeRandom(6);
+
+            break;
+        }
+
+        case 3:
+            initAsciiStringDraw(1, 0x18, 20, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, review[rev], 0, 142);
+            wait = 250;
+            break;
+
+
+        case 4:
+            myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
+            wait = 150;
+            lastpd = planetDir < 0 ? -1 : 1;
+            break;
+
+        case 5:
+
+            if (lastpd != (planetDir < 0 ? -1 : 1) && planetDir < 0) {
+                planet = nextPlanet();
+                wait = 200;
+                infoPhase = 0;
+            } else {
+                lastpd = planetDir < 0 ? -1 : 1;
+                infoPhase--;
+                wait++;
+            }
+            break;
         }
     }
 }
@@ -323,7 +352,7 @@ void OS_Globe() {
         ystep = -(ystep >> 2);
 
 
-    int b22 = id_y >> 3;
+    // int b22 = id_y >> 3;
     // if (b22 < 78)
     //     b22 = 78;
 

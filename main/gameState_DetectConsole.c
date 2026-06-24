@@ -64,7 +64,6 @@ void VB_DetectConsole() {
     case DETECT_FRAME_COUNT: {
 
         unsigned int detectedPeriod = T1TC;
-        actualScore = detectedPeriod;
 
         int delta = INT_MAX;
         for (unsigned int i = 0; i < sizeof(mapTimeToFormat) / sizeof(struct fmt); i++) {

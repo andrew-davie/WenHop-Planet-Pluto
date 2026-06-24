@@ -353,8 +353,8 @@ void processTypes() {
     }
 
     case TYPE_ELECTRIC: {
-        if (!rangeRandom(10))
-            *me = CH_ELECTRIC_0 + rangeRandom(4);
+        // if (!rangeRandom(10))
+        //     *me = CH_ELECTRIC_0 + rangeRandom(4);
 
         // if (Attribute[CharToType[GET(*(me + _1ROW))]] & (ATT_DISSOLVES | ATT_BLANK))
         //     *(me + _1ROW) = CH_ELECTRIC_0 + rangeRandom(4);

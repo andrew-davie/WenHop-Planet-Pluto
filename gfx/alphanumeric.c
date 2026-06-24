@@ -35,6 +35,22 @@ static const unsigned char char_041[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00000000   // 🟦🟦🟦
 };
 
+/* '*'  ASCII 42  width=5px  1 byte(s)/row */
+static const unsigned char char_042[ALPHANUMERIC_FONT_HEIGHT] = {
+    0b00000000,  // 🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦
+    0b00001010,  // 🟦🟨🟦🟨🟦
+    0b00000100,  // 🟦🟦🟨🟦🟦
+    0b00011111,  // 🟨🟨🟨🟨🟨
+    0b00001110,  // 🟦🟨🟨🟨🟦
+    0b00011011,  // 🟨🟨🟦🟨🟨
+    0b00011011,  // 🟨🟨🟦🟨🟨
+    0b00000000,  // 🟦🟦🟦🟦🟦
+    0b00000000   // 🟦🟦🟦🟦🟦
+};
+
 /* '+'  ASCII 43  width=5px  1 byte(s)/row */
 static const unsigned char char_043[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00000000,  // 🟦🟦🟦🟦🟦
@@ -153,9 +169,9 @@ static const unsigned char char_050[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00001111,  // 🟨🟨🟨🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00000001,  // 🟦🟦🟦🟨
-    0b00000001,  // 🟦🟦🟦🟨
-    0b00000010,  // 🟦🟦🟨🟦
-    0b00000100,  // 🟦🟨🟦🟦
+    0b00000011,  // 🟦🟦🟨🟨
+    0b00000110,  // 🟦🟨🟨🟦
+    0b00001100,  // 🟨🟨🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001111,  // 🟨🟨🟨🟨
     0b00001111,  // 🟨🟨🟨🟨
@@ -213,9 +229,9 @@ static const unsigned char char_053[ALPHANUMERIC_FONT_HEIGHT] = {
 
 /* '6'  ASCII 54  width=4px  1 byte(s)/row */
 static const unsigned char char_054[ALPHANUMERIC_FONT_HEIGHT] = {
-    0b00000011,  // 🟦🟦🟨🟨
-    0b00000111,  // 🟦🟨🟨🟨
-    0b00001100,  // 🟨🟨🟦🟦
+    0b00000110,  // 🟦🟨🟨🟦
+    0b00001110,  // 🟨🟨🟨🟦
+    0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001110,  // 🟨🟨🟨🟦
     0b00001111,  // 🟨🟨🟨🟨
@@ -248,9 +264,9 @@ static const unsigned char char_056[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00000110,  // 🟦🟨🟨🟦
     0b00001111,  // 🟨🟨🟨🟨
     0b00001001,  // 🟨🟦🟦🟨
-    0b00001011,  // 🟨🟦🟨🟨
+    0b00001001,  // 🟨🟦🟦🟨
     0b00000110,  // 🟦🟨🟨🟦
-    0b00001101,  // 🟨🟨🟦🟨
+    0b00001111,  // 🟨🟨🟨🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001111,  // 🟨🟨🟨🟨
@@ -373,9 +389,9 @@ static const unsigned char char_063[ALPHANUMERIC_FONT_HEIGHT] = {
 
 /* 'A'  ASCII 65  width=4px  1 byte(s)/row */
 static const unsigned char char_065[ALPHANUMERIC_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦
     0b00000011,  // 🟦🟦🟨🟨
     0b00000111,  // 🟦🟨🟨🟨
+    0b00000101,  // 🟦🟨🟦🟨
     0b00001101,  // 🟨🟨🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
@@ -389,11 +405,11 @@ static const unsigned char char_065[ALPHANUMERIC_FONT_HEIGHT] = {
 
 /* 'B'  ASCII 66  width=4px  1 byte(s)/row */
 static const unsigned char char_066[ALPHANUMERIC_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦
     0b00001110,  // 🟨🟨🟨🟦
     0b00001111,  // 🟨🟨🟨🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
+    0b00001111,  // 🟨🟨🟨🟨
     0b00001110,  // 🟨🟨🟨🟦
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
@@ -405,10 +421,10 @@ static const unsigned char char_066[ALPHANUMERIC_FONT_HEIGHT] = {
 
 /* 'C'  ASCII 67  width=4px  1 byte(s)/row */
 static const unsigned char char_067[ALPHANUMERIC_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦
     0b00000011,  // 🟦🟦🟨🟨
     0b00000111,  // 🟦🟨🟨🟨
     0b00001100,  // 🟨🟨🟦🟦
+    0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
@@ -421,10 +437,10 @@ static const unsigned char char_067[ALPHANUMERIC_FONT_HEIGHT] = {
 
 /* 'D'  ASCII 68  width=4px  1 byte(s)/row */
 static const unsigned char char_068[ALPHANUMERIC_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦
     0b00001100,  // 🟨🟨🟦🟦
     0b00001110,  // 🟨🟨🟨🟦
     0b00001011,  // 🟨🟦🟨🟨
+    0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
@@ -437,14 +453,14 @@ static const unsigned char char_068[ALPHANUMERIC_FONT_HEIGHT] = {
 
 /* 'E'  ASCII 69  width=4px  1 byte(s)/row */
 static const unsigned char char_069[ALPHANUMERIC_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦
     0b00001111,  // 🟨🟨🟨🟨
     0b00001111,  // 🟨🟨🟨🟨
     0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001110,  // 🟨🟨🟨🟦
+    0b00001110,  // 🟨🟨🟨🟦
     0b00001000,  // 🟨🟦🟦🟦
-    0b00001000,  // 🟨🟦🟦🟦
+    0b00001111,  // 🟨🟨🟨🟨
     0b00001111,  // 🟨🟨🟨🟨
     0b00001111,  // 🟨🟨🟨🟨
     0b00000000,  // 🟦🟦🟦🟦
@@ -453,11 +469,11 @@ static const unsigned char char_069[ALPHANUMERIC_FONT_HEIGHT] = {
 
 /* 'F'  ASCII 70  width=4px  1 byte(s)/row */
 static const unsigned char char_070[ALPHANUMERIC_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦
     0b00001111,  // 🟨🟨🟨🟨
     0b00001111,  // 🟨🟨🟨🟨
     0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
+    0b00001110,  // 🟨🟨🟨🟦
     0b00001110,  // 🟨🟨🟨🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
@@ -586,9 +602,9 @@ static const unsigned char char_078[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00010001,  // 🟨🟦🟦🟦🟨
     0b00011001,  // 🟨🟨🟦🟦🟨
     0b00011101,  // 🟨🟨🟨🟦🟨
+    0b00011111,  // 🟨🟨🟨🟨🟨
     0b00010111,  // 🟨🟦🟨🟨🟨
     0b00010011,  // 🟨🟦🟦🟨🟨
-    0b00010001,  // 🟨🟦🟦🟦🟨
     0b00010001,  // 🟨🟦🟦🟦🟨
     0b00010001,  // 🟨🟦🟦🟦🟨
     0b00000000,  // 🟦🟦🟦🟦🟦
@@ -680,7 +696,7 @@ static const unsigned char char_084[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00000000,  // 🟦🟦🟦🟦🟦
     0b00011111,  // 🟨🟨🟨🟨🟨
     0b00011111,  // 🟨🟨🟨🟨🟨
-    0b00000100,  // 🟦🟦🟨🟦🟦
+    0b00011111,  // 🟨🟨🟨🟨🟨
     0b00000100,  // 🟦🟦🟨🟦🟦
     0b00000100,  // 🟦🟦🟨🟦🟦
     0b00000100,  // 🟦🟦🟨🟦🟦
@@ -700,7 +716,7 @@ static const unsigned char char_085[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
-    0b00001001,  // 🟨🟦🟦🟨
+    0b00001111,  // 🟨🟨🟨🟨
     0b00001111,  // 🟨🟨🟨🟨
     0b00000110,  // 🟦🟨🟨🟦
     0b00000000,  // 🟦🟦🟦🟦
@@ -837,11 +853,11 @@ static const unsigned char char_093[ALPHANUMERIC_FONT_HEIGHT] = {
 
 /* '^'  ASCII 94  width=2px  1 byte(s)/row */
 static const unsigned char char_094[ALPHANUMERIC_FONT_HEIGHT] = {
-    0b00000010,  // 🟨🟦
-    0b00000001,  // 🟦🟨
+    0b00000011,  // 🟨🟨
     0b00000001,  // 🟦🟨
     0b00000010,  // 🟨🟦
     0b00000011,  // 🟨🟨
+    0b00000000,  // 🟦🟦
     0b00000000,  // 🟦🟦
     0b00000000,  // 🟦🟦
     0b00000000,  // 🟦🟦
@@ -1053,8 +1069,8 @@ static const unsigned char char_107[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00001100,  // 🟨🟨🟦🟦
     0b00001110,  // 🟨🟨🟨🟦
     0b00001011,  // 🟨🟦🟨🟨
-    0b00001011,  // 🟨🟦🟨🟨
-    0b00001011,  // 🟨🟦🟨🟨
+    0b00001001,  // 🟨🟦🟦🟨
+    0b00001001,  // 🟨🟦🟦🟨
     0b00000000,  // 🟦🟦🟦🟦
     0b00000000   // 🟦🟦🟦🟦
 };
@@ -1132,9 +1148,9 @@ static const unsigned char char_112[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
-    0b00001001,  // 🟨🟦🟦🟨
     0b00001111,  // 🟨🟨🟨🟨
     0b00001110,  // 🟨🟨🟨🟦
+    0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001000   // 🟨🟦🟦🟦
 };
@@ -1143,14 +1159,14 @@ static const unsigned char char_112[ALPHANUMERIC_FONT_HEIGHT] = {
 static const unsigned char char_113[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00000000,  // 🟦🟦🟦🟦
     0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
     0b00000111,  // 🟦🟨🟨🟨
+    0b00001111,  // 🟨🟨🟨🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001111,  // 🟨🟨🟨🟨
     0b00000111,  // 🟦🟨🟨🟨
+    0b00000001,  // 🟦🟦🟦🟨
     0b00000001,  // 🟦🟦🟦🟨
     0b00000001   // 🟦🟦🟦🟨
 };
@@ -1171,20 +1187,20 @@ static const unsigned char char_114[ALPHANUMERIC_FONT_HEIGHT] = {
     0b00000000   // 🟦🟦🟦
 };
 
-/* 's'  ASCII 115  width=3px  1 byte(s)/row */
+/* 's'  ASCII 115  width=4px  1 byte(s)/row */
 static const unsigned char char_115[ALPHANUMERIC_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦
-    0b00000011,  // 🟦🟨🟨
-    0b00000111,  // 🟨🟨🟨
-    0b00000100,  // 🟨🟦🟦
-    0b00000110,  // 🟨🟨🟦
-    0b00000011,  // 🟦🟨🟨
-    0b00000001,  // 🟦🟦🟨
-    0b00000111,  // 🟨🟨🟨
-    0b00000110,  // 🟨🟨🟦
-    0b00000000,  // 🟦🟦🟦
-    0b00000000   // 🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000111,  // 🟦🟨🟨🟨
+    0b00001111,  // 🟨🟨🟨🟨
+    0b00001000,  // 🟨🟦🟦🟦
+    0b00001110,  // 🟨🟨🟨🟦
+    0b00000111,  // 🟦🟨🟨🟨
+    0b00000001,  // 🟦🟦🟦🟨
+    0b00001111,  // 🟨🟨🟨🟨
+    0b00001110,  // 🟨🟨🟨🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000   // 🟦🟦🟦🟦
 };
 
 /* 't'  ASCII 116  width=4px  1 byte(s)/row */
@@ -1310,7 +1326,7 @@ const unsigned char alphanumeric_charWidths[] = {
       0  /* ''' ASCII 39 */,
       3  /* '(' ASCII 40 */,
       3  /* ')' ASCII 41 */,
-      0  /* '*' ASCII 42 */,
+      5  /* '*' ASCII 42 */,
       5  /* '+' ASCII 43 */,
       3  /* ',' ASCII 44 */,
       4  /* '-' ASCII 45 */,
@@ -1383,7 +1399,7 @@ const unsigned char alphanumeric_charWidths[] = {
       4  /* 'p' ASCII 112 */,
       4  /* 'q' ASCII 113 */,
       3  /* 'r' ASCII 114 */,
-      3  /* 's' ASCII 115 */,
+      4  /* 's' ASCII 115 */,
       4  /* 't' ASCII 116 */,
       4  /* 'u' ASCII 117 */,
       4  /* 'v' ASCII 118 */,
@@ -1409,7 +1425,7 @@ const unsigned char *alphanumeric_asciiTable[95] = {
     0  /* ''' ASCII 39 */,
     char_040  /* '(' ASCII 40 */,
     char_041  /* ')' ASCII 41 */,
-    0  /* '*' ASCII 42 */,
+    char_042  /* '*' ASCII 42 */,
     char_043  /* '+' ASCII 43 */,
     char_044  /* ',' ASCII 44 */,
     char_045  /* '-' ASCII 45 */,
