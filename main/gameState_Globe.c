@@ -5,15 +5,13 @@
 #include "caveData.h"
 #include "colour.h"
 #include "draw.h"
+#include "drawPlanet.h"
 #include "grid6.h"
 #include "main.h"
 #include "menuCharacterSet.h"
 #include "random.h"
 #include "reverseBits.h"
 #include "savekey.h"
-// #include "globe/main/main.h"
-#include "drawPlanet.h"
-#include "drawplanet.h"
 #include "sound.h"
 
 #include "../gfx/fontcompact.h"
@@ -31,7 +29,6 @@ int wait;
 int planet;
 
 struct STARS {
-
     unsigned int x;
     unsigned int y;
     unsigned char colour;
@@ -84,14 +81,10 @@ void initDataStreams_Globe() {
 }
 
 
-unsigned int buf[12];
-
-
 void initKernel_Globe() {
 
     setJumpVectors(_BUF_GLOBE_JUMP, _globeLoop, _globeExit, _SCANLINES);
     initDataStreams_Globe();
-
 
     killRepeatingAudio();
 
@@ -128,20 +121,54 @@ void drawPaletteGlobe(const unsigned char *palette) {
 }
 
 
-const char *planetInfo[10] = {
+const char *planetInfo[] = {
     // clang-format off
 
-    "=\"Squabbling|=rock whose|=dominant|=species spent|=millennia|=figuring out|=how to leave|=and, mostly,|=didn't bother#",
-    "=\">The name was|=chosen by|=committee,|=and somehow|=it was the|=kindest|=option on|=the table#",                         // 8
-    "=\"Dim flatulent|=gas giant that|=smells like|=regret and|=exists solely|=to remind|=near systems|=what failure|=looks like#",    // 6
-    "=\"Permanently|=shrouded in|=a haze that|=scientists|=politely call|='organic|=particulate'|=and everyone|=else calls|=filth#",    // 0
-    "=\"Named after|=the first|=explorer to|=land there,|=who...|=immediately...|=wished he|=hadn't#",    // 1
-    "=\"A liquid world,|=and trust us,|=you do not|=want to know|=what the|=liquid is#",        // 2
-    "=\"Hot and|=bothered#",                                               // 4
-    "=\"Tribble|=trouble#",                                                // 5
-    "=\"Wet grey lump|=that even its|=own moons|=try to stay|=away from#",    // 7
-    "=\"Mostly|=harmless#",     // 3
+    // =  center following lines
+    // >  right-justify following lines
+    // <  left-justify following lines
+    // #  right-close-quote
+    // \"  left-open-quote
+    // |  next line
+    // some non-alpha chars may not have shapes!
 
+    "=\"Squabbling|rock whose|dominant|species spent|millennia|figuring out|how to leave|and, mostly,|didn't|bother.#",
+    "=\"The name|was chosen|by committee,|and somehow|it was the|kindest|option on|the table.#",
+    "=\"Dim flatulent|gas giant that|smells like|regret and|exists solely|to remind|nearby|systems|what failure|looks like.#",
+    "=\"Permanently|shrouded in|a haze that|scientists|politely call|%organic|particulate&|and everyone|else calls|filth.#",
+    "=\"Wet grey|lump that|even its own|moons try|to stay|away from.#",
+    "=\"I cannot|stress this|enough:|do not touch|the ocean.#",
+    "=\"A liquid|world and,|trust me,|you do NOT|want to know|what the|liquid is.#",
+    "=\"The fertility|festival they|forgot to|mention in|the booking|details has|permanently|changed me|as a being.#",
+    "=\"Locals kept|insisting the|smell was|%cultural&|and I kept|insisting I|wanted|to leave.#",
+    "=\"My travel|insurance|specifically|excluded this|planet and in|hindsight that|was a sign.#",
+    "=\"Checked in,|checked out,|hosed down,|filed a report|with my|government.#",
+    "=\"Left feeling|worse about|the universe|than when|I arrived,|which I|genuinely|did not|think was|possible.#",
+    "=\"Met the|locals. Deeply|wish I hadn't.|They feel|the same way|and were|very clear|about it.#",
+    "=\"Asked the|concierge|what that pile|was, and|he said|%which one?&|and I said|%any of them!&|and he just|shrugged.#",
+    "=\"Warm, close,|humid,|intimate in|ways I did not|consent to.|Still finding|spores in my|luggage.#",
+    "=\"I asked what|happened|to the|first three|and nobody|would meet|my eyes.#",
+    "=\"The locals|described the|cuisine as|%foraged& and|I described|the|subsequent|evacuation of|my three|stomachs as|%thorough&.#",
+    "=\"The spa|promised|%gravitational|therapy&|which means|they just let|you get|fatter and|charge you|for it.#",
+    "=\"Four days of|locals|explaining|their ancient|culture|and not one|of them|noticed|I was trying|to leave.#",
+    "=\"Still|furious,|have been|furious,|my offspring|will be|furious,|this is my|legacy now.#",
+    "=\"The %scenic|overlook& was|a ledge above|a trench full|of something|slow-moving|and the guide|seemed|proud.#",
+    "=\"Asked for a|local|delicacy|and was|handed|something|that looked|back at me.#",
+    "=\"Breathed|through my|filter the|whole time|and STILL|came home|with|something|my doctor|called|%a new one&.#",
+    "=\"My ship|refused to|land and in|retrospect|I should have|listened to it.|It doesn't|have feelings,|and even|it knew.#",
+    "=\"The welcome|sign says|YOU'LL GET|USED TO IT|and that is|both the|tourism|slogan...|and a threat.#",
+    "=\"The|air quality|sensor in my|suit just said|%NO&|and powered|itself down|in protest.#",
+    "=\"The whole|planet has|a slight lean|to it that|nobody|mentions|until you've|already|unpacked.#",
+    "=\"Paid for|the premium|tour, which|covered the|same ground|as the|free tour|but with a|guide who|was angrier|about it.#",
+    "=\"The locals|have a saying:|%what's yours|is yours|until it isn't&|and that is|also their|legal|system.#",
+    "=\"Asked for a|local map and|was handed a|piece of|something,|that wasn't|paper, with|nothing on it,|and that was|apparently|correct.#",
+    "=\"The survival|suit rental|place had a|sign saying|%no refunds|if deceased&|and I thought|it was a joke|until I saw|the queue.#",
+    "=\"Tried the|local|nightlife,|which runs|from dusk|until about|half past|dusk, then|everyone|goes home|and sighs.#",
+    "=\"Genuinely|cannot tell|if they are|at war|or just|always|like this.#",
+    "=\"The|%historical|district&|is just the|part of town|where things|broke earlier|than|everywhere|else.#",
+    "=\"The|%five-star&|resort had|four stars|missing|from the sign|and I should|have taken|that literally.#",
+    "=\"Asked a|local the|population|and he said|%too many&|while looking|directly|at me.#",
+    "=\"My photos|came out|completely|grey and the|locals said|that was the|best the|planet had|ever looked.#",
     // clang-format on
 };
 
@@ -165,37 +192,24 @@ const char *planetInfoName[10] = {
     ">SWILL",       // 6
     ">LICHONI",     // 7
     ">MUCKSPON",    // 8
-    ">TODO",        // 9
+    ">PLANET X",    // 9
 };
 
 unsigned char planetNameColour[10] = {8, 8, 8, 8, 8, 8, 8, 8, 8, 8};
 
 unsigned char pic;
 
-unsigned char planetInfoColour[10] = {
-    0x18,    // 0
-    0x28,    // 1
-    0x38,    // 2
-    0x48,    // 3
-    0x58,    // 4
-    0x68,    // 5
-    0x78,    // 6
-    0x88,    // 7
-    0x88,    // 8
-    0x88,    // 9
-};
-
 const char *planetPhysics[10] = {
-    ">6900 km}>9.81 m/s^",      // 3
-    ">1500 km}>4.8 m/s^",       // 0
-    ">9874 km}>1.5 m/s^",       // 1
-    ">14566 km}>4.3 m/s^",      // 2
-    ">42000 km}>222.4 m/s^",    // 4
-    ">89000 km}>11.15 m/s^",    // 5
-    ">6800 km}>2.3 m/s^",       // 6
-    ">12400 km}>16.8 m/s^",     // 7
-    ">4522 km}>22.2 m/s^",      // 8
-    ">4522 km}>22.2 m/s^",      // 9
+    ">6900 km|9.81 m/s^",      // 0
+    ">1500 km|4.8 m/s^",       // 1
+    ">9874 km|1.5 m/s^",       // 2
+    ">14566 km|4.3 m/s^",      // 3
+    ">42000 km|222.4 m/s^",    // 4
+    ">89000 km|11.15 m/s^",    // 5
+    ">6800 km|2.3 m/s^",       // 6
+    ">12400 km|16.8 m/s^",     // 7
+    ">4522 km|22.2 m/s^",      // 8
+    ">4522 km|22.2 m/s^",      // 9
 };
 
 
@@ -209,7 +223,7 @@ void initGameState_Globe() {
 
 void drawBit2(int x, int y, unsigned char colour) {
 
-    colour |= colour << 3;
+    colour | colour << 3;
     colour >>= roller;
 
     int line = y * 3;
@@ -232,10 +246,8 @@ void drawBit2(int x, int y, unsigned char colour) {
     int shift;
     if (col < 4)
         shift = col + 4;
-
     else if (col < 12)
         shift = 11 - col;
-
     else
         shift = (col - 12);
 
@@ -245,18 +257,26 @@ void drawBit2(int x, int y, unsigned char colour) {
     unsigned char mask1 = (colour >> 1) << shift;
     unsigned char mask2 = (colour >> 2) << shift;
 
-
     if (!((basex[0] | basex[1] | basex[2]) & bit)) {
-
         basex[0] = (basex[0] & ~bit) | (bit & mask0);
         basex[1] = (basex[1] & ~bit) | (bit & mask1);
         basex[2] = (basex[2] & ~bit) | (bit & mask2);
     }
 }
 
-extern int planetDir;
 int lastpd;
-int rev;
+
+enum info {
+
+    INFO_NAME,
+    INFO_PHYSICS,
+    INFO_INFO,
+    INFO_RATING1,
+    INFO_RATING2,
+    INFO_CLEAR,
+    INFO_NEXTPLANET,
+};
+
 
 void VB_Globe() {
 
@@ -275,58 +295,63 @@ void VB_Globe() {
     if (!drawNextChar() && !--wait) {
         switch (infoPhase++) {
 
-        case 0:
-            initAsciiStringDraw(2, planetNameColour[planet] + 2, 8, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
-                                planetInfoName[planet], 0, 160);
+        case INFO_NAME:
+            initAsciiStringDraw(FONT_LARGE, planetNameColour[planet] + 2, 8, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
+                                planetInfoName[planet], 0, 158 - 5);
             wait = 10;
             break;
 
-        case 1:
-            initAsciiStringDraw(1, planetNameColour[planet] - 2, 1, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
-                                planetPhysics[planet], 0, 176);
+        case INFO_PHYSICS:
+            initAsciiStringDraw(FONT_COMPACT, 0x14, 1, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetPhysics[planet], 0,
+                                175 - 4);
             wait = 50;
             pic = ((rangeRandom(15) + 1) << 4) | 8;
+
             break;
 
-        case 2: {
+        case INFO_INFO: {
+
+            int pif = rangeRandom(sizeof(planetInfo) / sizeof(planetInfo[0]));
 
             int lines = 1;
-            unsigned char *p = planetInfo[planet];
-            while (*p) {
-                if (*p == '|' || *p == '}')
+            const char *p = planetInfo[pif];
+            do
+                if (*p == '|')
                     lines++;
-                p++;
-            }
+            while (*++p);
 
-            initAsciiStringDraw(1, 0xD8 /*planetInfoColour[planet]*/, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
-                                planetInfo[planet], 0, (142 - (lines * FONTCOMPACT_FONT_HEIGHT)) >> 1);
+            initAsciiStringDraw(FONT_COMPACT, 0xD8, 2, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfo[pif], 0,
+                                70 - ((lines * FONTCOMPACT_FONT_HEIGHT) >> 1));
             wait = 50;
-            rev = rangeRandom(6);
-
             break;
         }
 
-        case 3:
-            initAsciiStringDraw(1, 0x18, 20, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, review[rev], 0, 142);
+        case INFO_RATING1:
+            initAsciiStringDraw(FONT_COMPACT, 0x18, 1, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, review[0], 0, 142 - 4);
+            wait = 20;
+            break;
+
+        case INFO_RATING2:
+            initAsciiStringDraw(FONT_COMPACT, 0x18, 20, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, review[rangeRandom(6)], 0,
+                                142 - 4);
             wait = 250;
             break;
 
 
-        case 4:
+        case INFO_CLEAR:
             myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
             wait = 150;
             lastpd = planetDir < 0 ? -1 : 1;
             break;
 
-        case 5:
-
+        case INFO_NEXTPLANET:
             if (lastpd != (planetDir < 0 ? -1 : 1) && planetDir < 0) {
                 planet = nextPlanet();
                 wait = 200;
-                infoPhase = 0;
+                infoPhase = INFO_NAME;
             } else {
                 lastpd = planetDir < 0 ? -1 : 1;
-                infoPhase--;
+                infoPhase = INFO_NEXTPLANET;
                 wait++;
             }
             break;
@@ -342,30 +367,10 @@ void OS_Globe() {
 
     drawPlanet(0);
 
-    // if (frame > 6000)
-
-
     id_y += ystep;
-
 
     if ((ystep < 0 && id_y < (60 << 3)) || (ystep > 0 && id_y > (65 << 3)))
         ystep = -(ystep >> 2);
-
-
-    // int b22 = id_y >> 3;
-    // if (b22 < 78)
-    //     b22 = 78;
-
-
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, b22,
-    //             0xC6);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, b22 + 30, 0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, b22 + 42, 0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, b22 + 54, 0x8);
-    // draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem1_gif, gfx_grid_lorem1_gif_HEIGHT, b22 + 36 + 30,
-    // 0x8); draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem2_gif, gfx_grid_lorem2_gif_HEIGHT, b22 + 36 +
-    // 42, 0x8); draw6Bitmap(_BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, gfx_grid_lorem3_gif, gfx_grid_lorem3_gif_HEIGHT, b22 +
-    // 36 + 54, 0x8);
 }
 
 // EOF

@@ -114,11 +114,19 @@ void initKernel_Menu() {
     myMemsetInt((unsigned int *)(RAM + _MENU_BUFFERS_START), 0, _MENU_BUFFERS_SIZE / 4);
 
 
-    draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
-                gfx_grid_menu_planet_gif, gfx_grid_menu_planet_gif_HEIGHT, 94 + 30, 6);
+    initAsciiStringDraw(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 0, 172);
+    while (drawNextChar())
+        ;
+    initAsciiStringDraw(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 0, 184);
+    while (drawNextChar())
+        ;
 
-    draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
-                gfx_grid_menu_bravado_gif, gfx_grid_menu_bravado_gif_HEIGHT, 120 + 30, 6);
+
+    // draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
+    //             gfx_grid_menu_planet_gif, gfx_grid_menu_planet_gif_HEIGHT, 94 + 30, 6);
+
+    // draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
+    //             gfx_grid_menu_bravado_gif, gfx_grid_menu_bravado_gif_HEIGHT, 120 + 30, 6);
 
     menuLine = 0;
     base2 = 0;
@@ -195,9 +203,11 @@ void VB_Menu() {
 
     initDataStreams_Menu();
 
+    if (!drawNextChar()) {
+    }
 
-    if (frame > 25)
-        setGameState(GS_GAME);
+    // if (frame > 125)
+    //     setGameState(GS_GAME);
 }
 
 
@@ -285,7 +295,7 @@ void OS_Menu() {
         break;
 
     case MENU_OPTION_LEVEL:
-        dLine = Level[level];
+        //        dLine = Level[level];
         break;
 
         // case MENU_OPTION_TVSYSTEM:
@@ -297,7 +307,7 @@ void OS_Menu() {
 
     int colour = sline == menuLine ? (flashTime2 & 4) ? 0x0A : ((base2 << 2) & 0xF0) | 0x16 : 0x26;
 
-    drawString(0, y + 8 + 30, dLine, colour);
+    // drawString(0, y + 8 + 30, dLine, colour);
 
 
     //--------------------------------------------------------------------------
@@ -310,8 +320,8 @@ void OS_Menu() {
 
     //--------------------------------------------------------------------------
 
-    draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
-                gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 62, 0x96);
+    // draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
+    //             gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 62, 0x96);
 
 
     // static const char *registered = ":";

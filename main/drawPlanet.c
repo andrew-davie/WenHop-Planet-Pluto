@@ -87,7 +87,7 @@ const unsigned char ridged_ntsc_palette_override[3] = {
 };
 
 const unsigned char lava_ntsc_palette_override[3] = {
-    0xE0, /* palette[1] = (44,48,0) */
+    0xE2, /* palette[1] = (44,48,0) */
     0x30, /* palette[2] = (132,24,0) */
     0x34, /* palette[4] = (172,80,48) */
 };

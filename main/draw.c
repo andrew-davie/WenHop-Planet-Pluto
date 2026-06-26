@@ -5,8 +5,6 @@
 #include "cdfjplus.h"    // <- contains references from defines_dasm.h
 #include "colour.h"
 #include "draw.h"
-#include "random.h"
-#include "score.h"
 #include "sound.h"
 
 #include "../gfx/alphanumeric.h"
@@ -25,26 +23,27 @@ void draw6Bitmap(unsigned int grpOffset, unsigned int colup0Offset,    //
 
     colour = convertColour(colour);
 
-    if (y + height >= _SCANLINES)
-        height = _SCANLINES - y - 1;
+    if (y < 0) {
+        bm -= y * 6;
+        height += y;
+        p -= y;
+        q -= y;
+    }
 
-    // else if (y < 0) {
-    //     bm += -y * 6;
-    //     height += y;
-    //     p += y;
-    //     q += y;
-    // }
+    if (y + height >= _SCANLINES)
+        height = _SCANLINES - y;
+
 
     for (int line = 0; line < height; line++) {
-        if (y++ >= 0) {
-            q[line] = colour;
-            for (int c = 0; c < 6; c++)
-                p[c * _BUFFER_SIZE + line] = *bm++;
-        }
+        // if (y++ >= 0) {
+        q[line] = colour;
+        for (int c = 0; c < 6; c++)
+            p[c * _BUFFER_SIZE + line] = *bm++;
+        // }
 
-        else {
-            bm += 6;
-        }
+        // else {
+        //     bm += 6;
+        // }
     }
 }
 
@@ -59,14 +58,25 @@ static int colour;
 static int speedDelay;
 static int current;
 
+enum justify {
+    JUSTIFY_NONE,
+    JUSTIFY_LEFT,
+    JUSTIFY_RIGHT,
+    JUSTIFY_CENTER,
+};
+
+
+static enum justify justify;
+
 const struct FONT {
+    enum fontsize size;
     int lineHeight;
     const unsigned char **asciiTable;
     const unsigned char *charWidths;
 } fonts[] = {
-    {ALPHANUMERIC_FONT_HEIGHT, alphanumeric_asciiTable, alphanumeric_charWidths},
-    {FONTCOMPACT_FONT_HEIGHT, fontcompact_asciiTable, fontcompact_charWidths},
-    {FONTLARGE_FONT_HEIGHT, fontlarge_asciiTable, fontlarge_charWidths},
+    {FONT_STANDARD, ALPHANUMERIC_FONT_HEIGHT, alphanumeric_asciiTable, alphanumeric_charWidths},
+    {FONT_COMPACT, FONTCOMPACT_FONT_HEIGHT, fontcompact_asciiTable, fontcompact_charWidths},
+    {FONT_LARGE, FONTLARGE_FONT_HEIGHT, fontlarge_asciiTable, fontlarge_charWidths},
 };
 
 
@@ -80,96 +90,126 @@ void initAsciiStringDraw(int fontNumber, int c, int delay, int buffer, int colbu
     colour = c;
 
     ps = string;
-    buf = RAM + buffer + y;
-    colrx = RAM + colbuf + y - 1;
+    buf = RAM + buffer;          // + y;
+    colrx = RAM + colbuf - 1;    // + y - 1;
 
     speedDelay = delay;
     current = 0;
+
+    justify = JUSTIFY_NONE;
 
     cx = x;
     cy = y;
 }
 
 
-int wcol = 8;
+bool isIn(char ch, const char *str) {
+
+    if (font == FONT_COMPACT)
+        while (*str)
+            if (ch == *str++)
+                return true;
+    return false;
+}
+
+#define LTR(s) (s - ' ')
+#define KERN_LEFT "*+,\"^tTf"
+#define KERN_RIGHT "(cderTf"
 
 
-int getWordWidth(const char *str) {
+int getLineWidth(const char *str) {
 
     int width = 0;
     while (*str && *str != '}' && *str != '|') {
-        width += fonts[font].charWidths[*str - ' '] + 1;
+        width += fonts[font].charWidths[LTR(*str)] + 1;
+
+        if (font == FONT_COMPACT) {
+            if (isIn(*str, KERN_LEFT))    // LHS
+                width--;
+            if (isIn(*str, KERN_RIGHT))    // RHS
+                width--;
+        }
+
         str++;
     }
     return width ? width - 1 : 0;
+}
+
+void setJustifyX(const char *str) {
+
+    if (justify == JUSTIFY_CENTER)
+        cx = 24 - (getLineWidth(str) >> 1);
+
+    else if (justify == JUSTIFY_RIGHT)
+        cx = 48 - getLineWidth(str);
+
+    else    // JUSTIFY_NONE and JUSTIFY_LEFT
+        cx = 0;
 }
 
 
 bool drawNextChar() {
 
     // false = complete
-    // we have a lovely ASCII character set to work with, so this should be easy!
 
-    if (++current > speedDelay && ps && *ps) {
+    while (++current > speedDelay && ps && *ps) {
 
         current = 0;
+        if (*ps == '.' && *(ps - 1) == '.' && *(ps - 2) == '.')
+            current = -100;
 
-        int ch = *ps - ' ';
+        int ch = *ps;
+        int ci = LTR(ch);
 
-        if (ch == '|' - ' ') {
-            cx = 0;
-            cy += fonts[font].lineHeight + 2;
-
-            wcol = (rangeRandom(16) << 4) | 8;
+        if (ch == '|') {
+            setJustifyX(ps + 1);
+            cy += fonts[font].lineHeight;
         }
 
-        else if (ch == '}' - ' ') {
-            cx = 0;
-            cy += fonts[font].lineHeight + 2;
-            wcol = (rangeRandom(16) << 4) | 8;
+        else if (ch == '>') {
+            justify = JUSTIFY_RIGHT;
+            setJustifyX(ps + 1);
         }
 
-        else if (ch == '>' - ' ') {
-            cx = 47 - getWordWidth(ps + 1);
+        else if (ch == '<') {
+            justify = JUSTIFY_LEFT;
+            setJustifyX(ps + 1);
         }
 
-        else if (ch == '=' - ' ') {
-            cx = 24 - (getWordWidth(ps + 1) >> 1);
+        else if (ch == '=') {
+            justify = JUSTIFY_CENTER;
+            setJustifyX(ps + 1);
         }
 
+        else if (fonts[font].charWidths[ci]) {
 
-        else if (fonts[font].charWidths[ch]) {
+            ADDAUDIO(ci ? SFX_KEYPRESS : SFX_SPACE);
 
-            ADDAUDIO(ch ? SFX_KEYPRESS : SFX_SPACE);
-
-            if (ch == ',' - ' ')
+            if (isIn(ch, KERN_LEFT))
                 cx--;
 
             int column = cx >> 3;
             int bit = 7 - (cx & 7);
 
-            unsigned char *p = RAM + _BUF_GLOBE_GRP;    // buf;
-            // unsigned char *q = colrx - 1;
+            const unsigned char *charShape = fonts[font].asciiTable[ci];
 
-            const unsigned char *charShape = fonts[font].asciiTable[ch];
+            if (charShape) {
 
-            if (charShape)
                 for (int i = 0; i < fonts[font].lineHeight; i++) {
 
                     int vertPos = cy + i;
-                    if (vertPos >= 0) {    // && vertPos < _SCANLINES) {
+                    if (vertPos >= 0 && vertPos < _SCANLINES) {
 
-                        int shape = charShape[i] << (8 - fonts[font].charWidths[ch]);
+                        int shape = charShape[i] << (8 - fonts[font].charWidths[ci]);
 
                         int bs = bit + 1;
                         int band = column;
 
-                        unsigned char *qq = RAM + _BUF_GLOBE_COLUP0 - 1;
-                        qq[vertPos] = colour;
+                        colrx[vertPos] = colour;
 
                         while (shape && (band < 6)) {
 
-                            p[vertPos + band * _BUFFER_SIZE] |= (shape << bs) >> 8;
+                            buf[vertPos + band * _BUFFER_SIZE] |= (shape << bs) >> 8;
 
                             shape = (shape << bs) & 0xFF;
                             bs = 8;
@@ -177,8 +217,12 @@ bool drawNextChar() {
                         }
                     }
                 }
+            }
 
-            cx += fonts[font].charWidths[ch] + 1;
+            cx += fonts[font].charWidths[ci] + 1;
+
+            if (isIn(ch, KERN_RIGHT))
+                cx--;
         }
 
         ps++;
