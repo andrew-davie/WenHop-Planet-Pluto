@@ -51,7 +51,7 @@ from PIL import Image
 TRIXEL_W = 5     # pixels wide per character — default; overridden by --trixel-width
 TRIXEL_H = 10    # trixels deep per character — default; overridden by --trixel-height
 SCANLINES_PER_TRIXEL = 3
-WRAP_COLUMNS = 10  # extra character-columns appended for wrap-around
+WRAP_COLUMNS = 10  # extra character-columns appended for wrap-around (default; overridden by --wrap-columns)
 NUM_LOCKED = 8    # the 8 solid-colour seed characters are always locked
 
 # ---------------------------------------------------------------------------
@@ -827,6 +827,9 @@ def main():
                      help="character width in pixels/bits per byte (1-8, default 5)")
     ap.add_argument("--trixel-height", type=int, default=10,
                      help="character height in trixels (1+, default 10)")
+    ap.add_argument("--wrap-columns", type=int, default=10,
+                     help="number of extra character-columns appended to each map row "
+                          "for seamless horizontal wrap (default 10)")
     ap.add_argument("--max-chars", type=int, default=128,
                      help="maximum charset size, 8-256 (default 128)")
     ap.add_argument("--output", default=None, help="output .c filename (default: <image-stem>.c)")
@@ -863,12 +866,19 @@ def main():
                           "for palette index 0 to be used. Pixels further from black than "
                           "this threshold are mapped to the nearest non-black entry instead. "
                           "Lower = stricter (fewer pixels use black). Default: 30.")
+    ap.add_argument("--near-enough", type=int, default=0,
+                     help="during Phase 1 charset build, reuse an existing character if "
+                          "it differs from the new cell by at most this many trixels "
+                          "(0 = exact match only, default). The closest match within the "
+                          "threshold is used. Reduces charset size before Phase 2 merging "
+                          "at the cost of some extra approximation error.")
     args = ap.parse_args()
 
     # Apply --trixel-width / --trixel-height to module-level globals used by all helpers.
-    global TRIXEL_W, TRIXEL_H
+    global TRIXEL_W, TRIXEL_H, WRAP_COLUMNS
     TRIXEL_W = args.trixel_width
     TRIXEL_H = args.trixel_height
+    WRAP_COLUMNS = args.wrap_columns
 
     if args.char_width <= 0 or args.char_height <= 0:
         sys.exit("error: char_width and char_height must be positive")
@@ -876,6 +886,8 @@ def main():
         sys.exit("error: --trixel-width must be between 1 and 8")
     if TRIXEL_H < 1:
         sys.exit("error: --trixel-height must be at least 1")
+    if WRAP_COLUMNS < 0:
+        sys.exit("error: --wrap-columns must be >= 0")
     if not (NUM_LOCKED <= args.max_chars <= 256):
         sys.exit("error: --max-chars must be between %d and 256" % NUM_LOCKED)
     if args.recon_scale <= 0:
@@ -1013,6 +1025,16 @@ def main():
     weights = [0] * 8
     seen    = {tuple(int(v) for v in g): idx for idx, g in enumerate(grids)}
     orig_map_indices = []
+    near_enough = args.near_enough
+
+    # Pre-allocate a matrix for vectorised near-enough diff counting.
+    # Max rows = 8 seeds + one per cell in the image.
+    if near_enough > 0:
+        _ne_max = 8 + args.char_width * args.char_height
+        _ne_mat = np.zeros((_ne_max, cell_size), dtype=np.uint8)
+        for _i, _g in enumerate(grids):
+            _ne_mat[_i] = _g
+        _ne_n = 8  # number of rows currently populated
 
     for ry in range(args.char_height):
         for rx in range(args.char_width):
@@ -1021,11 +1043,20 @@ def main():
             flat = cell.reshape(-1)
             key  = tuple(int(v) for v in flat)
             idx  = seen.get(key)
+            if idx is None and near_enough > 0:
+                # Vectorised: count differing trixels against all existing chars.
+                diffs = (_ne_mat[:_ne_n] != flat).sum(axis=1)  # (n,)
+                best  = int(diffs.argmin())
+                if diffs[best] <= near_enough:
+                    idx = best
             if idx is None:
                 idx = len(grids)
                 seen[key] = idx
                 grids.append(flat.copy())
                 weights.append(0)
+                if near_enough > 0:
+                    _ne_mat[_ne_n] = flat
+                    _ne_n += 1
             weights[idx] += 1
             orig_map_indices.append(idx)
 
@@ -1114,11 +1145,31 @@ def main():
     lines.append("#pragma GCC diagnostic pop")
     lines.append("")
 
+    # Emoji palette: index 0-7 (RGB cube corner) → coloured square block.
+    # Index = bit0:R bit1:G bit2:B  (matches CUBE_RGB / adaptive palette slot order).
+    # Cyan (6) has no dedicated square emoji; 🟦 is the closest available.
+    _TRIXEL_EMOJI = ['⬛', '🟥', '🟩', '🟨', '🟦', '🟪', '🟫', '⬜']
+    #                black  red  green  yel   blue   mag  cyan  white
+    #                                                     (no cyan square; brown is the only unused block)
+
+    def _trixel_row_emoji(rbyte, gbyte, bbyte):
+        """Decode one trixel row (R-byte, G-byte, B-byte) → emoji art string."""
+        out = []
+        for col in range(TRIXEL_W):
+            shift = TRIXEL_W - 1 - col
+            idx = ((rbyte >> shift) & 1) | (((gbyte >> shift) & 1) << 1) | (((bbyte >> shift) & 1) << 2)
+            out.append(_TRIXEL_EMOJI[idx])
+        return ''.join(out)
+
     for i, b in enumerate(charset_bytes):
         name = "%s_char_%03d" % (prefix, i)
-        body = ", ".join(str(v) for v in b)
-        lines.append("static const unsigned char %s[%d] = { %s };"
-                      % (name, TRIXEL_H * SCANLINES_PER_TRIXEL, body))
+        total_bytes = TRIXEL_H * SCANLINES_PER_TRIXEL
+        lines.append("static const unsigned char %s[%d] = {" % (name, total_bytes))
+        for row in range(TRIXEL_H):
+            rb, gb, bb = b[row * 3], b[row * 3 + 1], b[row * 3 + 2]
+            emoji = _trixel_row_emoji(rb, gb, bb)
+            lines.append("    %3d, %3d, %3d,  /* %s */" % (rb, gb, bb, emoji))
+        lines.append("};")
     lines.append("")
 
     n_chars  = len(charset_bytes)

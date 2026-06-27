@@ -50,9 +50,14 @@ const unsigned char earth_ntsc_palette_override[3] = {
 };
 
 const unsigned char moon_ntsc_palette_override[3] = {
-    0x14, /* palette[1] = (108,108,108) */
-    0xE4, /* palette[2] = (144,144,144) */
-    0xE2, /* palette[4] = (176,176,176) */
+    0x14,
+    /* palette[1] = (108,108,108) */ 0xE4, /* palette[2] = (144,144,144) */
+    0xE2,                                  /* palette[4] = (176,176,176) */
+};
+const unsigned char moon_ntsc_palette_override2[3] = {
+    0x84, /* palette[1] = (108,108,108) */
+    0xC4, /* palette[2] = (144,144,144) */
+    0x24, /* palette[4] = (176,176,176) */
 };
 
 
@@ -75,8 +80,8 @@ const unsigned char blood2_ntsc_palette_override[3] = {
 };
 
 const unsigned char green1_ntsc_palette_override[3] = {
-    0xB2, /* palette[1] = (0,60,44) */
-    0xD6, /* palette[2] = (32,92,32) */
+    0xD4, /* palette[1] = (0,60,44) */
+    0xc6, /* palette[2] = (32,92,32) */
     0xC4, /* palette[4] = (108,108,108) */
 };
 
@@ -124,7 +129,7 @@ const struct GLOBE planets[10] = {
     {1, blood2_map, blood2_charset, blood2_ntsc_palette_override},
     {1, titan_map, titan_charset, titan_ntsc_palette},
     {-1, moon_map, moon_charset, moon_ntsc_palette_override},
-    {-1, moon_map, moon_charset, moon_ntsc_palette_override},    // TODO: dup
+    {-1, moon_map, moon_charset, moon_ntsc_palette_override2},    // TODO: dup
 };
 
 
@@ -265,23 +270,19 @@ const short int line85[] = {
 
 #define PSS 0
 
-int pscrollSpeed = PSS;    // 0x8800;    // C80;    // 0xA00;
+int rotationDelta = PSS;    // 0x8800;    // C80;    // 0xA00;
 
 
 unsigned int stepSize = 0x100;
-unsigned int stepSize2 = 0x100;
-
-
 unsigned int mult = (int)(1.25 * 0x100);
-unsigned int div = (int)(0x100 / 1.25);
 
 int scalex;
 int planetDir, dirTarget;
 int body;
 
 
-#define SCALE_FAR (0x140 << 8)                     // 262144
-#define SCALE_NEAR (0xC8 << 8)                     // 216
+#define SCALE_FAR 0x20000
+#define SCALE_NEAR 0x0F000
 #define MIDPOINT ((SCALE_FAR + SCALE_NEAR) / 2)    // ~131180
 #define DIVISOR 12000
 
@@ -293,7 +294,7 @@ void initPlanet(int planet) {
 
     scalex = MAXSCALE;
     planetDir = 0;
-    pscrollSpeed = PSS;
+    rotationDelta = PSS;
 
     body = planet;
 
@@ -318,116 +319,96 @@ void drawPlanet(int half) {
 
     const unsigned char *map = planets[body].map;
     const unsigned char *const *charset = planets[body].charSet;
-    // const unsigned char *palette = planets[body].palette;
 
+    // oscillate
     planetDir += ((MIDPOINT - scalex) * (0x10000 / DIVISOR)) >> 16;
     scalex += planetDir;
 
+    if (rotationDelta < 0x1100)
+        rotationDelta += 30;
 
-    if (pscrollSpeed < 0x1100)
-        pscrollSpeed += 30;
+#define TEXTURE_WRAP (20 << 16)
 
-
-    scrollY = 0;
-
-
-    // if (!(swcha & (0x40 << 4)))
-    //     pscrollSpeed += 100;
-    // if (!(swcha & (0x80 << 4)))
-    //     pscrollSpeed -= 100;
-
-    // if (!(swcha & 0x20)) {
-    //     if (scalex < 0x300)
-    //         scalex += 5;
-    // }
-
-    // if (!(swcha & 0x10)) {
-    //     if (scalex > 0x15)
-    //         scalex -= 5;
-    // }
-
-    stepSize = (0x100 * ((scalex * mult) >> 8)) >> 16;
-    stepSize2 = (0x100 * ((scalex * div) >> 8)) >> 16;
-
-
-#define TEX 20
-
-    scrollX += planets[body].retrograde * pscrollSpeed;
-    if (scrollX >= (TEX << 16)) {
-        scrollX -= (TEX << 16);
-    }
-    if (scrollX < 0) {
-        scrollX += TEX << 16;    //+= (20 << 16);
-    }
-
+    scrollX += planets[body].retrograde * rotationDelta;
+    if (scrollX >= TEXTURE_WRAP)
+        scrollX -= TEXTURE_WRAP;
+    if (scrollX < 0)
+        scrollX += TEXTURE_WRAP;
 
     int shift = 4 - ((scrollX >> 14) & 3);
     int frac = scrollX >> 16;
     const unsigned char *xchar;
     const unsigned char *image[6];
-    // int lastBottom = _SCANLINES;
 
+    int trixLine = 12;    // start globe y @
 
-    // int yz = (_SCANLINES >> 1);
-
-
-    unsigned char *pf0 = RAM + _BUF_GLOBE_PF + (half ? 0 : (3 * _BUFFER_SIZE));
+    unsigned char *pf0 = trixLine * 3 + RAM + _BUF_GLOBE_PF + (half ? 0 : (3 * _BUFFER_SIZE));
     unsigned char *pf1 = pf0 + _BUFFER_SIZE;
     unsigned char *pf2 = pf1 + _BUFFER_SIZE;
 
     int equivalentLine = 0;
     int equiv = 0;
-    int absScanline = 0;
-    unsigned char piece;
-    // unsigned int type;
 
-    int startScanline = 0;
+#undef BLK
+#undef BLK2
+#undef PUT
+#undef PUT2
+#undef GRAB
 
-    for (absScanline = startScanline; absScanline < _SCANLINES - 3 && line85[equiv] >= 0;) {
-
-        if (equiv > 56)
-            equiv = 56;    // tmp
-
-        xchar = map + (half + frac) + map[0] * (line85[equiv] >> 5) + 2;
-
-#define GRAB(i)                                                                                                        \
-    piece = *xchar++;                                                                                                  \
-    image[i] = charset[piece] + (line85[equiv] & 31);
-
-        GRAB(0);
-        GRAB(1);
-        GRAB(2);
-        GRAB(3);
-        GRAB(4);
-        GRAB(5);
-
-
-        int mask = pix85[equiv];
-        int roll = roller;
-
-        for (int icc = 0; icc < 3; icc++) {
-
-
-            absScanline++;
-
-            int p = (*(image[0] + roll) << 20       //
-                     | *(image[1] + roll) << 16     //
-                     | *(image[2] + roll) << 12     //
-                     | *(image[3] + roll) << 8      //
-                     | *(image[4] + roll) << 4 |    //
-                     *(image[5] + roll)) >>
-                    shift;
-
-            int p2 = 0;
-            int p3 = 0;
-            int bitOffset = 128;    // 1/2 pix
-
-
-            if (!half) {
+#define GRAB(i) image[i] = charset[*xchar++] + (line85[equiv] & 31);
 
 #define BLK(i)                                                                                                         \
     if (mask & (1 << i))                                                                                               \
         p2 = (p2 << 1) | ((p >> (19 - i)) & 1);
+
+#define PUT(i)                                                                                                         \
+    if (p2 & (1 << (bitOffset >> 16)))                                                                                 \
+        p3 |= 1 << i;                                                                                                  \
+    bitOffset += scalex;
+
+
+#define BLK2(i)                                                                                                        \
+    if (mask & (1 << i))                                                                                               \
+        p2 = (p2 >> 1) | (((p >> i) & 1) << 19);
+
+#define PUT2(i)                                                                                                        \
+    if (p2 & (1 << (19 - (bitOffset >> 16))))                                                                          \
+        p3 |= 1 << i;                                                                                                  \
+    bitOffset += scalex;
+
+    /*
+     * half is constant for the entire call.  Testing it inside the inner loop
+     * wastes 3 branches per outer iteration with no possibility of a different
+     * result.  Split the loop here so the hot path is branch-free.
+     */
+
+    const unsigned char *basex = map + half + frac + 2;
+
+
+    if (!half) {
+
+        for (; trixLine < (_SCANLINES / 3) - 3 && line85[equiv] >= 0;) {
+
+            xchar = basex + map[0] * (line85[equiv] >> 5);
+
+            GRAB(0)
+            GRAB(1)
+            GRAB(2)
+            GRAB(3)
+            GRAB(4)
+            GRAB(5)
+
+            int mask = pix85[equiv];
+            int roll = roller;
+
+            for (int icc = 0; icc < 3; icc++) {
+
+                int p = (*(image[0] + roll) << 20 | *(image[1] + roll) << 16 | *(image[2] + roll) << 12 |
+                         *(image[3] + roll) << 8 | *(image[4] + roll) << 4 | *(image[5] + roll)) >>
+                        shift;
+
+                int p2 = 0;
+                int p3 = 0;
 
                 BLK(0)
                 BLK(1)
@@ -439,7 +420,6 @@ void drawPlanet(int half) {
                 BLK(7)
                 BLK(8)
                 BLK(9)
-
                 BLK(10)
                 BLK(11)
                 BLK(12)
@@ -451,10 +431,9 @@ void drawPlanet(int half) {
                 BLK(18)
                 BLK(19)
 
-#define PUT(i)                                                                                                         \
-    if (p2 & (1 << (bitOffset >> 8)))                                                                                  \
-        p3 |= 1 << i;                                                                                                  \
-    bitOffset += stepSize;
+                // screen is 32px wide: output is 2 bytes (bits 0-15 of p3 only)
+
+                int bitOffset = 0x8000;
 
                 PUT(0)
                 PUT(1)
@@ -466,28 +445,52 @@ void drawPlanet(int half) {
                 PUT(7)
                 PUT(8)
                 PUT(9)
-
                 PUT(10)
                 PUT(11)
                 PUT(12)
                 PUT(13)
                 PUT(14)
                 PUT(15)
-                PUT(16)
-                PUT(17)
-                PUT(18)
-                // PUT(19)
 
-                if (p2 & (1 << (bitOffset >> 8)))
-                    p3 |= 0b1000000000000000000;
+                *pf1++ = p3 >> 8;
+                *pf2++ = reverseBits[(char)p3];
 
+                if (++roll > 2)
+                    roll = 0;
             }
 
-            else {
+            trixLine++;
 
-#define BLK2(i)                                                                                                        \
-    if (mask & (1 << i))                                                                                               \
-        p2 = (p2 >> 1) | (((p >> i) & 1) << 19);
+            equivalentLine += scalex;
+            equiv = equivalentLine >> 16;
+        }
+
+    } else {
+
+        for (; trixLine < (_SCANLINES / 3) - 3 && line85[equiv] >= 0;) {
+
+            xchar = basex + map[0] * (line85[equiv] >> 5);
+
+            GRAB(0)
+            GRAB(1)
+            GRAB(2)
+            GRAB(3)
+            GRAB(4)
+            GRAB(5)
+
+            int mask = pix85[equiv];
+            int roll = roller;
+
+            for (int icc = 0; icc < 3; icc++) {
+
+                int p = (*(image[0] + roll) << 20 | *(image[1] + roll) << 16 | *(image[2] + roll) << 12 |
+                         *(image[3] + roll) << 8 | *(image[4] + roll) << 4 | *(image[5] + roll)) >>
+                        shift;
+
+                int p2 = 0;
+                int p3 = 0;
+
+                int bitOffset = 0x8000;
 
                 BLK2(0)
                 BLK2(1)
@@ -499,7 +502,6 @@ void drawPlanet(int half) {
                 BLK2(7)
                 BLK2(8)
                 BLK2(9)
-
                 BLK2(10)
                 BLK2(11)
                 BLK2(12)
@@ -511,13 +513,7 @@ void drawPlanet(int half) {
                 BLK2(18)
                 BLK2(19)
 
-
-#define PUT2(i)                                                                                                        \
-    if (p2 & (1 << (19 - (bitOffset >> 8))))                                                                           \
-        p3 |= 1 << i;                                                                                                  \
-    bitOffset += stepSize;
-
-
+                // screen is 32px wide: bits 4-19 of p3 used (after <<4: bytes at >>16 and >>8)
                 PUT2(19)
                 PUT2(18)
                 PUT2(17)
@@ -528,50 +524,37 @@ void drawPlanet(int half) {
                 PUT2(12)
                 PUT2(11)
                 PUT2(10)
-
                 PUT2(9)
                 PUT2(8)
                 PUT2(7)
                 PUT2(6)
                 PUT2(5)
                 PUT2(4)
-                PUT2(3)
-                PUT2(2)
-                PUT2(1)
-                // PUT2(0)
-
-                if (p2 & (1 << (19 - (bitOffset >> 8))))
-                    p3 |= 1;
-            }
-
-            if (half) {
 
                 p3 <<= 4;
-
                 *pf2++ = p3 >> 16;
                 *pf1++ = reverseBits[(p3 >> 8) & 0xFF];
-                //                *pf0++ = p3;
+
+                if (++roll > 2)
+                    roll = 0;
             }
 
-            else {
+            trixLine++;
 
-
-                //              *pf0++ = reverseBits[p3 >> 16];
-                *pf1++ = p3 >> 8;
-                *pf2++ = reverseBits[p3 & 0xFF];
-            }
-
-
-            if (++roll > 2)
-                roll = 0;
+            equivalentLine += scalex;
+            equiv = equivalentLine >> 16;
         }
-
-        for (int i = 0; i < 6; i++)
-            image[i] += 3;
-
-        equivalentLine += stepSize;
-        equiv = equivalentLine >> 8;
     }
-}
 
+    while (trixLine++ < _SCANLINES / 3)
+        for (int i = 0; i < 3; i++)
+            *pf1++ = *pf2++ = 0;
+
+#undef BLK
+#undef BLK2
+#undef PUT
+#undef PUT2
+#undef GRAB
+#undef TEX
+}
 // EOF
