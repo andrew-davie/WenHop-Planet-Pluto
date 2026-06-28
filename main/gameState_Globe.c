@@ -6,6 +6,7 @@
 #include "colour.h"
 #include "draw.h"
 #include "drawPlanet.h"
+#include "drawplanet.h"
 #include "grid6.h"
 #include "main.h"
 #include "menuCharacterSet.h"
@@ -91,7 +92,7 @@ void initKernel_Globe() {
 
     killRepeatingAudio();
 
-    planet = 4;
+    planet = 0;
     initPlanet(planet);
 
 
@@ -542,7 +543,7 @@ void initGameState_Globe() {
 
 void drawBit2(int x, int y, unsigned char colour) {
 
-    colour | colour << 3;
+    // colour | colour << 3;
     colour >>= roller;
 
     int line = y * 3;
@@ -648,7 +649,7 @@ void OS_Globe() {
                         pif = 0;
 
                     if (pif == pif2) {
-                        for (unsigned int i = 0; i < reviews; i++)
+                        for (int i = 0; i < reviews; i++)
                             seen[i] = false;
                         seen[lastpif] = true;
                     }
@@ -688,12 +689,17 @@ void OS_Globe() {
 
         case INFO_CLEAR:
             myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
-            wait = 150;
-            lastpd = planetDir < 0 ? -1 : 1;
+            wait = 100;
             break;
 
+            // case INFO_NEXTPLANET1:
+            //     wait = 1;
+            //     lastpd = planetDir;
+            //     break;
+
         case INFO_NEXTPLANET:
-            if (lastpd != (planetDir < 0 ? -1 : 1) && planetDir < 0) {
+
+            if ((scalex >> 8) == (SCALE_FAR >> 8) && planetDir > 0) {
                 planet = nextPlanet();
                 myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
                 wait = 50;

@@ -158,9 +158,6 @@ int scalex;
 int planetDir;
 int body;
 
-
-#define SCALE_FAR 0x20000
-#define SCALE_NEAR 0x0F000
 #define MIDPOINT ((SCALE_FAR + SCALE_NEAR) / 2)    // ~131180
 #define DIVISOR 12000
 
@@ -178,6 +175,8 @@ void initPlanet(int planet) {
 
     initStars();
 
+    rotationAccel = 30;
+
     extern const unsigned char *thePalette;
     thePalette = planets[body].palette;
 }
@@ -193,17 +192,36 @@ int nextPlanet() {
 }
 
 
+int rotationAccel;
+
+
 void drawPlanet(int half) {
 
     const unsigned char *map = planets[body].map;
     const unsigned char *const *charset = planets[body].charSet;
 
     // oscillate
+
     planetDir += ((MIDPOINT - scalex) * (0x10000 / DIVISOR)) >> 16;
     scalex += planetDir;
 
-    if (rotationDelta < 0x1100)
-        rotationDelta += 30;
+
+    if (rotationAccel < 0 && rotationDelta > 0) {
+        rotationDelta += rotationAccel;
+        if (rotationDelta < 0) {
+            rotationDelta = 0;
+            rotationAccel = 0;
+        }
+    }
+
+    else if (rotationAccel > 0 && rotationDelta < 0x1100) {
+        rotationDelta += rotationAccel;
+        if (rotationDelta > 0x1100) {
+            rotationDelta = 0x1100;
+            rotationAccel = 0;
+        }
+    }
+
 
 #define TEXTURE_WRAP (20 << 16)
 
@@ -218,7 +236,7 @@ void drawPlanet(int half) {
     const unsigned char *xchar;
     const unsigned char *image[6];
 
-    int trixLine = 12;    // start globe y @
+    int trixLine = 6;    // start globe y @
 
     unsigned char *pf0 = trixLine * 3 + RAM + _BUF_GLOBE_PF + (half ? 0 : (3 * _BUFFER_SIZE));
     unsigned char *pf1 = pf0 + _BUFFER_SIZE;
@@ -264,7 +282,6 @@ void drawPlanet(int half) {
 
 
     if (!half) {
-
         for (; trixLine < (_SCANLINES / 3) - 1 && line85[equiv] >= 0;) {
 
             xchar = basex + map[0] * (line85[equiv] >> 5);
@@ -344,7 +361,6 @@ void drawPlanet(int half) {
         }
 
     } else {
-
         for (; trixLine < (_SCANLINES / 3) - 1 && line85[equiv] >= 0;) {
 
             xchar = basex + map[0] * (line85[equiv] >> 5);

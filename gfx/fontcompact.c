@@ -215,12 +215,12 @@ static const unsigned char char_046[FONTCOMPACT_FONT_HEIGHT] = {
 
 /* '0x2F'  ASCII 47  width=2px  1 byte(s)/row */
 static const unsigned char char_047[FONTCOMPACT_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦
     0b00000001,  // 🟦🟨
     0b00000001,  // 🟦🟨
     0b00000001,  // 🟦🟨
     0b00000001,  // 🟦🟨
-    0b00000011,  // 🟨🟨
+    0b00000001,  // 🟦🟨
+    0b00000010,  // 🟨🟦
     0b00000010,  // 🟨🟦
     0b00000010,  // 🟨🟦
     0b00000010,  // 🟨🟦
@@ -1227,7 +1227,7 @@ static const unsigned char char_118[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000101,  // 🟨🟦🟨
     0b00000101,  // 🟨🟦🟨
     0b00000101,  // 🟨🟦🟨
-    0b00000111,  // 🟨🟨🟨
+    0b00000011,  // 🟦🟨🟨
     0b00000010,  // 🟦🟨🟦
     0b00000000,  // 🟦🟦🟦
     0b00000000   // 🟦🟦🟦
