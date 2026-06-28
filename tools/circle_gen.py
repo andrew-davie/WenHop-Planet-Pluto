@@ -3,11 +3,19 @@
 import math
 
 
+
+
+# in the line table:
+planetHeight = 16 * 24     # was 20 * 24
+
+
+
+
 desiredPlanetRadiusPixels = 85         # max 1/2 of scanline count (198)
 
 print("const int pix" + str(desiredPlanetRadiusPixels) + "[] = {")
 
-textureWidth = 24
+textureWidth = 19          # was 24 — scaled so texturePix maxes at ~15 for 16-bit output
 pixelRatio = 6.9 #6.23
 
 full180 = desiredPlanetRadiusPixels * 2
@@ -21,9 +29,10 @@ for line in range(0, full180, 3):
 
         realAngle = math.degrees(math.asin((subPix + 0.5)/offset))
         texturePix = realAngle * (textureWidth) / 90
-        bits |= (1 << (19-int(texturePix )))
+        bits |= (1 << (15 - int(texturePix)))  # was (19-int(texturePix))
 
-    print(format(bits, '#032b') + ', //', line)
+    # format line:
+    print(format(bits, '#018b') + ', //', line)  # was '#032b' (18 = "0b" + 16 bits)
 print("};")
 
 

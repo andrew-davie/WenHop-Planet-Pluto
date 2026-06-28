@@ -204,6 +204,18 @@ static const unsigned char bloodworld_char_014[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     29,  31,   0,  /* 🟨🟨🟨🟩🟨 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+};
+static const unsigned char bloodworld_char_015[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      28,   7,   0,  /* 🟥🟥🟨🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -212,7 +224,7 @@ static const unsigned char bloodworld_char_014[30] = {
       3,  30,   3,  /* 🟩🟩🟩⬜🟪 */
       1,  31,   1,  /* 🟩🟩🟩🟩⬜ */
 };
-static const unsigned char bloodworld_char_015[30] = {
+static const unsigned char bloodworld_char_016[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      12,  31,   0,  /* 🟩🟨🟨🟩🟩 */
@@ -224,7 +236,7 @@ static const unsigned char bloodworld_char_015[30] = {
      18,  15,  30,  /* 🟪🟫🟫⬜🟩 */
      28,  31,  28,  /* ⬜⬜⬜🟩🟩 */
 };
-static const unsigned char bloodworld_char_016[30] = {
+static const unsigned char bloodworld_char_017[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      27,  12,   0,  /* 🟥🟨🟩🟥🟥 */
       3,  30,   0,  /* 🟩🟩🟩🟨🟥 */
@@ -236,7 +248,7 @@ static const unsigned char bloodworld_char_016[30] = {
       8,  31,   8,  /* 🟩⬜🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
 };
-static const unsigned char bloodworld_char_017[30] = {
+static const unsigned char bloodworld_char_018[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -248,7 +260,19 @@ static const unsigned char bloodworld_char_017[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
 };
-static const unsigned char bloodworld_char_018[30] = {
+static const unsigned char bloodworld_char_019[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   7,   0,  /* 🟥🟥🟨🟨🟨 */
+     16,  31,   0,  /* 🟨🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+};
+static const unsigned char bloodworld_char_020[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -260,7 +284,7 @@ static const unsigned char bloodworld_char_018[30] = {
       1,  18,  31,  /* 🟫🟦🟦🟫🟪 */
       0,  16,  31,  /* 🟫🟦🟦🟦🟦 */
 };
-static const unsigned char bloodworld_char_019[30] = {
+static const unsigned char bloodworld_char_021[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -272,7 +296,7 @@ static const unsigned char bloodworld_char_019[30] = {
      16,  31,  16,  /* ⬜🟩🟩🟩🟩 */
       8,   7,  24,  /* 🟦🟪🟩🟩🟩 */
 };
-static const unsigned char bloodworld_char_020[30] = {
+static const unsigned char bloodworld_char_022[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   3,   0,  /* 🟥🟥🟥🟨🟨 */
      16,  31,   0,  /* 🟨🟩🟩🟩🟩 */
@@ -284,7 +308,7 @@ static const unsigned char bloodworld_char_020[30] = {
       9,  31,   9,  /* 🟩⬜🟩🟩⬜ */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
 };
-static const unsigned char bloodworld_char_021[30] = {
+static const unsigned char bloodworld_char_023[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
       7,  31,   0,  /* 🟩🟩🟨🟨🟨 */
@@ -296,7 +320,7 @@ static const unsigned char bloodworld_char_021[30] = {
       1,  25,  31,  /* 🟫🟫🟦🟦⬜ */
       8,  23,  12,  /* 🟩🟪🟫🟩🟩 */
 };
-static const unsigned char bloodworld_char_022[30] = {
+static const unsigned char bloodworld_char_024[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       7,  31,   0,  /* 🟩🟩🟨🟨🟨 */
@@ -308,7 +332,7 @@ static const unsigned char bloodworld_char_022[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_023[30] = {
+static const unsigned char bloodworld_char_025[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
      28,  15,   0,  /* 🟥🟨🟨🟩🟩 */
@@ -320,7 +344,7 @@ static const unsigned char bloodworld_char_023[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_024[30] = {
+static const unsigned char bloodworld_char_026[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -332,7 +356,7 @@ static const unsigned char bloodworld_char_024[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_025[30] = {
+static const unsigned char bloodworld_char_027[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -344,7 +368,7 @@ static const unsigned char bloodworld_char_025[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_026[30] = {
+static const unsigned char bloodworld_char_028[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -356,7 +380,7 @@ static const unsigned char bloodworld_char_026[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_027[30] = {
+static const unsigned char bloodworld_char_029[30] = {
       4,  31,   0,  /* 🟩🟩🟨🟩🟩 */
      14,  19,   0,  /* 🟩🟥🟥🟨🟩 */
      15,  17,   0,  /* 🟩🟥🟥🟥🟨 */
@@ -368,7 +392,7 @@ static const unsigned char bloodworld_char_027[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_028[30] = {
+static const unsigned char bloodworld_char_030[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -380,7 +404,7 @@ static const unsigned char bloodworld_char_028[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_029[30] = {
+static const unsigned char bloodworld_char_031[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -392,7 +416,7 @@ static const unsigned char bloodworld_char_029[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_030[30] = {
+static const unsigned char bloodworld_char_032[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -404,7 +428,7 @@ static const unsigned char bloodworld_char_030[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_031[30] = {
+static const unsigned char bloodworld_char_033[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -416,7 +440,7 @@ static const unsigned char bloodworld_char_031[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_032[30] = {
+static const unsigned char bloodworld_char_034[30] = {
      16,   1,  31,  /* 🟪🟦🟦🟦🟫 */
      28,  31,  28,  /* ⬜⬜⬜🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -428,7 +452,7 @@ static const unsigned char bloodworld_char_032[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_033[30] = {
+static const unsigned char bloodworld_char_035[30] = {
      12,  23,  24,  /* 🟫🟪🟨🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -440,7 +464,19 @@ static const unsigned char bloodworld_char_033[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char bloodworld_char_034[30] = {
+static const unsigned char bloodworld_char_036[30] = {
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+     15,  16,   0,  /* 🟩🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+};
+static const unsigned char bloodworld_char_037[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -453,7 +489,7 @@ static const unsigned char bloodworld_char_034[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
 
-const unsigned char * const bloodworld_charset[35] = {
+const unsigned char * const bloodworld_charset[38] = {
     bloodworld_char_000,
     bloodworld_char_001,
     bloodworld_char_002,
@@ -489,13 +525,16 @@ const unsigned char * const bloodworld_charset[35] = {
     bloodworld_char_032,
     bloodworld_char_033,
     bloodworld_char_034,
+    bloodworld_char_035,
+    bloodworld_char_036,
+    bloodworld_char_037,
 };
 
 const unsigned char bloodworld_map[122] = {
     30, 4,
     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-    9, 10, 11, 12, 13, 10, 14, 15, 16, 17, 10, 18, 19, 20, 21, 9, 10, 11, 12, 13, 9, 10, 11, 12, 13, 10, 14, 15, 16, 17,
-    22, 23, 24, 25, 26, 27, 28, 29, 30, 24, 31, 32, 33, 22, 22, 22, 23, 24, 25, 26, 22, 23, 24, 25, 26, 27, 28, 29, 30, 24,
-    34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34,
+    9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 9, 10, 11, 12, 13, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+    24, 25, 26, 27, 28, 29, 30, 31, 32, 26, 33, 34, 35, 36, 36, 24, 25, 26, 27, 28, 24, 25, 26, 27, 28, 29, 30, 31, 32, 26,
+    37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37,
 };
 

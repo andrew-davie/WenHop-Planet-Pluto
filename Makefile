@@ -99,6 +99,7 @@ SRCS = \
  \
  menuCharacterSet.c \
  particle.c \
+ planet.c \
  reverseBits.c \
  schedule.c \
  score.c \
@@ -117,6 +118,7 @@ SRCS = \
  spinningGlobe/neptune.c \
  spinningGlobe/earth.c \
  spinningGlobe/moon.c \
+ spinningGlobe/terra.c \
  \
  ../gfx/alphanumeric.c \
  ../gfx/fontcompact.c \

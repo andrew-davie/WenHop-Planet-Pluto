@@ -415,10 +415,36 @@ def _dark_colour_recovery(arr_orig: np.ndarray, result: np.ndarray) -> np.ndarra
     return result
 
 
+def _remap_black_pixels(arr_orig: np.ndarray, result: np.ndarray,
+                        palette: np.ndarray = None) -> np.ndarray:
+    """
+    Remap every palette index-0 (black) pixel to the nearest non-black palette
+    entry (indices 1-7).  Used when --no-black is active to ensure palette index 0
+    never appears on the globe surface.
+
+    arr_orig : (H, W, 3) float64 source pixel values (before quantisation clipping)
+    result   : (H, W) uint8 quantised palette indices (modified in-place copy)
+    palette  : (8, 3) uint8; defaults to CUBE_RGB
+    """
+    if palette is None:
+        palette = CUBE_RGB
+    black_mask = (result == 0)
+    if not black_mask.any():
+        return result
+    pal_nonblack = palette[1:].astype(np.int32)          # (7, 3) — indices 1..7
+    pixels = np.clip(arr_orig[black_mask], 0, 255).astype(np.int32)  # (N, 3)
+    diffs  = pixels[:, np.newaxis, :] - pal_nonblack[np.newaxis, :, :]
+    nearest = (diffs ** 2).sum(axis=-1).argmin(axis=1) + 1  # +1: skip index 0
+    result = result.copy()
+    result[black_mask] = nearest.astype(np.uint8)
+    return result
+
+
 def quantize_to_trixel_grid(img: Image.Image, px_w: int, px_h: int,
                              dither: bool, dither_band: int = 64,
                              adaptive_palette: np.ndarray = None,
-                             black_threshold: int = 30) -> np.ndarray:
+                             black_threshold: int = 30,
+                             allow_black: bool = True) -> np.ndarray:
     """
     Resize to (px_w, px_h) and map each pixel to a 0-7 palette colour index.
 
@@ -437,6 +463,11 @@ def quantize_to_trixel_grid(img: Image.Image, px_w: int, px_h: int,
         range).  Nearest-colour is O(8*N), handles any palette geometry, and gives
         the correct Voronoi assignment in all cases.  Dithering is Floyd-Steinberg
         error diffusion in full RGB space (serpentine scan).
+
+    allow_black : if False, palette index 0 is never assigned; every pixel that
+        would map to black is instead mapped to the nearest non-black entry.
+        Suppression happens inside the quantiser for the adaptive path and via a
+        post-processing remap for the fixed-palette path.
     """
     resized = img.convert("RGB").resize((px_w, px_h), Image.LANCZOS)
     arr = np.asarray(resized, dtype=np.float64)  # (H, W, 3)
@@ -455,10 +486,13 @@ def quantize_to_trixel_grid(img: Image.Image, px_w: int, px_h: int,
             # Vectorised nearest-colour: argmin over 8 squared distances.
             diffs = arr[:, :, np.newaxis, :] - pal[np.newaxis, np.newaxis, :, :]
             dists = (diffs ** 2).sum(axis=-1)          # (H, W, 8)
-            # Suppress black (index 0) for pixels not close to black.
-            black_dist = (arr ** 2).sum(axis=-1)       # (H, W)
-            dists[:, :, 0] = np.where(black_dist <= black_sq_thresh,
-                                      dists[:, :, 0], np.inf)
+            # Suppress black (index 0): completely when --no-black, else by threshold.
+            if not allow_black:
+                dists[:, :, 0] = np.inf
+            else:
+                black_dist = (arr ** 2).sum(axis=-1)   # (H, W)
+                dists[:, :, 0] = np.where(black_dist <= black_sq_thresh,
+                                          dists[:, :, 0], np.inf)
             return dists.argmin(axis=-1).astype(np.uint8)
 
         # Floyd-Steinberg in RGB space (serpentine scan).
@@ -473,8 +507,8 @@ def quantize_to_trixel_grid(img: Image.Image, px_w: int, px_h: int,
             for x in xs:
                 pixel = row[x]
                 dists = ((pal - pixel) ** 2).sum(axis=-1)   # (8,)
-                # Suppress black unless pixel is genuinely close to black.
-                if (pixel ** 2).sum() > black_sq_thresh:
+                # Suppress black: always when --no-black, else by threshold.
+                if not allow_black or (pixel ** 2).sum() > black_sq_thresh:
                     dists[0] = np.inf
                 idx   = int(dists.argmin())
                 result[y, x] = idx
@@ -499,6 +533,8 @@ def quantize_to_trixel_grid(img: Image.Image, px_w: int, px_h: int,
         g_bit = (arr[..., 1] >= 128).astype(np.uint8)
         b_bit = (arr[..., 2] >= 128).astype(np.uint8)
         result = r_bit | (g_bit << 1) | (b_bit << 2)
+        if not allow_black:
+            return _remap_black_pixels(arr, result)
         return _dark_colour_recovery(arr.astype(np.float32), result)
 
     # Floyd-Steinberg dithering (serpentine scan, per-channel independent).
@@ -539,6 +575,8 @@ def quantize_to_trixel_grid(img: Image.Image, px_w: int, px_h: int,
                         work[y + 1, nxt, c] += err * (1.0 / 16.0)
 
     result = out_bits[..., 0] | (out_bits[..., 1] << 1) | (out_bits[..., 2] << 2)
+    if not allow_black:
+        return _remap_black_pixels(arr, result)
     return _dark_colour_recovery(arr.astype(np.float32), result)
 
 
@@ -866,6 +904,10 @@ def main():
                           "for palette index 0 to be used. Pixels further from black than "
                           "this threshold are mapped to the nearest non-black entry instead. "
                           "Lower = stricter (fewer pixels use black). Default: 30.")
+    ap.add_argument("--no-black", action="store_true",
+                     help="disallow palette index 0 (black) entirely on the globe surface. "
+                          "Every pixel that would quantise to black is remapped to the "
+                          "nearest non-black palette entry. Supersedes --black-threshold.")
     ap.add_argument("--near-enough", type=int, default=0,
                      help="during Phase 1 charset build, reuse an existing character if "
                           "it differs from the new cell by at most this many trixels "
@@ -1016,6 +1058,7 @@ def main():
         dither_band=args.dither_band,
         adaptive_palette=palette,
         black_threshold=args.black_threshold,
+        allow_black=not args.no_black,
     )  # (px_h, px_w) values 0-7
 
     # Phase 1: unbounded charset build, seeded with the 8 solid colours so

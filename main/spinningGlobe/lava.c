@@ -225,6 +225,18 @@ static const unsigned char lava_char_015[30] = {
      29,  31,  20,  /* ⬜🟨⬜🟩🟨 */
 };
 static const unsigned char lava_char_016[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     15,  24,   0,  /* 🟩🟨🟥🟥🟥 */
+     31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+};
+static const unsigned char lava_char_017[30] = {
      31,   1,   1,  /* 🟥🟥🟥🟥⬜ */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -236,7 +248,7 @@ static const unsigned char lava_char_016[30] = {
      30,  31,   2,  /* 🟨🟨🟨⬜🟩 */
      31,  24,  16,  /* ⬜🟨🟥🟥🟥 */
 };
-static const unsigned char lava_char_017[30] = {
+static const unsigned char lava_char_018[30] = {
       7,  24,  16,  /* 🟫🟩🟥🟥🟥 */
      31,  24,   0,  /* 🟨🟨🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -248,7 +260,7 @@ static const unsigned char lava_char_017[30] = {
       1,  18,  28,  /* 🟫🟦🟦🟩🟥 */
      17,  19,  28,  /* ⬜🟦🟦🟩🟨 */
 };
-static const unsigned char lava_char_018[30] = {
+static const unsigned char lava_char_019[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,  24,   0,  /* 🟨🟨🟥🟥🟥 */
@@ -260,7 +272,7 @@ static const unsigned char lava_char_018[30] = {
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
 };
-static const unsigned char lava_char_019[30] = {
+static const unsigned char lava_char_020[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -272,7 +284,7 @@ static const unsigned char lava_char_019[30] = {
      31,  31,   8,  /* 🟨⬜🟨🟨🟨 */
      31,  29,   8,  /* 🟨⬜🟨🟥🟨 */
 };
-static const unsigned char lava_char_020[30] = {
+static const unsigned char lava_char_021[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -284,7 +296,7 @@ static const unsigned char lava_char_020[30] = {
       7,  28,   0,  /* 🟩🟩🟨🟥🟥 */
      31,  24,  16,  /* ⬜🟨🟥🟥🟥 */
 };
-static const unsigned char lava_char_021[30] = {
+static const unsigned char lava_char_022[30] = {
      31,   7,   3,  /* 🟥🟥🟨⬜⬜ */
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -296,7 +308,7 @@ static const unsigned char lava_char_021[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char lava_char_022[30] = {
+static const unsigned char lava_char_023[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
@@ -308,7 +320,7 @@ static const unsigned char lava_char_022[30] = {
      28,  14,   1,  /* 🟥🟨🟨🟩🟦 */
      30,   1,   0,  /* 🟥🟥🟥🟥🟩 */
 };
-static const unsigned char lava_char_023[30] = {
+static const unsigned char lava_char_024[30] = {
      31,   3,   1,  /* 🟥🟥🟥🟨⬜ */
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
      31,   1,   1,  /* 🟥🟥🟥🟥⬜ */
@@ -320,7 +332,7 @@ static const unsigned char lava_char_023[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char lava_char_024[30] = {
+static const unsigned char lava_char_025[30] = {
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
      31,  24,  16,  /* ⬜🟨🟥🟥🟥 */
@@ -332,7 +344,19 @@ static const unsigned char lava_char_024[30] = {
       0,   1,  30,  /* 🟦🟦🟦🟦🟩 */
       0,   1,  30,  /* 🟦🟦🟦🟦🟩 */
 };
-static const unsigned char lava_char_025[30] = {
+static const unsigned char lava_char_026[30] = {
+     31,  15,   0,  /* 🟥🟨🟨🟨🟨 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+};
+static const unsigned char lava_char_027[30] = {
      31,  30,   0,  /* 🟨🟨🟨🟨🟥 */
      31,   2,   0,  /* 🟥🟥🟥🟨🟥 */
      31,   3,   0,  /* 🟥🟥🟥🟨🟨 */
@@ -344,7 +368,7 @@ static const unsigned char lava_char_025[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char lava_char_026[30] = {
+static const unsigned char lava_char_028[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -356,7 +380,7 @@ static const unsigned char lava_char_026[30] = {
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char lava_char_027[30] = {
+static const unsigned char lava_char_029[30] = {
      31,  25,   0,  /* 🟨🟨🟥🟥🟨 */
      28,  15,   4,  /* 🟥🟨⬜🟩🟩 */
      28,   7,   2,  /* 🟥🟥🟨🟫🟩 */
@@ -368,7 +392,7 @@ static const unsigned char lava_char_027[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char lava_char_028[30] = {
+static const unsigned char lava_char_030[30] = {
      19,  31,   0,  /* 🟨🟩🟩🟨🟨 */
      31,  28,   0,  /* 🟨🟨🟨🟥🟥 */
      31,  24,   0,  /* 🟨🟨🟥🟥🟥 */
@@ -380,7 +404,7 @@ static const unsigned char lava_char_028[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char lava_char_029[30] = {
+static const unsigned char lava_char_031[30] = {
      31,  24,   0,  /* 🟨🟨🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -392,7 +416,7 @@ static const unsigned char lava_char_029[30] = {
      30,   3,   2,  /* 🟥🟥🟥⬜🟩 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char lava_char_030[30] = {
+static const unsigned char lava_char_032[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -404,7 +428,7 @@ static const unsigned char lava_char_030[30] = {
      31,  24,  16,  /* ⬜🟨🟥🟥🟥 */
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
 };
-static const unsigned char lava_char_031[30] = {
+static const unsigned char lava_char_033[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      30,   3,   2,  /* 🟥🟥🟥⬜🟩 */
@@ -416,7 +440,7 @@ static const unsigned char lava_char_031[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char lava_char_032[30] = {
+static const unsigned char lava_char_034[30] = {
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
      31,   1,   1,  /* 🟥🟥🟥🟥⬜ */
      31,   1,   1,  /* 🟥🟥🟥🟥⬜ */
@@ -428,7 +452,7 @@ static const unsigned char lava_char_032[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char lava_char_033[30] = {
+static const unsigned char lava_char_035[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
@@ -440,7 +464,7 @@ static const unsigned char lava_char_033[30] = {
      16,  31,  28,  /* ⬜🟫🟫🟩🟩 */
      31,   4,   0,  /* 🟥🟥🟨🟥🟥 */
 };
-static const unsigned char lava_char_034[30] = {
+static const unsigned char lava_char_036[30] = {
       0,   1,  30,  /* 🟦🟦🟦🟦🟩 */
       0,   1,  30,  /* 🟦🟦🟦🟦🟩 */
       1,   2,  30,  /* 🟦🟦🟦🟫🟥 */
@@ -452,7 +476,19 @@ static const unsigned char lava_char_034[30] = {
       7,  28,  24,  /* 🟫🟫🟨🟥🟥 */
      31,  24,   0,  /* 🟨🟨🟥🟥🟥 */
 };
-static const unsigned char lava_char_035[30] = {
+static const unsigned char lava_char_037[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
+     31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
+     31,  24,   0,  /* 🟨🟨🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+};
+static const unsigned char lava_char_038[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -464,7 +500,7 @@ static const unsigned char lava_char_035[30] = {
      30,   3,   3,  /* 🟥🟥🟥⬜🟫 */
      30,   7,   2,  /* 🟥🟥🟨⬜🟩 */
 };
-static const unsigned char lava_char_036[30] = {
+static const unsigned char lava_char_039[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -476,7 +512,7 @@ static const unsigned char lava_char_036[30] = {
      15,  24,  16,  /* 🟫🟨🟥🟥🟥 */
      15,  24,   0,  /* 🟩🟨🟥🟥🟥 */
 };
-static const unsigned char lava_char_037[30] = {
+static const unsigned char lava_char_040[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -488,7 +524,7 @@ static const unsigned char lava_char_037[30] = {
      31,   0,  14,  /* 🟥🟪🟪🟪🟥 */
      31,   0,  30,  /* 🟪🟪🟪🟪🟥 */
 };
-static const unsigned char lava_char_038[30] = {
+static const unsigned char lava_char_041[30] = {
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
@@ -500,7 +536,7 @@ static const unsigned char lava_char_038[30] = {
      30,   3,   0,  /* 🟥🟥🟥🟨🟩 */
      30,   3,   0,  /* 🟥🟥🟥🟨🟩 */
 };
-static const unsigned char lava_char_039[30] = {
+static const unsigned char lava_char_042[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -512,7 +548,7 @@ static const unsigned char lava_char_039[30] = {
      28,  31,  23,  /* ⬜🟨⬜🟫🟫 */
      28,  23,  17,  /* ⬜🟥🟨🟩🟫 */
 };
-static const unsigned char lava_char_040[30] = {
+static const unsigned char lava_char_043[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -524,7 +560,7 @@ static const unsigned char lava_char_040[30] = {
       3,  30,  24,  /* 🟫🟫🟩🟨🟥 */
       1,   3,  28,  /* 🟦🟦🟦🟩🟨 */
 };
-static const unsigned char lava_char_041[30] = {
+static const unsigned char lava_char_044[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -537,7 +573,7 @@ static const unsigned char lava_char_041[30] = {
      31,  15,   2,  /* 🟥🟨🟨⬜🟨 */
 };
 
-const unsigned char * const lava_charset[42] = {
+const unsigned char * const lava_charset[45] = {
     lava_char_000,
     lava_char_001,
     lava_char_002,
@@ -580,13 +616,16 @@ const unsigned char * const lava_charset[42] = {
     lava_char_039,
     lava_char_040,
     lava_char_041,
+    lava_char_042,
+    lava_char_043,
+    lava_char_044,
 };
 
 const unsigned char lava_map[122] = {
     30, 4,
-    8, 9, 10, 11, 12, 13, 14, 15, 1, 1, 1, 1, 1, 16, 17, 18, 19, 20, 1, 21, 8, 9, 10, 11, 12, 13, 14, 15, 1, 1,
-    22, 23, 24, 1, 1, 1, 1, 25, 26, 1, 1, 1, 1, 27, 28, 29, 30, 1, 1, 31, 22, 23, 24, 1, 1, 1, 1, 25, 26, 1,
-    32, 33, 34, 1, 35, 36, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 32, 33, 34, 1, 35, 36, 1, 1, 1, 1,
-    37, 1, 1, 1, 1, 38, 39, 40, 41, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 37, 1, 1, 1, 1, 38, 39, 40, 41, 1,
+    8, 9, 10, 11, 12, 13, 14, 15, 16, 1, 1, 1, 1, 17, 18, 19, 20, 21, 1, 22, 8, 9, 10, 11, 12, 13, 14, 15, 16, 1,
+    23, 24, 25, 1, 1, 1, 26, 27, 28, 16, 1, 1, 1, 29, 30, 31, 32, 1, 1, 33, 23, 24, 25, 1, 1, 1, 26, 27, 28, 16,
+    34, 35, 36, 37, 38, 39, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 34, 35, 36, 37, 38, 39, 1, 1, 1, 1,
+    40, 1, 1, 1, 1, 41, 42, 43, 44, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 40, 1, 1, 1, 1, 41, 42, 43, 44, 1,
 };
 

@@ -170,13 +170,49 @@ static const unsigned char pangea_char_011[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,  12,   0,  /* 🟥🟨🟨🟥🟥 */
+      1,  31,   0,  /* 🟩🟩🟩🟩🟨 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+};
+static const unsigned char pangea_char_012[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   3,   0,  /* 🟥🟥🟥🟨🟨 */
      12,  31,   0,  /* 🟩🟨🟨🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
 };
-static const unsigned char pangea_char_012[30] = {
+static const unsigned char pangea_char_013[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     20,  31,   0,  /* 🟨🟩🟨🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+};
+static const unsigned char pangea_char_014[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+      7,  30,   0,  /* 🟩🟩🟨🟨🟥 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+};
+static const unsigned char pangea_char_015[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -188,7 +224,7 @@ static const unsigned char pangea_char_012[30] = {
      15,  24,   0,  /* 🟩🟨🟥🟥🟥 */
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
 };
-static const unsigned char pangea_char_013[30] = {
+static const unsigned char pangea_char_016[30] = {
      24,  15,   0,  /* 🟥🟨🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       6,  31,   0,  /* 🟩🟩🟨🟨🟩 */
@@ -200,7 +236,7 @@ static const unsigned char pangea_char_013[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char pangea_char_014[30] = {
+static const unsigned char pangea_char_017[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -212,7 +248,19 @@ static const unsigned char pangea_char_014[30] = {
      29,  15,   0,  /* 🟥🟨🟨🟩🟨 */
      16,  31,   0,  /* 🟨🟩🟩🟩🟩 */
 };
-static const unsigned char pangea_char_015[30] = {
+static const unsigned char pangea_char_018[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+      7,  31,   0,  /* 🟩🟩🟨🟨🟨 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+};
+static const unsigned char pangea_char_019[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -224,7 +272,7 @@ static const unsigned char pangea_char_015[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
       3,  31,   0,  /* 🟩🟩🟩🟨🟨 */
 };
-static const unsigned char pangea_char_016[30] = {
+static const unsigned char pangea_char_020[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -236,7 +284,7 @@ static const unsigned char pangea_char_016[30] = {
      16,  15,   0,  /* 🟥🟩🟩🟩🟩 */
      16,  31,   0,  /* 🟨🟩🟩🟩🟩 */
 };
-static const unsigned char pangea_char_017[30] = {
+static const unsigned char pangea_char_021[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -248,7 +296,7 @@ static const unsigned char pangea_char_017[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
 };
-static const unsigned char pangea_char_018[30] = {
+static const unsigned char pangea_char_022[30] = {
      31,   8,   0,  /* 🟥🟨🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -260,7 +308,7 @@ static const unsigned char pangea_char_018[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
 };
-static const unsigned char pangea_char_019[30] = {
+static const unsigned char pangea_char_023[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -272,7 +320,7 @@ static const unsigned char pangea_char_019[30] = {
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
 };
-static const unsigned char pangea_char_020[30] = {
+static const unsigned char pangea_char_024[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -284,7 +332,7 @@ static const unsigned char pangea_char_020[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
       7,  24,   0,  /* 🟩🟩🟥🟥🟥 */
 };
-static const unsigned char pangea_char_021[30] = {
+static const unsigned char pangea_char_025[30] = {
       7,  24,   0,  /* 🟩🟩🟥🟥🟥 */
      15,  24,   0,  /* 🟩🟨🟥🟥🟥 */
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
@@ -296,7 +344,7 @@ static const unsigned char pangea_char_021[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char pangea_char_022[30] = {
+static const unsigned char pangea_char_026[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      21,  31,   0,  /* 🟨🟩🟨🟩🟨 */
@@ -308,7 +356,7 @@ static const unsigned char pangea_char_022[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char pangea_char_023[30] = {
+static const unsigned char pangea_char_027[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -320,7 +368,19 @@ static const unsigned char pangea_char_023[30] = {
      31,  14,   0,  /* 🟥🟨🟨🟨🟥 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
 };
-static const unsigned char pangea_char_024[30] = {
+static const unsigned char pangea_char_028[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,  22,   0,  /* 🟨🟥🟨🟨🟥 */
+};
+static const unsigned char pangea_char_029[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -332,7 +392,19 @@ static const unsigned char pangea_char_024[30] = {
      16,  15,   0,  /* 🟥🟩🟩🟩🟩 */
      16,  31,   0,  /* 🟨🟩🟩🟩🟩 */
 };
-static const unsigned char pangea_char_025[30] = {
+static const unsigned char pangea_char_030[30] = {
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+     16,  15,   0,  /* 🟥🟩🟩🟩🟩 */
+     16,  15,   0,  /* 🟥🟩🟩🟩🟩 */
+     16,  31,   0,  /* 🟨🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+      0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
+};
+static const unsigned char pangea_char_031[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -344,7 +416,7 @@ static const unsigned char pangea_char_025[30] = {
       1,  31,   1,  /* 🟩🟩🟩🟩⬜ */
       6,  31,   7,  /* 🟩🟩⬜⬜🟫 */
 };
-static const unsigned char pangea_char_026[30] = {
+static const unsigned char pangea_char_032[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -356,7 +428,7 @@ static const unsigned char pangea_char_026[30] = {
       9,  31,  25,  /* 🟫⬜🟩🟩⬜ */
       9,  31,  25,  /* 🟫⬜🟩🟩⬜ */
 };
-static const unsigned char pangea_char_027[30] = {
+static const unsigned char pangea_char_033[30] = {
      28,  31,  31,  /* ⬜⬜⬜🟫🟫 */
       4,  31,   7,  /* 🟩🟩⬜🟫🟫 */
       9,  31,  15,  /* 🟩⬜🟫🟫⬜ */
@@ -368,7 +440,7 @@ static const unsigned char pangea_char_027[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_028[30] = {
+static const unsigned char pangea_char_034[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
      16,  31,  16,  /* ⬜🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -380,7 +452,7 @@ static const unsigned char pangea_char_028[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_029[30] = {
+static const unsigned char pangea_char_035[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -392,7 +464,7 @@ static const unsigned char pangea_char_029[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_030[30] = {
+static const unsigned char pangea_char_036[30] = {
       3,  28,   0,  /* 🟩🟩🟩🟥🟥 */
       3,  28,   0,  /* 🟩🟩🟩🟥🟥 */
       3,  30,   0,  /* 🟩🟩🟩🟨🟥 */
@@ -404,7 +476,7 @@ static const unsigned char pangea_char_030[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_031[30] = {
+static const unsigned char pangea_char_037[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -416,7 +488,7 @@ static const unsigned char pangea_char_031[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_032[30] = {
+static const unsigned char pangea_char_038[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -428,7 +500,7 @@ static const unsigned char pangea_char_032[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_033[30] = {
+static const unsigned char pangea_char_039[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      30,   7,   0,  /* 🟥🟥🟨🟨🟩 */
      16,  15,   0,  /* 🟥🟩🟩🟩🟩 */
@@ -440,7 +512,7 @@ static const unsigned char pangea_char_033[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_034[30] = {
+static const unsigned char pangea_char_040[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      15,  28,   0,  /* 🟩🟨🟨🟥🟥 */
       1,  31,   0,  /* 🟩🟩🟩🟩🟨 */
@@ -452,7 +524,7 @@ static const unsigned char pangea_char_034[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_035[30] = {
+static const unsigned char pangea_char_041[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
       6,  31,   0,  /* 🟩🟩🟨🟨🟩 */
@@ -464,7 +536,7 @@ static const unsigned char pangea_char_035[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_036[30] = {
+static const unsigned char pangea_char_042[30] = {
      28,  15,   0,  /* 🟥🟨🟨🟩🟩 */
      30,   7,   0,  /* 🟥🟥🟨🟨🟩 */
      24,  31,   0,  /* 🟨🟨🟩🟩🟩 */
@@ -476,7 +548,7 @@ static const unsigned char pangea_char_036[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_037[30] = {
+static const unsigned char pangea_char_043[30] = {
      30,  31,   0,  /* 🟨🟨🟨🟨🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -488,7 +560,7 @@ static const unsigned char pangea_char_037[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_038[30] = {
+static const unsigned char pangea_char_044[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -500,7 +572,7 @@ static const unsigned char pangea_char_038[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_039[30] = {
+static const unsigned char pangea_char_045[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -512,7 +584,7 @@ static const unsigned char pangea_char_039[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_040[30] = {
+static const unsigned char pangea_char_046[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -524,7 +596,7 @@ static const unsigned char pangea_char_040[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_041[30] = {
+static const unsigned char pangea_char_047[30] = {
       1,  31,   1,  /* 🟩🟩🟩🟩⬜ */
       1,  31,   1,  /* 🟩🟩🟩🟩⬜ */
       1,  31,   1,  /* 🟩🟩🟩🟩⬜ */
@@ -536,7 +608,7 @@ static const unsigned char pangea_char_041[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_042[30] = {
+static const unsigned char pangea_char_048[30] = {
      23,  31,  23,  /* ⬜🟩⬜⬜⬜ */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
       0,  17,  31,  /* 🟫🟦🟦🟦🟫 */
@@ -548,7 +620,7 @@ static const unsigned char pangea_char_042[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_043[30] = {
+static const unsigned char pangea_char_049[30] = {
       8,  31,  15,  /* 🟩⬜🟫🟫🟫 */
       9,  31,  31,  /* 🟫⬜🟫🟫⬜ */
      15,  31,  31,  /* 🟫⬜⬜⬜⬜ */
@@ -560,7 +632,7 @@ static const unsigned char pangea_char_043[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char pangea_char_044[30] = {
+static const unsigned char pangea_char_050[30] = {
      29,  31,  29,  /* ⬜⬜⬜🟩⬜ */
      31,  31,  31,  /* ⬜⬜⬜⬜⬜ */
      31,  31,  31,  /* ⬜⬜⬜⬜⬜ */
@@ -573,7 +645,7 @@ static const unsigned char pangea_char_044[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
 
-const unsigned char * const pangea_charset[45] = {
+const unsigned char * const pangea_charset[51] = {
     pangea_char_000,
     pangea_char_001,
     pangea_char_002,
@@ -619,13 +691,19 @@ const unsigned char * const pangea_charset[45] = {
     pangea_char_042,
     pangea_char_043,
     pangea_char_044,
+    pangea_char_045,
+    pangea_char_046,
+    pangea_char_047,
+    pangea_char_048,
+    pangea_char_049,
+    pangea_char_050,
 };
 
 const unsigned char pangea_map[122] = {
     30, 4,
     8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-    10, 10, 11, 10, 10, 12, 13, 1, 1, 1, 1, 1, 1, 1, 14, 14, 15, 16, 17, 18, 10, 10, 11, 10, 10, 12, 13, 1, 1, 1,
-    19, 2, 2, 2, 20, 21, 22, 1, 1, 1, 23, 1, 1, 24, 2, 2, 2, 2, 25, 26, 19, 2, 2, 2, 20, 21, 22, 1, 1, 1,
-    27, 28, 29, 29, 30, 31, 32, 33, 34, 35, 36, 29, 37, 38, 39, 40, 41, 42, 43, 44, 27, 28, 29, 29, 30, 31, 32, 33, 34, 35,
+    10, 11, 12, 13, 14, 15, 16, 1, 1, 1, 1, 1, 1, 1, 17, 18, 19, 20, 21, 22, 10, 11, 12, 13, 14, 15, 16, 1, 1, 1,
+    23, 2, 2, 2, 24, 25, 26, 1, 1, 1, 27, 28, 1, 29, 30, 2, 2, 2, 31, 32, 23, 2, 2, 2, 24, 25, 26, 1, 1, 1,
+    33, 34, 35, 35, 36, 37, 38, 39, 40, 41, 42, 35, 43, 44, 45, 46, 47, 48, 49, 50, 33, 34, 35, 35, 36, 37, 38, 39, 40, 41,
 };
 

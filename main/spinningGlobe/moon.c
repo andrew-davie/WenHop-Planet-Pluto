@@ -177,18 +177,6 @@ static const unsigned char moon_char_011[30] = {
       0,  25,  31,  /* 🟫🟫🟦🟦🟫 */
 };
 static const unsigned char moon_char_012[30] = {
-      0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
-      0,  19,  15,  /* 🟩🟦🟦🟫🟫 */
-      0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
-      0,  29,  31,  /* 🟫🟫🟫🟦🟫 */
-      0,  30,  31,  /* 🟫🟫🟫🟫🟦 */
-      0,  30,  31,  /* 🟫🟫🟫🟫🟦 */
-      0,  14,  31,  /* 🟦🟫🟫🟫🟦 */
-      0,  31,  27,  /* 🟫🟫🟩🟫🟫 */
-      0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
-      0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
-};
-static const unsigned char moon_char_013[30] = {
       0,  31,   9,  /* 🟩🟫🟩🟩🟫 */
       0,  31,  27,  /* 🟫🟫🟩🟫🟫 */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
@@ -200,7 +188,7 @@ static const unsigned char moon_char_013[30] = {
       3,  30,  26,  /* 🟫🟫🟩⬜🟥 */
      15,  20,  24,  /* 🟫🟪🟨🟥🟥 */
 };
-static const unsigned char moon_char_014[30] = {
+static const unsigned char moon_char_013[30] = {
       0,  31,  24,  /* 🟫🟫🟩🟩🟩 */
       4,  27,  21,  /* 🟫🟩🟪🟩🟫 */
       0,  15,  31,  /* 🟦🟫🟫🟫🟫 */
@@ -212,7 +200,7 @@ static const unsigned char moon_char_014[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char moon_char_015[30] = {
+static const unsigned char moon_char_014[30] = {
       4,  27,  20,  /* 🟫🟩🟪🟩🟩 */
       4,  31,  29,  /* 🟫🟫⬜🟩🟫 */
       0,  26,  31,  /* 🟫🟫🟦🟫🟦 */
@@ -224,7 +212,7 @@ static const unsigned char moon_char_015[30] = {
      31,   3,   0,  /* 🟥🟥🟥🟨🟨 */
      28,   7,   0,  /* 🟥🟥🟨🟩🟩 */
 };
-static const unsigned char moon_char_016[30] = {
+static const unsigned char moon_char_015[30] = {
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   1,  /* 🟩🟩🟩🟩🟫 */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
@@ -236,7 +224,7 @@ static const unsigned char moon_char_016[30] = {
      15,  22,   8,  /* 🟩🟪🟨🟨🟥 */
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
 };
-static const unsigned char moon_char_017[30] = {
+static const unsigned char moon_char_016[30] = {
       0,  31,  15,  /* 🟩🟫🟫🟫🟫 */
       0,  31,  15,  /* 🟩🟫🟫🟫🟫 */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
@@ -248,7 +236,7 @@ static const unsigned char moon_char_017[30] = {
      30,  27,   0,  /* 🟨🟨🟥🟨🟩 */
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
 };
-static const unsigned char moon_char_018[30] = {
+static const unsigned char moon_char_017[30] = {
       0,  31,  28,  /* 🟫🟫🟫🟩🟩 */
       0,  31,  14,  /* 🟩🟫🟫🟫🟩 */
       0,  19,  31,  /* 🟫🟦🟦🟫🟫 */
@@ -260,7 +248,7 @@ static const unsigned char moon_char_018[30] = {
      31,   0,  16,  /* 🟪🟥🟥🟥🟥 */
      31,   7,  24,  /* 🟪🟪🟨🟨🟨 */
 };
-static const unsigned char moon_char_019[30] = {
+static const unsigned char moon_char_018[30] = {
       0,  31,  29,  /* 🟫🟫🟫🟩🟫 */
       0,  31,  30,  /* 🟫🟫🟫🟫🟩 */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
@@ -272,7 +260,7 @@ static const unsigned char moon_char_019[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,  15,  16,  /* 🟪🟨🟨🟨🟨 */
 };
-static const unsigned char moon_char_020[30] = {
+static const unsigned char moon_char_019[30] = {
       0,  31,  19,  /* 🟫🟩🟩🟫🟫 */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
       0,  31,  28,  /* 🟫🟫🟫🟩🟩 */
@@ -284,7 +272,7 @@ static const unsigned char moon_char_020[30] = {
      24,  31,   9,  /* 🟨⬜🟩🟩🟫 */
      21,  14,  23,  /* 🟪🟩⬜🟫🟪 */
 };
-static const unsigned char moon_char_021[30] = {
+static const unsigned char moon_char_020[30] = {
       0,  31,   1,  /* 🟩🟩🟩🟩🟫 */
       0,  31,   3,  /* 🟩🟩🟩🟫🟫 */
       0,  31,  19,  /* 🟫🟩🟩🟫🟫 */
@@ -296,7 +284,7 @@ static const unsigned char moon_char_021[30] = {
      17,  14,  31,  /* 🟪🟫🟫🟫🟪 */
      24,  23,  14,  /* 🟨🟪🟫🟫🟩 */
 };
-static const unsigned char moon_char_022[30] = {
+static const unsigned char moon_char_021[30] = {
       0,  31,  25,  /* 🟫🟫🟩🟩🟫 */
       0,  31,  21,  /* 🟫🟩🟫🟩🟫 */
      24,   7,  27,  /* 🟪🟪🟩🟫🟫 */
@@ -308,7 +296,7 @@ static const unsigned char moon_char_022[30] = {
      16,  15,  31,  /* 🟪🟫🟫🟫🟫 */
       8,  31,  15,  /* 🟩⬜🟫🟫🟫 */
 };
-static const unsigned char moon_char_023[30] = {
+static const unsigned char moon_char_022[30] = {
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
       0,  28,  27,  /* 🟫🟫🟩🟦🟦 */
       0,  30,  31,  /* 🟫🟫🟫🟫🟦 */
@@ -320,7 +308,7 @@ static const unsigned char moon_char_023[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char moon_char_024[30] = {
+static const unsigned char moon_char_023[30] = {
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
       0,  31,  29,  /* 🟫🟫🟫🟩🟫 */
       0,  30,  31,  /* 🟫🟫🟫🟫🟦 */
@@ -332,7 +320,7 @@ static const unsigned char moon_char_024[30] = {
       0,   1,  31,  /* 🟦🟦🟦🟦🟫 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char moon_char_025[30] = {
+static const unsigned char moon_char_024[30] = {
       0,  31,  25,  /* 🟫🟫🟩🟩🟫 */
       0,  31,  23,  /* 🟫🟩🟫🟫🟫 */
       0,  29,  31,  /* 🟫🟫🟫🟦🟫 */
@@ -344,7 +332,7 @@ static const unsigned char moon_char_025[30] = {
       0,  17,  31,  /* 🟫🟦🟦🟦🟫 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char moon_char_026[30] = {
+static const unsigned char moon_char_025[30] = {
       4,  31,  20,  /* 🟫🟩⬜🟩🟩 */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
       0,  16,  31,  /* 🟫🟦🟦🟦🟦 */
@@ -356,7 +344,7 @@ static const unsigned char moon_char_026[30] = {
       0,  17,  31,  /* 🟫🟦🟦🟦🟫 */
       0,  12,  31,  /* 🟦🟫🟫🟦🟦 */
 };
-static const unsigned char moon_char_027[30] = {
+static const unsigned char moon_char_026[30] = {
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
       0,  15,  31,  /* 🟦🟫🟫🟫🟫 */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
@@ -368,7 +356,7 @@ static const unsigned char moon_char_027[30] = {
       0,  16,  31,  /* 🟫🟦🟦🟦🟦 */
       0,  16,  31,  /* 🟫🟦🟦🟦🟦 */
 };
-static const unsigned char moon_char_028[30] = {
+static const unsigned char moon_char_027[30] = {
       0,  12,  31,  /* 🟦🟫🟫🟦🟦 */
       0,  15,  31,  /* 🟦🟫🟫🟫🟫 */
       0,   7,  31,  /* 🟦🟦🟫🟫🟫 */
@@ -380,7 +368,7 @@ static const unsigned char moon_char_028[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char moon_char_029[30] = {
+static const unsigned char moon_char_028[30] = {
       0,   7,  31,  /* 🟦🟦🟫🟫🟫 */
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
       0,  31,  22,  /* 🟫🟩🟫🟫🟩 */
@@ -392,7 +380,7 @@ static const unsigned char moon_char_029[30] = {
       0,   1,  31,  /* 🟦🟦🟦🟦🟫 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char moon_char_030[30] = {
+static const unsigned char moon_char_029[30] = {
      31,  12,  16,  /* 🟪🟨🟨🟥🟥 */
      31,   4,  24,  /* 🟪🟪🟨🟥🟥 */
      15,  16,   8,  /* 🟩🟪🟥🟥🟥 */
@@ -403,6 +391,18 @@ static const unsigned char moon_char_030[30] = {
       1,  31,  28,  /* 🟫🟫🟫🟩🟨 */
       0,  25,  31,  /* 🟫🟫🟦🟦🟫 */
       0,  15,  31,  /* 🟦🟫🟫🟫🟫 */
+};
+static const unsigned char moon_char_030[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     15,  24,   0,  /* 🟩🟨🟥🟥🟥 */
+      7,  24,  16,  /* 🟫🟩🟥🟥🟥 */
 };
 static const unsigned char moon_char_031[30] = {
      31,   7,   0,  /* 🟥🟥🟨🟨🟨 */
@@ -1078,8 +1078,8 @@ const unsigned char * const moon_charset[80] = {
 
 const unsigned char moon_map[122] = {
     30, 4,
-    8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-    4, 4, 4, 28, 29, 30, 1, 31, 32, 1, 33, 34, 35, 36, 37, 38, 4, 4, 39, 4, 4, 4, 4, 28, 29, 30, 1, 31, 32, 1,
+    8, 9, 10, 11, 6, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 8, 9, 10, 11, 6, 12, 13, 14, 15, 16,
+    4, 4, 4, 27, 28, 29, 30, 31, 32, 1, 33, 34, 35, 36, 37, 38, 4, 4, 39, 4, 4, 4, 4, 27, 28, 29, 30, 31, 32, 1,
     40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
     60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
 };

@@ -105,134 +105,145 @@ void initAsciiStringDraw(int fontNumber, int c, int delay, int buffer, int colbu
 
 const unsigned char justifyChar[] = {
 
-    0b00, /* ' ' ASCII 32 */
-    0b00, /* '!' ASCII 33 */
-    0b10, /* '0x22' ASCII 34 */
-    0b00, /* '#' ASCII 35 */
-    0b00, /* '$' ASCII 36 */
-    0b00, /* '%' ASCII 37 */
-    0b00, /* '&' ASCII 38 */
-    0b00, /* ''' ASCII 39 */
-    0b01, /* '(' ASCII 40 */
-    0b00, /* ')' ASCII 41 */
-    0b10, /* '*' ASCII 42 */
-    0b10, /* '+' ASCII 43 */
-    0b10, /* ',' ASCII 44 */
-    0b00, /* '-' ASCII 45 */
-    0b00, /* '.' ASCII 46 */
-    0b00, /* '/' ASCII 47 */
-    0b00, /* '0' ASCII 48 */
-    0b00, /* '1' ASCII 49 */
-    0b00, /* '2' ASCII 50 */
-    0b00, /* '3' ASCII 51 */
-    0b00, /* '4' ASCII 52 */
-    0b00, /* '5' ASCII 53 */
-    0b00, /* '6' ASCII 54 */
-    0b00, /* '7' ASCII 55 */
-    0b00, /* '8' ASCII 56 */
-    0b00, /* '9' ASCII 57 */
-    0b00, /* ':' ASCII 58 */
-    0b00, /* ';' ASCII 59 */
-    0b00, /* '<' ASCII 60 */
-    0b00, /* '=' ASCII 61 */
-    0b00, /* '>' ASCII 62 */
-    0b00, /* '?' ASCII 63 */
-    0b00, /* '@' ASCII 64 */
-    0b00, /* 'A' ASCII 65 */
-    0b00, /* 'B' ASCII 66 */
-    0b00, /* 'C' ASCII 67 */
-    0b00, /* 'D' ASCII 68 */
-    0b00, /* 'E' ASCII 69 */
-    0b00, /* 'F' ASCII 70 */
-    0b00, /* 'G' ASCII 71 */
-    0b00, /* 'H' ASCII 72 */
-    0b00, /* 'I' ASCII 73 */
-    0b00, /* 'J' ASCII 74 */
-    0b00, /* 'K' ASCII 75 */
-    0b00, /* 'L' ASCII 76 */
-    0b00, /* 'M' ASCII 77 */
-    0b00, /* 'N' ASCII 78 */
-    0b00, /* 'O' ASCII 79 */
-    0b00, /* 'P' ASCII 80 */
-    0b00, /* 'Q' ASCII 81 */
-    0b00, /* 'R' ASCII 82 */
-    0b00, /* 'S' ASCII 83 */
-    0b11, /* 'T' ASCII 84 */
-    0b00, /* 'U' ASCII 85 */
-    0b00, /* 'V' ASCII 86 */
-    0b00, /* 'W' ASCII 87 */
-    0b00, /* 'X' ASCII 88 */
-    0b00, /* 'Y' ASCII 89 */
-    0b00, /* 'Z' ASCII 90 */
-    0b00, /* '[' ASCII 91 */
-    0b00, /* '0x5C' ASCII 92 */
-    0b00, /* ']' ASCII 93 */
-    0b10, /* '^' ASCII 94 */
-    0b00, /* '_' ASCII 95 */
-    0b00, /* '`' ASCII 96 */
-    0b00, /* 'a' ASCII 97 */
-    0b00, /* 'b' ASCII 98 */
-    0b01, /* 'c' ASCII 99 */
-    0b01, /* 'd' ASCII 100 */
-    0b01, /* 'e' ASCII 101 */
-    0b11, /* 'f' ASCII 102 */
-    0b00, /* 'g' ASCII 103 */
-    0b00, /* 'h' ASCII 104 */
-    0b00, /* 'i' ASCII 105 */
-    0b00, /* 'j' ASCII 106 */
-    0b00, /* 'k' ASCII 107 */
-    0b00, /* 'l' ASCII 108 */
-    0b00, /* 'm' ASCII 109 */
-    0b00, /* 'n' ASCII 110 */
-    0b00, /* 'o' ASCII 111 */
-    0b00, /* 'p' ASCII 112 */
-    0b00, /* 'q' ASCII 113 */
-    0b01, /* 'r' ASCII 114 */
-    0b00, /* 's' ASCII 115 */
-    0b10, /* 't' ASCII 116 */
-    0b00, /* 'u' ASCII 117 */
-    0b00, /* 'v' ASCII 118 */
-    0b00, /* 'w' ASCII 119 */
-    0b00, /* 'x' ASCII 120 */
-    0b00, /* 'y' ASCII 121 */
-    0b00, /* 'z' ASCII 122 */
-    0b00, /* '{' ASCII 123 */
-    0b00, /* '|' ASCII 124 */
-    0b00, /* '}' ASCII 125 */
-    0b00, /* '~' ASCII 126 */
+    0b100,    // 100, /* ' ' ASCII 32 */
+    0b100,    // 100, /* '!' ASCII 33 */
+    0b110,    // 100, /* '0x22' ASCII 34 */
+    0b100,    // 100, /* '#' ASCII 35 */
+    0b100,    // 100, /* '$' ASCII 36 */
+    0b100,    // 100, /* '%' ASCII 37 */
+    0b100,    // 100, /* '&' ASCII 38 */
+    0b100,    // 100, /* ''' ASCII 39 */
+    0b101,    // 100, /* '(' ASCII 40 */
+    0b100,    // 100, /* ')' ASCII 41 */
+    0b110,    // 100, /* '*' ASCII 42 */
+    0b110,    // 100, /* '+' ASCII 43 */
+    0b110,    // 100, /* ',' ASCII 44 */
+    0b100,    // 100, /* '-' ASCII 45 */
+    0b100,    // 100, /* '.' ASCII 46 */
+    0b100,    // 100, /* '/' ASCII 47 */
+    0b100,    // 100, /* '0' ASCII 48 */
+    0b100,    // 100, /* '1' ASCII 49 */
+    0b100,    // 100, /* '2' ASCII 50 */
+    0b100,    // 100, /* '3' ASCII 51 */
+    0b100,    // 100, /* '4' ASCII 52 */
+    0b100,    // 100, /* '5' ASCII 53 */
+    0b100,    // 100, /* '6' ASCII 54 */
+    0b100,    // 100, /* '7' ASCII 55 */
+    0b100,    // 100, /* '8' ASCII 56 */
+    0b100,    // 100, /* '9' ASCII 57 */
+    0b100,    // 100, /* ':' ASCII 58 */
+    0b100,    // 100, /* ';' ASCII 59 */
+    0b000,    // 000, /* '<' ASCII 60 */
+    0b000,    // 000, /* '=' ASCII 61 */
+    0b000,    // 000, /* '>' ASCII 62 */
+    0b100,    // 100, /* '?' ASCII 63 */
+    0b100,    // 100, /* '@' ASCII 64 */
+    0b100,    // 100, /* 'A' ASCII 65 */
+    0b100,    // 100, /* 'B' ASCII 66 */
+    0b100,    // 100, /* 'C' ASCII 67 */
+    0b100,    // 100, /* 'D' ASCII 68 */
+    0b100,    // 100, /* 'E' ASCII 69 */
+    0b100,    // 100, /* 'F' ASCII 70 */
+    0b100,    // 100, /* 'G' ASCII 71 */
+    0b100,    // 100, /* 'H' ASCII 72 */
+    0b100,    // 100, /* 'I' ASCII 73 */
+    0b100,    // 100, /* 'J' ASCII 74 */
+    0b100,    // 100, /* 'K' ASCII 75 */
+    0b100,    // 100, /* 'L' ASCII 76 */
+    0b100,    // 100, /* 'M' ASCII 77 */
+    0b100,    // 100, /* 'N' ASCII 78 */
+    0b100,    // 100, /* 'O' ASCII 79 */
+    0b100,    // 100, /* 'P' ASCII 80 */
+    0b100,    // 100, /* 'Q' ASCII 81 */
+    0b100,    // 100, /* 'R' ASCII 82 */
+    0b100,    // 100, /* 'S' ASCII 83 */
+    0b111,    // 100, /* 'T' ASCII 84 */
+    0b100,    // 100, /* 'U' ASCII 85 */
+    0b100,    // 100, /* 'V' ASCII 86 */
+    0b100,    // 100, /* 'W' ASCII 87 */
+    0b100,    // 100, /* 'X' ASCII 88 */
+    0b100,    // 100, /* 'Y' ASCII 89 */
+    0b100,    // 100, /* 'Z' ASCII 90 */
+    0b100,    // 100, /* '[' ASCII 91 */
+    0b100,    // 100, /* '0x5C' ASCII 92 */
+    0b100,    // 100, /* ']' ASCII 93 */
+    0b100,    // 100, /* '^' ASCII 94 */
+    0b100,    // 100, /* '_' ASCII 95 */
+    0b100,    // 100, /* '`' ASCII 96 */
+    0b100,    // 100, /* 'a' ASCII 97 */
+    0b100,    // 100, /* 'b' ASCII 98 */
+    0b101,    // 100, /* 'c' ASCII 99 */
+    0b100,    // 100, /* 'd' ASCII 100 */
+    0b101,    // 100, /* 'e' ASCII 101 */
+    0b111,    // 100, /* 'f' ASCII 102 */
+    0b100,    // 100, /* 'g' ASCII 103 */
+    0b100,    // 100, /* 'h' ASCII 104 */
+    0b100,    // 100, /* 'i' ASCII 105 */
+    0b100,    // 100, /* 'j' ASCII 106 */
+    0b100,    // 100, /* 'k' ASCII 107 */
+    0b100,    // 100, /* 'l' ASCII 108 */
+    0b100,    // 100, /* 'm' ASCII 109 */
+    0b100,    // 100, /* 'n' ASCII 110 */
+    0b100,    // 100, /* 'o' ASCII 111 */
+    0b100,    // 100, /* 'p' ASCII 112 */
+    0b100,    // 100, /* 'q' ASCII 113 */
+    0b101,    // 100, /* 'r' ASCII 114 */
+    0b100,    // 100, /* 's' ASCII 115 */
+    0b110,    // 100, /* 't' ASCII 116 */
+    0b100,    // 100, /* 'u' ASCII 117 */
+    0b100,    // 100, /* 'v' ASCII 118 */
+    0b100,    // 100, /* 'w' ASCII 119 */
+    0b100,    // 100, /* 'x' ASCII 120 */
+    0b100,    // 100, /* 'y' ASCII 121 */
+    0b100,    // 100, /* 'z' ASCII 122 */
+    0b100,    // 100, /* '{' ASCII 123 */
+    0b000,    // 000, /* '|' ASCII 124 */
+    0b100,    // 100, /* '}' ASCII 125 */
+    0b100,    // 100, /* '~' ASCII 126 */
 };
 
 
 #define LTR(s) (s - ' ')
+#define CRLF '|'
+
 
 int getLineWidth(const char *str) {
 
     int width = 0;
-    while (*str && *str != '}' && *str != '|') {
-        width += fonts[font].charWidths[LTR(*str)] + 1;
+    while (*str && *str != CRLF) {
 
-        if (font == FONT_COMPACT) {
-            if (justifyChar[LTR(*str)] & 0b10)    // LHS
+        char ci = LTR(*str);
+        if (justifyChar[ci] & 0b100) {
+
+            width += fonts[font].charWidths[ci] + 1;
+
+            if (justifyChar[ci] & 0b10)    // LHS
                 width--;
-            if (justifyChar[LTR(*str)] & 0b01)    // RHS
+            if (justifyChar[ci] & 0b01)    // RHS
                 width--;
         }
-
         str++;
     }
-    return width ? width - 1 : 0;
+    return width;
 }
+
 
 void setJustifyX(const char *str) {
 
-    if (justify == JUSTIFY_CENTER)
-        cx = 24 - (getLineWidth(str) >> 1);
+    switch (justify) {
 
-    else if (justify == JUSTIFY_RIGHT)
-        cx = 48 - getLineWidth(str);
+    case JUSTIFY_CENTER:
+        cx = (48 - getLineWidth(str)) >> 1;
+        break;
 
-    else    // JUSTIFY_NONE and JUSTIFY_LEFT
+    case JUSTIFY_RIGHT:
+        cx = 47 - getLineWidth(str);
+        break;
+
+    default:
         cx = 0;
+        break;
+    }
 }
 
 
@@ -240,7 +251,7 @@ bool drawNextChar() {
 
     // false = complete
 
-    if (ps && *ps && ++current > speedDelay) {
+    while (ps && *ps && ++current > speedDelay) {
 
         current = 0;
         // if (*ps == '.' && *(ps - 1) == '.' && *(ps - 2) == '.')
@@ -249,7 +260,7 @@ bool drawNextChar() {
         int ch = *ps;
         int ci = LTR(ch);
 
-        if (ch == '|') {
+        if (ch == CRLF) {
             setJustifyX(ps + 1);
             cy += fonts[font].lineHeight;
         }
@@ -274,14 +285,13 @@ bool drawNextChar() {
             if (ch != '+' && ch != ' ')
                 ADDAUDIO(ch == '*' ? SFX_DOGE : SFX_KEYPRESS);
 
-            if (font == FONT_COMPACT && justifyChar[ci] & 0b10)
+            if (justifyChar[ci] & 0b10)
                 cx--;
 
             int column = cx >> 3;
             int bit = 7 - (cx & 7);
 
             const unsigned char *charShape = fonts[font].asciiTable[ci];
-
             if (charShape) {
 
                 for (int i = 0; i < fonts[font].lineHeight; i++) {
@@ -310,7 +320,7 @@ bool drawNextChar() {
 
             cx += fonts[font].charWidths[ci] + 1;
 
-            if (font == FONT_COMPACT && justifyChar[ci] & 0b01)
+            if (justifyChar[ci] & 0b01)
                 cx--;
         }
 

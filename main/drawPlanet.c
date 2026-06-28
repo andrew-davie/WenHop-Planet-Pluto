@@ -6,191 +6,74 @@
 #include "colour.h"
 #include "drawplanet.h"
 #include "main.h"
+#include "planet.h"
 #include "reverseBits.h"
 #include "scroll.h"
 
-#include "spinningGlobe/blood2.h"
-#include "spinningGlobe/bloodworld.h"
-#include "spinningGlobe/earth.h"
-#include "spinningGlobe/green1.h"
-#include "spinningGlobe/lava.h"
-#include "spinningGlobe/moon.h"
-#include "spinningGlobe/neptune.h"
-#include "spinningGlobe/pangea.h"
-#include "spinningGlobe/titan.h"
 
 #define DSP -200
 
 extern void initStars();
 
-struct GLOBE {
-    int retrograde;
-    const unsigned char *map;
-    const unsigned char *const *charSet;
-    const unsigned char *palette;
-};
 
-
-const unsigned char neptune_ntsc_palette_override[3] = {
-    0x92, /* palette[1] = (28,56,144) */
-    0x94, /* palette[2] = (56,84,168) */
-    0x96, /* palette[4] = (80,116,188) */
-};
-
-const unsigned char jupiter_ntsc_palette_override[3] = {
-    0x4C, /* palette[1] = (108,108,108) */
-    0x18, /* palette[2] = (144,144,144) */
-    0x2A, /* palette[4] = (176,176,176) */
-};
-
-const unsigned char earth_ntsc_palette_override[3] = {
-    0x94, /* palette[1] = (28,76,120) */
-    0xD6, /* palette[2] = (104,112,52) */
-    0x0A, /* palette[4] = (212,188,248) */
-};
-
-const unsigned char moon_ntsc_palette_override[3] = {
-    0x14,
-    /* palette[1] = (108,108,108) */ 0xE4, /* palette[2] = (144,144,144) */
-    0xE2,                                  /* palette[4] = (176,176,176) */
-};
-const unsigned char moon_ntsc_palette_override2[3] = {
-    0x84, /* palette[1] = (108,108,108) */
-    0xC4, /* palette[2] = (144,144,144) */
-    0x24, /* palette[4] = (176,176,176) */
-};
-
-
-const unsigned char bloodworld_ntsc_palette_override[3] = {
-    0x40, /* palette[1] = (68,40,0) */
-    0x42, /* palette[2] = (100,72,24) */
-    0xC6, /* palette[4] = (144,144,144) */
-};
-
-const unsigned char pangea_ntsc_palette_override[3] = {
-    0x84, /* palette[1] = (0,44,92) */
-    0xD4, /* palette[2] = (64,64,64) */
-    0x32, /* palette[4] = (176,176,176) */
-};
-
-const unsigned char blood2_ntsc_palette_override[3] = {
-    0xF6, /* palette[1] = (68,40,0) */
-    0x94, /* palette[2] = (132,104,48) */
-    0x64, /* palette[4] = (176,176,176) */
-};
-
-const unsigned char green1_ntsc_palette_override[3] = {
-    0xD4, /* palette[1] = (0,60,44) */
-    0xc6, /* palette[2] = (32,92,32) */
-    0xC4, /* palette[4] = (108,108,108) */
-};
-
-const unsigned char ridged_ntsc_palette_override[3] = {
-    0x12, /* palette[1] = (0,44,92) */
-    0xDA, /* palette[2] = (64,64,64) */
-    0xCA, /* palette[4] = (144,144,144) */
-};
-
-const unsigned char lava_ntsc_palette_override[3] = {
-    0xE2, /* palette[1] = (44,48,0) */
-    0x30, /* palette[2] = (132,24,0) */
-    0x34, /* palette[4] = (172,80,48) */
-};
-
-// TODO: run spinningGlobe/make.sh to re-gen the planet data
-//       run python3 spinningGlobe/planet-gen.py to create new planet images
-
-// To add a planet
-
-//  a) put planet texture map in spinningGlobes/textures director (e.g., newplanet.jpg)
-//  b) run cset.py from spinningGlobes directory
-//     suggested params:
-//     --no-dither
-//     --trixel-height 10 --trixel-width 5
-//      --adaptive-palette --black-threshold 20
-//      --brightness 1.0
-//     --max-chars 128 textures/titan.png 20 4
-//  c) optionally add planet to spinningGlobes/make.sh
-//
-//  Note: a reconstructed image is placed in spinningGlobes (newplanet_recon.png)
-
-//  1) enter filename in makefile SRCS list (e.g., spinningGlobes/newplanet.c)
-//  2) enter map, charset, palette entries in planets[] table below
-//     note: the palette can be replaced (copy from newplanet.c to above, and append _override)
-//  3) "#include spinningGlobe/newplanet.h" at the top of displayPlanet.c
-
-const struct GLOBE planets[10] = {
-    {1, earth_map, earth_charset, earth_ntsc_palette_override},
-    {-1, lava_map, lava_charset, lava_ntsc_palette_override},
-    {1, neptune_map, neptune_charset, neptune_ntsc_palette_override},
-    {-1, green1_map, green1_charset, green1_ntsc_palette_override},
-    {-1, pangea_map, pangea_charset, pangea_ntsc_palette_override},
-    {1, bloodworld_map, bloodworld_charset, bloodworld_ntsc_palette_override},
-    {1, blood2_map, blood2_charset, blood2_ntsc_palette_override},
-    {1, titan_map, titan_charset, titan_ntsc_palette},
-    {-1, moon_map, moon_charset, moon_ntsc_palette_override},
-    {-1, moon_map, moon_charset, moon_ntsc_palette_override2},    // TODO: dup
-};
-
-
-const int pix85[] = {
-    0b000000000000000000000000000000,    // 00  0
-    0b000000000000100001000000010000,    // 01  3
-    0b000000000001001001000100000100,    // 02  6
-    0b000000000001010010010010000100,    // 03  9
-    0b000000000001010010010010000100,    // 04  12
-    0b000000000001010101001001000010,    // 05  15
-    0b000000000010101010010100100010,    // 06  18
-    0b000000000010101010010100100010,    // 07  21
-    0b000000000010101011001010010010,    // 08  24
-    0b000000000010101011001010010010,    // 09  27
-    0b000000000010101011001010010010,    // 10  30
-    0b000000000010110101101010010001,    // 11  33
-    0b000000000010110101101010010001,    // 12  36
-    0b000000000010110101101010010001,    // 13  39
-    0b000000000010111011010101010001,    // 14  42
-    0b000000000010111011010101010001,    // 15  45
-    0b000000000010111011010101010001,    // 16  48
-    0b000000000010111011010101010001,    // 17  51
-    0b000000000010111011010101010001,    // 18  54
-    0b000000000011011101101011001001,    // 19  57
-    0b000000000011011101101011001001,    // 20  60
-    0b000000000011011101101011001001,    // 21  63
-    0b000000000011011101101011001001,    // 22  66
-    0b000000000011011101101011001001,    // 23  69
-    0b000000000011011101101011001001,    // 24  72
-    0b000000000011011101101011001001,    // 25  75
-    0b000000000011011101101011001001,    // 26  78
-    0b000000000011011101101011001001,    // 27  81
-    0b000000000011011101101011001001,    // 28  84
-    0b000000000011011101101011001001,    // 29  87
-    0b000000000011011101101011001001,    // 30  90
-    0b000000000011011101101011001001,    // 31  93
-    0b000000000011011101101011001001,    // 32  96
-    0b000000000011011101101011001001,    // 33  99
-    0b000000000011011101101011001001,    // 34  102
-    0b000000000011011101101011001001,    // 35  105
-    0b000000000011011101101011001001,    // 36  108
-    0b000000000011011101101011001001,    // 37  111
-    0b000000000011011101101011001001,    // 38  114
-    0b000000000010111011010101010001,    // 39  117
-    0b000000000010111011010101010001,    // 40  120
-    0b000000000010111011010101010001,    // 41  123
-    0b000000000010111011010101010001,    // 42  126
-    0b000000000010111011010101010001,    // 43  129
-    0b000000000010110101101010010001,    // 44  132
-    0b000000000010110101101010010001,    // 45  135
-    0b000000000010110101101010010001,    // 46  138
-    0b000000000010101011001010010010,    // 47  141
-    0b000000000010101011001010010010,    // 48  144
-    0b000000000010101010010100100010,    // 49  147
-    0b000000000010101010010100100010,    // 50  150
-    0b000000000001010101001001000010,    // 51  153
-    0b000000000001010101001001000010,    // 52  156
-    0b000000000001010010010010000100,    // 53  159
-    0b000000000001001001000100000100,    // 54  162
-    0b000000000001000100001000001000,    // 55  165
-    0b000000000000100001000000010000,    // 56  168
+const unsigned short pix85[] = {
+    0b0000000000000000,    // 0
+    0b0010001000010000,    // 3
+    0b0101001001000100,    // 6
+    0b0101010100100010,    // 9
+    0b0101010100100010,    // 12
+    0b1010101010100010,    // 15
+    0b1011010101010010,    // 18
+    0b1011010101010010,    // 21
+    0b1011101101010010,    // 24
+    0b1011101101010010,    // 27
+    0b1011101101010010,    // 30
+    0b1101110110101001,    // 33
+    0b1101110110101001,    // 36
+    0b1101110110101001,    // 39
+    0b1111011101101001,    // 42
+    0b1111011101101001,    // 45
+    0b1111011101101001,    // 48
+    0b1111011101101001,    // 51
+    0b1111011101101001,    // 54
+    0b1111111011011001,    // 57
+    0b1111111011011001,    // 60
+    0b1111111011011001,    // 63
+    0b1111111011011001,    // 66
+    0b1111111011011001,    // 69
+    0b1111111011011001,    // 72
+    0b1111111011011001,    // 75
+    0b1111111011011001,    // 78
+    0b1111111011011001,    // 81
+    0b1111111011011001,    // 84
+    0b1111111011011001,    // 87
+    0b1111111011011001,    // 90
+    0b1111111011011001,    // 93
+    0b1111111011011001,    // 96
+    0b1111111011011001,    // 99
+    0b1111111011011001,    // 102
+    0b1111111011011001,    // 105
+    0b1111111011011001,    // 108
+    0b1111111011011001,    // 111
+    0b1111111011011001,    // 114
+    0b1111011101101001,    // 117
+    0b1111011101101001,    // 120
+    0b1111011101101001,    // 123
+    0b1111011101101001,    // 126
+    0b1111011101101001,    // 129
+    0b1101110110101001,    // 132
+    0b1101110110101001,    // 135
+    0b1101110110101001,    // 138
+    0b1011101101010010,    // 141
+    0b1011101101010010,    // 144
+    0b1011010101010010,    // 147
+    0b1011010101010010,    // 150
+    0b1010101010100010,    // 153
+    0b1010101010100010,    // 156
+    0b0101010100100010,    // 159
+    0b0101001001000100,    // 162
+    0b0100100010001000,    // 165
+    0b0010001000010000,    // 168
 };
 
 
@@ -359,7 +242,7 @@ void drawPlanet(int half) {
 
 #define BLK(i)                                                                                                         \
     if (mask & (1 << i))                                                                                               \
-        p2 = (p2 << 1) | ((p >> (19 - i)) & 1);
+        p2 = (p2 << 1) | ((p >> (15 - i)) & 1);
 
 #define PUT(i)                                                                                                         \
     if (p2 & (1 << (bitOffset >> 16)))                                                                                 \
@@ -369,10 +252,10 @@ void drawPlanet(int half) {
 
 #define BLK2(i)                                                                                                        \
     if (mask & (1 << i))                                                                                               \
-        p2 = (p2 >> 1) | (((p >> i) & 1) << 19);
+        p2 = (p2 >> 1) | (((p >> i) & 1) << 15);
 
 #define PUT2(i)                                                                                                        \
-    if (p2 & (1 << (19 - (bitOffset >> 16))))                                                                          \
+    if (p2 & (1 << (15 - (bitOffset >> 16))))                                                                          \
         p3 |= 1 << i;                                                                                                  \
     bitOffset += scalex;
 
@@ -387,7 +270,7 @@ void drawPlanet(int half) {
 
     if (!half) {
 
-        for (; trixLine < (_SCANLINES / 3) - 3 && line85[equiv] >= 0;) {
+        for (; trixLine < (_SCANLINES / 3) - 1 && line85[equiv] >= 0;) {
 
             xchar = basex + map[0] * (line85[equiv] >> 5);
 
@@ -426,10 +309,10 @@ void drawPlanet(int half) {
                 BLK(13)
                 BLK(14)
                 BLK(15)
-                BLK(16)
-                BLK(17)
-                BLK(18)
-                BLK(19)
+                // BLK(16)
+                // BLK(17)
+                // BLK(18)
+                // BLK(19)
 
                 // screen is 32px wide: output is 2 bytes (bits 0-15 of p3 only)
 
@@ -467,7 +350,7 @@ void drawPlanet(int half) {
 
     } else {
 
-        for (; trixLine < (_SCANLINES / 3) - 3 && line85[equiv] >= 0;) {
+        for (; trixLine < (_SCANLINES / 3) - 1 && line85[equiv] >= 0;) {
 
             xchar = basex + map[0] * (line85[equiv] >> 5);
 
@@ -485,7 +368,7 @@ void drawPlanet(int half) {
 
                 int p = (*(image[0] + roll) << 20 | *(image[1] + roll) << 16 | *(image[2] + roll) << 12 |
                          *(image[3] + roll) << 8 | *(image[4] + roll) << 4 | *(image[5] + roll)) >>
-                        shift;
+                        (shift + 4);
 
                 int p2 = 0;
                 int p3 = 0;
@@ -508,16 +391,16 @@ void drawPlanet(int half) {
                 BLK2(13)
                 BLK2(14)
                 BLK2(15)
-                BLK2(16)
-                BLK2(17)
-                BLK2(18)
-                BLK2(19)
+                // BLK2(16)
+                // BLK2(17)
+                // BLK2(18)
+                // BLK2(19)
 
                 // screen is 32px wide: bits 4-19 of p3 used (after <<4: bytes at >>16 and >>8)
-                PUT2(19)
-                PUT2(18)
-                PUT2(17)
-                PUT2(16)
+                // PUT2(19)
+                // PUT2(18)
+                // PUT2(17)
+                // PUT2(16)
                 PUT2(15)
                 PUT2(14)
                 PUT2(13)
@@ -530,10 +413,14 @@ void drawPlanet(int half) {
                 PUT2(6)
                 PUT2(5)
                 PUT2(4)
+                PUT2(3)
+                PUT2(2)
+                PUT2(1)
+                PUT2(0)
 
-                p3 <<= 4;
+                p3 <<= 8;
                 *pf2++ = p3 >> 16;
-                *pf1++ = reverseBits[(p3 >> 8) & 0xFF];
+                *pf1++ = reverseBits[(char)(p3 >> 8)];
 
                 if (++roll > 2)
                     roll = 0;

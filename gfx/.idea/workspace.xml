@@ -2,18 +2,29 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="09715811-3b5d-4d4e-bce5-e6709461026e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tools/alphanumeric.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/../Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../kernels/kernel_Globe.asm" beforeDir="false" afterPath="$PROJECT_DIR$/../kernels/kernel_Globe.asm" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tools/circle_gen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/alphanumeric/fontLarge.png" beforeDir="false" afterPath="$PROJECT_DIR$/alphanumeric/fontLarge.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/alphanumeric/fontcompact.png" beforeDir="false" afterPath="$PROJECT_DIR$/alphanumeric/fontcompact.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fontcompact.c" beforeDir="false" afterPath="$PROJECT_DIR$/fontcompact.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fontlarge.c" beforeDir="false" afterPath="$PROJECT_DIR$/fontlarge.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../main/draw.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/draw.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../main/draw.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/draw.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../main/drawPlanet.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/drawPlanet.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../main/gameState_Globe.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/gameState_Globe.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../main/sound.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/sound.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../main/sound.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/sound.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/bloodworld.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/bloodworld.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/bloodworld.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/bloodworld.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/earth.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/earth.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/earth.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/earth.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/scale.py" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/scale.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/green1.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/green1.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/lava.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/lava.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/lava.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/lava.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/make.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/make.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/moon.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/moon.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/neptune.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/neptune.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/neptune.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/neptune.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/pangea.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/pangea.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/pangea.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/pangea.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/titan.c" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/titan.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main/spinningGlobe/titan.h" beforeDir="false" afterPath="$PROJECT_DIR$/../main/spinningGlobe/titan.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,23 +34,23 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="3FUCQSNAwqcxX4mlRNvXGRLcW2d" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto/gfx"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto/gfx&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

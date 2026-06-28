@@ -333,6 +333,18 @@ static const unsigned char titan_char_024[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
 static const unsigned char titan_char_025[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   7,   7,  /* 🟥🟥⬜⬜⬜ */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+};
+static const unsigned char titan_char_026[30] = {
      31,   6,   6,  /* 🟥🟥⬜⬜🟥 */
      27,  17,  31,  /* ⬜🟪🟦🟪⬜ */
      16,  16,  15,  /* 🟨🟦🟦🟦🟦 */
@@ -344,7 +356,7 @@ static const unsigned char titan_char_025[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_026[30] = {
+static const unsigned char titan_char_027[30] = {
      27,  24,  31,  /* ⬜⬜🟦🟪🟪 */
      25,   0,  31,  /* 🟪🟪🟦🟦🟪 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
@@ -356,7 +368,7 @@ static const unsigned char titan_char_026[30] = {
      31,  16,  16,  /* ⬜🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_027[30] = {
+static const unsigned char titan_char_028[30] = {
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      25,   0,  31,  /* 🟪🟪🟦🟦🟪 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
@@ -368,7 +380,7 @@ static const unsigned char titan_char_027[30] = {
      28,   4,   7,  /* 🟥🟥⬜🟦🟦 */
      31,   2,   3,  /* 🟥🟥🟥⬜🟪 */
 };
-static const unsigned char titan_char_028[30] = {
+static const unsigned char titan_char_029[30] = {
      24,   0,  31,  /* 🟪🟪🟦🟦🟦 */
      24,   0,  31,  /* 🟪🟪🟦🟦🟦 */
      24,   0,  31,  /* 🟪🟪🟦🟦🟦 */
@@ -380,7 +392,7 @@ static const unsigned char titan_char_028[30] = {
      15,   0,  24,  /* 🟦🟪🟥🟥🟥 */
       7,  24,  24,  /* 🟫🟫🟥🟥🟥 */
 };
-static const unsigned char titan_char_029[30] = {
+static const unsigned char titan_char_030[30] = {
       6,   0,  27,  /* 🟦🟦🟥🟪🟦 */
      12,   0,  27,  /* 🟦🟪🟥🟦🟦 */
      15,   7,  31,  /* 🟦🟪⬜⬜⬜ */
@@ -392,7 +404,7 @@ static const unsigned char titan_char_029[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_030[30] = {
+static const unsigned char titan_char_031[30] = {
       0,   4,  31,  /* 🟦🟦🟫🟦🟦 */
      15,   4,  31,  /* 🟦🟪⬜🟪🟪 */
      31,  28,  28,  /* ⬜⬜⬜🟥🟥 */
@@ -404,7 +416,7 @@ static const unsigned char titan_char_030[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_031[30] = {
+static const unsigned char titan_char_032[30] = {
       7,   0,  24,  /* 🟦🟦🟥🟥🟥 */
      31,   8,  24,  /* 🟪⬜🟥🟥🟥 */
      31,   8,   8,  /* 🟥⬜🟥🟥🟥 */
@@ -416,7 +428,7 @@ static const unsigned char titan_char_031[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_032[30] = {
+static const unsigned char titan_char_033[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -428,7 +440,7 @@ static const unsigned char titan_char_032[30] = {
      28,   4,   7,  /* 🟥🟥⬜🟦🟦 */
      30,   4,   3,  /* 🟥🟥🟨🟪🟦 */
 };
-static const unsigned char titan_char_033[30] = {
+static const unsigned char titan_char_034[30] = {
      15,   0,  31,  /* 🟦🟪🟪🟪🟪 */
      23,   0,  31,  /* 🟪🟦🟪🟪🟪 */
      29,  16,  31,  /* ⬜🟪🟪🟦🟪 */
@@ -440,7 +452,7 @@ static const unsigned char titan_char_033[30] = {
       7,   0,  31,  /* 🟦🟦🟪🟪🟪 */
       7,   0,  31,  /* 🟦🟦🟪🟪🟪 */
 };
-static const unsigned char titan_char_034[30] = {
+static const unsigned char titan_char_035[30] = {
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      31,   0,   3,  /* 🟥🟥🟥🟪🟪 */
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
@@ -452,7 +464,7 @@ static const unsigned char titan_char_034[30] = {
      25,   1,  31,  /* 🟪🟪🟦🟦⬜ */
      29,   0,  31,  /* 🟪🟪🟪🟦🟪 */
 };
-static const unsigned char titan_char_035[30] = {
+static const unsigned char titan_char_036[30] = {
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
@@ -464,7 +476,7 @@ static const unsigned char titan_char_035[30] = {
      29,  16,  31,  /* ⬜🟪🟪🟦🟪 */
      23,   0,  31,  /* 🟪🟦🟪🟪🟪 */
 };
-static const unsigned char titan_char_036[30] = {
+static const unsigned char titan_char_037[30] = {
      19,   1,  30,  /* 🟪🟦🟦🟪🟨 */
      28,   0,  31,  /* 🟪🟪🟪🟦🟦 */
      31,   0,  25,  /* 🟪🟪🟥🟥🟪 */
@@ -476,7 +488,7 @@ static const unsigned char titan_char_036[30] = {
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      31,   0,  24,  /* 🟪🟪🟥🟥🟥 */
 };
-static const unsigned char titan_char_037[30] = {
+static const unsigned char titan_char_038[30] = {
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
      30,   8,  27,  /* 🟪⬜🟥🟪🟦 */
      16,   0,  31,  /* 🟪🟦🟦🟦🟦 */
@@ -488,7 +500,7 @@ static const unsigned char titan_char_037[30] = {
      31,   0,  30,  /* 🟪🟪🟪🟪🟥 */
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
 };
-static const unsigned char titan_char_038[30] = {
+static const unsigned char titan_char_039[30] = {
      31,  18,  30,  /* ⬜🟪🟪⬜🟥 */
       1,   1,  31,  /* 🟦🟦🟦🟦⬜ */
      24,   0,  31,  /* 🟪🟪🟦🟦🟦 */
@@ -500,7 +512,7 @@ static const unsigned char titan_char_038[30] = {
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
 };
-static const unsigned char titan_char_039[30] = {
+static const unsigned char titan_char_040[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,  16,  16,  /* ⬜🟥🟥🟥🟥 */
       9,   0,  31,  /* 🟦🟪🟦🟦🟪 */
@@ -512,7 +524,7 @@ static const unsigned char titan_char_039[30] = {
      31,   0,  16,  /* 🟪🟥🟥🟥🟥 */
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
 };
-static const unsigned char titan_char_040[30] = {
+static const unsigned char titan_char_041[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -524,7 +536,7 @@ static const unsigned char titan_char_040[30] = {
      15,   0,  30,  /* 🟦🟪🟪🟪🟥 */
      31,   0,  28,  /* 🟪🟪🟪🟥🟥 */
 };
-static const unsigned char titan_char_041[30] = {
+static const unsigned char titan_char_042[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -536,7 +548,7 @@ static const unsigned char titan_char_041[30] = {
      29,   4,   7,  /* 🟥🟥⬜🟦🟪 */
      27,   0,  14,  /* 🟥🟪🟦🟪🟥 */
 };
-static const unsigned char titan_char_042[30] = {
+static const unsigned char titan_char_043[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,  16,  31,  /* ⬜🟪🟪🟪🟪 */
@@ -548,7 +560,7 @@ static const unsigned char titan_char_042[30] = {
      31,   0,  16,  /* 🟪🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_043[30] = {
+static const unsigned char titan_char_044[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,  16,  16,  /* ⬜🟥🟥🟥🟥 */
@@ -560,7 +572,7 @@ static const unsigned char titan_char_043[30] = {
      17,   3,  31,  /* 🟪🟦🟦🟫⬜ */
      27,   2,  14,  /* 🟥🟪🟦⬜🟥 */
 };
-static const unsigned char titan_char_044[30] = {
+static const unsigned char titan_char_045[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -572,7 +584,7 @@ static const unsigned char titan_char_044[30] = {
      28,   2,   3,  /* 🟥🟥🟥🟫🟦 */
      28,   1,   7,  /* 🟥🟥🟪🟦🟫 */
 };
-static const unsigned char titan_char_045[30] = {
+static const unsigned char titan_char_046[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   2,   0,  /* 🟥🟥🟥🟨🟥 */
@@ -584,7 +596,7 @@ static const unsigned char titan_char_045[30] = {
       1,   0,  31,  /* 🟦🟦🟦🟦🟪 */
       1,   4,  31,  /* 🟦🟦🟫🟦🟪 */
 };
-static const unsigned char titan_char_046[30] = {
+static const unsigned char titan_char_047[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -596,7 +608,7 @@ static const unsigned char titan_char_046[30] = {
      28,   0,  31,  /* 🟪🟪🟪🟦🟦 */
      24,   0,  31,  /* 🟪🟪🟦🟦🟦 */
 };
-static const unsigned char titan_char_047[30] = {
+static const unsigned char titan_char_048[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   2,   3,  /* 🟥🟥🟥⬜🟪 */
@@ -608,7 +620,7 @@ static const unsigned char titan_char_047[30] = {
      31,   0,  28,  /* 🟪🟪🟪🟥🟥 */
      31,   0,  16,  /* 🟪🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_048[30] = {
+static const unsigned char titan_char_049[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   5,  29,  /* 🟪🟪⬜🟥⬜ */
@@ -620,7 +632,7 @@ static const unsigned char titan_char_048[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_049[30] = {
+static const unsigned char titan_char_050[30] = {
      24,  24,  31,  /* ⬜⬜🟦🟦🟦 */
      24,  24,  31,  /* ⬜⬜🟦🟦🟦 */
      17,   0,  31,  /* 🟪🟦🟦🟦🟪 */
@@ -632,7 +644,7 @@ static const unsigned char titan_char_049[30] = {
      31,   0,   8,  /* 🟥🟪🟥🟥🟥 */
      23,   0,  12,  /* 🟥🟦🟪🟥🟥 */
 };
-static const unsigned char titan_char_050[30] = {
+static const unsigned char titan_char_051[30] = {
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      24,   0,  31,  /* 🟪🟪🟦🟦🟦 */
@@ -644,7 +656,7 @@ static const unsigned char titan_char_050[30] = {
      27,   0,  28,  /* 🟪🟪🟦🟥🟥 */
      31,   0,  28,  /* 🟪🟪🟪🟥🟥 */
 };
-static const unsigned char titan_char_051[30] = {
+static const unsigned char titan_char_052[30] = {
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
@@ -656,7 +668,7 @@ static const unsigned char titan_char_051[30] = {
      31,   0,   4,  /* 🟥🟥🟪🟥🟥 */
      31,   0,   3,  /* 🟥🟥🟥🟪🟪 */
 };
-static const unsigned char titan_char_052[30] = {
+static const unsigned char titan_char_053[30] = {
      31,   0,  28,  /* 🟪🟪🟪🟥🟥 */
      31,   0,  24,  /* 🟪🟪🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -668,7 +680,7 @@ static const unsigned char titan_char_052[30] = {
      31,   0,   7,  /* 🟥🟥🟪🟪🟪 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_053[30] = {
+static const unsigned char titan_char_054[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -680,7 +692,7 @@ static const unsigned char titan_char_053[30] = {
      19,   0,  28,  /* 🟪🟦🟦🟥🟥 */
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
 };
-static const unsigned char titan_char_054[30] = {
+static const unsigned char titan_char_055[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,  15,  /* 🟥🟪🟪🟪🟪 */
@@ -692,7 +704,7 @@ static const unsigned char titan_char_054[30] = {
      16,   0,  31,  /* 🟪🟦🟦🟦🟦 */
      31,  12,  29,  /* 🟪⬜⬜🟥🟪 */
 };
-static const unsigned char titan_char_055[30] = {
+static const unsigned char titan_char_056[30] = {
      31,   0,  25,  /* 🟪🟪🟥🟥🟪 */
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
      31,   0,  17,  /* 🟪🟥🟥🟥🟪 */
@@ -704,7 +716,7 @@ static const unsigned char titan_char_055[30] = {
      15,   6,  28,  /* 🟦🟪⬜🟨🟥 */
      15,   0,  30,  /* 🟦🟪🟪🟪🟥 */
 };
-static const unsigned char titan_char_056[30] = {
+static const unsigned char titan_char_057[30] = {
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,  16,  /* 🟪🟥🟥🟥🟥 */
@@ -716,7 +728,7 @@ static const unsigned char titan_char_056[30] = {
      31,   8,   8,  /* 🟥⬜🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_057[30] = {
+static const unsigned char titan_char_058[30] = {
      23,   4,  28,  /* 🟪🟦⬜🟥🟥 */
       7,   0,  24,  /* 🟦🟦🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -728,7 +740,7 @@ static const unsigned char titan_char_057[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_058[30] = {
+static const unsigned char titan_char_059[30] = {
      31,   0,  30,  /* 🟪🟪🟪🟪🟥 */
      31,   0,  28,  /* 🟪🟪🟪🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -740,7 +752,7 @@ static const unsigned char titan_char_058[30] = {
      15,   0,  30,  /* 🟦🟪🟪🟪🟥 */
      31,   0,  30,  /* 🟪🟪🟪🟪🟥 */
 };
-static const unsigned char titan_char_059[30] = {
+static const unsigned char titan_char_060[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -752,7 +764,7 @@ static const unsigned char titan_char_059[30] = {
      31,   0,  15,  /* 🟥🟪🟪🟪🟪 */
      31,   0,  29,  /* 🟪🟪🟪🟥🟪 */
 };
-static const unsigned char titan_char_060[30] = {
+static const unsigned char titan_char_061[30] = {
      31,   0,   6,  /* 🟥🟥🟪🟪🟥 */
      29,   1,   7,  /* 🟥🟥🟪🟦⬜ */
      30,   0,   3,  /* 🟥🟥🟥🟪🟦 */
@@ -764,7 +776,7 @@ static const unsigned char titan_char_060[30] = {
       1,   2,  30,  /* 🟦🟦🟦🟫🟥 */
       3,   2,  30,  /* 🟦🟦🟦⬜🟥 */
 };
-static const unsigned char titan_char_061[30] = {
+static const unsigned char titan_char_062[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,  16,  /* 🟪🟥🟥🟥🟥 */
@@ -776,7 +788,7 @@ static const unsigned char titan_char_061[30] = {
      24,   0,   7,  /* 🟥🟥🟦🟦🟦 */
      24,   0,   7,  /* 🟥🟥🟦🟦🟦 */
 };
-static const unsigned char titan_char_062[30] = {
+static const unsigned char titan_char_063[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -788,7 +800,7 @@ static const unsigned char titan_char_062[30] = {
      12,   8,  31,  /* 🟦⬜🟪🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char titan_char_063[30] = {
+static const unsigned char titan_char_064[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -800,7 +812,7 @@ static const unsigned char titan_char_063[30] = {
       3,   0,  31,  /* 🟦🟦🟦🟪🟪 */
       1,   0,  31,  /* 🟦🟦🟦🟦🟪 */
 };
-static const unsigned char titan_char_064[30] = {
+static const unsigned char titan_char_065[30] = {
      16,   9,  15,  /* 🟥🟫🟦🟦🟫 */
      16,   1,  31,  /* 🟪🟦🟦🟦🟫 */
       1,   1,  31,  /* 🟦🟦🟦🟦⬜ */
@@ -812,7 +824,7 @@ static const unsigned char titan_char_064[30] = {
      31,   0,  19,  /* 🟪🟥🟥🟪🟪 */
      31,   0,  22,  /* 🟪🟥🟪🟪🟥 */
 };
-static const unsigned char titan_char_065[30] = {
+static const unsigned char titan_char_066[30] = {
       1,  24,  31,  /* 🟫🟫🟦🟦🟪 */
      27,  16,  31,  /* ⬜🟪🟦🟪🟪 */
      31,   0,  15,  /* 🟥🟪🟪🟪🟪 */
@@ -824,7 +836,7 @@ static const unsigned char titan_char_065[30] = {
      23,   0,  24,  /* 🟪🟦🟥🟥🟥 */
      15,   0,  24,  /* 🟦🟪🟥🟥🟥 */
 };
-static const unsigned char titan_char_066[30] = {
+static const unsigned char titan_char_067[30] = {
      17,   0,  31,  /* 🟪🟦🟦🟦🟪 */
      23,   0,  31,  /* 🟪🟦🟪🟪🟪 */
       7,   0,  31,  /* 🟦🟦🟪🟪🟪 */
@@ -836,7 +848,7 @@ static const unsigned char titan_char_066[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_067[30] = {
+static const unsigned char titan_char_068[30] = {
      31,   0,  16,  /* 🟪🟥🟥🟥🟥 */
      31,   0,  16,  /* 🟪🟥🟥🟥🟥 */
      31,   0,  16,  /* 🟪🟥🟥🟥🟥 */
@@ -848,7 +860,7 @@ static const unsigned char titan_char_067[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_068[30] = {
+static const unsigned char titan_char_069[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -860,7 +872,7 @@ static const unsigned char titan_char_068[30] = {
      31,   0,  12,  /* 🟥🟪🟪🟥🟥 */
      31,   0,   6,  /* 🟥🟥🟪🟪🟥 */
 };
-static const unsigned char titan_char_069[30] = {
+static const unsigned char titan_char_070[30] = {
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
@@ -872,7 +884,7 @@ static const unsigned char titan_char_069[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_070[30] = {
+static const unsigned char titan_char_071[30] = {
      23,   0,  28,  /* 🟪🟦🟪🟥🟥 */
      22,   2,  31,  /* 🟪🟦🟪⬜🟦 */
      23,   0,  25,  /* 🟪🟦🟥🟥🟪 */
@@ -884,7 +896,7 @@ static const unsigned char titan_char_070[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_071[30] = {
+static const unsigned char titan_char_072[30] = {
      31,   0,  30,  /* 🟪🟪🟪🟪🟥 */
      27,   0,  15,  /* 🟥🟪🟦🟪🟪 */
      29,   0,   7,  /* 🟥🟥🟪🟦🟪 */
@@ -896,7 +908,7 @@ static const unsigned char titan_char_071[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_072[30] = {
+static const unsigned char titan_char_073[30] = {
      29,   0,  15,  /* 🟥🟪🟪🟦🟪 */
       1,   0,  31,  /* 🟦🟦🟦🟦🟪 */
      31,   8,  24,  /* 🟪⬜🟥🟥🟥 */
@@ -908,7 +920,7 @@ static const unsigned char titan_char_072[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_073[30] = {
+static const unsigned char titan_char_074[30] = {
      31,  12,  13,  /* 🟥⬜⬜🟥🟪 */
      31,  25,  25,  /* ⬜⬜🟥🟥⬜ */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -920,7 +932,7 @@ static const unsigned char titan_char_073[30] = {
      27,  24,  30,  /* ⬜⬜🟦🟪🟥 */
      31,   0,  14,  /* 🟥🟪🟪🟪🟥 */
 };
-static const unsigned char titan_char_074[30] = {
+static const unsigned char titan_char_075[30] = {
      12,   0,  31,  /* 🟦🟪🟪🟦🟦 */
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
      23,   0,  31,  /* 🟪🟦🟪🟪🟪 */
@@ -932,7 +944,7 @@ static const unsigned char titan_char_074[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char titan_char_075[30] = {
+static const unsigned char titan_char_076[30] = {
      31,  30,  30,  /* ⬜⬜⬜⬜🟥 */
      27,   1,  31,  /* 🟪🟪🟦🟪⬜ */
      28,   0,  31,  /* 🟪🟪🟪🟦🟦 */
@@ -944,7 +956,7 @@ static const unsigned char titan_char_075[30] = {
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
      31,   0,   1,  /* 🟥🟥🟥🟥🟪 */
 };
-static const unsigned char titan_char_076[30] = {
+static const unsigned char titan_char_077[30] = {
      30,   2,   3,  /* 🟥🟥🟥⬜🟦 */
      28,   0,   7,  /* 🟥🟥🟪🟦🟦 */
      25,   0,  31,  /* 🟪🟪🟦🟦🟪 */
@@ -957,7 +969,7 @@ static const unsigned char titan_char_076[30] = {
      31,   0,  31,  /* 🟪🟪🟪🟪🟪 */
 };
 
-const unsigned char * const titan_charset[77] = {
+const unsigned char * const titan_charset[78] = {
     titan_char_000,
     titan_char_001,
     titan_char_002,
@@ -1035,13 +1047,14 @@ const unsigned char * const titan_charset[77] = {
     titan_char_074,
     titan_char_075,
     titan_char_076,
+    titan_char_077,
 };
 
 const unsigned char titan_map[122] = {
     30, 4,
     1, 1, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1, 21, 22, 23, 24, 1, 1, 8, 9, 10, 11, 12, 13, 14, 15,
-    1, 1, 1, 25, 26, 27, 28, 29, 30, 31, 1, 32, 33, 34, 35, 36, 37, 38, 39, 40, 1, 1, 1, 25, 26, 27, 28, 29, 30, 31,
-    41, 42, 43, 1, 1, 1, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 41, 42, 43, 1, 1, 1, 44, 45, 46, 47,
-    58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 1, 71, 72, 73, 74, 75, 76, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67,
+    1, 1, 25, 26, 27, 28, 29, 30, 31, 32, 1, 33, 34, 35, 36, 37, 38, 39, 40, 41, 1, 1, 25, 26, 27, 28, 29, 30, 31, 32,
+    42, 43, 44, 1, 1, 1, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 42, 43, 44, 1, 1, 1, 45, 46, 47, 48,
+    59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 1, 72, 73, 74, 75, 76, 77, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68,
 };
 
