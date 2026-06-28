@@ -11,8 +11,6 @@
 #include "scroll.h"
 
 
-#define DSP -200
-
 extern void initStars();
 
 
@@ -147,7 +145,7 @@ const short int line85[] = {
     108,    // 53
     111,    // 54
     114,    // 55
-    128,    // 56
+    127,    // 56
     -1,  -1, -1, -1, -1, -1, -1,
 };
 
@@ -156,11 +154,8 @@ const short int line85[] = {
 int rotationDelta = PSS;    // 0x8800;    // C80;    // 0xA00;
 
 
-unsigned int stepSize = 0x100;
-unsigned int mult = (int)(1.25 * 0x100);
-
 int scalex;
-int planetDir, dirTarget;
+int planetDir;
 int body;
 
 
@@ -336,7 +331,7 @@ void drawPlanet(int half) {
                 PUT(15)
 
                 *pf1++ = p3 >> 8;
-                *pf2++ = reverseBits[(char)p3];
+                *pf2++ = reverseBits[(unsigned char)p3];
 
                 if (++roll > 2)
                     roll = 0;
@@ -420,7 +415,7 @@ void drawPlanet(int half) {
 
                 p3 <<= 8;
                 *pf2++ = p3 >> 16;
-                *pf1++ = reverseBits[(char)(p3 >> 8)];
+                *pf1++ = reverseBits[(unsigned char)(p3 >> 8)];
 
                 if (++roll > 2)
                     roll = 0;

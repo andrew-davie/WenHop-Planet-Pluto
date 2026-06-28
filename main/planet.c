@@ -19,12 +19,6 @@ const unsigned char neptune_ntsc_palette_override[3] = {
     0x96, /* palette[4] = (80,116,188) */
 };
 
-const unsigned char jupiter_ntsc_palette_override[3] = {
-    0x4C, /* palette[1] = (108,108,108) */
-    0x18, /* palette[2] = (144,144,144) */
-    0x2A, /* palette[4] = (176,176,176) */
-};
-
 const unsigned char earth_ntsc_palette_override[3] = {
     0xA4, /* palette[1] = (28,76,120) */
     0xC6, /* palette[2] = (104,112,52) */
@@ -65,12 +59,6 @@ const unsigned char green1_ntsc_palette_override[3] = {
     0x42, /* palette[1] = (0,60,44) */
     0x94, /* palette[2] = (32,92,32) */
     0x16, /* palette[4] = (108,108,108) */
-};
-
-const unsigned char ridged_ntsc_palette_override[3] = {
-    0x12, /* palette[1] = (0,44,92) */
-    0xDA, /* palette[2] = (64,64,64) */
-    0xCA, /* palette[4] = (144,144,144) */
 };
 
 const unsigned char lava_ntsc_palette_override[3] = {
