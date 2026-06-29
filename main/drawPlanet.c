@@ -167,9 +167,9 @@ int body;
 
 void initPlanet(int planet) {
 
-    //    scalex = MAXSCALE;
+    scalex = MAXSCALE;
     planetDir = 0;
-    //    rotationDelta = 0;
+    rotationDelta = ROTATION_MAX;
 
     body = planet;
 

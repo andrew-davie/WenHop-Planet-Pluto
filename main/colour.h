@@ -4,6 +4,8 @@
 #define FLASH(colour, time) pulseBackgroundColour(colour, time);
 
 extern int roller;
+extern int luminance;
+extern int lumTarget;
 
 void fadeBackgroundColour();
 void pulseBackgroundColour(unsigned char colour, int time);

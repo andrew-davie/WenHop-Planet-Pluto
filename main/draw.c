@@ -87,7 +87,7 @@ void initAsciiStringDraw(int fontNumber, int c, int delay, int buffer, int colbu
     // string zero-terminated
 
     font = fontNumber;
-    colour = c;
+    colour = convertColour(c);
 
     ps = string;
     buf = RAM + buffer;          // + y;
@@ -168,7 +168,7 @@ const unsigned char justifyChar[] = {
     0b100,    // 100, /* '0x5C' ASCII 92 */
     0b100,    // 100, /* ']' ASCII 93 */
     0b100,    // 100, /* '^' ASCII 94 */
-    0b100,    // 100, /* '_' ASCII 95 */
+    0b101,    // 100, /* '_' ASCII 95 */
     0b100,    // 100, /* '`' ASCII 96 */
     0b100,    // 100, /* 'a' ASCII 97 */
     0b100,    // 100, /* 'b' ASCII 98 */

@@ -19,6 +19,7 @@ static int lastPfCharLine;
 static int lastBgCharLine;
 int currentPalette;
 int luminance;
+int lumTarget = 0;
 
 int flashTime = 1;
 
@@ -131,14 +132,15 @@ void setPFColours(unsigned char *colours) {
     }
 }
 
+int step_toward(int current, int target) {
+    int diff = target - current;
+    return current + (diff > 0) - (diff < 0);
+}
 
 void adjustLuminance() {
 
-    if (luminance < 0)
-        luminance++;
-
-    if (luminance > 0)
-        luminance = 0;    // MAJOR error
+    if (!(frame & 1))
+        luminance = step_toward(luminance, lumTarget);
 }
 
 

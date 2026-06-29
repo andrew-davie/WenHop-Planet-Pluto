@@ -99,6 +99,9 @@ void initKernel_Globe() {
     infoPhase = 0;
     wait = 50;
 
+    luminance = -15;
+    lumTarget = 0;
+
     sound_max_volume = VOLUME_MAX;
 }
 
@@ -141,21 +144,38 @@ const struct pi {
     // |  next line
     // some non-alpha chars may not have shapes!
 
-#if 1
+#if 0
 
-//2,"=\"The humans|share|information|by vibrating|their|face-holes.|Impressive|but needless|given that|telepathy|exists.#",
-// 3,"=\"They pay for|water in a|bottle when|it falls free|from the|sky, complain|when it|falls, and|both are|considered|normal.#",
-// 3,"=\"A local told|me to take|care when I|left. I asked|of what. She|said just in|general. I|said that is a|lot to take|care of.#",
- //2,"=\"Joined what|I thought|was a guided|walk. It was|a funeral. By|the end I|was a|pallbearer|and did not|know how to|raise this.#",
- 2,"=\"I asked what|not to miss.|She said|everything. I|asked what|she liked.|She said she|had not|thought|about it.#",
-// 3,"=\"Asked a|ranger which|trail was|best. He said|'It depends'.|I said|'scenery'.|He said 'then|not this|park'.#",
+
+// 2,"=\"Did not|realise|breathing was|compulsory|here and had|to be|reminded|twice,|signage is|inadequate.#",
+// 1,"=\"Consumed|the|atmosphere|as a snack.|Two|secondary|digestive|organs have|since lodged|a formal|complaint.#",
+//2,"=\"Tried to eat|the soil as a|starter and|was told this|is not done|here.|Different|culture.|Would have|appreciated|a heads up.#",
+// 2,"=\"Asked a local|what time it|was and he|told me in a|unit I do not|have the|organs to|perceive.|Useless.#",
+// 1,"=\"The heat|here sits in|the range my|species uses|for food|storage and I|kept|reflexively|trying to put|things in the|locals.#",
+ //3,"=\"Was told the|piles were|'historical'|and I said|'historical|what' and|nobody|finished the|sentence.#",
+//2,"=\"Moisture|stuck to my|outer layer|and I took|this as a|territorial|claim and|panicked.|Better|labelling|would help.#",
+ //3,"=\"My translator|rendered|the local|language as|'medium|length sighs'|all visit. I'm|not entirely|sure that was|wrong.#",
+//3,"=\"Asked a local|if the planet|had feelings.|No. Are you|sure. Yes. It|seems sad.|They walked|away. I think|I was right.#",
+ //1,"=\"The planet|has a|breathable|atmosphere|in the loosest|possible|reading of|the word|'breathable'.#",
+//1,"=\"Assumed the|atmosphere|was|decorative|and removed|my suit. This|was my|second|mistake,|after|booking.#",
+
+
+// 2,"=\"Local|timekeeping|uses units|that match|nothing|astronomical.|I said so. A|human said|'yeah' and|walked away.#",
+// 2,"=\"Asked where|all the|valuable|minerals had|gone and was|told 'away'|which is|technically|an answer.#",
+// 3,"=\"Asked a local|if the smell|was natural or|man-made.|She said|'yes'. I have|thought about|this every|day since.#",
+// 1,"=\"Asked if the|air was safe|and was told|'for some|definitions|of safe'|which my|species|processes as|a yes and is|not.#",
+// 2,"=\"Asked what|grew here.|Told|'resentment'.|I said that|sounds|promising for|a cultural|visit. It was|not.#",
+// 2,"=\"Asked if the|haze ever|cleared.|'Cleared of|what,' they|said. I|realised they|had never|seen their|planet. Nor|had I.#",
+// 2,"=\"Stepped off|the ship and|joined the|local|ecosystem.|Took effort|to reverse.|Left me|feeling|implicated in|something.#",
+// 2,"=\"Asked a local|what they|did for fun.|They stared|long enough|that I felt I|had said|something in|very poor|taste.#",
+// 1,"=\"Emergency|card,|seventeen|steps. Step|one:|'reconsider'.|The rest:|increasingly|specific|ways to|leave.#",
+// 2,"=\"The ocean|here is|technically|swimmable in|the sense|that you can|enter it and|exit it, the|question is|what you exit|as.#",
+
+
 
 #else
-3,"=\"The oceans|are warm|and the|things in|them are|also warm|and|friendly, in|the way that|means you|cannot swim.#",
-3,"=\"The planet is|beautiful|from orbit,|and less so|up close, and|the|brochure|was taken|from orbit.#",
-2,"=\"The locals|have no word|for no and|express it by|doing the|thing|anyway, but,|sadly, I|missed this|for three|days.#",
-2,"=\"The planet|has a smell|that changes|with your|thoughts. I|could not|stop thinking|about the|smell, and it|kept|changing.#",
-2,"=\"The locals|shed their|skin each|morning and|leave it in|the hall. I|greeted my|neighbour's|shed for|two days.#",
+3,"=\"The oceans|are warm|and the|things in|them are|also warm|and|friendly, in|the way that|means you|cannot|swim.#",
+2,"=\"The locals|shed their|skin each|morning and|leave it in|the hall. I|greeted my|neighbour's|%shed& for|two days.#",
 2,"=\"The locals|leave gaps in|speech for|you to fill. By|day one, I|had agreed|to several|things I had|not planned|on.#",
 2,"=\"The locals|can see|sound and|asked me to|keep it|down. I said|I was not|making any,|and they|showed me|that I was.#",
 2,"=\"Happiness|here is going|still. I kept|asking if|locals were|well, and|upset them,|which they|showed by|moving.#",
@@ -180,7 +200,6 @@ const struct pi {
 3,"=\"They|removed the|stimulant|from their|stimulant|drink, still|drink it, and|call this a|choice they|made|freely.#",
 3,"=\"They say|how are you|to each|other as a|greeting, do|not want to|know, and|are alarmed|when told.#",
 3,"=\"They keep a|room clean|and ready|for guests,|sit in a|worse room|on all other|days, and|call this|having a|lounge.#",
-////
 1,"=\"The cold|here has|texture, and|I was not|warned|about this,|and I do not|have the|right organs|for it.#",
 1,"=\"The gas|here is|sentient in|patches, and|one of the|patches was|in my cabin|and had|strong views|about the|lighting.#",
 2,"=\"Waved at my|reflection|for two days|before a|local|explained|what it was,|and I had to|rethink|several prior|greetings.#",
@@ -280,8 +299,20 @@ const struct pi {
 2,"=\"Asked how|far the|viewpoint|was, and he|said not far,|and walked|with me for|four hours,|and still|called it not|far.#",
 4,"=\"Have a full|account of|this place,|but the box|provided is|too small,|and I have|run out of|time to find|a bigger one.#",
 2,"=\"The humans|share|information|by vibrating|their|face-holes.|Impressive|but needless|given that|telepathy|exists.#",
-#endif
+2,"=\"The humans|share|information|by vibrating|their|face-holes.|Impressive|but needless|given that|telepathy|exists.#",
+3,"=\"They pay for|water in a|bottle when|it falls free|from the|sky, complain|when it|falls, and|both are|considered|normal.#",
+3,"=\"A local told|me to take|care when I|left. I asked|of what. She|said just in|general. I|said that is a|lot to take|care of.#",
+2,"=\"Joined what|I thought|was a guided|walk. It was|a funeral. By|the end I|was a|pallbearer|and did not|know how to|raise this.#",
+2,"=\"I asked what|not to miss.|She said|everything. I|asked what|she liked.|She said she|had not|thought|about it.#",
+3,"=\"Asked a|ranger which|trail was|best. He said|'It depends'.|I said|'scenery'.|He said 'then|not this|planet'.#",
 
+// vetted...
+
+3,"=\"The planet is|beautiful|from orbit,|and less so|up close, and|the|brochure|was taken|from orbit.#",
+2,"=\"The locals|have no word|for %no& and|express it by|doing the|thing|anyway, but,|sadly, I|missed this|for three|days.#",
+2,"=\"The planet|has a smell|that changes|with your|thoughts. I|could not|stop thinking|about the|smell, and it|kept|changing.#",
+
+#endif
 
     // clang-format on
 };
@@ -292,234 +323,43 @@ bool seen[sizeof(planetInfo) / sizeof(planetInfo[0])];
 
 /*
 
-
-Earth — Tried to purchase the large yellow sky-fire but was told it was "the sun" and "not for sale" which seems like a
-missed revenue opportunity. ★★★☆☆
-Bloatworld — Did not realise gravity was optional until my third day, by which point I
-had been walking on the ceiling the whole time and nobody said anything.
-★★★☆☆ Spite — Attempted to communicate with the
-frozen water formations as I do at home but they simply refused, very rude, one star. ★☆☆☆☆
- Pustula — The geysers
-erupted on a schedule and I waited politely for them to finish before applauding, which I am told was incorrect but I
-stand by my manners. ★★★☆☆
-Dross — Brought my own star as is customary but the locals seemed alarmed and I had to leave
-it in orbit which meant my accommodation was very dark. ★★☆☆☆
-Fetid IX — I consumed the atmosphere as a snack and would
-not recommend it, two of my secondary digestive organs have lodged a formal complaint. ★☆☆☆☆
-Glumvast — The rocks here
-do not respond to conversation no matter how loudly you speak into them, extremely poor infrastructure. ★★☆☆☆
- Noxis —
-Tried to fold the planet's weather into my travel bag as a souvenir and my travel bag is still angry with me. ★★☆☆☆
-Plod
-— Did not understand that the planet moves and spent the whole trip chasing it, will plan better next time. ★★★☆☆
-Earth
-— The smaller humans kept asking for something called "candy" and when I produced the standard greeting mineral they
-cried, very confusing, did not give five stars. ★★☆☆☆ Here we go — 100 reviews in the clueless alien visitor style:
----
-**Earth** — Attempted to purchase the ocean as accommodation but was told it was "public" which seems like very poor
-estate management for such a large property. ★★☆☆☆
-**Bloatworld** — Did not understand why my body kept trying to go downward so I filed a complaint with the front desk
-and they said that was "gravity" which is no excuse. ★★☆☆☆
-**Spite** — Tried to turn the cold down but could not locate the dial, infrastructure clearly unfinished. ★☆☆☆☆
-**Pustula** — Sat on what I thought was a rock and it sat back, gave it three stars for the company but minus two for
-the surprise. ★★★☆☆
-**Fetid IX** — Ate what I assumed was the local currency as is customary on my home world and was asked to leave the
-bank, humiliating. ★☆☆☆☆
-**Glumvast** — The sky here is one colour all the time, I tried adjusting it manually from my ship but the controls
-don't reach that far, very poor design. ★★☆☆☆
-**Dross** — Brought a gift for the planet as is polite and left it on the surface but the planet did not acknowledge
-receipt, extremely rude. ★☆☆☆☆
-**Noxis** — Did not realise breathing was compulsory on this planet and had to be reminded twice, signage is inadequate.
-★★☆☆☆
-**Plod** — Tried to speed the rotation up by pushing on the equator and pulled a muscle, no compensation offered. ★☆☆☆☆
-**Earth** — The humans communicate by vibrating air with their face-holes and I found this both impressive and
-unnecessary given that telepathy exists. ★★☆☆☆
-**Skumveil** — Could not see anything due to the haze so I assumed the planet was empty and began filling out the
-discovery paperwork, locals were furious. ★☆☆☆☆
-**Maggrot** — Tried to eat the soil as a starter before the main meal arrived and was told soil is not a starter here,
-very different culture, would have appreciated a heads up. ★★☆☆☆
-**Oaf** — Kept bumping into the planet during my approach because it failed to move out of the way, basic orbital
-courtesy completely absent. ★☆☆☆☆
-**Grunthos** — Asked a local what time it was and he told me in a unit I do not have the organs to perceive, useless.
-★★☆☆☆
-**Swill** — Attempted to drain the ocean to see what was underneath and several locals became hostile before I had made
-significant progress. ★☆☆☆☆
-**Tepid** — The temperature here sits in the range my species uses for food storage and I kept reflexively trying to put
-things in the locals. ★★☆☆☆
-**Rankle** — Tried to purchase one of the smaller mountains as a souvenir and the locals said mountains are "not for
-sale" which is exactly what someone who hadn't considered selling them would say. ★★☆☆☆
-**Blight** — Nothing growing here so I planted several seeds from home as a courtesy and have since received a strongly
-worded message from their government. ★☆☆☆☆
-**Vomitron** — Assumed the name was a translation error and it was not. ★☆☆☆☆
-**Filchmore** — My belongings were taken at customs for "inspection" and returned to me in smaller quantities, asked for
-an explanation and was given one that did not help. ★☆☆☆☆
-**Crud** — Tried to communicate with the ground as I do at home and the ground communicated back in a way I was not
-prepared for. ★☆☆☆☆
-**Dreg-7** — Did not realise gas giants have no surface until I was already committed to the landing approach, the
-concept was never adequately explained in the brochure. ★☆☆☆☆
-**Blundor** — Thought the locals were a weather formation for the first two days and sheltered from them accordingly, by
-the time I understood my mistake it was too late to apologise meaningfully. ★★☆☆☆
-**Scab** — Attempted to pick at the surface crust as is customary when inspecting real estate and the planet made a
-noise at me. ★☆☆☆☆
-**Midden-3** — Was told the piles were "historical" and I said "historical what" and nobody finished the sentence. ★☆☆☆☆
-**Wretchard** — Tried to use the star as a light source in my room and was told that is not how rooms work here, very
-limiting. ★★☆☆☆
-**Earth** — Rented a "car" which is a ground-vehicle that moves slowly and makes noise and I kept waiting for it to fly
-and it never flew and when I asked why it doesn't fly the human laughed for a very long time. ★★☆☆☆
-**Fug** — The moisture here kept sticking to my outer layer and I assumed I was being claimed as territory and panicked
-unnecessarily, better labelling would help. ★★☆☆☆
-**Dredmore** — Noticed the planet leaning and attempted to correct it by redistributing weight across the surface, this
-did not work and I am tired. ★☆☆☆☆
-**Snivvel** — The precipitation here falls downward which is the opposite of home and I spent the entire first day
-looking at the wrong sky. ★★☆☆☆
-**Glump** — Tried to negotiate with the tectonic plates directly and they did not come to the table, literally, the
-table just sank into one of them. ★☆☆☆☆
-**Clot** — Got stuck in a traffic system and after three days realised I was going in a circle and after five days
-realised everyone knew and nobody had mentioned it. ★☆☆☆☆
-**Pustula** — The geysers here operate on a timer and I bought a ticket to the 3pm show and arrived at what I calculated
-to be 3pm and was erupted upon, the timer and I disagree about when 3pm is. ★★☆☆☆
-**Scum's Landing** — Attempted to claim the planet under exploration rights and was shown a plaque suggesting someone
-had beaten me to it several centuries ago, very disappointing, the plaque did not even have my name on it. ★☆☆☆☆
-**Drivel** — The locals speak in a language that my translator rendered as "medium-length sighs" for the entire visit
-and I'm not entirely sure that was wrong. ★★☆☆☆
-**Earth** — The buildings here go upward instead of downward which means their basements are at the top and the
-foundations are at the bottom which seems structurally backwards to me. ★★★☆☆
-**Bloatworld** — Tried to take some gravity home as a souvenir and packed it very carefully but it seems to have escaped
-in transit because my luggage is floating. ★★☆☆☆
-**Glumvast** — Asked a local if the planet had feelings and they said no and I said are you sure and they said yes and I
-said because it seems sad and they walked away and I think I was right. ★★☆☆☆
-**Fetid IX** — Complimented a local on their atmospheric production and they seemed offended, cultural misunderstanding,
-I meant it sincerely. ★★★☆☆
-**Noxis** — The planet has a breathable atmosphere in the loosest possible interpretation of the word "breathable."
-★☆☆☆☆
-**Oaf** — The planet rotates but only slowly and I kept having to reposition my chair to stay in the light, no staff
-assistance was offered. ★★☆☆☆
-**Spite** — Attempted to warm the planet up by reflecting sunlight from my ship's hull toward the surface for six hours
-and achieved nothing except mild embarrassment. ★★☆☆☆
-**Rankle** — Tried to eat the local starlight as is customary and was informed by my own digestive system that this was
-incorrect, the planet's star is weaker than it looks. ★☆☆☆☆
-**Gunk Prime** — The liquid here behaves like a solid and the solid here behaves like a liquid and I behaved like
-someone who had made a terrible mistake, which was accurate. ★☆☆☆☆
-**Maggrot** — Was informed after landing that the surface moves on its own and I said that sounds fine and it was not
-fine, it moved a great deal, I am in a different location than I intended. ★☆☆☆☆
-**Blight** — Tried to start a small fire for warmth using the local rocks and the local rocks refused on principle, I
-didn't know rocks could do that. ★★☆☆☆
-**Vomitron** — Assumed the atmosphere was decorative and removed my suit to appreciate the view more directly, this was
-my second mistake of the trip after booking it. ★☆☆☆☆
-**Earth** — The local timekeeping system divides the day into units that do not correspond to anything astronomical and
-when I pointed this out a human said "yeah" and walked away. ★★☆☆☆
-**Filchmore** — Left a tip at the restaurant as is polite and the tip was gone before I had stood up, very fast service,
-unfortunately applied to the wrong thing. ★★☆☆☆
-**Dross** — Asked where all the valuable minerals had gone and was told "away" which is technically an answer. ★★☆☆☆
-**Tepid** — The locals described themselves as "warm" people and I took this literally and packed accordingly and was
-underdressed in every sense. ★★☆☆☆
-**Skumveil** — Navigated entirely by feel for three days before discovering I had been inside a building the whole time
-and the "haze" was just the interior of a very large, poorly lit structure. ★☆☆☆☆
-**Plod** — Miscalculated the orbital period and arrived 40 years before my booking, the hotel did not honour the early
-check-in, unreasonable. ★☆☆☆☆
-**Scab** — The surface texture here is described in the brochure as "characterful" which I now understand is a word used
-when something is bad but the person saying it lives there. ★★☆☆☆
-**Grunthos** — Attempted to pay with standard galactic credit and was asked if I had anything "real" and I said this is
-real and they said is it though, which is not a legal question for a shop to ask. ★☆☆☆☆
-**Swill** — Believed the ocean was a mirror due to the reflection and spent four hours trying to find the planet on the
-other side of it. ★★☆☆☆
-**Clot** — The roundabout system here operates on a logic I could not identify even after mapping it, I eventually
-concluded there is no logic and the roundabouts are self-governing. ★☆☆☆☆
-**Midden-3** — Asked a local if the smell was natural or man-made and she said "yes" and walked away, I have thought
-about this every day since. ★☆☆☆☆
-**Earth** — Observed a ritual called "rush hour" in which all the humans attempt to travel in the same direction at the
-same time and seem surprised every day that this is difficult. ★★★☆☆
-**Wretchard** — Bought travel insurance, read the exclusions list, found Wretchard explicitly named as a planet the
-policy does not cover, booked anyway, deeply regret it. ★☆☆☆☆
-**Glumvast** — The planet emits a low frequency hum that my species processes as sadness and I cried for six days and
-only realised the cause on the shuttle home. ★☆☆☆☆
-**Dredmore** — Attempted to correct the lean by moving to the high side of the planet but was only one passenger and it
-did not make a measurable difference, would need a group booking to fix this. ★★☆☆☆
-**Pustula** — Tried to book a geyser for a private event and was told they are not bookable and I said everything is
-bookable and they said not the geysers and I said fine two stars. ★★☆☆☆
-**Fetid IX** — The atmosphere is listed as "unique" in the brochure and my species has a different word for it and that
-word is "evidence." ★☆☆☆☆
-**Snivvel** — Tried to collect the rain as a souvenir and filled seventeen containers before a local explained that rain
-is not a finite resource here and I had been collecting it for no reason for two days. ★★★☆☆
-**Bloatworld** — The gravity here is listed as "strong" and I listed myself as "prepared" and we were both wrong about
-something. ★☆☆☆☆
-**Noxis** — Asked if the air was safe and was told "for some definitions of safe" which my species processes as a yes
-and is not. ★☆☆☆☆
-**Oaf** — The planet failed to greet me upon landing which every other planet I have visited has also failed to do but I
-keep expecting it and Oaf felt like the most likely candidate. ★★☆☆☆
-**Vomitron** — Brought a friend who had not read the reviews and when we landed I watched their face go through five
-distinct phases and I have never felt so guilty. ★☆☆☆☆
-**Rankle** — Attempted to climb the local star to get a better view and was prevented from doing so by what scientists
-call "physics" and what I call "a personal attack." ★☆☆☆☆
-**Blight** — Asked if anything grew here and was told "resentment" and I said that sounds promising for a cultural visit
-and it was not. ★★☆☆☆
-**Earth** — The humans have invented "queuing" which is standing in a line to wait for something and they are extremely
-serious about it and will tell you off for doing it wrong and I respect this and this is the only thing I respect about
-Earth. ★★★☆☆
-**Gunk Prime** — Tried to take a photograph and the camera sank, tried to retrieve the camera and my arm sank, tried to
-retrieve my arm and had to make difficult decisions. ★☆☆☆☆
-**Crud** — The hotel room had a view of a wall and when I asked for a better room I was moved to a room with a view of a
-different wall, both walls were bad. ★★☆☆☆
-**Dreg-7** — Thought the gas giant was hollow and attempted to enter it from the top and kept going and am still not
-entirely sure where I exited. ★☆☆☆☆
-**Scum's Landing** — Asked what the founding crime was and was told it is celebrated every year at a festival and I said
-what is the festival called and they said "The Festival" and that was that. ★★☆☆☆
-**Filchmore** — Checked my pockets after leaving and found things in them that were not mine, which is either theft in
-reverse or the most confusing form of gift-giving I have encountered. ★★☆☆☆
-**Fug** — Tried to open a window to let some air in and was told the air outside is the same as the air inside and I
-said then what is the window for and nobody answered. ★★☆☆☆
-**Skumveil** — Asked a local if the haze ever cleared and they said "cleared of what" and I realised they had never seen
-their own planet and did not know what was under the haze and neither do I. ★★☆☆☆
-**Tepid** — Tried to start a conversation about the weather, which is my species' standard greeting, and the weather
-here is so consistent that the conversation lasted four seconds and then there was silence for an hour. ★★☆☆☆
-**Spite** — The planet has one warm spot, a single thermal vent on the southern continent, and the queue for it was
-eighteen kilometres long. ★☆☆☆☆
-**Maggrot** — Stepped off the ship and immediately became part of the ecosystem in a way that took considerable effort
-to reverse and left me feeling implicated in something. ★☆☆☆☆
-**Dross** — The museum of natural history contains nothing that is natural, historical, or in any sense a museum, it is
-a shed. ★☆☆☆☆
-**Blundor** — Ended up here after a navigation error and stayed for three weeks because I could not find the exit, not a
-metaphor, there is literally only one way out and it is not marked. ★☆☆☆☆
-**Earth** — The humans have a system called "money" which is points they give each other in exchange for things and the
-points are not even real but they are extremely serious about the points and will do almost anything for points. ★★★★☆
-**Midden-3** — Tried to organise a clean-up as a community service and the locals said the mess is load-bearing and I
-said load-bearing what and they said the economy. ★☆☆☆☆
-**Wretchard** — The departure lounge had one seat and it was taken and when I asked when it would be free the occupant
-said they were also waiting for a departure and had been for eleven years. ★☆☆☆☆
-**Glumvast** — Asked a local what they did for fun and they stared at me long enough that I started to feel I had said
-something in very poor taste. ★★☆☆☆
-**Plod** — The local year is so long that I arrived in spring and left in spring and did not experience any other season
-despite being there for what felt like forever. ★★☆☆☆
-**Clot** — The traffic system is sentient, I am now certain of this, and it is angry about something specific to me
-personally. ★☆☆☆☆
-**Pustula** — Attempted to rate the geysers while they were erupting and my reviewer device was destroyed, one star for
-the principle of the thing. ★☆☆☆☆
-**Fetid IX** — Left a candle burning in my hotel room to improve the ambience and was informed that an open flame in
-that atmosphere was an act of war. ★☆☆☆☆
-**Oaf** — The planet has a moon that is visibly embarrassed to be there and I felt a kinship with it that I have not
-felt with anything else on this trip. ★★★☆☆
-**Noxis** — The emergency information card in my room had seventeen steps and step one was "reconsider" and steps two
-through seventeen were increasingly specific ways to leave. ★☆☆☆☆
-**Earth** — Watched a human argue with a small glowing rectangle for forty minutes while sitting next to another human
-they did not speak to and I found this deeply relatable in a way that worries me. ★★★☆☆
-**Rankle** — Tried to diplomatically suggest the planet could improve its image with some simple renovations and
-received a response from their government that my translator rendered as "how dare you" seventeen times in a row. ★☆☆☆☆
-**Scab** — The walking tour covered twelve kilometres of terrain and my guide described all of it as "fine, mostly"
-which I now understand was optimistic. ★★☆☆☆
-**Swill** — The ocean here is technically swimmable in the sense that you can enter it and exit it, the question is what
-you exit as. ★☆☆☆☆
+Did not realise breathing was compulsory on this planet and had to be reminded twice, signage is inadequate.
+I consumed the atmosphere as a snack and would not recommend it, two of my secondary digestive organs have lodged a
+formal complaint. Tried to eat the soil as a starter before the main meal arrived and was told soil is not a starter
+here, very different culture, would have appreciated a heads up. Asked a local what time it was and he told me in a unit
+I do not have the organs to perceive, useless. The temperature here sits in the range my species uses for food storage
+and I kept reflexively trying to put things in the locals. Was told the piles were "historical" and I said "historical
+what" and nobody finished the sentence. The moisture here kept sticking to my outer layer and I assumed I was being
+claimed as territory and panicked unnecessarily, better labelling would help. The locals speak in a language that my
+translator rendered as "medium-length sighs" for the entire visit and I'm not entirely sure that was wrong. Asked a
+local if the planet had feelings and they said no and I said are you sure and they said yes and I said because it seems
+sad and they walked away and I think I was right. The planet has a breathable atmosphere in the loosest possible
+interpretation of the word "breathable. Assumed the atmosphere was decorative and removed my suit to appreciate the view
+more directly, this was my second mistake of the trip after booking it. The local timekeeping system divides the day
+into units that do not correspond to anything astronomical and when I pointed this out a human said "yeah" and walked
+away. Asked where all the valuable minerals had gone and was told "away" which is technically an answer. Asked a local
+if the smell was natural or man-made and she said "yes" and walked away, I have thought about this every day since.
+Asked if the air was safe and was told "for some definitions of safe" which my species processes as a yes and is not.
+Asked if anything grew here and was told "resentment" and I said that sounds promising for a cultural visit and it was
+not. Asked a local if the haze ever cleared and they said "cleared of what" and I realised they had never seen their own
+planet and did not know what was under the haze and neither do I. Stepped off the ship and immediately became part of
+the ecosystem in a way that took considerable effort to reverse and left me feeling implicated in something. Asked a
+local what they did for fun and they stared at me long enough that I started to feel I had said something in very poor
+taste. The emergency information card in my room had seventeen steps and step one was "reconsider" and steps two through
+seventeen were increasingly specific ways to leave. The ocean here is technically swimmable in the sense that you can
+enter it and exit it, the question is what you exit as.
 
 
 
 */
 
 const char *review[] = {
-    "=+++++",    // 0
-    "=*++++",    // 1
-    "=**+++",    // 2
-    "=***++",    // 3
-    "=****+",    // 4
-    "=*****",    // 5
+    ">+++++",    // 0
+    ">*++++",    // 1
+    ">**+++",    // 2
+    ">***++",    // 3
+    ">****+",    // 4
+    ">*****",    // 5
 };
 
 
@@ -580,19 +420,24 @@ void drawBit2(int x, int y, unsigned char colour) {
 
 enum info {
 
+    INFO_FADEUP,
     INFO_NAME,
     INFO_PHYSICS,
+    INFO_CLEAR1,
+    INFO_PLANETADVISOR,
+    INFO_PLANETADVISOR_UNDERLINE,
     INFO_INFO,
-    INFO_RATING1,
     INFO_RATING2,
     INFO_CLEAR,
-    INFO_NEXTPLANET1,
     INFO_NEXTPLANET,
+    INFO_FADE_DOWN,
 };
 
 
 void VB_Globe() {
 
+
+    adjustLuminance();
     initDataStreams_Globe();
     drawPaletteGlobe(thePalette);
 
@@ -600,11 +445,16 @@ void VB_Globe() {
 
     for (unsigned int i = 0; i < 10; i++)    // sizeof(stars) / sizeof(stars[0]); i++)
         drawBit2(stars[i].x >> 8, stars[i].y >> 8, stars[i].colour);
+
+    // unsigned char *col = RAM + _BUF_GLOBE_COLUP0;
+    // for (int i = 0; i < _SCANLINES; i++)
+    //     col[i] = convertColour(i);
 }
 
 
 static int pif;
 static int lines;
+static int pa_lines;
 
 void OS_Globe() {
 
@@ -615,23 +465,30 @@ void OS_Globe() {
     if (!drawNextChar() && !--wait) {
         switch (infoPhase++) {
 
+        case INFO_FADEUP:
+
+            wait = 1;
+            if (luminance)
+                infoPhase = INFO_FADEUP;
+            break;
+
+
         case INFO_NAME:
-            initAsciiStringDraw(FONT_LARGE, 0xA, 8, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planets[planet].name, 0,
-                                _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - FONTLARGE_FONT_HEIGHT);
+            initAsciiStringDraw(FONT_LARGE, 0x8, 8, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planets[planet].name, 0,
+                                _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - FONTLARGE_FONT_HEIGHT - 25);
+
             wait = 10;
             break;
 
         case INFO_PHYSICS:
             initAsciiStringDraw(FONT_COMPACT, 0x16, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
-                                planets[planet].physics, 0, _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT);
-            wait = 50;
+                                planets[planet].physics, 0, _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - 25 + 5);
+            wait = 200;
             // pic = ((rangeRandom(15) + 1) << 4) | 8;
-            pif = -1;
-            break;
 
-        case INFO_INFO: {
+
             int lastpif = pif;
-            pif = pif + 1;    // rangeRandom(MAX_PLANET);
+            pif = rangeRandom(MAX_PLANET);
 
             int reviews = sizeof(planetInfo) / sizeof(planetInfo[0]);
             if (reviews > 2) {
@@ -660,56 +517,90 @@ void OS_Globe() {
                     lines++;
             while (*++p);
 
-            initAsciiStringDraw(FONT_COMPACT, 0xD8, 2, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfo[pif].review, 0,
-                                70 - ((lines * FONTCOMPACT_FONT_HEIGHT) >> 1));
+
+            break;
+
+        case INFO_CLEAR1:
+            myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
+            wait = 30;
+            break;
+
+        case INFO_PLANETADVISOR:
+
+            pa_lines = ((_SCANLINES - 1 - lines * FONTCOMPACT_FONT_HEIGHT) >> 1) - 25;
+
+
+            initAsciiStringDraw(FONT_COMPACT, 0x8, 2, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
+                                "=PlanetAdvisor", 0, pa_lines);
+            wait = 1;
+            break;
+
+
+        case INFO_PLANETADVISOR_UNDERLINE:
+
+            initAsciiStringDraw(FONT_COMPACT, 0x8, 1, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
+                                "=_____________", 0, pa_lines);
+            wait = 1;
+            break;
+
+
+        case INFO_INFO: {
+            initAsciiStringDraw(FONT_COMPACT, 0xD8, 4, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfo[pif].review, 0,
+                                ((_SCANLINES - 1 - ((lines * FONTCOMPACT_FONT_HEIGHT))) >> 1));
             wait = 50;
             break;
         }
 
-        case INFO_RATING1:
-
-            lines = 68 + (((lines + 1) * FONTCOMPACT_FONT_HEIGHT) >> 1);
-
-            initAsciiStringDraw(FONT_COMPACT, 0x18, 0, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, review[0], 0, lines);
-            wait = 1;
-            break;
-
         case INFO_RATING2:
+            pa_lines = ((_SCANLINES - 1 + lines * FONTCOMPACT_FONT_HEIGHT) >> 1) + 8;
             initAsciiStringDraw(FONT_COMPACT, 0x18, 20, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
-                                review[planetInfo[pif].stars], 0, lines);
-            wait = 400;
+                                review[planetInfo[pif].stars], 0, pa_lines);
+            wait = 150;
             break;
 
 
         case INFO_CLEAR:
             myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
-            wait = 1;
-            break;
-
-        case INFO_NEXTPLANET1:
-
-            if ((scalex < MIDPOINT && planetDir < 0)) {
-                // while (true)
-                //     ;
-                wait = 30;
-            } else {
-                infoPhase = INFO_NEXTPLANET1;
-                wait++;
-            }
+            wait = 30;
             break;
 
         case INFO_NEXTPLANET:
 
-            if (scalex > MIDPOINT && planetDir < 0) {    //(scalex >> 8) == (SCALE_FAR >> 8) && planetDir > 0) {
-                planet = nextPlanet();
-                myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
-                wait = 50;
-                infoPhase = INFO_NAME;
+            // #define SCALE_FAR 0x20000
+            // #define SCALE_NEAR 0x0C000
+            // #define MIDPOINT ((SCALE_FAR + SCALE_NEAR) / 2)    // ~131180
+            // planetdir + === away
+
+
+            if (scalex > (SCALE_FAR - 0x4000) && planetDir > 0) {
+                lumTarget = -15;
+
+                // if (scalex > MIDPOINT && planetDir < 0) {    //(scalex >> 8) == (SCALE_FAR >> 8) && planetDir >
+                // 0) {
+                wait++;
             } else {
-                //                lastpd = planetDir < 0 ? -1 : 1;
                 infoPhase = INFO_NEXTPLANET;
                 wait++;
             }
+            break;
+
+        case INFO_FADE_DOWN:
+
+
+            if (luminance == lumTarget) {
+
+                myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
+                lumTarget = 0;
+                wait = 1;
+                infoPhase = INFO_FADEUP;
+                planet = nextPlanet();
+            }
+
+            else {
+                infoPhase = INFO_FADE_DOWN;
+                wait++;
+            }
+
             break;
         }
     }
