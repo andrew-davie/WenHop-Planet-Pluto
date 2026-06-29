@@ -697,12 +697,12 @@ static const unsigned char char_082[FONTCOMPACT_FONT_HEIGHT] = {
 static const unsigned char char_083[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000,  // 🟦🟦🟦🟦
     0b00000111,  // 🟦🟨🟨🟨
-    0b00001110,  // 🟨🟨🟨🟦
+    0b00001100,  // 🟨🟨🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001110,  // 🟨🟨🟨🟦
     0b00000011,  // 🟦🟦🟨🟨
     0b00000001,  // 🟦🟦🟦🟨
-    0b00000111,  // 🟦🟨🟨🟨
+    0b00000011,  // 🟦🟦🟨🟨
     0b00001110,  // 🟨🟨🟨🟦
     0b00000000,  // 🟦🟦🟦🟦
     0b00000000   // 🟦🟦🟦🟦

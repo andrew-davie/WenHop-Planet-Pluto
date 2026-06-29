@@ -224,7 +224,7 @@ int getLineWidth(const char *str) {
         }
         str++;
     }
-    return width;
+    return width ? width - 1 : 0;
 }
 
 
@@ -237,7 +237,7 @@ void setJustifyX(const char *str) {
         break;
 
     case JUSTIFY_RIGHT:
-        cx = 47 - getLineWidth(str);
+        cx = 48 - getLineWidth(str);
         break;
 
     default:

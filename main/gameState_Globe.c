@@ -141,161 +141,145 @@ const struct pi {
     // |  next line
     // some non-alpha chars may not have shapes!
 
-#if 0
+#if 1
 
+//2,"=\"The humans|share|information|by vibrating|their|face-holes.|Impressive|but needless|given that|telepathy|exists.#",
+// 3,"=\"They pay for|water in a|bottle when|it falls free|from the|sky, complain|when it|falls, and|both are|considered|normal.#",
+// 3,"=\"A local told|me to take|care when I|left. I asked|of what. She|said just in|general. I|said that is a|lot to take|care of.#",
+ //2,"=\"Joined what|I thought|was a guided|walk. It was|a funeral. By|the end I|was a|pallbearer|and did not|know how to|raise this.#",
+ 2,"=\"I asked what|not to miss.|She said|everything. I|asked what|she liked.|She said she|had not|thought|about it.#",
+// 3,"=\"Asked a|ranger which|trail was|best. He said|'It depends'.|I said|'scenery'.|He said 'then|not this|park'.#",
 
 #else
-
-
-    2,"=\"Fowre days|o dreich an|haar. Twal|degree an|aw the|natives took|thair taps|aff. Ah|cannae|fathom this.|Twa starn.#",
-
-3,"=\"The oceans|are warm|and the|things in|them are|also warm|and friendly|in the way|that means|you cannot|swim.#",
-3,"=\"The planet is|beautiful|from orbit|and less so|up close and|the|brochure|was taken|from orbit.#",
-2,"=\"The locals|have no word|for no and|express it by|doing the|thing anyway|but sadly and|I missed this|for three|days.#",
-2,"=\"The planet|has a smell|that changes|with your|thoughts and|I could not|stop thinking|about the|smell and it|kept|changing.#",
-2,"=\"The locals|shed their|skin each|morning and|leave it in|the hall and I|greeted my|neighbour's|shed for|two days.#",
-2,"=\"The locals|leave gaps in|speech for|you to fill|and by day|one I had|agreed to|several|things I had|not planned|on.#",
-
-2,"=\"The locals|can see|sound and|asked me to|keep it down|and I said I|was not|making any|and they|showed me|that I was.#",
-2,"=\"Happiness|here is going|still and I|kept asking|if locals|were well|and upset|them, which|they showed|by moving.#",
-2,"=\"The locals|have many|words for|one type of|regret and I|used most|before|leaving and|used them|correctly.#",
-
-2,"=\"The|handshake|has a part|where you|pretend not|to know each|other and I|skipped that|part and|things went|wrong.#",
-2,"=\"Each object|has a name|and must be|addressed|when|touched and|I caused|three|scenes|before lunch|on day one.#",
-2,"=\"The locals|breathe out|what I|breathe in|and we kept|drifting|toward each|other and it|became a|situation.#",
-
-2,"=\"Memory is|shared here|and I woke|on day two|knowing|private|things about|strangers I|had not met.#",
-
-
-1,"=\"The|currency is|smell-based|and I|arrived with|nothing of|value and|left owing a|scent debt I|am still|repaying.#",
-1,"=\"Silence is|against local|law and I|was fined|three times|on the first|day before I|grasped the|scale of the|problem.#",
-2,"=\"Everyone|here has|three|shadows,|one of them|cold, and|mine kept|touching|theirs and|this was|rude.#",
-1,"=\"The food|here is|invisible and|you eat by|feel and I|ate the|table my|first night|and was|charged for|the table.#",
-2,"=\"Roads are in|the sky and|buildings are|underground|and I used|both the|wrong way|for two|days.#",
-1,"=\"The ground|changes|colour based|on mood and|mine kept|showing|things I had|not planned|to share in|public.#",
-2,"=\"The locals|are made of|sound and I|kept walking|through|them and|they kept|saying sorry|which made|the problem|louder.#",
-1,"=\"Each room|runs at a|different|speed and I|was|somehow|early and|late for the|same meal.#",
-1,"=\"The year is|three days|long and I|booked a|week and|attended|five new|years and a|gift was|expected|each time.#",
-2,"=\"The sun|rises from|the ground|and sets|upward and|by day three|my sense of|down was a|rough guess.#",
-2,"=\"Everything is|slightly left|of where it|appears and|I adapted on|day four and|went home|and broke|things I had|owned for|years.#",
-1,"=\"The air here|is edible and|I had too|much on day|one and had|to lie down|for reasons|I could not|convey to|anyone|nearby.#",
-
-
-3,"=\"They pay for|water in a|bottle when|it falls free|from the sky|and also|complain|when it falls|and both are|considered|normal.#",
+3,"=\"The oceans|are warm|and the|things in|them are|also warm|and|friendly, in|the way that|means you|cannot swim.#",
+3,"=\"The planet is|beautiful|from orbit,|and less so|up close, and|the|brochure|was taken|from orbit.#",
+2,"=\"The locals|have no word|for no and|express it by|doing the|thing|anyway, but,|sadly, I|missed this|for three|days.#",
+2,"=\"The planet|has a smell|that changes|with your|thoughts. I|could not|stop thinking|about the|smell, and it|kept|changing.#",
+2,"=\"The locals|shed their|skin each|morning and|leave it in|the hall. I|greeted my|neighbour's|shed for|two days.#",
+2,"=\"The locals|leave gaps in|speech for|you to fill. By|day one, I|had agreed|to several|things I had|not planned|on.#",
+2,"=\"The locals|can see|sound and|asked me to|keep it|down. I said|I was not|making any,|and they|showed me|that I was.#",
+2,"=\"Happiness|here is going|still. I kept|asking if|locals were|well, and|upset them,|which they|showed by|moving.#",
+2,"=\"The locals|have many|words for|one type of|regret. I|used most|before|leaving, and|used them|correctly.#",
+2,"=\"The|handshake|has a part|where you|pretend not|to know each|other. I|skipped that|part, and|things went|wrong.#",
+2,"=\"Each object|has a name,|and must be|addressed|when|touched. I|caused|three|scenes|before lunch|on day one.#",
+4,"=\"The locals|exhale what|I breathe,|and I exhale|what they|breathe, and|for one|afternoon|we were|very close.#",
+2,"=\"Memory is|shared|here, and I|woke on day|two knowing|private|things about|strangers I|had not met.#",
+1,"=\"The|currency is|smell-based.|I arrived|with nothing|of value, and|left owing a|scent debt I|am still|repaying.#",
+1,"=\"Silence is|against local|law, and I|was fined|three times|on the first|day before I|grasped the|scale of the|problem.#",
+2,"=\"Everyone|here has|three|shadows,|one of them|cold, and|mine kept|touching|theirs, and|this was|rude.#",
+1,"=\"The food|here is|invisible and|you eat by|feel. I ate|the table my|first night|and was|charged for|the table.#",
+2,"=\"Roads are in|the sky,|buildings are|underground,|and I used|both the|wrong way|for two|days.#",
+1,"=\"The ground|changes|colour based|on mood, and|mine kept|showing|things I had|not planned|to share in|public.#",
+2,"=\"The locals|are made of|sound, and I|kept walking|through|them, and|they kept|saying sorry,|which made|the problem|louder.#",
+1,"=\"Each room|runs at a|different|speed, and I|was|somehow|early and|late for the|same meal.#",
+1,"=\"The year is|three days|long. I|booked a|week,|attended|five new|years, and a|gift was|expected|each time.#",
+2,"=\"The sun|rises from|the ground|and sets|upward, and|by day three|my sense of|down was a|rough guess.#",
+2,"=\"Everything is|slightly left|of where it|appears. I|adapted on|day four,|went home,|and broke|things I had|owned for|years.#",
+1,"=\"The air here|is edible,|and I had too|much on day|one and had|to lie down|for reasons|I could not|convey to|anyone|nearby.#",
 3,"=\"The slow|part of the|day is called|rush hour, a|naming|decision|that has|clearly|never been|reviewed.#",
-3,"=\"They|removed the|stimulant|from their|stimulant|drink and|still drink it|and call this|a choice|they made|freely.#",
-3,"=\"They say|how are you|to each|other as a|greeting and|do not want|to know and|are alarmed|when told.#",
-3,"=\"They keep a|room clean|and ready|for guests|and sit in a|worse room|on all other|days and call|this having a|lounge.#",
-
+3,"=\"They|removed the|stimulant|from their|stimulant|drink, still|drink it, and|call this a|choice they|made|freely.#",
+3,"=\"They say|how are you|to each|other as a|greeting, do|not want to|know, and|are alarmed|when told.#",
+3,"=\"They keep a|room clean|and ready|for guests,|sit in a|worse room|on all other|days, and|call this|having a|lounge.#",
 ////
-
-1,"=\"The cold|here has|texture and|I was not|warned|about this|and I do not|have the|right organs|for it.#",
-1,"=\"The gas|here is|sentient in|patches and|one of the|patches was|in my cabin|and had|strong views|about the|lighting.#",
-2,"=\"Waved at my|reflection|for two days|before a|local|explained|what it was|and I had to|rethink|several prior|greetings.#",
-3,"=\"A human said|I looked well|and I said I|did not feel|well and it|said no, you|look good and|I said I did|not feel|good and it|left.#",
-2,"=\"Tried to eat|the colour|blue as it|looked|nutritious|and a local|stopped me|and I do not|know what|she thought|I was doing.#",
-2,"=\"A human|laughed at|me and I|read this as|a threat|display and|responded in|kind and the|crowd that|formed did|not help.#",
-2,"=\"Tried to buy|someone's|shadow as it|was the best|one I had|seen and|they said no|and did not|seem to|take it as a|kind remark.#",
-3,"=\"Saw a human|walked by a|small animal|on a lead and|was unsure|who was in|charge until|the animal|made it|clear.#",
-2,"=\"The shadow|followed me|the whole|time and|when I|complained|was told it|was mine,|which raised|more|questions.#",
-1,"=\"The compost|bin in my|room was|sentient and|began making|requests on|day two and|I did not|know how to|refuse.#",
-1,"=\"The|checkout|time was|listed as|flexible and|flexible|here means|fixed and|also earlier|than I was|told.#",
-1,"=\"The hot|spring was|listed as|relaxing and|I have a|different|word for|what it was|and that|word is not|relaxing.#",
-3,"=\"A human told|me to have a|nice day and|I said I|would try|and it looked|at me as|though trying|was not the|expected|response.#",
-1,"=\"The tour bus|had|seatbelts|which I|thought was|standard|until the|driver put|his on and|said right,|here we go.#",
-3,"=\"A local told|me to take|care when I|left and I|asked of|what and she|said just in|general and|I said that is|a lot to take|care of.#",
-3,"=\"Was handed|a leaflet of|things to do|here and the|leaflet had|one page and|one of the|things listed|was leaving.#",
-1,"=\"Time here is|measured in|moods and|my shuttle|was due at|after the|sadness and|I waited at|the wrong|feeling.#",
-2,"=\"There is no|word for|stranger and|I was given a|family on|arrival and|they had|views on how|I spent my|days.#",
-1,"=\"The locals|change|colour to|speak and I|have no such|ability and|spent the|trip mute in|a way I have|not been|before.#",
-2,"=\"A kind word|here causes|mild pain and|I was polite|on day one|and did not|connect|these two|facts until|well into day|two.#",
-2,"=\"Things here|exist only in|pairs and I|arrived|alone and|was quietly|pitied by|everyone|for the|duration of|my stay.#",
-1,"=\"The wildlife|is harmless|if you avoid|eye contact|and the|wildlife is|everywhere|and makes a|great deal|of it first.#",
-2,"=\"The planet's|famous|silence is|broken only|by the|wildlife and|the wildlife|is loud and|has not read|the|brochure.#",
-2,"=\"The days|are eighteen|minutes and|I booked|three nights|and was|there for|under an|hour.#",
-4,"=\"The locals|exhale what|I breathe|and I exhale|what they|breathe and|for one|afternoon|we were|very close.#",
-2,"=\"Three moons|and all of|them wrong|and I do not|know what I|expected|but it was|not this.#",
-3,"=\"Everything|here has six|legs except|the things|with eight|and I spent a|week trying|to find the|pattern and|there is not|one.#",
-2,"=\"The planet|smells of|something I|cannot name|but have|smelled|once before|in a situation|I do not wish|to revisit.#",
+1,"=\"The cold|here has|texture, and|I was not|warned|about this,|and I do not|have the|right organs|for it.#",
+1,"=\"The gas|here is|sentient in|patches, and|one of the|patches was|in my cabin|and had|strong views|about the|lighting.#",
+2,"=\"Waved at my|reflection|for two days|before a|local|explained|what it was,|and I had to|rethink|several prior|greetings.#",
+3,"=\"A human said|I looked|well. I said I|did not feel|well, and it|said no, you|look good. I|said I did|not feel|good and it|left.#",
+2,"=\"Tried to eat|the colour|blue as it|looked|nutritious,|and a local|stopped me,|and I do not|know what|she thought|I was doing.#",
+2,"=\"A human|laughed at|me, and I|read this as|a threat|display and|responded in|kind, and the|crowd that|formed did|not help.#",
+2,"=\"Tried to buy|someone's|shadow, as it|was the best|one I had|seen, and|they said no|and did not|seem to|take it as a|kind remark.#",
+3,"=\"Saw a human|walking by a|small animal|on a lead,|and was|unsure who|was in|charge until|the animal|made it|clear.#",
+2,"=\"The shadow|followed me|the whole|time, and|when I|complained,|was told it|was mine,|which raised|more|questions.#",
+1,"=\"The compost|bin in my|room was|sentient and|began making|requests on|day two, and|I did not|know how to|refuse.#",
+1,"=\"The|checkout|time was|listed as|flexible, and|flexible|here means|fixed, and|also earlier|than I was|told.#",
+1,"=\"The hot|spring was|listed as|relaxing, and|I have a|different|word for|what it was,|and that|word is not|relaxing.#",
+3,"=\"A human told|me to have a|nice day,|and I said I|would try,|and it looked|at me as|though trying|was not the|expected|response.#",
+1,"=\"The tour bus|had|seatbelts,|which I|thought was|standard,|until the|driver put|his on and|said right,|here we go.#",
+3,"=\"Was handed|a leaflet of|things to do|here, and|the leaflet|had one|page, and|one of the|things listed|was leaving.#",
+1,"=\"Time here is|measured in|moods, and|my shuttle|was due at|after the|sadness, and|I waited at|the wrong|feeling.#",
+2,"=\"There is no|word for|stranger,|and I was|given a|family on|arrival, and|they had|views on how|I spent my|days.#",
+1,"=\"The locals|change|colour to|speak, and I|have no such|ability, and|spent the|trip mute in|a way I have|not been|before.#",
+2,"=\"A kind word|here causes|mild pain,|and I was|polite on day|one, and did|not connect|these two|facts until|well into day|two.#",
+2,"=\"Things here|exist only in|pairs, and I|arrived|alone, and|was quietly|pitied by|everyone|for the|duration of|my stay.#",
+1,"=\"The wildlife|is harmless|if you avoid|eye|contact, and|the wildlife|is|everywhere|and makes a|great deal|of it first.#",
+2,"=\"The planet's|famous|silence is|broken only|by the|wildlife, and|the wildlife|is loud and|has not read|the|brochure.#",
+2,"=\"The days|are eighteen|minutes. I|booked|three nights|and was|there for|under an|hour.#",
+2,"=\"Three|moons, and|all of them|wrong, and I|do not know|what I|expected,|but it was|not this.#",
+3,"=\"Everything|here has six|legs except|the things|with eight,|and I spent a|week trying|to find the|pattern, and|there is not|one.#",
+2,"=\"The planet|smells of|something I|cannot name|but have|smelled|once|before, in a|situation I|do not wish|to revisit.#",
 3,"=\"Lovely|staff,|wrong|planet, too|late to do|much about|it by the|time I|noticed.#",
 4,"=\"Beautiful|planet,|would|return,|cannot|return, legal|reasons,|four stars.#",
-2,"=\"Checked in|to what I|thought was|my room and|it was a lift|and I|unpacked|before the|lift|explained|itself.#",
-2,"=\"Joined what|I thought|was a guided|walk and was|a funeral|and by the|end I was a|pallbearer|and did not|know how to|raise this.#",
-2,"=\"Asked for an|early|wake-up call|and their|early and my|early were|several|hours apart|in the wrong|direction.#",
-2,"=\"The vendor|said the|item was|rare and|local and I|pointed out|every stall|had one and|she said yes,|rare and|local.#",
-3,"=\"The tourism|office gave|me a list of|things to do|and one of|them was|the tourism|office and I|was already|there.#",
-2,"=\"I asked what|not to miss|and she said|everything|and I asked|what she|personally|liked and she|said she had|not thought|about it.#",
+2,"=\"Checked in|to what I|thought was|my room, and|it was a lift,|and I|unpacked|before the|lift|explained|itself.#",
+2,"=\"Asked for an|early|wake-up|call, and|their early|and my early|were|several|hours apart|in the wrong|direction.#",
+2,"=\"The vendor|said the|item was|rare and|local, and I|pointed out|every stall|had one, and|she said yes,|rare and|local.#",
+3,"=\"The tourism|office gave|me a list of|things to do,|and one of|them was|the tourism|office, and|I was|already|there.#",
 3,"=\"I asked a|local for the|best dish,|she named|one, I|ordered it,|she brought|it out, and|seemed to|have planned|all of this.#",
-3,"=\"Asked a|ranger which|trail was|best and he|said it|depends and|I said|scenery and|he said then|probably not|this park.#",
-2,"=\"Asked what|the locals do|for fun and|the silence|that|followed|was|technically|an answer.#",
+2,"=\"Asked what|the locals do|for fun, and|the silence|that|followed|was|technically|an answer.#",
 1,"=\"The|welcome|pack|included a|breathing|guide, which|I assumed|was a joke,|and it was|not a joke.#",
-1,"=\"The exit sign|pointed at|the ocean|and the|ocean had no|exit, very|poor planning.#",
+1,"=\"The exit sign|pointed at|the ocean,|and the|ocean had no|exit, very|poor planning.#",
 2,"=\"Ordered|breakfast,|it arrived at|dinner,|dinner|arrived the|following|week, I left|before|lunch.#",
 1,"=\"Stepped off|the ship and|became part|of the local|food chain|within|minutes.#",
 2,"=\"Held my|umbrella the|wrong way|for two days|before|learning the|rain falls|down here.#",
-2,"=\"The festival|was|described|as lively and|involved|twelve|people|standing|near a thing.#",
-2,"=\"The planet|leans and|every local I|told looked|genuinely|unsure if|that was|true.#",
-2,"=\"The|wake-up call|said only it is|time and did|not say time|for what.#",
-1,"=\"The local|dish arrived|alive and|looking at me|and I did not|know the|correct|response.#",
-2,"=\"The upgrade|was to a|larger pile|and I said|thank you|because I|did not know|what else to|say.#",
+2,"=\"The festival|was|described|as lively, and|involved|twelve|people|standing|near a thing.#",
+2,"=\"The planet|leans, and|every local I|told looked|genuinely|unsure if|that was|true.#",
+2,"=\"The|wake-up call|said only it is|time, and|did not say|time for|what.#",
+1,"=\"The local|dish arrived|alive and|looking at|me, and I|did not know|the correct|response.#",
+2,"=\"The upgrade|was to a|larger pile,|and I said|thank you|because I|did not know|what else to|say.#",
 2,"=\"Asked what|grows here,|was told|resentment,|booked the|culture|tour, it was|about|resentment.#",
-1,"=\"The planet|hums at a|pitch my|species|reads as|grief and I|cried for|five days|before|making the|connection.#",
+1,"=\"The planet|hums at a|pitch my|species|reads as|grief, and I|cried for|five days|before|making the|connection.#",
 1,"=\"The hotel|stars were|awarded by|the hotel,|which is a|system with|a visible|flaw.#",
 1,"=\"My suit's air|monitor|skipped|numbers and|went|straight to a|small picture|of something|dying.#",
-1,"=\"The locals|said the|smell was|part of the|culture and|I said which|part and|they said all|of it.#",
+1,"=\"The locals|said the|smell was|part of the|culture, and|I said which|part, and|they said all|of it.#",
 2,"=\"Watched a|human argue|with a small|glowing|rectangle|while sitting|next to|someone|they|ignored.#",
-1,"=\"The trail|was marked|safe and|safe here|means a|different|thing than it|means|where I am|from.#",
-1,"=\"Paid for the|premium|tour and the|standard|tour and|they were|the same|tour with a|different|hat on the|guide.#",
-2,"=\"The|nightlife|starts at|dusk and|ends shortly|after dusk|and|everyone|goes home|and sighs.#",
-1,"=\"The|currency is|based on|something I|will not name|but I had|more of it|after a long|trip and that|felt unfair.#",
-2,"=\"The humans|sleep for a|third of|their lives|and built all|their|systems|around this,|which|explains the|systems.#",
-2,"=\"The dig tour|lets you|uncover|layers of|past life and|each layer is|worse than|the one|above it.#",
-1,"=\"The guided|walk was|described|as gentle|and nature|had a|different|idea about|what gentle|means.#",
+1,"=\"The trail|was marked|safe, and|safe here|means a|different|thing than it|means|where I am|from.#",
+1,"=\"Paid for the|premium|tour and the|standard|tour, and|they were|the same|tour with a|different|hat on the|guide.#",
+2,"=\"The|nightlife|starts at|dusk, ends|shortly|after dusk,|and|everyone|goes home|and sighs.#",
+1,"=\"The|currency is|based on|something I|will not|name, but I|had more of|it after a|long trip, and|that felt|unfair.#",
+2,"=\"The humans|sleep for a|third of|their lives,|and built all|their|systems|around this,|which|explains the|systems.#",
+2,"=\"The dig tour|lets you|uncover|layers of|past life,|and each|layer is|worse than|the one|above it.#",
+1,"=\"The guided|walk was|described|as gentle,|and nature|had a|different|idea about|what gentle|means.#",
 2,"=\"The locals|have thirty|words for|types of rain|and none for|leaving,|which tells|you|something.#",
-1,"=\"Asked if the|haze ever|clears and|the local|said clears|of what and|I|understood|she had|never seen|the planet.#",
+1,"=\"Asked if the|haze ever|clears, and|the local|said clears|of what, and|I|understood|she had|never seen|the planet.#",
 1,"=\"The thermal|pool was not|a pool in any|sense I had|prepared|for.#",
-1,"=\"The beach|looked|perfect in|photos and|photos were|the right|way to|experience|it.#",
-2,"=\"The scenic|flyby is good|if you like|gas, which I|did not know|I did not|until I was|inside it.#",
+1,"=\"The beach|looked|perfect in|photos, and|photos were|the right|way to|experience|it.#",
+2,"=\"The scenic|flyby is good|if you like|gas, which I|did not know|I did not like|until I was|inside it.#",
 1,"=\"The kids|here have a|look in their|eyes that I|have thought|about every|day since I|left.#",
 2,"=\"The two|moons orbit|at a|distance|that|suggests|they are|trying to|stay out of|things.#",
-2,"=\"Asked a local|what to see|and she|began|thinking|about it and|was still|thinking|when I left.#",
-2,"=\"Asked a local|how long|they had|lived here|and she said|longer than|she meant to|and looked|at the|horizon.#",
-3,"=\"Tried to|explain to a|human that|their planet|is unusual|and she said|we like to|think we are|special and I|said I know.#",
-1,"=\"Asked what|the big pile|was and was|told it was|the economy|and I did not|follow up.#",
-2,"=\"My photos|came out|entirely|grey and the|locals said|that was the|best the|planet had|looked.#",
-2,"=\"Discovered|customer|service|which is|humans|saying sorry|for things|they will|immediately|do again.#",
+2,"=\"Asked a local|what to see,|and she|began|thinking|about it and|was still|thinking|when I left.#",
+2,"=\"Asked a local|how long|they had|lived here,|and she said|longer than|she meant|to, and|looked at|the horizon.#",
+3,"=\"Tried to|explain to a|human that|their planet|is unusual,|and she said|we like to|think we are|special, and|I said I|know.#",
+1,"=\"Asked what|the big pile|was and was|told it was|the|economy,|and I did not|follow up.#",
+2,"=\"My photos|came out|entirely|grey, and|the locals|said that|was the best|the planet|had looked.#",
+2,"=\"Discovered|customer|service,|which is|humans|saying sorry|for things|they will|immediately|do again.#",
 1,"=\"The ocean|laps the|shore in a|way that|sounds like it|is sighing at|you|personally.#",
 2,"=\"The volcano|tour was|cancelled|due to the|volcano, a|sentence I|could not|have|predicted|needing.#",
-1,"=\"Travel|insurance|listed this|planet by|name in the|exclusions|and I booked|anyway, my|mistake.#",
+1,"=\"Travel|insurance|listed this|planet by|name in the|exclusions,|and I booked|anyway, my|mistake.#",
 1,"=\"Checked the|reviews|before|going, they|all said it|was fine,|those|reviewers|have given|up.#",
-2,"=\"The tourist|board slogan|is|%WE ARE HERE&|and|that is the|full extent|of the pitch.#",
-
-
-1,"=\"The planet|hums a note|not quite any|note I know|and my|species has|a word for|that note|and the|word means|leave.#",
-1,"=\"A local|sneezed and|I replied in|kind and it|looked|alarmed and|I had said|something I|will not|repeat here.#",
-2,"=\"Clapped|after the|lightning as is|polite at|home and|several|locals moved|away before|I could|explain.#",
-2,"=\"The|fireworks|looked like|an attack|and I|responded|and the|response to|my response|was not what|I hoped for.#",
-2,"=\"Mistook the|warning|siren for a|welcome|song and|sang back|for twenty|minutes|before|someone|intervened.#",
-2,"=\"Assumed the|dog was the|local leader|based on how|everyone|treated it|and spent|two days|following it|before being|corrected.#",
-1,"=\"The phone|box looked|like a|transport|pod and by|the time I|understood|it was not I|had pressed|everything.#",
-1,"=\"My ship's|navigation|refused to|save this|location to|favourites|and I|understand|now it was|trying to|help me.#",
-1,"=\"The locals|shed opinions|the way|others shed|skin and|several|stuck to me|by day three|and I could|not put them|down.#",
-1,"=\"The local|trees finish|your|thoughts and|some of|mine were|not ones I|would have|chosen to|share with a|tree.#",
+2,"=\"The tourist|board slogan|is %WE ARE|HERE&, and|that is the|full extent|of the pitch.#",
+1,"=\"The planet|hums a note|not quite any|note I know,|and my|species has|a word for|that note,|and the|word means|leave.#",
+1,"=\"A local|sneezed,|and I replied|in kind, and|it looked|alarmed, and|I had said|something I|will not|repeat here.#",
+2,"=\"Clapped|after the|lightning, as|is polite at|home, and|several|locals moved|away before|I could|explain.#",
+2,"=\"The|fireworks|looked like|an attack,|and I|responded,|and the|response to|my response|was not what|I hoped for.#",
+2,"=\"Mistook the|warning|siren for a|welcome|song, and|sang back|for twenty|minutes|before|someone|intervened.#",
+2,"=\"Assumed the|dog was the|local leader|based on how|everyone|treated it,|and spent|two days|following it|before being|corrected.#",
+1,"=\"The phone|box looked|like a|transport|pod, and by|the time I|understood|it was not, I|had pressed|everything.#",
+1,"=\"My ship's|navigation|refused to|save this|location to|favourites,|and I|understand|now it was|trying to|help me.#",
+1,"=\"The locals|shed opinions|the way|others shed|skin, and|several|stuck to me|by day|three, and I|could not put|them down.#",
+1,"=\"The local|trees finish|your|thoughts,|and some of|mine were|not ones I|would have|chosen to|share with a|tree.#",
 2,"=\"The surface|is lovely|from orbit,|which is also|the viewing|distance the|tourism|board|suggests,|buried on|page nine.#",
 1,"=\"The planet|has no native|predators,|which is|true, and|the wildlife|found other|solutions the|brochure|does not|address.#",
 2,"=\"Asked for|directions|and told to|follow my|nose, which|I do not|have, and|was told to|follow it|anyway.#",
-3,"=\"Was told to|make myself|at home and|did and was|asked to|leave and|learned|there is a|gap between|the two.#",
-3,"=\"The locals|have|seventeen|senses and|explained|the planet|using all of|them and I|have five|and missed|most.#",
-2,"=\"Landed,|explored,|ate|something,|left, three|of those|four I would|not do again|and I will not|say which|three.#",
+3,"=\"Was told to|make myself|at home, and|did, and was|asked to|leave, and|learned|there is a|gap between|the two.#",
+3,"=\"The locals|have|seventeen|senses and|explained|the planet|using all of|them, and I|have five|and missed|most.#",
+2,"=\"Landed,|explored,|ate|something,|left. Three|of those|four I would|not do again,|and I will not|say which|three.#",
 3,"=\"Misread the|entry form,|declared|myself|luggage, and|spent day|one in a|storage bay|nicer than|my hotel.#",
-1,"=\"The ranger|said stay on|the path and|when I|asked what|was off it|she said she|would rather|not say.#",
+1,"=\"The ranger|said stay on|the path,|and when I|asked what|was off it,|she said she|would rather|not say.#",
 1,"=\"The guide|pointed at|something,|said there it|is, and|walked on|before I|could see|what it was.#",
-1,"=\"The guide|was|excellent|then said|this is where|I turn back|and did and I|had no map.#",
-1,"=\"The|attendant|said the|wildlife was|friendly and|when I|asked how|friendly she|paused in a|way that|answered.#",
-2,"=\"Asked how|far the|viewpoint|was and he|said not far|and walked|with me for|four hours|and still|called it not|far.#",
-
-4,"=\"Have a full|account of|this place|but the box|provided is|too small and|I have run|out of time|to find a|bigger one.#",
-
+1,"=\"The guide|was|excellent,|then said|this is where|I turn back,|and did, and|I had no map.#",
+1,"=\"The|attendant|said the|wildlife was|friendly,|and when I|asked how|friendly,|she paused|in a way that|answered.#",
+2,"=\"Asked how|far the|viewpoint|was, and he|said not far,|and walked|with me for|four hours,|and still|called it not|far.#",
+4,"=\"Have a full|account of|this place,|but the box|provided is|too small,|and I have|run out of|time to find|a bigger one.#",
+2,"=\"The humans|share|information|by vibrating|their|face-holes.|Impressive|but needless|given that|telepathy|exists.#",
 #endif
 
 
@@ -310,16 +294,25 @@ bool seen[sizeof(planetInfo) / sizeof(planetInfo[0])];
 
 
 Earth — Tried to purchase the large yellow sky-fire but was told it was "the sun" and "not for sale" which seems like a
-missed revenue opportunity. ★★★☆☆ Bloatworld — Did not realise gravity was optional until my third day, by which point I
-had been walking on the ceiling the whole time and nobody said anything. ★★★☆☆ Spite — Attempted to communicate with the
-frozen water formations as I do at home but they simply refused, very rude, one star. ★☆☆☆☆ Pustula — The geysers
+missed revenue opportunity. ★★★☆☆
+Bloatworld — Did not realise gravity was optional until my third day, by which point I
+had been walking on the ceiling the whole time and nobody said anything.
+★★★☆☆ Spite — Attempted to communicate with the
+frozen water formations as I do at home but they simply refused, very rude, one star. ★☆☆☆☆
+ Pustula — The geysers
 erupted on a schedule and I waited politely for them to finish before applauding, which I am told was incorrect but I
-stand by my manners. ★★★☆☆ Dross — Brought my own star as is customary but the locals seemed alarmed and I had to leave
-it in orbit which meant my accommodation was very dark. ★★☆☆☆ Fetid IX — I consumed the atmosphere as a snack and would
-not recommend it, two of my secondary digestive organs have lodged a formal complaint. ★☆☆☆☆ Glumvast — The rocks here
-do not respond to conversation no matter how loudly you speak into them, extremely poor infrastructure. ★★☆☆☆ Noxis —
-Tried to fold the planet's weather into my travel bag as a souvenir and my travel bag is still angry with me. ★★☆☆☆ Plod
-— Did not understand that the planet moves and spent the whole trip chasing it, will plan better next time. ★★★☆☆ Earth
+stand by my manners. ★★★☆☆
+Dross — Brought my own star as is customary but the locals seemed alarmed and I had to leave
+it in orbit which meant my accommodation was very dark. ★★☆☆☆
+Fetid IX — I consumed the atmosphere as a snack and would
+not recommend it, two of my secondary digestive organs have lodged a formal complaint. ★☆☆☆☆
+Glumvast — The rocks here
+do not respond to conversation no matter how loudly you speak into them, extremely poor infrastructure. ★★☆☆☆
+ Noxis —
+Tried to fold the planet's weather into my travel bag as a souvenir and my travel bag is still angry with me. ★★☆☆☆
+Plod
+— Did not understand that the planet moves and spent the whole trip chasing it, will plan better next time. ★★★☆☆
+Earth
 — The smaller humans kept asking for something called "candy" and when I produced the standard greeting mineral they
 cried, very confusing, did not give five stars. ★★☆☆☆ Here we go — 100 reviews in the clueless alien visitor style:
 ---
@@ -593,6 +586,7 @@ enum info {
     INFO_RATING1,
     INFO_RATING2,
     INFO_CLEAR,
+    INFO_NEXTPLANET1,
     INFO_NEXTPLANET,
 };
 
@@ -632,12 +626,12 @@ void OS_Globe() {
                                 planets[planet].physics, 0, _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT);
             wait = 50;
             // pic = ((rangeRandom(15) + 1) << 4) | 8;
-
+            pif = -1;
             break;
 
         case INFO_INFO: {
             int lastpif = pif;
-            pif = rangeRandom(MAX_PLANET);
+            pif = pif + 1;    // rangeRandom(MAX_PLANET);
 
             int reviews = sizeof(planetInfo) / sizeof(planetInfo[0]);
             if (reviews > 2) {
@@ -683,29 +677,36 @@ void OS_Globe() {
         case INFO_RATING2:
             initAsciiStringDraw(FONT_COMPACT, 0x18, 20, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
                                 review[planetInfo[pif].stars], 0, lines);
-            wait = 100;
+            wait = 400;
             break;
 
 
         case INFO_CLEAR:
             myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
-            wait = 100;
+            wait = 1;
             break;
 
-            // case INFO_NEXTPLANET1:
-            //     wait = 1;
-            //     lastpd = planetDir;
-            //     break;
+        case INFO_NEXTPLANET1:
+
+            if ((scalex < MIDPOINT && planetDir < 0)) {
+                // while (true)
+                //     ;
+                wait = 30;
+            } else {
+                infoPhase = INFO_NEXTPLANET1;
+                wait++;
+            }
+            break;
 
         case INFO_NEXTPLANET:
 
-            if ((scalex >> 8) == (SCALE_FAR >> 8) && planetDir > 0) {
+            if (scalex > MIDPOINT && planetDir < 0) {    //(scalex >> 8) == (SCALE_FAR >> 8) && planetDir > 0) {
                 planet = nextPlanet();
                 myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
                 wait = 50;
                 infoPhase = INFO_NAME;
             } else {
-                lastpd = planetDir < 0 ? -1 : 1;
+                //                lastpd = planetDir < 0 ? -1 : 1;
                 infoPhase = INFO_NEXTPLANET;
                 wait++;
             }

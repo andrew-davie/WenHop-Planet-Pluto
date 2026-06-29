@@ -20,7 +20,7 @@ const unsigned char neptune_ntsc_palette_override[3] = {
 };
 
 const unsigned char earth_ntsc_palette_override[3] = {
-    0xA4, /* palette[1] = (28,76,120) */
+    0x82, /* palette[1] = (28,76,120) */
     0xC6, /* palette[2] = (104,112,52) */
     0x16, /* palette[4] = (212,188,248) */
 };
@@ -56,9 +56,9 @@ const unsigned char blood2_ntsc_palette_override[3] = {
 };
 
 const unsigned char green1_ntsc_palette_override[3] = {
-    0x42, /* palette[1] = (0,60,44) */
-    0x94, /* palette[2] = (32,92,32) */
-    0x16, /* palette[4] = (108,108,108) */
+    0xE4, /* palette[1] = (0,60,44) */
+    0xF4, /* palette[2] = (32,92,32) */
+    0x14, /* palette[4] = (108,108,108) */
 };
 
 const unsigned char lava_ntsc_palette_override[3] = {
@@ -99,9 +99,9 @@ const unsigned char terra_ntsc_palette_override[3] = {
 
 const struct GLOBE planets[MAX_PLANET] = {
 
-    {">Terror", 8, ">16900 km|1$81 m/s^", 1, terra_map, terra_charset, terra_ntsc_palette_override},           // 0
     {">Earth", 8, ">6900 km|9$81 m/s^", 1, earth_map, earth_charset, earth_ntsc_palette_override},             // 1
     {">Xe'drith", 8, ">1500 km|4$8 m/s^", -1, lava_map, lava_charset, lava_ntsc_palette_override},             // 2
+    {">Terror", 8, ">16900 km|1$81 m/s^", 1, terra_map, terra_charset, terra_ntsc_palette_override},           // 0
     {">Neptune", 8, ">9874 km|1$5 m/s^", 1, neptune_map, neptune_charset, neptune_ntsc_palette_override},      // 3
     {">WASP-76b", 8, ">14566 km|4$3 m/s^", -1, green1_map, green1_charset, green1_ntsc_palette_override},      // 4
     {">Skumveil", 8, ">42000 km|222$4 m/s^", -1, pangea_map, pangea_charset, pangea_ntsc_palette_override},    // 5

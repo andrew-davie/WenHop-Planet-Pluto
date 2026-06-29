@@ -10,6 +10,8 @@
 #include "reverseBits.h"
 #include "scroll.h"
 
+#define ROTATION_MAX 0x1000
+
 
 extern void initStars();
 
@@ -149,33 +151,31 @@ const short int line85[] = {
     -1,  -1, -1, -1, -1, -1, -1,
 };
 
-#define PSS 0
-
-int rotationDelta = PSS;    // 0x8800;    // C80;    // 0xA00;
-
-
-int scalex;
-int planetDir;
-int body;
-
-#define MIDPOINT ((SCALE_FAR + SCALE_NEAR) / 2)    // ~131180
 #define DIVISOR 12000
 
 #define MINSCALE SCALE_NEAR
 #define MAXSCALE SCALE_FAR
 
 
+int rotationDelta = 0;    // 0x8800;    // C80;    // 0xA00;
+
+
+int scalex = MAXSCALE;
+int planetDir;
+int body;
+
+
 void initPlanet(int planet) {
 
-    scalex = MAXSCALE;
+    //    scalex = MAXSCALE;
     planetDir = 0;
-    rotationDelta = PSS;
+    //    rotationDelta = 0;
 
     body = planet;
 
     initStars();
 
-    rotationAccel = 30;
+    rotationAccel = 10;
 
     extern const unsigned char *thePalette;
     thePalette = planets[body].palette;
@@ -210,15 +210,15 @@ void drawPlanet(int half) {
         rotationDelta += rotationAccel;
         if (rotationDelta < 0) {
             rotationDelta = 0;
-            rotationAccel = 0;
+            // rotationAccel = 0;
         }
     }
 
-    else if (rotationAccel > 0 && rotationDelta < 0x1100) {
+    else if (rotationAccel > 0 && rotationDelta < ROTATION_MAX) {
         rotationDelta += rotationAccel;
-        if (rotationDelta > 0x1100) {
-            rotationDelta = 0x1100;
-            rotationAccel = 0;
+        if (rotationDelta > ROTATION_MAX) {
+            rotationDelta = ROTATION_MAX;
+            // rotationAccel = 0;
         }
     }
 
@@ -304,6 +304,7 @@ void drawPlanet(int half) {
 
                 int p2 = 0;
                 int p3 = 0;
+                int bitOffset = 0x8000;
 
                 BLK(0)
                 BLK(1)
@@ -321,14 +322,6 @@ void drawPlanet(int half) {
                 BLK(13)
                 BLK(14)
                 BLK(15)
-                // BLK(16)
-                // BLK(17)
-                // BLK(18)
-                // BLK(19)
-
-                // screen is 32px wide: output is 2 bytes (bits 0-15 of p3 only)
-
-                int bitOffset = 0x8000;
 
                 PUT(0)
                 PUT(1)
@@ -383,7 +376,6 @@ void drawPlanet(int half) {
 
                 int p2 = 0;
                 int p3 = 0;
-
                 int bitOffset = 0x8000;
 
                 BLK2(0)
@@ -402,16 +394,7 @@ void drawPlanet(int half) {
                 BLK2(13)
                 BLK2(14)
                 BLK2(15)
-                // BLK2(16)
-                // BLK2(17)
-                // BLK2(18)
-                // BLK2(19)
 
-                // screen is 32px wide: bits 4-19 of p3 used (after <<4: bytes at >>16 and >>8)
-                // PUT2(19)
-                // PUT2(18)
-                // PUT2(17)
-                // PUT2(16)
                 PUT2(15)
                 PUT2(14)
                 PUT2(13)
@@ -429,9 +412,8 @@ void drawPlanet(int half) {
                 PUT2(1)
                 PUT2(0)
 
-                p3 <<= 8;
-                *pf2++ = p3 >> 16;
-                *pf1++ = reverseBits[(unsigned char)(p3 >> 8)];
+                *pf2++ = p3 >> 8;
+                *pf1++ = reverseBits[(unsigned char)(p3)];
 
                 if (++roll > 2)
                     roll = 0;
