@@ -114,10 +114,10 @@ void initKernel_Menu() {
     myMemsetInt((unsigned int *)(RAM + _MENU_BUFFERS_START), 0, _MENU_BUFFERS_SIZE / 4);
 
 
-    initAsciiStringDraw(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 0, 172);
+    initAsciiStringDraw(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 0, 172, true);
     while (drawNextChar())
         ;
-    initAsciiStringDraw(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 0, 184);
+    initAsciiStringDraw(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 0, 184, true);
     while (drawNextChar())
         ;
 
@@ -278,19 +278,17 @@ void OS_Menu() {
     if (sline >= 2)    //(int)(sizeof(smallWord) / sizeof(smallWord[0])))
         sline = 0;
 
-    int y = sline * 28 + 96;
-
     if (flashTime2)
         --flashTime2;
 
-    const char *dLine = 0;
+    // const char *dLine = 0;
 
     switch (sline) {
 
     case MENU_OPTION_CAVE:
         //        dLine = showCave[cave];
 
-        dLine = showCaveName[tempName];
+        // dLine = showCaveName[tempName];
 
         break;
 
@@ -305,7 +303,7 @@ void OS_Menu() {
 
     //    drawSmallString(y, smallWord[sline]);
 
-    int colour = sline == menuLine ? (flashTime2 & 4) ? 0x0A : ((base2 << 2) & 0xF0) | 0x16 : 0x26;
+    // int colour = sline == menuLine ? (flashTime2 & 4) ? 0x0A : ((base2 << 2) & 0xF0) | 0x16 : 0x26;
 
     // drawString(0, y + 8 + 30, dLine, colour);
 

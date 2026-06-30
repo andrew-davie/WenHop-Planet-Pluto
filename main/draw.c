@@ -57,6 +57,8 @@ static int font;
 static int colour;
 static int speedDelay;
 static int current;
+static int underline;
+
 
 enum justify {
     JUSTIFY_NONE,
@@ -80,7 +82,8 @@ const struct FONT {
 };
 
 
-void initAsciiStringDraw(int fontNumber, int c, int delay, int buffer, int colbuf, const char *string, int x, int y) {
+void initAsciiStringDraw(int fontNumber, int c, int delay, int buffer, int colbuf, const char *string, int x, int y,
+                         bool under) {
 
     // x: 0..47 pixel pos in GRP array
     // y: 1.._SCANLINES-1 line  (0 doesn't work because of colour)
@@ -88,6 +91,7 @@ void initAsciiStringDraw(int fontNumber, int c, int delay, int buffer, int colbu
 
     font = fontNumber;
     colour = convertColour(c);
+    underline = under;
 
     ps = string;
     buf = RAM + buffer;          // + y;
@@ -112,7 +116,7 @@ const unsigned char justifyChar[] = {
     0b100,    // 100, /* '$' ASCII 36 */
     0b100,    // 100, /* '%' ASCII 37 */
     0b100,    // 100, /* '&' ASCII 38 */
-    0b100,    // 100, /* ''' ASCII 39 */
+    0b101,    // 100, /* ''' ASCII 39 */
     0b101,    // 100, /* '(' ASCII 40 */
     0b100,    // 100, /* ')' ASCII 41 */
     0b110,    // 100, /* '*' ASCII 42 */
@@ -212,7 +216,7 @@ int getLineWidth(const char *str) {
     int width = 0;
     while (*str && *str != CRLF) {
 
-        char ci = LTR(*str);
+        int ci = LTR(*str);
         if (justifyChar[ci] & 0b100) {
 
             width += fonts[font].charWidths[ci] + 1;
@@ -247,11 +251,48 @@ void setJustifyX(const char *str) {
 }
 
 
+void doLetter(int ci, int cx, int cy) {
+
+    int column = cx >> 3;
+    int bit = 7 - (cx & 7);
+
+    const unsigned char *charShape = fonts[font].asciiTable[ci];
+    if (charShape) {
+
+        for (int i = 0; i < fonts[font].lineHeight; i++) {
+
+            int vertPos = cy + i;
+            if (vertPos >= 0 && vertPos < _SCANLINES) {
+
+                int shape = charShape[i] << (8 - fonts[font].charWidths[ci]);
+
+                int bs = bit + 1;
+                int band = column;
+
+                colrx[vertPos] = colour;
+
+                while (shape && (band < 6)) {
+
+                    buf[vertPos + band * _BUFFER_SIZE] |= (shape << bs) >> 8;
+
+                    shape = (shape << bs) & 0xFF;
+                    bs = 8;
+                    band++;
+                }
+            }
+        }
+    }
+}
+
+
 bool drawNextChar() {
 
     // false = complete
+    bool something = false;
 
     while (ps && *ps && ++current > speedDelay) {
+
+        something = true;
 
         current = 0;
         // if (*ps == '.' && *(ps - 1) == '.' && *(ps - 2) == '.')
@@ -282,41 +323,16 @@ bool drawNextChar() {
 
         else if (fonts[font].charWidths[ci]) {
 
-            if (ch != '+' && ch != ' ')
+            if (ch != ' ')
                 ADDAUDIO(ch == '*' ? SFX_DOGE : SFX_KEYPRESS);
 
             if (justifyChar[ci] & 0b10)
                 cx--;
 
-            int column = cx >> 3;
-            int bit = 7 - (cx & 7);
 
-            const unsigned char *charShape = fonts[font].asciiTable[ci];
-            if (charShape) {
-
-                for (int i = 0; i < fonts[font].lineHeight; i++) {
-
-                    int vertPos = cy + i;
-                    if (vertPos >= 0 && vertPos < _SCANLINES) {
-
-                        int shape = charShape[i] << (8 - fonts[font].charWidths[ci]);
-
-                        int bs = bit + 1;
-                        int band = column;
-
-                        colrx[vertPos] = colour;
-
-                        while (shape && (band < 6)) {
-
-                            buf[vertPos + band * _BUFFER_SIZE] |= (shape << bs) >> 8;
-
-                            shape = (shape << bs) & 0xFF;
-                            bs = 8;
-                            band++;
-                        }
-                    }
-                }
-            }
+            doLetter(ci, cx, cy);
+            if (underline)
+                doLetter(LTR('_'), cx, cy);
 
             cx += fonts[font].charWidths[ci] + 1;
 
@@ -326,6 +342,11 @@ bool drawNextChar() {
 
         ps++;
     }
+
+
+    if (something && !(ps && *ps))
+        ADDAUDIO(SFX_DIRT);
+
 
     return ps && *ps;
 }

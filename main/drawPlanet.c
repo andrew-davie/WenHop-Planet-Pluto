@@ -9,6 +9,7 @@
 #include "planet.h"
 #include "reverseBits.h"
 #include "scroll.h"
+#include "sound.h"
 
 #define ROTATION_MAX 0x1000
 
@@ -184,7 +185,8 @@ void initPlanet(int planet) {
 
 int nextPlanet() {
 
-    if (++body >= (int)(sizeof(planets) / sizeof(planets[0])))
+    ADDAUDIO(SFX_WHOOSH);
+    if (!planets[++body].name)
         body = 0;
 
     initPlanet(body);

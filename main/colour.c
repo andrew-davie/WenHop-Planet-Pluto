@@ -139,8 +139,12 @@ int step_toward(int current, int target) {
 
 void adjustLuminance() {
 
-    if (!(frame & 1))
+    static signed char lumSpeed = 0;
+
+    if (--lumSpeed < 0) {
         luminance = step_toward(luminance, lumTarget);
+        lumSpeed = 3;
+    }
 }
 
 

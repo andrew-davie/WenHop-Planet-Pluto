@@ -551,7 +551,7 @@ const unsigned char trackGridLockMelody2[] = {
     e4 g4 b4 a4 c5 e5 d5 b4 c5 e5 g5 f5 a5 g5 e5 d5
     c5 e5 d5 b4 a4 g4 f4 e4 g4 b4 d5 c5 e5 g5 e5 c5
 
-    TRACK_END
+    TRACK_LOOP
 };
 
 const unsigned char trackGridLockBase2[] = {
@@ -568,7 +568,7 @@ const unsigned char trackGridLockBase2[] = {
     e3 e3 c3 c3 g3 g3 c2 c2
     f2 f2 c3 c3 g3 g3 c2 c2
 
-    TRACK_END
+    TRACK_LOOP
 };
 
 const unsigned char trackGridLockMelodyIntro[] = {
@@ -576,7 +576,7 @@ const unsigned char trackGridLockMelodyIntro[] = {
     c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4 g3 b3
     d4 a3 c4 e4 b3 d4 f4 c3 e3 g3 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4
 
-    TRACK_END
+    TRACK_LOOP
 };
 
 const unsigned char trackGridLockBase[] = {
@@ -587,7 +587,7 @@ const unsigned char trackGridLockBase[] = {
     g3 a2_SHARP a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 f2 f2 c3 c3 g3 g3 d3
     d3 a2_SHARP a2_SHARP e3 e3 c2 c2 c2 c2
 
-    TRACK_END
+    TRACK_LOOP
 };
 
 
@@ -606,10 +606,19 @@ const unsigned char adsr_Rage[] = {
 
     100, 200, 255, 255, 255, 255, 255, 255, 255, 255, 125, 75, 50, 25, 0, 0};
 
+const unsigned char adsr_mmh[] = {
+
+    255,255,255,255,
+    255,255,255,255,
+    255,255,255,255,
+    200,100,50,0,
+};
+
 
 const unsigned char *const instrument[] = {
     adsr_Trombone,
     adsr_Rage,
+    adsr_mmh
 };
 
 // clang-format on

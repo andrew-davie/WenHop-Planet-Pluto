@@ -10,7 +10,7 @@ struct GLOBE {
     const unsigned char *palette;
 };
 
-#define MAX_PLANET 11
-extern const struct GLOBE planets[MAX_PLANET];
+// #define MAX_PLANET 11
+extern const struct GLOBE planets[];
 
 // EOF

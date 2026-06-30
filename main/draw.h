@@ -14,7 +14,7 @@ void draw6Bitmap(unsigned int grpOffset, unsigned int colup0Offset, const unsign
                  int colour);
 
 void initAsciiStringDraw(int fontNumber, int colour, int delay, int buffer, int colbuf, const char *string, int x,
-                         int y);
+                         int y, bool underline);
 bool drawNextChar();
 
 // EOF

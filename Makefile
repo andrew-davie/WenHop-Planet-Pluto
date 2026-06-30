@@ -272,7 +272,7 @@ make_rom: prep
 	@ls -la $(CUSTOMBIN)
 	@ls -la $(CUSTOMELF)
 	@echo ">>> ARM binary size: $$(ls -la $(CUSTOMBIN))"
-	$(DASM) $(SOURCE).asm -f3 -v5 \
+	$(DASM) $(SOURCE).asm -f3 \
 		-s$(OUTPUT)/$(CUSTOMNAME).sym \
 		-l$(OUTPUT)/$(CUSTOMNAME).lst \
 		-o$(OUTPUT)/$(CUSTOMNAME).bin

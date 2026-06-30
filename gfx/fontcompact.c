@@ -873,19 +873,19 @@ static const unsigned char char_094[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000   // 🟦🟦
 };
 
-/* '_'  ASCII 95  width=4px  1 byte(s)/row */
+/* '_'  ASCII 95  width=6px  1 byte(s)/row */
 static const unsigned char char_095[FONTCOMPACT_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00001111   // 🟨🟨🟨🟨
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00111111   // 🟨🟨🟨🟨🟨🟨
 };
 
 /* '`'  ASCII 96  width=2px  1 byte(s)/row */
@@ -982,7 +982,7 @@ static const unsigned char char_101[FONTCOMPACT_FONT_HEIGHT] = {
 static const unsigned char char_102[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000,  // 🟦🟦🟦🟦
     0b00000011,  // 🟦🟦🟨🟨
-    0b00000100,  // 🟦🟨🟦🟦
+    0b00000110,  // 🟦🟨🟨🟦
     0b00000100,  // 🟦🟨🟦🟦
     0b00001110,  // 🟨🟨🟨🟦
     0b00000100,  // 🟦🟨🟦🟦
@@ -1213,7 +1213,7 @@ static const unsigned char char_117[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000101,  // 🟨🟦🟨
     0b00000101,  // 🟨🟦🟨
     0b00000101,  // 🟨🟦🟨
-    0b00000011,  // 🟦🟨🟨
+    0b00000111,  // 🟨🟨🟨
     0b00000000,  // 🟦🟦🟦
     0b00000000   // 🟦🟦🟦
 };
@@ -1227,7 +1227,7 @@ static const unsigned char char_118[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000101,  // 🟨🟦🟨
     0b00000101,  // 🟨🟦🟨
     0b00000101,  // 🟨🟦🟨
-    0b00000011,  // 🟦🟨🟨
+    0b00000110,  // 🟨🟨🟦
     0b00000010,  // 🟦🟨🟦
     0b00000000,  // 🟦🟦🟦
     0b00000000   // 🟦🟦🟦
@@ -1357,7 +1357,7 @@ const unsigned char fontcompact_charWidths[] = {
       4  /* '0x5C' ASCII 92 */,
       3  /* ']' ASCII 93 */,
       2  /* '^' ASCII 94 */,
-      4  /* '_' ASCII 95 */,
+      6  /* '_' ASCII 95 */,
       2  /* '`' ASCII 96 */,
       3  /* 'a' ASCII 97 */,
       3  /* 'b' ASCII 98 */,
