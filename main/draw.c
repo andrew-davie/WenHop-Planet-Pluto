@@ -158,7 +158,7 @@ const unsigned char justifyChar[126 - 32 + 1] = {
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '='         61       center justify string
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '>'         62       right justify string
     🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '?'         63
-    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '@'         64
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '@'         64
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'A'         65
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'B'         66
     🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   'C'         67
@@ -385,7 +385,7 @@ bool drawNextChar() {
                 dramaticPause = 50;
 
             else if (ch == ',')
-                dramaticPause = 20;
+                dramaticPause = 10;
 
             if (ch != ' ')
                 ADDAUDIO(ch == '*' ? SFX_DOGE : SFX_KEYPRESS);    // review-star = "*"

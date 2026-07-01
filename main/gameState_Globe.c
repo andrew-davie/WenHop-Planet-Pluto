@@ -258,78 +258,24 @@ const struct {
 #else
 
 
-{"=\"I asked|how far the|viewpoint|was, and he|said %not far&,|and walked|with me for|four hours.|He still|called it|%not far&.#",2},
-{"=\"I asked if the|air was safe|and was told|%for some|definitions|of safe&,|which my|species|processes as|a %yes&,|and it is _not_.#",1},
-{"=\"I asked if the|haze ever|clears.|%Clears of|what?&, they|asked.|I realised|they had|never seen|their|planet.#",2},
-{"=\"I asked|what grows|here.|I was told|%resentment&.|Booked the|cultural tour.|It was about|resentment.#",2},
-{"=\"I asked|what not|to miss.|She said|everything.|I asked what|she liked.|She said she|had not|thought|about it.#",2},
-{"=\"I asked|what the|locals do|for fun.|The silence|that|followed|was|technically|an answer.#",2},
-{"=\"I asked|what the big|pile was, and|was told it|was the|economy.|I did not|follow up.#",1},
-{"=\"I asked|where all the|valuable|minerals had|gone, and was|told %away&|which is|technically|correct.#",2},
-{"=\"Landed,|explored,|ate|something,|left. Three|of those|four I would|not do again.#",2},
-{"=\"Lovely|staff,|wrong|planet, too|late to do|much about|it by the|time I|noticed.#",3},
-{"=\"Memory is|shared|here, and I|woke on day|two knowing|private|things about|strangers I|had not met.#",2},
-{"=\"Misread|the entry|form, and|declared|myself|as luggage.|I spent day|one in a|storage bay|nicer than|my hotel.#",3},
-{"=\"Mistook the|warning|siren for a|welcome|song, and|sang back|for twenty|minutes|before|someone|intervened.#",2},
-{"=\"Moisture|stuck to my|outer layer|and I took|this as a|territorial|claim and|panicked.|Better|labelling|would help.#",2},
-{"=\"My photos|came out|entirely|grey, and|the locals|said that|was the best|the planet|had looked.#",2},
-{"=\"My ship's|navigation|refused to|save this|location to|favourites,|and I|understand|now it was|trying to|help me.#",1},
-{"=\"My suit's air|monitor|skipped|numbers and|went|straight to a|small picture|of something|dying.#",1},
-{"=\"My translator|rendered|the local|language as|'medium|length sighs'|all visit. I'm|not entirely|sure that was|wrong.#",3},
-{"=\"Ordered|breakfast,|it arrived at|dinner,|dinner|arrived the|following|week, I left|before|lunch.#",2},
-{"=\"Paid for the|premium|tour.|It was the|same as the|standard tour,|but with an|angry guide.#",1},
-{"=\"Roads are in|the sky,|buildings are|underground.|I used|both the|wrong way|for two|days.#",2},
-{"=\"Saw a human|walking by a|small animal|on a lead,|and was|unsure who|was in|charge until|the animal|made it|clear.#",3},
-{"=\"Silence is|against local|law, and I|was fined|three times|on the first|day before I|grasped the|scale of the|problem.#",1},
-{"=\"Stepped off|the ship and|became part|of the local|food chain|within|minutes.#",1},
-{"=\"Stepped off|the ship and|joined the|local|ecosystem.|Took effort|to reverse.|Left me|feeling|implicated in|something.#",2},
-{"=\"The air here|is edible,|and I had too|much on day|one and had|to lie down|for reasons|I could not|convey to|anyone|nearby.#",1},
-{"=\"The beach|looked|perfect in|photos.|Photos were|the right|way to|experience|it.#",1},
-{"=\"The cold|here has|texture.|I was not|warned|about this.|I do not|have the|right organs|for it.#",1},
-{"=\"The compost|bin in my|room was|sentient and|began making|requests on|day two.|I did not|know how to|refuse.#",1},
-{"=\"The days|are eighteen|minutes. I|booked|three nights|and was|there for|under an|hour.#",2},
-{"=\"The dig tour|lets you|uncover|layers of|past life,|and each|layer is|worse than|the one|above it.#",2},
-{"=\"The exit|sign pointed|at the ocean,|and the ocean|had no exit.|Very poor|planning.#",1},
-{"=\"The festival|was|described|as lively.|It involved|twelve|people|standing|near a thing.#",2},
-{"=\"The food|here is|invisible and|you eat by|feel. I ate|the table my|first night|and was|charged for|the table.#",1},
-{"=\"The gas|here is|sentient in|patches.|One of the|patches was|in my cabin|and had|strong views|about the|lighting.#",1},
-{"=\"The ground|changes|colour based|on mood, and|mine kept|showing|things I had|not planned|to share in|public.#",1},
-{"=\"The guide|pointed at|something,|said there it|is, and|walked on|before I|could see|what it was.#",1},
-{"=\"The guide|was|excellent,|then said|this is where|I turn back,|and did.|I had no map.#",1},
-{"=\"The heat|here sits in|the range my|species uses|for food|storage and I|kept|reflexively|trying to put|things in the|locals.#",1},
-{"=\"The hot|spring was|listed as|relaxing.|I have a|different|word for|what it was,|and that|word is not|%relaxing&.#",1},
-{"=\"The hotel|stars were|awarded by|the hotel,|which is a|system with|a visible|flaw.#",1},
-{"=\"The humans|share|information|by vibrating|their|face-holes.|Impressive|but needless|given that|telepathy|exists.#",2},
-{"=\"The kids|here have a|look in their|eyes that I|have thought|about every|day since I|left.#",1},
-{"=\"The local|dish arrived|alive and|looking at|me, and I|did not know|the correct|response.#",1},
-{"=\"The locals|are made of|sound, and I|kept walking|through|them.|They kept|saying sorry,|which made|the problem|louder.#",2},
-{"=\"The locals|can see|sound and|asked me to|keep it down.|I said|I was not|making any,|and they|showed me|that I was.#",2},
-{"=\"The locals|change|colour to|speak, and I|have no such|ability.|I spent the|trip mute in|a way I have|not been|before.#",1},
-{"=\"The locals|exhale what|I breathe,|and I exhale|what they|breathe.|For one|afternoon|we were|very close.#",4},
-{"=\"The locals|have many|words for|one type of|regret.|I used most|before|leaving, and|used them|correctly.#",2},
-{"=\"The locals|have no _word_|for %no& and|express it by|doing the|thing|anyway, but,|sadly, I|missed this|for three|days.#",2},
-{"=\"The locals|have thirty|words for|types of rain|and none for|leaving,|which tells|you|something.#",2},
-{"=\"The locals|have|seventeen|senses and|explained|the planet|using all of|them.|I have five|and missed|most of it.#",3},
-{"=\"The locals|leave gaps in|speech for|you to fill. By|day one, I|had agreed|to several|things I had|not planned|on.#",2},
-{"=\"The locals|said the|smell was|part of the|culture.|I said which|part, and|they said|%all of it&.#",1},
-{"=\"The locals|shed opinions|the way|others shed|skin.|Several|stuck to me|by day|three, and I|could not put|them down.#",1},
-{"=\"The locals|shed their|skin each|morning and|leave it in|the hall. I|greeted my|neighbour's|%shed& for|two days.#",2},
-{"=\"The ocean|here is|technically|swimmable, in|the sense|that you can|enter it and|exit it.|The question|is what you|exit as.#",2},
-{"=\"The ocean|laps the|shore in a|way that|sounds like it|is sighing at|you,|personally.#",1},
-{"=\"The oceans|are warm|and the|things in|them are|also warm|and|friendly, in|the way that|means you|cannot|swim.#",3},
-{"=\"The phone|box looked|like a|transport|pod, and by|the time I|understood|it was not, I|had pressed|everything.#",1},
-{"=\"The planet is|beautiful|from orbit,|and less so|up close.|The|brochure|was taken|from orbit.#",3},
-{"=\"The planet's|famous|silence is|broken only|by the|wildlife.|The wildlife|is loud and|has not read|the|brochure.#",2},
-{"=\"The planet|has a smell|that changes|with your|thoughts.|I could not|stop thinking|about the|smell.|It kept|changing.#",2},
-{"=\"The planet|has a|breathable|atmosphere|in the loosest|possible|reading of|the word|'breathable'.#",1},
-{"=\"The planet|has no native|predators,|which is|true.|The wildlife|found other|solutions the|brochure|does not|address.#",1},
-{"=\"The planet|hums a note|not quite any|note I know,|and my|species has|a word for|that note,|and the|word means|_leave_.#",1},
-{"=\"The planet|hums at a|pitch my|species|reads as grief.|I cried for|five days|before|making the|connection.#",1},
-{"=\"The planet|leans, and|every local I|told looked|genuinely|unsure if|that was|true.#",2},
-{"=\"The planet|smells of|something I|cannot name|but have|smelled|once|before, in a|situation I|do not wish|to revisit.#",2},
-{"=\"The ranger|said stay on|the path,|and when I|asked what|was off it,|she said she|would rather|not say.#",1},
-{"=\"The scenic|flyby is good|if you like|gas, which I|did not know|I did not like|until I was|inside it.#",2},
-{"=\"The shadow|followed me|the whole|time.|When I|complained, I|was told it|was mine.|This only|raised more|questions.#",2},
+{"=\"The|locals shed|opinions|the way|others shed|skin.|Several|stuck to me|by day|three, and I|could not put|them down.#",1},
+{"=\"The|locals|shed their|skin each|morning and|leave it in|the hall. I|greeted my|neighbour's|%shed& for|two days.#",2},
+{"=\"The|ocean|here is|technically|swimmable, in|the sense|that you can|enter it and|exit it.|The question|is what you|exit as.#",2},
+{"=\"The|ocean|laps the|shore in a|way that|sounds like it|is sighing at|you,|personally.#",1},
+{"=\"The|oceans|are warm|and the|things in|them are|also warm|and|friendly, in|the way that|means you|cannot|swim.#",3},
+{"=\"The|phone|box looked|like a|transport|pod, and by|the time I|understood|it was not, I|had pressed|everything.#",1},
+{"=\"The|planet is|beautiful|from orbit,|and less so|up close.|The|brochure|was taken|from orbit.#",3},
+{"=\"The|planet's|famous|silence is|broken only|by the|wildlife.|The wildlife|is loud and|has not read|the|brochure.#",2},
+{"=\"The|planet|has a smell|that changes|with your|thoughts.|I could not|stop thinking|about the|smell.|It kept|changing.#",2},
+{"=\"The|planet|has a|breathable|atmosphere|in the loosest|possible|reading of|the word|'breathable'.#",1},
+{"=\"The|planet|has no native|predators,|which is|true.|The wildlife|found other|solutions the|brochure|does not|address.#",1},
+{"=\"The|planet|hums a note|not quite any|note I know,|and my|species has|a word for|that note,|and the|word means|_leave_.#",1},
+{"=\"The|planet|hums at a|pitch my|species|reads as grief.|I cried for|five days|before|making the|connection.#",1},
+{"=\"The|planet|leans, and|every local I|told looked|genuinely|unsure if|that was|true.#",2},
+{"=\"The|planet|smells of|something I|cannot name|but have|smelled|once|before, in a|situation I|do not wish|to revisit.#",2},
+{"=\"The|ranger|said stay on|the path,|and when I|asked what|was off it,|she said she|would rather|not say.#",1},
+{"=\"The|scenic|flyby is good|if you like|gas, which I|did not know|I did not like|until I was|inside it.#",2},
+{"=\"The|shadow|followed me|the whole|time.|When I|complained, I|was told it|was mine.|This only|raised more|questions.#",2},
 {"=\"The slow|part of the|day is called|rush hour, a|naming|decision|that has|clearly|never been|reviewed.#",3},
 {"=\"The sun|rises from|the ground|and sets|upward.|By day three|my sense of|down was a|rough guess.#",2},
 {"=\"The surface|is lovely|from orbit,|which is also|the viewing|distance the|tourism|board|suggests,|buried on|page nine.#",2},
@@ -379,6 +325,7 @@ const struct {
 
 // 2
 {"=\"Ate some|atmosphere|as a snack.|Two|secondary|digestive|organs have|since lodged|a formal|complaint.#",1},
+{"=\"The food|here is|invisible and|you eat by|feel.|I ate|the table my|first night|and was|charged for|the table.#",1},
 
 // 3
 
@@ -398,6 +345,8 @@ const struct {
 {"=\"The|guided walk|was described|as gentle.|Nature|had a|different|idea about|what gentle|means.#",1},
 {"=\"The|tourist|board slogan|is...|WE~ ARE|~HERE.|That is the|full extent|of the|pitch.#",2},
 {"=\"I asked|for|directions|and was told|to follow my|nose, which|I do not|have.|I was told to|follow it|anyway.#",2},
+{"=\"I asked|how far the|viewpoint|was, and he|said %not far&,|and walked|with me for|four hours.|He still|called it|%not far&.#",2},
+{"=\"The|ground|changes|colour based|on mood.|Mine kept|showing|things I had|not planned|to share in|public.#",1},
 
 // 6
 {"=\"Each object|has a name,|and must be|addressed|when|touched.|I caused|three|scenes|before lunch|on day one.#",2},
@@ -408,6 +357,12 @@ const struct {
 {"=\"Things|here have six|legs except|the things|with eight.|I spent a|week trying|to find the|pattern.|There is not|one.#",3},
 {"=\"I asked a|local what|they did|for fun.|They stared|long enough|that I felt I|had said|something in|very poor|taste.#",2},
 {"=\"I asked|for an early|wake-up|call.|Their early|and my early|were|several|hours apart.|In the wrong|direction.#",2},
+{"=\"I asked|what the|locals do|for fun.|The silence|that|followed|was|technically|an|answer.#",2},
+{"=\"Ordered|breakfast,|it arrived at|dinner.|Dinner|arrived the|following|week.|I left|before|lunch.#",2},
+{"=\"Roads|are in the sky,|buildings are|underground.|I used both|the wrong|way for two|days.#",2},
+{"=\"Saw a|human walking|with a small|animal on|a lead.|Was unsure|who was|in charge.|The animal|made it|clear.#",3},
+{"=\"The dig|tour lets you|uncover|layers of|past life.|Each layer|is worse than|the one|above it.#",2},
+{"=\"The hot|spring was|listed as|relaxing.|I have a|different|word for|what it was,|and that|word is not|relaxing.#",1},
 
 // 7
 {"=\"Everyone|here has|three|shadows,|one of them|cold.|Mine kept|touching|theirs, and|this was|rude.#",2},
@@ -419,6 +374,20 @@ const struct {
 {"=\"Made an|amazing|discovery|on this planet.|The box|provided is|too small|to detail|it here.#",4},
 {"=\"I asked a|local if|the planet|had feelings.|No. Are you|sure? Yes.|It seems sad.|They walked|away. I think|I was right.#",3},
 {"=\"I asked a|local|what to see,|and she|began|thinking|about it.|She was still|thinking|when I|left.#",2},
+{"=\"I asked|what not to|miss.|She said|everything.|I asked what|she liked.|She said she|had not|thought|about it.#",2},
+{"=\"I asked|what the big|pile was, and|was told it|was the|economy.|I did not|follow up.#",1},
+{"=\"Lovely|staff,|wrong|planet.|Too late to do|much about|it by the|time I|noticed.#",3},
+{"=\"Memory|is shared|here, and I|woke on day|two knowing|private|things about|strangers I|had not met.#",2},
+{"=\"Paid for|the|premium|tour.|It was the|same as the|standard tour,|~but with an|angry guide.#",1},
+{"=\"Silence|is against|local law, and|I was fined|three times|on the first|day before I|grasped the|scale of the|problem.#",1},
+{"=\"Stepped|off the ship|and joined|the local|ecosystem.|Took effort|to reverse.|Left me|feeling|implicated in|something.#",2},
+{"=\"The exit|sign pointed|at the ocean,|and the ocean|had no exit.|Very poor|planning.#",1},
+{"=\"The guide|was|excellent,|then said|%this is where|I turn back&,|and did.|I had no map.#",1},
+{"=\"The hotel|stars were|awarded by|the hotel,|which is a|system with|a visible|flaw.#",1},
+{"=\"The|locals can see|sound and|asked me to|keep it down.|I said I was|not making|any, and they|showed me|that I was.#",2},
+{"=\"The|locals have|many words|for one type|of regret.|I used most|before|leaving, and|used them|correctly.#",2},
+{"=\"The|locals have|thirty words|for types of|rain, and none|for leaving.|Which tells|you|something.",2},
+{"=\"The|locals have|seventeen|senses and|explained|the planet|using all of|them.|I have|five and|missed most|of it.#",3},
 
 // 8
 {"=\"A local|told me to|take care|when I left.|I asked|of what.|She said just|in general.|I said that is|a lot to take|care of.#",3},
@@ -427,12 +396,43 @@ const struct {
 {"=\"I asked a|local how|long they had|lived here.|It said|longer than|it meant|to, and|stared at|the horizon.#",2},
 {"=\"I asked a|local what|time it was,|and he|told me in a|unit I do not|have the|organs to|perceive.|Useless.#",2},
 {"=\"I asked a|ranger which|trail was|best. He said|%It depends&.|I said|%scenery&.|He said %then|not this|planet&.#",3},
+{"=\"I asked|if the air was|safe and was|told %for some|definitions|of safe&,|which my|species|processes as|a %yes&,|and it is _not_.#",1},
+{"=\"I asked|if the haze|ever clears.|%Clears of|what?&,|they asked.|I realised|they had|never seen|their|planet.#",2},
+{"=\"I asked|where all the|valuable|minerals had|gone, and was|told %away&|which is|technically|correct.#",2},
+{"=\"Mistook|the|warning|siren for a|welcome|song, and|sang for|twenty|minutes|before|someone|intervened#",2},
+{"=\"Moisture|stuck to my|outer layer|and I took|this as a|territorial|claim and|panicked.|Better|labelling|would help#",2},
+{"=\"Photos|came out|entirely|grey, and|the locals|said that|was the best|the planet had|looked.#",2},
+{"=\"My ship's|navigation|refused to|save this|location to|favourites.|I now|understand|it was|trying to|help me.#",1},
+{"=\"The air here|is edible.|I had too|much on day|one and had|to lie down.|For reasons|I could not|convey to|anyone.#",1},
+{"=\"The|beach|looked|perfect in|photos.|Photos were|the right|way to|experience|it.#",1},
+{"=\"The guide|pointed at|something,|said|%there it is&,|and walked|on before I|could see|what it|was.#",1},
+{"=\"The|locals change|colour to|speak, and I|have no such|ability.|I spent the|trip mute in|a way I have|not been|before.#",1},
+{"=\"The|locals exhale|what I|breathe, and|I exhale|what they|breathe.|For one|afternoon|we were|very close.#",4},
 
 // 9
 {"=\"I asked a|local if the|_smell_|was natural|or man-made.|She said|%yes&.|I have|thought about|this every|day since.#",3},
+{"=\"I asked|what grows|here.|I was told|%resentment&.|Booked the|cultural tour.|It was about|resentment.|              #",2},
+{"=\"Landed,|explored,|ate|something,|left.|Three|of those|four I would|not do again.#",2},
+{"=\"Misread|the entry|form, and|declared|myself|as luggage.|I spent day|one in a|storage bay|nicer than|my hotel.#",3},
+{"=\"My|suit's air|monitor|skipped|numbers and|went|straight to a|small picture|of something|dying.#",1},
+{"=\"The cold|here has|texture.|I was not|warned|about this.|I do not|have the|right organs|for it.#",1},
+{"=\"The gas|here is|sentient in|patches.|One of the|patches was|in my cabin|and had|strong views|about the|lighting.#",1},
+{"=\"The heat|here sits in|the range my|species uses|for food|storage.|I kept|reflexively|trying to put|things in the|locals.#",1},
+{"=\"The local|dish arrived|alive and|looking at|me.|I did not know|the correct|response.#",1},
 
 
 // 10
+{"=\"My|translator|rendered|the local|language as|'medium|length sighs'|all visit.|I'm|not entirely|sure that was|wrong.#",3},
+{"=\"Stepped|off the ship|and became|part of the|local food|chain|within|minutes.#",1},
+{"=\"The|compost bin|in my room|was sentient |and began|making|requests|on day two.|I did not|know how to|refuse.#",1},
+{"=\"The days|are eighteen|minutes.|I booked|three nights|and was there|for under|an hour.#",2},
+{"=\"The|festival|was|described|as %lively&.|It involved|twelve|people|standing|near a|thing.#",2},
+{"=\"The|humans|exchange|information|by vibrating|their|face-holes.|Impressive,|but needless|given that|telepathy|exists.#",2},
+{"=\"The kids|here have a|look in their|eyes that I|have thought|about every|day since I|left.#",1},
+{"=\"The|locals are|made of|sound, and I|kept walking|through|them.|They kept|saying sorry,|which made|the problem|louder.#",2},
+{"=\"The|locals have|no word for|%no&|~and express it|by doing the|thing anyway.|Sadly, I|missed this|for three|days.#",2},
+{"=\"The|locals leave|gaps in|speech for|you to fill.|By day one, I|had agreed|to several|things I had|not planned|on.#",2},
+{"=\"The|locals said the|smell was|part of the|culture.|I said which|part, and|they said|%all of it&.#",1},
 
 
 #endif
@@ -505,7 +505,8 @@ void OS_Globe() {
 
         case INFO_FADEUP:
             if (luminance)
-                infoPhase = INFO_FADEUP;
+                //                infoPhase = INFO_FADEUP;
+                infoPhase = INFO_CLEAR1;    // tmp
             break;
 
 
@@ -523,6 +524,12 @@ void OS_Globe() {
                        planets[planet].physics, 0,                                  //
                        _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - 25 + 5 + ADJ);
             wait = 200;
+
+
+            break;
+
+
+        case INFO_CLEAR1: {
 
             int lastpif = pif;
             pif = rangeRandom(PIS);
@@ -558,14 +565,11 @@ void OS_Globe() {
                 }
             while (*++p);
 
-            break;
 
-
-        case INFO_CLEAR1:
             myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
             ADDAUDIO(SFX_DOGE2);
             wait = 30;
-            break;
+        } break;
 
 
         case INFO_PLANETADVISOR:
@@ -574,7 +578,7 @@ void OS_Globe() {
 
 
             drawString(FONT_COMPACT, 0x8, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
-                       "=_PlanetAdvisor", 0, pa_lines - 20);
+                       "=_Planet@visor", 0, pa_lines - 20);
             wait = 25;
             break;
 
