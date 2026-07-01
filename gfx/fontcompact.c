@@ -18,34 +18,34 @@ static const unsigned char char_033[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000   // 🟦🟦
 };
 
-/* '0x22'  ASCII 34  width=4px  1 byte(s)/row */
+/* '0x22'  ASCII 34  width=7px  1 byte(s)/row */
 static const unsigned char char_034[FONTCOMPACT_FONT_HEIGHT] = {
-    0b00001010,  // 🟨🟦🟨🟦
-    0b00001010,  // 🟨🟦🟨🟦
-    0b00001010,  // 🟨🟦🟨🟦
-    0b00001001,  // 🟨🟦🟦🟨
-    0b00000100,  // 🟦🟨🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000   // 🟦🟦🟦🟦
+    0b01010000,  // 🟨🟦🟨🟦🟦🟦🟦
+    0b01010000,  // 🟨🟦🟨🟦🟦🟦🟦
+    0b01010000,  // 🟨🟦🟨🟦🟦🟦🟦
+    0b01001000,  // 🟨🟦🟦🟨🟦🟦🟦
+    0b00100000,  // 🟦🟨🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000   // 🟦🟦🟦🟦🟦🟦🟦
 };
 
-/* '#'  ASCII 35  width=4px  1 byte(s)/row */
+/* '#'  ASCII 35  width=7px  1 byte(s)/row */
 static const unsigned char char_035[FONTCOMPACT_FONT_HEIGHT] = {
-    0b00000101,  // 🟦🟨🟦🟨
-    0b00000101,  // 🟦🟨🟦🟨
-    0b00000101,  // 🟦🟨🟦🟨
-    0b00001001,  // 🟨🟦🟦🟨
-    0b00000010,  // 🟦🟦🟨🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000   // 🟦🟦🟦🟦
+    0b00000101,  // 🟦🟦🟦🟦🟨🟦🟨
+    0b00000101,  // 🟦🟦🟦🟦🟨🟦🟨
+    0b00000101,  // 🟦🟦🟦🟦🟨🟦🟨
+    0b00001001,  // 🟦🟦🟦🟨🟦🟦🟨
+    0b00000010,  // 🟦🟦🟦🟦🟦🟨🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦🟦
+    0b00000000   // 🟦🟦🟦🟦🟦🟦🟦
 };
 
 /* '$'  ASCII 36  width=4px  1 byte(s)/row */
@@ -177,25 +177,25 @@ static const unsigned char char_044[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000,  // 🟦🟦
     0b00000000,  // 🟦🟦
     0b00000000,  // 🟦🟦
-    0b00000001,  // 🟦🟨
+    0b00000000,  // 🟦🟦
     0b00000001,  // 🟦🟨
     0b00000001,  // 🟦🟨
     0b00000010   // 🟨🟦
 };
 
-/* '-'  ASCII 45  width=4px  1 byte(s)/row */
+/* '-'  ASCII 45  width=3px  1 byte(s)/row */
 static const unsigned char char_045[FONTCOMPACT_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000111,  // 🟦🟨🟨🟨
-    0b00001110,  // 🟨🟨🟨🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000   // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦
+    0b00000111,  // 🟨🟨🟨
+    0b00000111,  // 🟨🟨🟨
+    0b00000000,  // 🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦
+    0b00000000   // 🟦🟦🟦
 };
 
 /* '.'  ASCII 46  width=1px  1 byte(s)/row */
@@ -408,11 +408,56 @@ static const unsigned char char_059[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000   // 🟦🟦
 };
 
+/* '<'  ASCII 60  width=4px  1 byte(s)/row */
+static const unsigned char char_060[FONTCOMPACT_FONT_HEIGHT] = {
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000010,  // 🟦🟦🟨🟦
+    0b00000100,  // 🟦🟨🟦🟦
+    0b00001000,  // 🟨🟦🟦🟦
+    0b00001100,  // 🟨🟨🟦🟦
+    0b00000110,  // 🟦🟨🟨🟦
+    0b00000111,  // 🟦🟨🟨🟨
+    0b00000011,  // 🟦🟦🟨🟨
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000   // 🟦🟦🟦🟦
+};
+
+/* '='  ASCII 61  width=4px  1 byte(s)/row */
+static const unsigned char char_061[FONTCOMPACT_FONT_HEIGHT] = {
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00001111,  // 🟨🟨🟨🟨
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00001111,  // 🟨🟨🟨🟨
+    0b00001111,  // 🟨🟨🟨🟨
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000   // 🟦🟦🟦🟦
+};
+
+/* '>'  ASCII 62  width=4px  1 byte(s)/row */
+static const unsigned char char_062[FONTCOMPACT_FONT_HEIGHT] = {
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000100,  // 🟦🟨🟦🟦
+    0b00000010,  // 🟦🟦🟨🟦
+    0b00000001,  // 🟦🟦🟦🟨
+    0b00000011,  // 🟦🟦🟨🟨
+    0b00000110,  // 🟦🟨🟨🟦
+    0b00001110,  // 🟨🟨🟨🟦
+    0b00001100,  // 🟨🟨🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000   // 🟦🟦🟦🟦
+};
+
 /* '?'  ASCII 63  width=4px  1 byte(s)/row */
 static const unsigned char char_063[FONTCOMPACT_FONT_HEIGHT] = {
     0b00001110,  // 🟨🟨🟨🟦
-    0b00001111,  // 🟨🟨🟨🟨
     0b00000011,  // 🟦🟦🟨🟨
+    0b00000001,  // 🟦🟦🟦🟨
     0b00000001,  // 🟦🟦🟦🟨
     0b00000011,  // 🟦🟦🟨🟨
     0b00000110,  // 🟦🟨🟨🟦
@@ -421,6 +466,21 @@ static const unsigned char char_063[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000100,  // 🟦🟨🟦🟦
     0b00000000,  // 🟦🟦🟦🟦
     0b00000000   // 🟦🟦🟦🟦
+};
+
+/* '@'  ASCII 64  width=6px  1 byte(s)/row */
+static const unsigned char char_064[FONTCOMPACT_FONT_HEIGHT] = {
+    0b00000000,  // 🟦🟦🟦🟦🟦🟦
+    0b00001100,  // 🟦🟦🟨🟨🟦🟦
+    0b00011110,  // 🟦🟨🟨🟨🟨🟦
+    0b00110011,  // 🟨🟨🟦🟦🟨🟨
+    0b00001101,  // 🟦🟦🟨🟨🟦🟨
+    0b00011101,  // 🟦🟨🟨🟨🟦🟨
+    0b00010101,  // 🟦🟨🟦🟨🟦🟨
+    0b00010101,  // 🟦🟨🟦🟨🟦🟨
+    0b00011111,  // 🟦🟨🟨🟨🟨🟨
+    0b00001010,  // 🟦🟦🟨🟦🟨🟦
+    0b00000000   // 🟦🟦🟦🟦🟦🟦
 };
 
 /* 'A'  ASCII 65  width=4px  1 byte(s)/row */
@@ -442,10 +502,10 @@ static const unsigned char char_065[FONTCOMPACT_FONT_HEIGHT] = {
 static const unsigned char char_066[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000,  // 🟦🟦🟦🟦
     0b00001110,  // 🟨🟨🟨🟦
-    0b00001111,  // 🟨🟨🟨🟨
+    0b00001011,  // 🟨🟦🟨🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001110,  // 🟨🟨🟨🟦
-    0b00001111,  // 🟨🟨🟨🟨
+    0b00001011,  // 🟨🟦🟨🟨
     0b00001001,  // 🟨🟦🟦🟨
     0b00001111,  // 🟨🟨🟨🟨
     0b00001110,  // 🟨🟨🟨🟦
@@ -456,9 +516,9 @@ static const unsigned char char_066[FONTCOMPACT_FONT_HEIGHT] = {
 /* 'C'  ASCII 67  width=4px  1 byte(s)/row */
 static const unsigned char char_067[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000,  // 🟦🟦🟦🟦
-    0b00000011,  // 🟦🟦🟨🟨
     0b00000111,  // 🟦🟨🟨🟨
     0b00001100,  // 🟨🟨🟦🟦
+    0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
     0b00001000,  // 🟨🟦🟦🟦
@@ -828,19 +888,19 @@ static const unsigned char char_091[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000   // 🟦🟦🟦
 };
 
-/* '0x5C'  ASCII 92  width=4px  1 byte(s)/row */
+/* '0x5C'  ASCII 92  width=3px  1 byte(s)/row */
 static const unsigned char char_092[FONTCOMPACT_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00001000,  // 🟨🟦🟦🟦
-    0b00000100,  // 🟦🟨🟦🟦
-    0b00000100,  // 🟦🟨🟦🟦
-    0b00000110,  // 🟦🟨🟨🟦
-    0b00000010,  // 🟦🟦🟨🟦
-    0b00000011,  // 🟦🟦🟨🟨
-    0b00000011,  // 🟦🟦🟨🟨
-    0b00000000,  // 🟦🟦🟦🟦
-    0b00000000   // 🟦🟦🟦🟦
+    0b00000100,  // 🟨🟦🟦
+    0b00000100,  // 🟨🟦🟦
+    0b00000100,  // 🟨🟦🟦
+    0b00000110,  // 🟨🟨🟦
+    0b00000010,  // 🟦🟨🟦
+    0b00000010,  // 🟦🟨🟦
+    0b00000010,  // 🟦🟨🟦
+    0b00000011,  // 🟦🟨🟨
+    0b00000001,  // 🟦🟦🟨
+    0b00000001,  // 🟦🟦🟨
+    0b00000001   // 🟦🟦🟨
 };
 
 /* ']'  ASCII 93  width=3px  1 byte(s)/row */
@@ -873,19 +933,19 @@ static const unsigned char char_094[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000   // 🟦🟦
 };
 
-/* '_'  ASCII 95  width=6px  1 byte(s)/row */
+/* '_'  ASCII 95  width=1px  1 byte(s)/row */
 static const unsigned char char_095[FONTCOMPACT_FONT_HEIGHT] = {
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00000000,  // 🟦🟦🟦🟦🟦🟦
-    0b00111111   // 🟨🟨🟨🟨🟨🟨
+    0b00000000,  // 🟦
+    0b00000000,  // 🟦
+    0b00000000,  // 🟦
+    0b00000000,  // 🟦
+    0b00000000,  // 🟦
+    0b00000000,  // 🟦
+    0b00000000,  // 🟦
+    0b00000000,  // 🟦
+    0b00000000,  // 🟦
+    0b00000000,  // 🟦
+    0b00000001   // 🟨
 };
 
 /* '`'  ASCII 96  width=2px  1 byte(s)/row */
@@ -1194,7 +1254,7 @@ static const unsigned char char_116[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000010,  // 🟦🟨🟦
     0b00000010,  // 🟦🟨🟦
     0b00000111,  // 🟨🟨🟨
-    0b00000010,  // 🟦🟨🟦
+    0b00000011,  // 🟦🟨🟨
     0b00000010,  // 🟦🟨🟦
     0b00000010,  // 🟦🟨🟦
     0b00000011,  // 🟦🟨🟨
@@ -1293,11 +1353,41 @@ static const unsigned char char_122[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000   // 🟦🟦🟦
 };
 
+/* '|'  ASCII 124  width=1px  1 byte(s)/row */
+static const unsigned char char_124[FONTCOMPACT_FONT_HEIGHT] = {
+    0b00000001,  // 🟨
+    0b00000001,  // 🟨
+    0b00000001,  // 🟨
+    0b00000001,  // 🟨
+    0b00000001,  // 🟨
+    0b00000001,  // 🟨
+    0b00000001,  // 🟨
+    0b00000001,  // 🟨
+    0b00000001,  // 🟨
+    0b00000001,  // 🟨
+    0b00000001   // 🟨
+};
+
+/* '~'  ASCII 126  width=4px  1 byte(s)/row */
+static const unsigned char char_126[FONTCOMPACT_FONT_HEIGHT] = {
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000001,  // 🟦🟦🟦🟨
+    0b00000111,  // 🟦🟨🟨🟨
+    0b00001110,  // 🟨🟨🟨🟦
+    0b00001000,  // 🟨🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000,  // 🟦🟦🟦🟦
+    0b00000000   // 🟦🟦🟦🟦
+};
+
 const unsigned char fontcompact_charWidths[] = {
       1  /* ' ' ASCII 32 */,
       2  /* '!' ASCII 33 */,
-      4  /* '0x22' ASCII 34 */,
-      4  /* '#' ASCII 35 */,
+      7  /* '0x22' ASCII 34 */,
+      7  /* '#' ASCII 35 */,
       4  /* '$' ASCII 36 */,
       2  /* '%' ASCII 37 */,
       2  /* '&' ASCII 38 */,
@@ -1307,7 +1397,7 @@ const unsigned char fontcompact_charWidths[] = {
       7  /* '*' ASCII 42 */,
       7  /* '+' ASCII 43 */,
       2  /* ',' ASCII 44 */,
-      4  /* '-' ASCII 45 */,
+      3  /* '-' ASCII 45 */,
       1  /* '.' ASCII 46 */,
       2  /* '/' ASCII 47 */,
       4  /* '0' ASCII 48 */,
@@ -1322,11 +1412,11 @@ const unsigned char fontcompact_charWidths[] = {
       4  /* '9' ASCII 57 */,
       1  /* ':' ASCII 58 */,
       2  /* ';' ASCII 59 */,
-      0  /* '<' ASCII 60 */,
-      0  /* '=' ASCII 61 */,
-      0  /* '>' ASCII 62 */,
+      4  /* '<' ASCII 60 */,
+      4  /* '=' ASCII 61 */,
+      4  /* '>' ASCII 62 */,
       4  /* '?' ASCII 63 */,
-      0  /* '@' ASCII 64 */,
+      6  /* '@' ASCII 64 */,
       4  /* 'A' ASCII 65 */,
       4  /* 'B' ASCII 66 */,
       4  /* 'C' ASCII 67 */,
@@ -1354,10 +1444,10 @@ const unsigned char fontcompact_charWidths[] = {
       4  /* 'Y' ASCII 89 */,
       4  /* 'Z' ASCII 90 */,
       3  /* '[' ASCII 91 */,
-      4  /* '0x5C' ASCII 92 */,
+      3  /* '0x5C' ASCII 92 */,
       3  /* ']' ASCII 93 */,
       2  /* '^' ASCII 94 */,
-      6  /* '_' ASCII 95 */,
+      1  /* '_' ASCII 95 */,
       2  /* '`' ASCII 96 */,
       3  /* 'a' ASCII 97 */,
       3  /* 'b' ASCII 98 */,
@@ -1386,9 +1476,9 @@ const unsigned char fontcompact_charWidths[] = {
       3  /* 'y' ASCII 121 */,
       3  /* 'z' ASCII 122 */,
       0  /* '{' ASCII 123 */,
-      0  /* '|' ASCII 124 */,
+      1  /* '|' ASCII 124 */,
       0  /* '}' ASCII 125 */,
-      0  /* '~' ASCII 126 */
+      4  /* '~' ASCII 126 */
 };
 
 /* fontcompact_asciiTable[i] → character for ASCII (i + 32), 0 if no glyph */
@@ -1421,11 +1511,11 @@ const unsigned char *fontcompact_asciiTable[95] = {
     char_057  /* '9' ASCII 57 */,
     char_058  /* ':' ASCII 58 */,
     char_059  /* ';' ASCII 59 */,
-    0  /* '<' ASCII 60 */,
-    0  /* '=' ASCII 61 */,
-    0  /* '>' ASCII 62 */,
+    char_060  /* '<' ASCII 60 */,
+    char_061  /* '=' ASCII 61 */,
+    char_062  /* '>' ASCII 62 */,
     char_063  /* '?' ASCII 63 */,
-    0  /* '@' ASCII 64 */,
+    char_064  /* '@' ASCII 64 */,
     char_065  /* 'A' ASCII 65 */,
     char_066  /* 'B' ASCII 66 */,
     char_067  /* 'C' ASCII 67 */,
@@ -1485,7 +1575,7 @@ const unsigned char *fontcompact_asciiTable[95] = {
     char_121  /* 'y' ASCII 121 */,
     char_122  /* 'z' ASCII 122 */,
     0  /* '{' ASCII 123 */,
-    0  /* '|' ASCII 124 */,
+    char_124  /* '|' ASCII 124 */,
     0  /* '}' ASCII 125 */,
-    0  /* '~' ASCII 126 */
+    char_126  /* '~' ASCII 126 */
 };

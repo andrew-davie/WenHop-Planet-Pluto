@@ -114,10 +114,10 @@ void initKernel_Menu() {
     myMemsetInt((unsigned int *)(RAM + _MENU_BUFFERS_START), 0, _MENU_BUFFERS_SIZE / 4);
 
 
-    initAsciiStringDraw(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 0, 172, true);
+    drawString(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 0, 172);
     while (drawNextChar())
         ;
-    initAsciiStringDraw(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 0, 184, true);
+    drawString(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 0, 184);
     while (drawNextChar())
         ;
 
@@ -178,14 +178,14 @@ void drawCharacter(int x, int y, int ch) {
         *col++ = *p++;
 }
 
-void drawString(int x, int y, const char *text, int colour) {
+// void xxxdrawString(int x, int y, const char *text, int colour) {
 
-    while (*text && x < 6)
-        drawCharacter(x++, y, *text++);
+//     while (*text && x < 6)
+//         drawCharacter(x++, y, *text++);
 
-    for (int i = 0; i < LETTER_HEIGHT; i++)
-        RAM[_BUF_MENU_COLUP0 + i + y - 1] = convertColour(colour);
-}
+//     for (int i = 0; i < LETTER_HEIGHT; i++)
+//         RAM[_BUF_MENU_COLUP0 + i + y - 1] = convertColour(colour);
+// }
 
 void drawSmallString(int y, const char *smallText) {
 

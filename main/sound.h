@@ -107,8 +107,9 @@ void killRepeatingAudio();
 void initAudio(bool killTracks);
 void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument);
 void startMusic();
-void startFanfare();
-void startTrophyJingle();
+
+int step_toward(int current, int target);
+
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-macros"

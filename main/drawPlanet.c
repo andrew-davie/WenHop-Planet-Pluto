@@ -7,15 +7,81 @@
 #include "drawplanet.h"
 #include "main.h"
 #include "planet.h"
+#include "random.h"
 #include "reverseBits.h"
 #include "scroll.h"
 #include "sound.h"
 
+
 #define ROTATION_MAX 0x1000
 
 
-extern void initStars();
+struct STARS {
+    unsigned int x;
+    unsigned int y;
+    unsigned char colour;
+} stars[10];
 
+
+void initStars() {
+
+    for (unsigned int i = 0; i < sizeof(stars) / sizeof(stars[0]); i++) {
+        stars[i].x = rangeRandom(40) << 8;
+        stars[i].y = rangeRandom(66) << 8;
+        stars[i].colour = rangeRandom(7) + 1;
+    }
+}
+
+
+void drawOneStar(int x, int y, unsigned char colour) {
+
+    colour |= colour << 3;
+    colour >>= roller;
+
+    int line = y * 3;
+    if (line < 0 || line >= _SCANLINES - 3)
+        return;
+
+    int col = x;
+    if (col < 0 || col > SCREEN_TRIX_X - 1)
+        return;
+
+    unsigned char *basex = _BUF_GLOBE_PF + RAM + line;
+
+    if (col >= 20) {
+        col = 39 - col;
+        basex += 3 * _BUFFER_SIZE;
+    }
+
+    basex += ((col + 4) >> 3) * _BUFFER_SIZE;
+
+    int shift;
+    if (col < 4)
+        shift = col + 4;
+    else if (col < 12)
+        shift = 11 - col;
+    else
+        shift = (col - 12);
+
+    int bit = 1 << shift;
+
+    unsigned char mask0 = (colour) << shift;
+    unsigned char mask1 = (colour >> 1) << shift;
+    unsigned char mask2 = (colour >> 2) << shift;
+
+    if (!((basex[0] | basex[1] | basex[2]) & bit)) {
+        basex[0] = (basex[0] & ~bit) | (bit & mask0);
+        basex[1] = (basex[1] & ~bit) | (bit & mask1);
+        basex[2] = (basex[2] & ~bit) | (bit & mask2);
+    }
+}
+
+
+void drawStars() {
+
+    for (unsigned int i = 0; i < 10; i++)    // sizeof(stars) / sizeof(stars[0]); i++)
+        drawOneStar(stars[i].x >> 8, stars[i].y >> 8, stars[i].colour);
+}
 
 const unsigned short pix85[] = {
     0b0000000000000000,    // 0

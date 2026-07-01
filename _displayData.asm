@@ -145,8 +145,6 @@ _GLOBE_BUFFERS_START = *
 
 _GLOBE_BUFFERS_SIZE = * - _GLOBE_BUFFERS_START
 
-    echo "GLOBE buffers = ",[_GLOBE_BUFFERS_SIZE]d, "bytes"
-
     ; end of grouping (10)
 
     if * > END_BUFFERS

@@ -12,10 +12,10 @@
 
 #TOOLCHAIN 	= ~/Documents/software/gcc-arm-none-eabi/bin/arm-none-eabi
 
-TOOLCHAIN = /Users/boo/Documents/software/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/arm-none-eabi
-DASM 		= ~/Documents/software/Atari\ 2600/dasm/bin/dasm
+TOOLCHAIN = ../../ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/arm-none-eabi
+DASM 		= ../dasm/bin/dasm
 #DASM 		= python3 ~/Documents/software/Atari\ 2600/pydasm/dasm.py
-GOPHER 		= ~/Documents/software/Atari\ 2600/Gopher2600/
+GOPHER 		= ../Gopher2600/
 GOPHERNAME  = gopher2600_darwin_arm64
 STELLA 		= /Applications/Stella.app
 
@@ -224,7 +224,7 @@ prep: tools
 
 .PHONY: bootstrap_defines
 bootstrap_defines: gfx
-	$(DASM) $(SOURCE).asm -f3 -v5 \
+	$(DASM) $(SOURCE).asm -f3 \
 		-s$(OUTPUT)/$(SOURCE).sym \
 		-l$(OUTPUT)/$(SOURCE).lst \
 		-o$(OUTPUT)/$(SOURCE).bin

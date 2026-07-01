@@ -79,7 +79,7 @@ const unsigned char terra_ntsc_palette_override[3] = {
 
 // To add a planet
 
-//  a) put planet texture map in spinningGlobes/textures director (e.g., newplanet.jpg)
+//  a) put planet texture map in spinningGlobes/textures directory (e.g., newplanet.jpg)
 //  b) run cset.py from spinningGlobes directory
 //     suggested params:
 //     --no-dither
@@ -99,18 +99,19 @@ const unsigned char terra_ntsc_palette_override[3] = {
 
 const struct GLOBE planets[] = {
 
-    {">Earth", 8, ">6900 km|1.0 g", 1, earth_map, earth_charset, earth_ntsc_palette_override},                  // 1
-    {">Xe'drith", 8, ">1500 km|3.2 g", -1, lava_map, lava_charset, lava_ntsc_palette_override},                 // 2
-    {">Terror", 8, ">16900 km|9.2 g", 1, terra_map, terra_charset, terra_ntsc_palette_override},                // 0
-    {">Neptune", 8, ">9874 km|1.14 g", 1, neptune_map, neptune_charset, neptune_ntsc_palette_override},         // 3
-    {">WASP-76b", 8, ">14566 km|1.02 g", -1, green1_map, green1_charset, green1_ntsc_palette_override},         // 4
-    {">Skumveil", 8, ">42000 km|3.1415926 g", -1, pangea_map, pangea_charset, pangea_ntsc_palette_override},    // 5
-    {">Grunthos", 8, ">89000 km|8.2 g", 1, bloodworld_map, bloodworld_charset,
-     bloodworld_ntsc_palette_override},                                                                 // 6
-    {">Swilint", 8, ">6800 km|44 g", 1, blood2_map, blood2_charset, blood2_ntsc_palette_override},      // 7
-    {">Lichoni", 8, ">12400 km|0.00002 g", 1, titan_map, titan_charset, titan_ntsc_palette},            // 8
-    {">Muckspon", 8, ">4522 km|4.2 g", -1, moon_map, moon_charset, moon_ntsc_palette_override},         // 9
-    {">Planet X", 8, ">14530 km|2.71828 g", 1, moon_map, moon_charset, moon_ntsc_palette_override2},    // 10
+    // use $ in place of . for numbers; no delay and larger
+
+    {">_Earth", ">6900 km|9$81 m/s^", 1, earth_map, earth_charset, earth_ntsc_palette_override},                   // 1
+    {">_Xe'drith", ">1500 km|3$2 g", -1, lava_map, lava_charset, lava_ntsc_palette_override},                      // 2
+    {">_Terror", ">16900 km|9$2 g", 1, terra_map, terra_charset, terra_ntsc_palette_override},                     // 0
+    {">_Neptune", ">9874 km|1$14 g", 1, neptune_map, neptune_charset, neptune_ntsc_palette_override},              // 3
+    {">_WASP-76b", ">14566 km|1$02 g", -1, green1_map, green1_charset, green1_ntsc_palette_override},              // 4
+    {">_Skumveil", ">42000 km|3$1415926 g", -1, pangea_map, pangea_charset, pangea_ntsc_palette_override},         // 5
+    {">_Grunthos", ">89000 km|8$2 g", 1, bloodworld_map, bloodworld_charset, bloodworld_ntsc_palette_override},    // 6
+    {">_Swilint", ">6800 km|44 g", 1, blood2_map, blood2_charset, blood2_ntsc_palette_override},                   // 7
+    {">_Lichoni", ">12400 km|0$00002 g", 1, titan_map, titan_charset, titan_ntsc_palette},                         // 8
+    {">_Muckspon", ">4522 km|4$2 g", -1, moon_map, moon_charset, moon_ntsc_palette_override},                      // 9
+    {">_Planet X", ">14530 km|2$71828 g", 1, moon_map, moon_charset, moon_ntsc_palette_override2},                 // 10
 
     {0},    // END
 };

@@ -2,6 +2,7 @@
 
 #include "defines_dasm.h"
 
+#include "bitPatterns.h"
 #include "cdfjplus.h"    // <- contains references from defines_dasm.h
 #include "colour.h"
 #include "draw.h"
@@ -10,6 +11,10 @@
 #include "../gfx/alphanumeric.h"
 #include "../gfx/fontcompact.h"
 #include "../gfx/fontlarge.h"
+
+
+int dramaticPause;
+
 
 void draw6Bitmap(unsigned int grpOffset, unsigned int colup0Offset,    //
                  const unsigned char bitmap6[][6],                     //
@@ -58,7 +63,7 @@ static int colour;
 static int speedDelay;
 static int current;
 static int underline;
-
+static int escape;
 
 enum justify {
     JUSTIFY_NONE,
@@ -82,8 +87,7 @@ const struct FONT {
 };
 
 
-void initAsciiStringDraw(int fontNumber, int c, int delay, int buffer, int colbuf, const char *string, int x, int y,
-                         bool under) {
+void drawString(int fontNumber, int c, int delay, int buffer, int colbuf, const char *string, int x, int y) {
 
     // x: 0..47 pixel pos in GRP array
     // y: 1.._SCANLINES-1 line  (0 doesn't work because of colour)
@@ -91,7 +95,10 @@ void initAsciiStringDraw(int fontNumber, int c, int delay, int buffer, int colbu
 
     font = fontNumber;
     colour = convertColour(c);
-    underline = under;
+    underline = false;
+    escape = false;
+
+    dramaticPause = 0;
 
     ps = string;
     buf = RAM + buffer;          // + y;
@@ -106,128 +113,158 @@ void initAsciiStringDraw(int fontNumber, int c, int delay, int buffer, int colbu
     cy = y;
 }
 
+// clang-format off
+#define J_UNDER 0b00000100  /* underline */
+#define J_ON    0b10000000  /* visible */
+#define J_LEFT  0b00000010  /* left-justify */
+#define J_RIGHT 0b00000001  /* right-justify */
 
-const unsigned char justifyChar[] = {
+const unsigned char justifyChar[126 - 32 + 1] = {
 
-    0b100,    // 100, /* ' ' ASCII 32 */
-    0b100,    // 100, /* '!' ASCII 33 */
-    0b110,    // 100, /* '0x22' ASCII 34 */
-    0b100,    // 100, /* '#' ASCII 35 */
-    0b100,    // 100, /* '$' ASCII 36 */
-    0b100,    // 100, /* '%' ASCII 37 */
-    0b100,    // 100, /* '&' ASCII 38 */
-    0b101,    // 100, /* ''' ASCII 39 */
-    0b101,    // 100, /* '(' ASCII 40 */
-    0b100,    // 100, /* ')' ASCII 41 */
-    0b110,    // 100, /* '*' ASCII 42 */
-    0b110,    // 100, /* '+' ASCII 43 */
-    0b110,    // 100, /* ',' ASCII 44 */
-    0b100,    // 100, /* '-' ASCII 45 */
-    0b100,    // 100, /* '.' ASCII 46 */
-    0b100,    // 100, /* '/' ASCII 47 */
-    0b100,    // 100, /* '0' ASCII 48 */
-    0b100,    // 100, /* '1' ASCII 49 */
-    0b100,    // 100, /* '2' ASCII 50 */
-    0b100,    // 100, /* '3' ASCII 51 */
-    0b100,    // 100, /* '4' ASCII 52 */
-    0b100,    // 100, /* '5' ASCII 53 */
-    0b100,    // 100, /* '6' ASCII 54 */
-    0b100,    // 100, /* '7' ASCII 55 */
-    0b100,    // 100, /* '8' ASCII 56 */
-    0b100,    // 100, /* '9' ASCII 57 */
-    0b100,    // 100, /* ':' ASCII 58 */
-    0b100,    // 100, /* ';' ASCII 59 */
-    0b000,    // 000, /* '<' ASCII 60 */
-    0b000,    // 000, /* '=' ASCII 61 */
-    0b000,    // 000, /* '>' ASCII 62 */
-    0b100,    // 100, /* '?' ASCII 63 */
-    0b100,    // 100, /* '@' ASCII 64 */
-    0b100,    // 100, /* 'A' ASCII 65 */
-    0b100,    // 100, /* 'B' ASCII 66 */
-    0b100,    // 100, /* 'C' ASCII 67 */
-    0b100,    // 100, /* 'D' ASCII 68 */
-    0b100,    // 100, /* 'E' ASCII 69 */
-    0b100,    // 100, /* 'F' ASCII 70 */
-    0b100,    // 100, /* 'G' ASCII 71 */
-    0b100,    // 100, /* 'H' ASCII 72 */
-    0b100,    // 100, /* 'I' ASCII 73 */
-    0b100,    // 100, /* 'J' ASCII 74 */
-    0b100,    // 100, /* 'K' ASCII 75 */
-    0b100,    // 100, /* 'L' ASCII 76 */
-    0b100,    // 100, /* 'M' ASCII 77 */
-    0b100,    // 100, /* 'N' ASCII 78 */
-    0b100,    // 100, /* 'O' ASCII 79 */
-    0b100,    // 100, /* 'P' ASCII 80 */
-    0b100,    // 100, /* 'Q' ASCII 81 */
-    0b100,    // 100, /* 'R' ASCII 82 */
-    0b100,    // 100, /* 'S' ASCII 83 */
-    0b111,    // 100, /* 'T' ASCII 84 */
-    0b100,    // 100, /* 'U' ASCII 85 */
-    0b100,    // 100, /* 'V' ASCII 86 */
-    0b100,    // 100, /* 'W' ASCII 87 */
-    0b100,    // 100, /* 'X' ASCII 88 */
-    0b100,    // 100, /* 'Y' ASCII 89 */
-    0b100,    // 100, /* 'Z' ASCII 90 */
-    0b100,    // 100, /* '[' ASCII 91 */
-    0b100,    // 100, /* '0x5C' ASCII 92 */
-    0b100,    // 100, /* ']' ASCII 93 */
-    0b100,    // 100, /* '^' ASCII 94 */
-    0b101,    // 100, /* '_' ASCII 95 */
-    0b100,    // 100, /* '`' ASCII 96 */
-    0b100,    // 100, /* 'a' ASCII 97 */
-    0b100,    // 100, /* 'b' ASCII 98 */
-    0b101,    // 100, /* 'c' ASCII 99 */
-    0b100,    // 100, /* 'd' ASCII 100 */
-    0b101,    // 100, /* 'e' ASCII 101 */
-    0b111,    // 100, /* 'f' ASCII 102 */
-    0b100,    // 100, /* 'g' ASCII 103 */
-    0b100,    // 100, /* 'h' ASCII 104 */
-    0b100,    // 100, /* 'i' ASCII 105 */
-    0b100,    // 100, /* 'j' ASCII 106 */
-    0b100,    // 100, /* 'k' ASCII 107 */
-    0b100,    // 100, /* 'l' ASCII 108 */
-    0b100,    // 100, /* 'm' ASCII 109 */
-    0b100,    // 100, /* 'n' ASCII 110 */
-    0b100,    // 100, /* 'o' ASCII 111 */
-    0b100,    // 100, /* 'p' ASCII 112 */
-    0b100,    // 100, /* 'q' ASCII 113 */
-    0b101,    // 100, /* 'r' ASCII 114 */
-    0b100,    // 100, /* 's' ASCII 115 */
-    0b110,    // 100, /* 't' ASCII 116 */
-    0b100,    // 100, /* 'u' ASCII 117 */
-    0b100,    // 100, /* 'v' ASCII 118 */
-    0b100,    // 100, /* 'w' ASCII 119 */
-    0b100,    // 100, /* 'x' ASCII 120 */
-    0b100,    // 100, /* 'y' ASCII 121 */
-    0b100,    // 100, /* 'z' ASCII 122 */
-    0b100,    // 100, /* '{' ASCII 123 */
-    0b000,    // 000, /* '|' ASCII 124 */
-    0b100,    // 100, /* '}' ASCII 125 */
-    0b100,    // 100, /* '~' ASCII 126 */
+//   🟨 = visible
+//  ⎧        🟨 = underline
+//  ⎮       ⎧  🟨 = left-justify
+//  ⎮       ⎮ ⎧  🟨 = right-justify
+//  ⎮       ⎮ ⎮ ⎮
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   ' '         32
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '!'         33
+    🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '"'         34
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '#'         35
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '$'         36       replacement '.' without a delay (for numbers0
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '%'         37
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '&'         38
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '''         39 
+    🟨🟦🟦🟦🟦🟦🟦🟨 ,    //   '('         40
+    🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   ')'         41
+    🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '*'         42
+    🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '+'         43
+    🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   ','         44       + short pause
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '-'         45
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '.'         46       + long pause if '|' follows
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '/'         47
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '0'         48
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '1'         49
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '2'         50
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '3'         51
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '4'         52
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '5'         53
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '6'         54
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '7'         55
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '8'         56
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '9'         57
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   ':'         58
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   ';'         59
+    🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '<'         60       left justify string
+    🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '='         61       center justify string
+    🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '>'         62       right justify string
+    🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '?'         63
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '@'         64
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'A'         65
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'B'         66
+    🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   'C'         67
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'D'         68
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'E'         69
+    🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   'F'         70
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'G'         71
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'H'         72
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'I'         73
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'J'         74
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'K'         75
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'L'         76
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'M'         77
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'N'         78
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'O'         79
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'P'         80
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'Q'         81
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'R'         82
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'S'         83
+    🟨🟦🟦🟦🟦🟨🟨🟨 ,    //   'T'         84
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'U'         85
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'V'         86
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'W'         87
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '🟨'         88
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'Y'         89
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'Z'         90
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '['         91
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   'backslash  92
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   ']'         93
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '^'         94
+    🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '🟦'         95      toggle underline
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '`'         96
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'a'         97
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'b'         98
+    🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   'c'         99
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'd'         🟨🟦🟦
+    🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   'e'         101
+    🟨🟦🟦🟦🟦🟨🟨🟨 ,    //   'f'         102
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'g'         103
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'h'         104
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'i'         105
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'j'         106
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'k'         107
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'l'         108
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'm'         109
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'n'         110
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'o'         111
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'p'         112
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'q'         113
+    🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   'r'         114
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   's'         115
+    🟨🟦🟦🟦🟦🟨🟨🟦 ,    //   't'         116
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'u'         117
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'v'         118
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'w'         119
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '🟨'         120
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'y'         121
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'z'         122
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '{'         123
+    🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '|'         124      new line
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '}'         125
+    🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '~'         126      pause
 };
+
+// clang-format on
 
 
 #define LTR(s) (s - ' ')
-#define CRLF '|'
+#define EOL '|'
 
 
 int getLineWidth(const char *str) {
 
+    bool esc = false;
+
     int width = 0;
-    while (*str && *str != CRLF) {
+    while (*str && *str != EOL) {
 
-        int ci = LTR(*str);
-        if (justifyChar[ci] & 0b100) {
+        int ch = *str;
+        int ci = LTR(ch);
 
-            width += fonts[font].charWidths[ci] + 1;
-
-            if (justifyChar[ci] & 0b10)    // LHS
-                width--;
-            if (justifyChar[ci] & 0b01)    // RHS
-                width--;
-        }
         str++;
+
+        if (ch == '\\') {
+            esc = true;
+            continue;
+        }
+
+        if (esc || (justifyChar[ci] & J_ON)) {
+
+            if (ch != '#')
+                width += fonts[font].charWidths[ci] + 1;
+
+            // let quotes (open/closing) extend
+            if (ch == '\"')
+                width += fonts[font].charWidths[ci] + 1;
+
+            if (justifyChar[ci] & J_LEFT)
+                width--;
+            if (justifyChar[ci] & J_RIGHT)
+                width--;
+
+            esc = false;
+        }
     }
+
     return width ? width - 1 : 0;
 }
 
@@ -251,7 +288,7 @@ void setJustifyX(const char *str) {
 }
 
 
-void doLetter(int ci, int cx, int cy) {
+void doLetter(int ci, int cx, int cy, char colour) {
 
     int column = cx >> 3;
     int bit = 7 - (cx & 7);
@@ -269,7 +306,8 @@ void doLetter(int ci, int cx, int cy) {
                 int bs = bit + 1;
                 int band = column;
 
-                colrx[vertPos] = colour;
+                if (shape)
+                    colrx[vertPos] = colour;
 
                 while (shape && (band < 6)) {
 
@@ -287,66 +325,90 @@ void doLetter(int ci, int cx, int cy) {
 
 bool drawNextChar() {
 
-    // false = complete
-    bool something = false;
+    if (dramaticPause)
+        dramaticPause--;
 
-    while (ps && *ps && ++current > speedDelay) {
-
-        something = true;
-
-        current = 0;
-        // if (*ps == '.' && *(ps - 1) == '.' && *(ps - 2) == '.')
-        //     current = -100;
+    while (!dramaticPause && ps && *ps && ++current > speedDelay) {
 
         int ch = *ps;
         int ci = LTR(ch);
 
-        if (ch == CRLF) {
-            setJustifyX(ps + 1);
-            cy += fonts[font].lineHeight;
+        ps++;
+
+
+        if (!escape) {
+
+            switch (ch) {
+
+            case '\\':
+                escape = true;
+                current = 0;
+                continue;
+
+            case EOL:
+                setJustifyX(ps);
+                cy += fonts[font].lineHeight;
+                if (*(ps - 2) == '.')
+                    cy += fonts[font].lineHeight >> 1;
+                continue;
+
+            case '>':
+                justify = JUSTIFY_RIGHT;
+                setJustifyX(ps);
+                continue;
+
+            case '<':
+                justify = JUSTIFY_LEFT;
+                setJustifyX(ps);
+                continue;
+
+            case '=':
+                justify = JUSTIFY_CENTER;
+                setJustifyX(ps);
+                continue;
+
+            case '_':
+                underline = !underline;
+                continue;
+
+            case '~':
+                dramaticPause = 50;
+                continue;
+            }
         }
 
-        else if (ch == '>') {
-            justify = JUSTIFY_RIGHT;
-            setJustifyX(ps + 1);
-        }
+        if ((escape || (justifyChar[ci] & J_ON)) && fonts[font].charWidths[ci]) {
 
-        else if (ch == '<') {
-            justify = JUSTIFY_LEFT;
-            setJustifyX(ps + 1);
-        }
+            current = 0;
 
-        else if (ch == '=') {
-            justify = JUSTIFY_CENTER;
-            setJustifyX(ps + 1);
-        }
+            if (ch == '.' && *ps != '#' && *ps != '.')    // pause sentence except at end
+                dramaticPause = 50;
 
-        else if (fonts[font].charWidths[ci]) {
+            else if (ch == ',')
+                dramaticPause = 20;
 
             if (ch != ' ')
-                ADDAUDIO(ch == '*' ? SFX_DOGE : SFX_KEYPRESS);
+                ADDAUDIO(ch == '*' ? SFX_DOGE : SFX_KEYPRESS);    // review-star = "*"
 
-            if (justifyChar[ci] & 0b10)
+            if (justifyChar[ci] & J_LEFT)
                 cx--;
 
+            doLetter(ci, cx, cy, colour);
+            if ((justifyChar[ci] & J_UNDER) && underline) {
 
-            doLetter(ci, cx, cy);
-            if (underline)
-                doLetter(LTR('_'), cx, cy);
+                int uwide = fonts[font].charWidths[ci] - fonts[font].charWidths[LTR('_')] + 1;
+                for (int i = 0; i <= uwide; i++)
+                    doLetter(LTR('_'), cx + i, cy + 1, convertColour(0x46));
+            }
 
             cx += fonts[font].charWidths[ci] + 1;
 
-            if (justifyChar[ci] & 0b01)
+            if (justifyChar[ci] & J_RIGHT)
                 cx--;
+
+            escape = false;
         }
-
-        ps++;
     }
-
-
-    if (something && !(ps && *ps))
-        ADDAUDIO(SFX_DIRT);
-
 
     return ps && *ps;
 }

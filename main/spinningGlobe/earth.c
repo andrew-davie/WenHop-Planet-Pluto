@@ -470,7 +470,7 @@ static const unsigned char earth_char_036[30] = {
       7,  28,  16,  /* 🟫🟩🟨🟥🟥 */
       3,  14,  28,  /* 🟦🟫🟫🟨🟥 */
       1,   9,  30,  /* 🟦🟫🟦🟦🟨 */
-      1,   0,  31,  /* 🟦🟦🟦🟦🟪 */
+      1,   1,  31,  /* 🟦🟦🟦🟦⬜ */
       0,  31,  30,  /* 🟫🟫🟫🟫🟩 */
       1,  31,   0,  /* 🟩🟩🟩🟩🟨 */
       7,  28,   0,  /* 🟩🟩🟨🟥🟥 */
@@ -484,11 +484,23 @@ static const unsigned char earth_char_037[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
+};
+static const unsigned char earth_char_038[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   7,   0,  /* 🟥🟥🟨🟨🟨 */
      24,  15,   0,  /* 🟥🟨🟩🟩🟩 */
      31,  31,   0,  /* 🟨🟨🟨🟨🟨 */
 };
-static const unsigned char earth_char_038[30] = {
+static const unsigned char earth_char_039[30] = {
      28,  31,   0,  /* 🟨🟨🟨🟩🟩 */
      28,  15,   0,  /* 🟥🟨🟨🟩🟩 */
      31,   7,   0,  /* 🟥🟥🟨🟨🟨 */
@@ -500,7 +512,7 @@ static const unsigned char earth_char_038[30] = {
      15,  24,   0,  /* 🟩🟨🟥🟥🟥 */
      31,  24,   0,  /* 🟨🟨🟥🟥🟥 */
 };
-static const unsigned char earth_char_039[30] = {
+static const unsigned char earth_char_040[30] = {
       1,  31,   1,  /* 🟩🟩🟩🟩⬜ */
       1,  31,   1,  /* 🟩🟩🟩🟩⬜ */
      16,  31,   3,  /* 🟨🟩🟩🟫🟫 */
@@ -512,7 +524,7 @@ static const unsigned char earth_char_039[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_040[30] = {
+static const unsigned char earth_char_041[30] = {
      17,  30,  16,  /* ⬜🟩🟩🟩🟥 */
       1,  30,  28,  /* 🟫🟫🟫🟩🟥 */
      19,  28,  24,  /* ⬜🟫🟩🟥🟥 */
@@ -524,7 +536,19 @@ static const unsigned char earth_char_040[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_041[30] = {
+static const unsigned char earth_char_042[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   8,   0,  /* 🟥🟨🟥🟥🟥 */
+     31,   4,   0,  /* 🟥🟥🟨🟥🟥 */
+};
+static const unsigned char earth_char_043[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -536,7 +560,7 @@ static const unsigned char earth_char_041[30] = {
      31,   1,   0,  /* 🟥🟥🟥🟥🟨 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_042[30] = {
+static const unsigned char earth_char_044[30] = {
      31,   8,   0,  /* 🟥🟨🟥🟥🟥 */
      31,  24,   0,  /* 🟨🟨🟥🟥🟥 */
      31,   6,   0,  /* 🟥🟥🟨🟨🟥 */
@@ -548,7 +572,7 @@ static const unsigned char earth_char_042[30] = {
      31,  16,   0,  /* 🟨🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_043[30] = {
+static const unsigned char earth_char_045[30] = {
      31,   2,   0,  /* 🟥🟥🟥🟨🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -560,7 +584,19 @@ static const unsigned char earth_char_043[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_044[30] = {
+static const unsigned char earth_char_046[30] = {
+     31,   8,   0,  /* 🟥🟨🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+};
+static const unsigned char earth_char_047[30] = {
      30,   3,   0,  /* 🟥🟥🟥🟨🟩 */
      30,   1,   0,  /* 🟥🟥🟥🟥🟩 */
      30,   1,   0,  /* 🟥🟥🟥🟥🟩 */
@@ -572,7 +608,7 @@ static const unsigned char earth_char_044[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_045[30] = {
+static const unsigned char earth_char_048[30] = {
       7,  31,   0,  /* 🟩🟩🟨🟨🟨 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
       0,  31,   0,  /* 🟩🟩🟩🟩🟩 */
@@ -584,7 +620,7 @@ static const unsigned char earth_char_045[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_046[30] = {
+static const unsigned char earth_char_049[30] = {
      15,  24,   0,  /* 🟩🟨🟥🟥🟥 */
      15,  24,   0,  /* 🟩🟨🟥🟥🟥 */
      15,  16,   0,  /* 🟩🟥🟥🟥🟥 */
@@ -596,7 +632,7 @@ static const unsigned char earth_char_046[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_047[30] = {
+static const unsigned char earth_char_050[30] = {
      31,  15,   0,  /* 🟥🟨🟨🟨🟨 */
       1,  31,   0,  /* 🟩🟩🟩🟩🟨 */
      17,  31,   0,  /* 🟨🟩🟩🟩🟨 */
@@ -608,7 +644,7 @@ static const unsigned char earth_char_047[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_048[30] = {
+static const unsigned char earth_char_051[30] = {
      31,  31,   0,  /* 🟨🟨🟨🟨🟨 */
      31,  31,   0,  /* 🟨🟨🟨🟨🟨 */
      31,  31,   0,  /* 🟨🟨🟨🟨🟨 */
@@ -620,7 +656,7 @@ static const unsigned char earth_char_048[30] = {
      24,  15,   0,  /* 🟥🟨🟩🟩🟩 */
      28,   3,   0,  /* 🟥🟥🟥🟩🟩 */
 };
-static const unsigned char earth_char_049[30] = {
+static const unsigned char earth_char_052[30] = {
      31,  12,   0,  /* 🟥🟨🟨🟥🟥 */
      31,  12,   0,  /* 🟥🟨🟨🟥🟥 */
       7,  24,   0,  /* 🟩🟩🟥🟥🟥 */
@@ -632,7 +668,7 @@ static const unsigned char earth_char_049[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
 };
-static const unsigned char earth_char_050[30] = {
+static const unsigned char earth_char_053[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -644,7 +680,7 @@ static const unsigned char earth_char_050[30] = {
       0,  31,  31,  /* 🟫🟫🟫🟫🟫 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_051[30] = {
+static const unsigned char earth_char_054[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -656,7 +692,7 @@ static const unsigned char earth_char_051[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_052[30] = {
+static const unsigned char earth_char_055[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -668,7 +704,7 @@ static const unsigned char earth_char_052[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_053[30] = {
+static const unsigned char earth_char_056[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -680,7 +716,19 @@ static const unsigned char earth_char_053[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_054[30] = {
+static const unsigned char earth_char_057[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,  31,  14,  /* 🟨⬜⬜⬜🟨 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+};
+static const unsigned char earth_char_058[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -692,7 +740,7 @@ static const unsigned char earth_char_054[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_055[30] = {
+static const unsigned char earth_char_059[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -704,7 +752,19 @@ static const unsigned char earth_char_055[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_056[30] = {
+static const unsigned char earth_char_060[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,  16,  16,  /* ⬜🟥🟥🟥🟥 */
+      1,   2,  31,  /* 🟦🟦🟦🟫🟪 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+};
+static const unsigned char earth_char_061[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -716,7 +776,19 @@ static const unsigned char earth_char_056[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_057[30] = {
+static const unsigned char earth_char_062[30] = {
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
+     31,  15,  31,  /* 🟪⬜⬜⬜⬜ */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+      0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
+};
+static const unsigned char earth_char_063[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -728,7 +800,7 @@ static const unsigned char earth_char_057[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_058[30] = {
+static const unsigned char earth_char_064[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -740,7 +812,7 @@ static const unsigned char earth_char_058[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_059[30] = {
+static const unsigned char earth_char_065[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -752,7 +824,7 @@ static const unsigned char earth_char_059[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_060[30] = {
+static const unsigned char earth_char_066[30] = {
      30,   3,   0,  /* 🟥🟥🟥🟨🟩 */
      30,   1,   0,  /* 🟥🟥🟥🟥🟩 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -764,7 +836,7 @@ static const unsigned char earth_char_060[30] = {
       0,  30,  31,  /* 🟫🟫🟫🟫🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_061[30] = {
+static const unsigned char earth_char_067[30] = {
      15,  16,   0,  /* 🟩🟥🟥🟥🟥 */
      15,  16,   0,  /* 🟩🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -776,7 +848,7 @@ static const unsigned char earth_char_061[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_062[30] = {
+static const unsigned char earth_char_068[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -788,7 +860,7 @@ static const unsigned char earth_char_062[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_063[30] = {
+static const unsigned char earth_char_069[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -800,7 +872,7 @@ static const unsigned char earth_char_063[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_064[30] = {
+static const unsigned char earth_char_070[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -812,7 +884,7 @@ static const unsigned char earth_char_064[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_065[30] = {
+static const unsigned char earth_char_071[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -824,7 +896,7 @@ static const unsigned char earth_char_065[30] = {
       0,   7,  31,  /* 🟦🟦🟫🟫🟫 */
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
-static const unsigned char earth_char_066[30] = {
+static const unsigned char earth_char_072[30] = {
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
      31,   0,   0,  /* 🟥🟥🟥🟥🟥 */
@@ -837,7 +909,7 @@ static const unsigned char earth_char_066[30] = {
       0,   0,  31,  /* 🟦🟦🟦🟦🟦 */
 };
 
-const unsigned char * const earth_charset[67] = {
+const unsigned char * const earth_charset[73] = {
     earth_char_000,
     earth_char_001,
     earth_char_002,
@@ -905,13 +977,19 @@ const unsigned char * const earth_charset[67] = {
     earth_char_064,
     earth_char_065,
     earth_char_066,
+    earth_char_067,
+    earth_char_068,
+    earth_char_069,
+    earth_char_070,
+    earth_char_071,
+    earth_char_072,
 };
 
 const unsigned char earth_map[122] = {
     30, 4,
     8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-    1, 1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 1, 1, 37, 38, 39, 40, 1, 1, 1, 1, 1, 28, 29, 30, 31, 32, 33, 34, 35,
-    1, 41, 42, 43, 1, 1, 1, 44, 45, 46, 1, 1, 47, 48, 49, 1, 1, 1, 1, 1, 1, 41, 42, 43, 1, 1, 1, 44, 45, 46,
-    50, 51, 52, 53, 52, 54, 55, 54, 56, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 50, 51, 52, 53, 52, 54, 55, 54, 56, 56,
+    1, 1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 1, 37, 38, 39, 40, 41, 1, 1, 1, 1, 1, 28, 29, 30, 31, 32, 33, 34, 35,
+    42, 43, 44, 45, 46, 1, 1, 47, 48, 49, 1, 1, 50, 51, 52, 1, 1, 1, 1, 1, 42, 43, 44, 45, 46, 1, 1, 47, 48, 49,
+    53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
 };
 
