@@ -2,13 +2,11 @@ todo:
 
 star swipe import from BD
 rain particles from BD
-planets!
 
 weapon from board!!!  e.g., M = mace, R = ROPE, G = gun
 x/y triggered pipe pushers
 rolling on hardware (spiceware)
 sound priority (process all, use loudest)
-fade in/out with intensity from Gridlock
 suicide/timer/level end logic
 
 process all sfx to ensure we don't get delayed soundx!!
@@ -19,4 +17,6 @@ bonus levels - you get 3 attempts at each
 conway's LIFE planets
 fade
 
+
+level selection grid/display fromgridlock
 

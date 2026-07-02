@@ -105,6 +105,9 @@ SRCS = \
  score.c \
  scroll.c \
  spinningPlanet.c \
+ \
+ planetHuffman.c \
+ \
  wyrm.c \
  \
  grid6.c \

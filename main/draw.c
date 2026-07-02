@@ -119,7 +119,7 @@ void drawString(int fontNumber, int c, int delay, int buffer, int colbuf, const 
 #define J_LEFT  0b00000010  /* left-justify */
 #define J_RIGHT 0b00000001  /* right-justify */
 
-const unsigned char justifyChar[126 - 32 + 1] = {
+const unsigned char justifyChar['~' - ' ' + 1] = {
 
 //   🟨 = visible
 //  ⎧        🟨 = underline
@@ -128,7 +128,7 @@ const unsigned char justifyChar[126 - 32 + 1] = {
 //  ⎮       ⎮ ⎮ ⎮
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   ' '         32
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '!'         33
-    🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '"'         34
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '"'         34
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '#'         35
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '$'         36       replacement '.' without a delay (for numbers0
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '%'         37
@@ -158,7 +158,7 @@ const unsigned char justifyChar[126 - 32 + 1] = {
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '='         61       center justify string
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '>'         62       right justify string
     🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '?'         63
-    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '@'         64
+    🟨🟦🟦🟦🟦🟨🟨🟦 ,    //   '@'         64
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'A'         65
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'B'         66
     🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   'C'         67
@@ -249,12 +249,12 @@ int getLineWidth(const char *str) {
 
         if (esc || (justifyChar[ci] & J_ON)) {
 
-            if (ch != '#')
+            if (ch != '#' && ch != '\"')
                 width += fonts[font].charWidths[ci] + 1;
 
             // let quotes (open/closing) extend
-            if (ch == '\"')
-                width += fonts[font].charWidths[ci] + 1;
+            //            if (ch == '\"')
+            // width += fonts[font].charWidths[ci] + 1;
 
             if (justifyChar[ci] & J_LEFT)
                 width--;
@@ -389,6 +389,9 @@ bool drawNextChar() {
 
             if (ch != ' ')
                 ADDAUDIO(ch == '*' ? SFX_DOGE : SFX_KEYPRESS);    // review-star = "*"
+
+            if (ch == '\"')
+                cx -= fonts[font].charWidths[LTR('\"')];
 
             if (justifyChar[ci] & J_LEFT)
                 cx--;
