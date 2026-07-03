@@ -49,7 +49,7 @@ const struct planetReviews planetInfo[] = {
 // {"=\"The|currency|here is|apologies. I|had several|to spend. I|ran out on|day|three.#",2}, // 8
 // {"=\"The|locals have a|greeting of|twelve|gestures. I|learned|eleven. The|twelfth is|apparently|the important|one.#",2}, // 8
 // Planet 1
-/* 0 */ {"=\"The|tourist board|slogan is...}_WE|ARE HERE_}That is the|full extent|of the|pitch.#",2}, // 7
+/* 0 */ {"=\"The|tourist board|slogan is...}_WE ARE|HERE_}That is the|full extent|of the|pitch.#",2}, // 7
 /* 1 */ {"=\"The|handshake|has a part|where you|pretend not|to know each|other.}I skipped|that part, and|things went|wrong.#",2}, // 8
 /* 2 */ {"=\"The|nightlife|starts at|dusk, ends|shortly after|dusk, and|everyone|goes home|and|sighs.#",2}, // 8
 /* 3 */ {"=\"The|welcome|pack|included a|breathing|guide, which|I assumed|was a joke.}It was not a|joke.#",1}, // 8
@@ -57,7 +57,7 @@ const struct planetReviews planetInfo[] = {
 /* 5 */ {"=\"On day|five my|translator|became|philosophical.|It rendered|everything as|%but why?&}I have not|found good|answers.#",2}, // 8
 /* 6 */ {"=\"I do not|sleep the|way this|species does.|I stood in a|corner each|night.}The cleaner|stopped|coming in on|day two.#",2}, // 8
 /* 7 */ {"=\"The|entry form|asked what I|was willing to|lose. I did|not read this|carefully.}I have since|checked.}Something is|missing.#",1}, // 9
-/* 8 */ {"=\"The|locals|reproduce by|arguing. I|made several|points at|dinner.}I am told|there are|now nine|more locals. I|apologise.#",2}, // 10
+/* 8 */ {"=\"The|locals|reproduce by|arguing. I|made several|points at|dinner. I am|told there|are now nine|more locals. I|apologise#",2}, // 10
 /* 9 */ {"=\"The|mountain is|said to watch|visitors. I|dismissed|this.}On day four|it was closer.}I did not|check on day|five.#",2}, // 9
 // {"=\"There|are no|shadows|here. The|light comes|from|everywhere.|After three|days I missed|somewhere|to hide.#",1}, // 9
 // {"=\"Pointing|is considered|rude here.|The|guidebook|has pictures|you point at|to order|food. This is|not|noted.#",1}, // 8

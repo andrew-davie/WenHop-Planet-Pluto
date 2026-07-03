@@ -14,8 +14,28 @@
 #include "../gfx/fontcompact.h"
 #include "../gfx/fontlarge.h"
 
+
+//------------------------------------------------------------------------------
+// Notes on Huffman encoding of remarks
+
 // #define HUFFMAN
 
+// Remarks are in planetInfo.c
+// These remarks are used as-is if HUFFMAN is NOT defined.
+// However, if HUFFMAN is defined, then the compressed version of these remarks is used.
+// These are generated via tools/huffman.py
+// Usage (from main)..
+// python3 tools/huffman.py path/to/planetInfo.c  path/to/planetHuffman
+// The generated planetHuffman files are used instead of planetInfo.c
+
+// Beware out-of-date .o files -- do a make-clean and make if you change HUFFMAN
+
+// Strings are formatted correctly by...
+// python3 tools/reformat.py
+// # or
+// python3 reformat.py path/to/planetInfo.c
+
+//------------------------------------------------------------------------------
 
 static int pif;
 static int lines;
