@@ -114,10 +114,10 @@ void initKernel_Menu() {
     myMemsetInt((unsigned int *)(RAM + _MENU_BUFFERS_START), 0, _MENU_BUFFERS_SIZE / 4);
 
 
-    drawString(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 0, 172);
+    drawString(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 172);
     while (drawNextChar())
         ;
-    drawString(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 0, 184);
+    drawString(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 184);
     while (drawNextChar())
         ;
 

@@ -14,6 +14,9 @@
 #include "../gfx/fontcompact.h"
 #include "../gfx/fontlarge.h"
 
+// #define HUFFMAN
+
+
 static int pif;
 static int lines;
 static int pa_lines;
@@ -185,6 +188,7 @@ const unsigned char track1d[] = {FULLNOTE e3 f3 g3 TRACK_LOOP};
 
 /* Track 2 — 5 note loop: oscillates across the same cluster differently */
 const unsigned char track2d[] = {FULLNOTE g3 f3 e3 f3 g3_SHARP TRACK_LOOP};
+// clang-format on
 
 
 void initKernel_Globe() {
@@ -203,7 +207,7 @@ void initKernel_Globe() {
 
     sound_volume = VOLUME_PLAYING;
 
-    const int speed = 0x40; //rangeRandom(80) + 16;
+    const int speed = 0x40;    // rangeRandom(80) + 16;
 
     loadTrack(10, track1b, 40, speed, 1);
     loadTrack(0, track2b, 25, speed, 2);
@@ -229,8 +233,6 @@ void drawPaletteGlobe(const unsigned char *palette) {
         p[i + 2] = pal[0];
     }
 }
-
-#define HUFFMAN
 
 
 #ifdef HUFFMAN
@@ -261,27 +263,13 @@ bool seen[PHRASE_COUNT];
 // phrase_decode(phrases[42].data, phrases[42].len, buf, sizeof(buf));
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const char *review[] = {
-    ">+++++",    // 0
-    ">*++++",    // 1
-    ">**+++",    // 2
-    ">***++",    // 3
-    ">****+",    // 4
-    ">*****",    // 5
+    "=+++++",    // 0
+    "=*++++",    // 1
+    "=**+++",    // 2
+    "=***++",    // 3
+    "=****+",    // 4
+    "=*****",    // 5
 };
 
 
@@ -323,7 +311,7 @@ void VB_Globe() {
 
 void OS_Globe() {
 
-#define ADJ 6
+#define ADJ 0
 
     interleaveChronoColour(&roller);
 
@@ -336,14 +324,13 @@ void OS_Globe() {
         case INFO_FADEUP:
             if (luminance)
                 infoPhase = INFO_FADEUP;
-                //infoPhase = INFO_CLEAR1;    // tmp
             break;
 
 
         case INFO_NAME:
 
             drawString(FONT_LARGE, 0x8, 10, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
-                       planets[planet].name, 0,
+                       planets[planet].name,
                        _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - FONTLARGE_FONT_HEIGHT - 25 + ADJ);
             wait = 10;
             break;
@@ -351,7 +338,7 @@ void OS_Globe() {
 
         case INFO_PHYSICS:
             drawString(FONT_COMPACT, 0x16, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
-                       planets[planet].physics, 0,                                  //
+                       planets[planet].physics,                                     //
                        _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - 25 + 5 + ADJ);
             wait = 200;
 
@@ -360,6 +347,10 @@ void OS_Globe() {
 
 
         case INFO_CLEAR1: {
+
+            myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
+            ADDAUDIO(SFX_DOGE2);
+
 
             int lastpif = pif;
             pif = rangeRandom(PHRASE_COUNT);
@@ -398,61 +389,56 @@ void OS_Globe() {
 
 #endif
 
-            do
-                if (*p == '|') {
+            do {
+                if (*p == '|')
                     lines += FONTCOMPACT_FONT_HEIGHT;
-                    if (*(p - 1) == '.')
-                        lines += FONTCOMPACT_FONT_HEIGHT >> 1;
-                }
-            while (*++p);
+                if (*(p - 1) == '}')
+                    lines += FONTCOMPACT_FONT_HEIGHT + (FONTCOMPACT_FONT_HEIGHT >> 1);
+            } while (*++p);
 
 
-            myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
-            ADDAUDIO(SFX_DOGE2);
+#define INFO_GAP 10
+#define TITLE_HEIGHT (FONTCOMPACT_FONT_HEIGHT + 2)
+#define RATING_HEIGHT (FONTCOMPACT_FONT_HEIGHT)
+
+            pa_lines = (_SCANLINES >> 1) - ((lines + (INFO_GAP * 2 + TITLE_HEIGHT + RATING_HEIGHT)) >> 1) + ADJ;
             wait = 30;
         } break;
 
 
         case INFO_PLANETADVISOR:
 
-            pa_lines = ((_SCANLINES - lines) >> 1) + ADJ;
-
-
-            drawString(FONT_COMPACT, 0x8, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
-                       "=_Planet@vVsor", 0, pa_lines - 20);
+            drawString(FONT_COMPACT, 0x8, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, "=_Planet@Visor", pa_lines);
+            pa_lines += TITLE_HEIGHT + INFO_GAP;
             wait = 25;
-
             break;
 
 
         case INFO_INFO:
-#ifdef HUFFMAN
 
-drawString(FONT_COMPACT, 0xD8, 4, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
-                       huffBuff, 0, pa_lines);
+#ifdef HUFFMAN
+            drawString(FONT_COMPACT, 0xD8, 4, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, huffBuff, pa_lines);
 #else
-drawString(FONT_COMPACT, 0xD8, 4, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
-                       planetInfo[pif].review, 0, pa_lines);
+            drawString(FONT_COMPACT, 0xD8, 4, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planetInfo[pif].review, pa_lines);
 #endif
+            pa_lines += lines + INFO_GAP;
             wait = 50;
             break;
 
 
         case INFO_RATING1:
-            pa_lines += lines + 8;
-            drawString(FONT_COMPACT, 0x18, 0, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, review[0], 0, pa_lines);
+            drawString(FONT_COMPACT, 0x18, 0, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, review[0], pa_lines);
             break;
 
 
         case INFO_RATING2:
 #ifdef HUFFMAN
-            drawString(FONT_COMPACT, 0x18, 20, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
-                       review[phrases[pif].stars], 0, pa_lines);
+            drawString(FONT_COMPACT, 0x18, 20, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, review[phrases[pif].stars], pa_lines);
 #else
-            drawString(FONT_COMPACT, 0x18, 20, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,
-                       review[planetInfo[pif].stars < 6 ? planetInfo[pif].stars : 5], 0, pa_lines);
+            drawString(FONT_COMPACT, 0x18, 20, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, review[planetInfo[pif].stars],
+                       pa_lines);
 #endif
-            wait = 150;
+            wait = 200;
             break;
 
 

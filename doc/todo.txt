@@ -3,9 +3,9 @@ todo:
 star swipe import from BD
 rain particles from BD
 
-weapon from board!!!  e.g., M = mace, R = ROPE, G = gun
+weapon from board!!!  e.g., M = mace, R = ROPE, G = gun << some other mechanism
+
 x/y triggered pipe pushers
-rolling on hardware (spiceware)
 sound priority (process all, use loudest)
 suicide/timer/level end logic
 
@@ -20,3 +20,15 @@ fade
 
 level selection grid/display fromgridlock
 
+
+    planet/continent selection screen (aka GridLock)
+        --. Names for each
+
+BUGS:
+    rolling on hardware (spiceware)
+    --> simply overtime viz planet issues rsolved with optimisation
+
+
+
+COMPLETED
+    fade

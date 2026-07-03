@@ -87,7 +87,7 @@ const struct FONT {
 };
 
 
-void drawString(int fontNumber, int c, int delay, int buffer, int colbuf, const char *string, int x, int y) {
+void drawString(int fontNumber, int c, int delay, int buffer, int colbuf, const char *string, int y) {
 
     // x: 0..47 pixel pos in GRP array
     // y: 1.._SCANLINES-1 line  (0 doesn't work because of colour)
@@ -109,26 +109,29 @@ void drawString(int fontNumber, int c, int delay, int buffer, int colbuf, const 
 
     justify = JUSTIFY_NONE;
 
-    cx = x;
+    cx = 0;
     cy = y;
 }
 
 // clang-format off
-#define J_UNDER 0b00000100  /* underline */
-#define J_ON    0b10000000  /* visible */
-#define J_LEFT  0b00000010  /* left-justify */
-#define J_RIGHT 0b00000001  /* right-justify */
+
+#define J_ON        0b10000000  /* visible */
+#define J_PARAGRAPH 0b00001000  /* new paragraph if followed by EOL */
+#define J_UNDER     0b00000100  /* underline */
+#define J_LEFT      0b00000010  /* left-justify */
+#define J_RIGHT     0b00000001  /* right-justify */
 
 const unsigned char justifyChar['~' - ' ' + 1] = {
 
 //   🟨 = visible
-//  ⎧        🟨 = underline
-//  ⎮       ⎧  🟨 = left-justify
-//  ⎮       ⎮ ⎧  🟨 = right-justify
-//  ⎮       ⎮ ⎮ ⎮
+//  ⎧       🟨 = new paragraph if followed by | 
+//  ⎮      ⎧ 🟨 = underline
+//  ⎮      ⎮⎧  🟨 = left-justify
+//  ⎮      ⎮⎮ ⎧  🟨 = right-justify
+//  ⎮      ⎮⎮ ⎮ ⎮
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   ' '         32
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '!'         33
-    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '"'         34
+    🟨🟦🟦🟦🟨🟦🟦🟦 ,    //   '"'         34
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '#'         35
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '$'         36       replacement '.' without a delay (for numbers0
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '%'         37
@@ -140,7 +143,7 @@ const unsigned char justifyChar['~' - ' ' + 1] = {
     🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '+'         43
     🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   ','         44       + short pause
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '-'         45
-    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '.'         46       + long pause if '|' follows
+    🟨🟦🟦🟦🟨🟦🟦🟦 ,    //   '.'         46       + long pause if '|' follows
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '/'         47
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '0'         48
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '1'         49
@@ -157,7 +160,7 @@ const unsigned char justifyChar['~' - ' ' + 1] = {
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '<'         60       left justify string
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '='         61       center justify string
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '>'         62       right justify string
-    🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '?'         63
+    🟨🟦🟦🟦🟨🟦🟨🟦 ,    //   '?'         63
     🟨🟦🟦🟦🟦🟨🟨🟦 ,    //   '@'         64
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'A'         65
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'B'         66
@@ -219,7 +222,7 @@ const unsigned char justifyChar['~' - ' ' + 1] = {
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'z'         122
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '{'         123
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '|'         124      new line
-    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '}'         125
+    🟦🟦🟦🟦🟨🟦🟦🟦 ,    //   '}'         125      new paragraph
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '~'         126      pause
 };
 
@@ -228,6 +231,17 @@ const unsigned char justifyChar['~' - ' ' + 1] = {
 
 #define LTR(s) (s - ' ')
 #define EOL '|'
+#define EOP '}'
+
+enum {
+    CTL_EOL = '|',
+    CTL_PAR = '}',
+    CTL_LEFT = '<',
+    CTL_RIGHT = '>',
+    CTL_CENTER = '=',
+    CTL_UNDERLINE = '_',
+    CTL_PAUSE = '~',
+};
 
 
 int getLineWidth(const char *str) {
@@ -235,7 +249,7 @@ int getLineWidth(const char *str) {
     bool esc = false;
 
     int width = 0;
-    while (*str && *str != EOL) {
+    while (*str && *str != EOL && *str != EOP) {
 
         int ch = *str;
         int ci = LTR(ch);
@@ -251,10 +265,6 @@ int getLineWidth(const char *str) {
 
             if (ch != '#' && ch != '\"')
                 width += fonts[font].charWidths[ci] + 1;
-
-            // let quotes (open/closing) extend
-            //            if (ch == '\"')
-            // width += fonts[font].charWidths[ci] + 1;
 
             if (justifyChar[ci] & J_LEFT)
                 width--;
@@ -345,33 +355,39 @@ bool drawNextChar() {
                 current = 0;
                 continue;
 
-            case EOL:
+            case CTL_PAR:
+
+                cy += fonts[font].lineHeight >> 1;
+                dramaticPause = 20;
+                __attribute__((fallthrough));
+
+            case CTL_EOL: {
+
                 setJustifyX(ps);
                 cy += fonts[font].lineHeight;
-                if (*(ps - 2) == '.')
-                    cy += fonts[font].lineHeight >> 1;
                 continue;
+            }
 
-            case '>':
+            case CTL_RIGHT:
                 justify = JUSTIFY_RIGHT;
                 setJustifyX(ps);
                 continue;
 
-            case '<':
+            case CTL_LEFT:
                 justify = JUSTIFY_LEFT;
                 setJustifyX(ps);
                 continue;
 
-            case '=':
+            case CTL_CENTER:
                 justify = JUSTIFY_CENTER;
                 setJustifyX(ps);
                 continue;
 
-            case '_':
+            case CTL_UNDERLINE:
                 underline = !underline;
                 continue;
 
-            case '~':
+            case CTL_PAUSE:
                 dramaticPause = 50;
                 continue;
             }
@@ -387,7 +403,7 @@ bool drawNextChar() {
             else if (ch == ',')
                 dramaticPause = 10;
 
-            if (ch != ' ')
+            if (ch != ' ' && ch != '+')                           // review empty star, space
                 ADDAUDIO(ch == '*' ? SFX_DOGE : SFX_KEYPRESS);    // review-star = "*"
 
             if (ch == '\"')
@@ -401,7 +417,7 @@ bool drawNextChar() {
 
                 int uwide = fonts[font].charWidths[ci] - fonts[font].charWidths[LTR('_')] + 1;
                 for (int i = 0; i <= uwide; i++)
-                    doLetter(LTR('_'), cx + i, cy + 1, convertColour(0x46));
+                    doLetter(LTR('_'), cx + i, cy + 1, convertColour(0x44));
             }
 
             cx += fonts[font].charWidths[ci] + 1;
