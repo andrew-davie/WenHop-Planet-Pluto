@@ -59,7 +59,7 @@ static unsigned char *colrx;
 static int cx;
 static int cy;
 static int font;
-static int colour;
+static int stringColour;
 static int speedDelay;
 static int current;
 static int underline;
@@ -94,7 +94,7 @@ void drawString(int fontNumber, int c, int delay, int buffer, int colbuf, const 
     // string zero-terminated
 
     font = fontNumber;
-    colour = convertColour(c);
+    stringColour = c;
     underline = false;
     escape = false;
 
@@ -125,25 +125,25 @@ const unsigned char justifyChar['~' - ' ' + 1] = {
 
 //   🟨 = visible
 //  ⎧       🟨 = new paragraph if followed by | 
-//  ⎮      ⎧ 🟨 = underline
-//  ⎮      ⎮⎧  🟨 = left-justify
-//  ⎮      ⎮⎮ ⎧  🟨 = right-justify
-//  ⎮      ⎮⎮ ⎮ ⎮
-    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   ' '         32
+//  ⎮      ⎧  🟨 = underline
+//  ⎮      ⎮ ⎧ 🟨 = left-justify
+//  ⎮      ⎮ ⎮⎧  🟨 = right-justify
+//  ⎮      ⎮ ⎮⎮ ⎮
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   ' '         32
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '!'         33
-    🟨🟦🟦🟦🟨🟦🟦🟦 ,    //   '"'         34
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '"'         34
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '#'         35
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '$'         36       replacement '.' without a delay (for numbers0
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '%'         37
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '&'         38
-    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '''         39 
+    🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   '''         39 
     🟨🟦🟦🟦🟦🟦🟦🟨 ,    //   '('         40
     🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   ')'         41
     🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '*'         42
     🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '+'         43
     🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   ','         44       + short pause
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '-'         45
-    🟨🟦🟦🟦🟨🟦🟦🟦 ,    //   '.'         46       + long pause if '|' follows
+    🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '.'         46
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '/'         47
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '0'         48
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '1'         49
@@ -160,7 +160,7 @@ const unsigned char justifyChar['~' - ' ' + 1] = {
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '<'         60       left justify string
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '='         61       center justify string
     🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '>'         62       right justify string
-    🟨🟦🟦🟦🟨🟦🟨🟦 ,    //   '?'         63
+    🟨🟦🟦🟦🟦🟦🟨🟦 ,    //   '?'         63
     🟨🟦🟦🟦🟦🟨🟨🟦 ,    //   '@'         64
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'A'         65
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'B'         66
@@ -185,19 +185,19 @@ const unsigned char justifyChar['~' - ' ' + 1] = {
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'U'         85
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'V'         86
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'W'         87
-    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '🟨'         88
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'x'         88
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'Y'         89
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'Z'         90
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '['         91
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   'backslash  92
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   ']'         93
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '^'         94
-    🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '🟦'         95      toggle underline
+    🟦🟦🟦🟦🟦🟦🟦🟦 ,    //   '_'         95      toggle underline
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '`'         96
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'a'         97
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'b'         98
     🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   'c'         99
-    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'd'         🟨🟦🟦
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'd'         100
     🟨🟦🟦🟦🟦🟨🟦🟨 ,    //   'e'         101
     🟨🟦🟦🟦🟦🟨🟨🟨 ,    //   'f'         102
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'g'         103
@@ -217,7 +217,7 @@ const unsigned char justifyChar['~' - ' ' + 1] = {
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'u'         117
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'v'         118
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'w'         119
-    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   '🟨'         120
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'x'         120
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'y'         121
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'z'         122
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '{'         123
@@ -412,7 +412,7 @@ bool drawNextChar() {
             if (justifyChar[ci] & J_LEFT)
                 cx--;
 
-            doLetter(ci, cx, cy, colour);
+            doLetter(ci, cx, cy, convertColour(stringColour));
             if ((justifyChar[ci] & J_UNDER) && underline) {
 
                 int uwide = fonts[font].charWidths[ci] - fonts[font].charWidths[LTR('_')] + 1;

@@ -3,6 +3,7 @@
 
 #include "cdfjplus.h"
 
+#include "colour.h"
 #include "gameState.h"
 #include "main.h"
 #include "score.h"
@@ -93,9 +94,9 @@ void VB_DetectConsole() {
         armCycles = (armCycles * (0x10000 / 262)) >> 16;            // cycles/scanline
         armCycles = (armCycles * (64 * 0x10000 / 76)) >> 16;        // cycles/INTIM
 
-        setGameState(GS_GLOBE);
-        // setGameState(GS_MENU);
-        // setGameState(GS_SKULL);
+        //        // setGameState(GS_GLOBE);
+        //      setGameState(GS_COPYRIGHT);
+        setGameState(GS_SKULL);
     }
     }
 

@@ -9,6 +9,7 @@
 #include "main.h"
 #include "planet.h"
 #include "random.h"
+#include "scroll.h"
 #include "sound.h"
 
 #include "../gfx/fontcompact.h"
@@ -18,7 +19,7 @@
 //------------------------------------------------------------------------------
 // Notes on Huffman encoding of remarks
 
-// #define HUFFMAN
+#define HUFFMAN
 
 // Remarks are in planetInfo.c
 // These remarks are used as-is if HUFFMAN is NOT defined.
@@ -42,7 +43,8 @@ static int lines;
 static int pa_lines;
 static int infoPhase;
 int wait;
-static int planet;
+static int planet = -1;
+static bool finished;
 
 const unsigned char *thePalette;
 
@@ -216,14 +218,11 @@ void initKernel_Globe() {
     setJumpVectors(_BUF_GLOBE_JUMP, _globeLoop, _globeExit, _SCANLINES);
     initDataStreams_Globe();
 
-    planet = 0;
+    planet++;
     initPlanet(planet);
 
     infoPhase = INFO_FADEUP;
     wait = 50;
-
-    luminance = -15;
-    lumTarget = 0;
 
     sound_volume = VOLUME_PLAYING;
 
@@ -265,7 +264,7 @@ void drawPaletteGlobe(const unsigned char *palette) {
 
 #include "planetHuffman.h"
 
-char huffBuff[200];
+char huffBuff[PHRASE_BUF_SIZE];
 
 #else /* unencoded */
 
@@ -277,10 +276,6 @@ char huffBuff[200];
 
 
 bool seen[PHRASE_COUNT];
-
-
-// char buf[200];
-// phrase_decode(phrases[42].data, phrases[42].len, buf, sizeof(buf));
 
 
 const char *review[] = {
@@ -298,17 +293,20 @@ void initGameState_Globe() {
     myMemsetInt((unsigned int *)(RAM + _GLOBE_BUFFERS_START), 0, _GLOBE_BUFFERS_SIZE / 4);
     myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_COLUP0), 0x58585858, _BUFFER_SIZE / 4);
 
+    luminance = -15;
+    lumTarget = 0;
     frame = 0;
 
     for (unsigned int i = 0; i < PHRASE_COUNT; i++)
         seen[i] = false;
+
+    finished = false;
 }
 
 
 void VB_Globe() {
 
 
-    adjustLuminance();
     initDataStreams_Globe();
     drawPaletteGlobe(thePalette);
 
@@ -317,15 +315,13 @@ void VB_Globe() {
 
     static int nsv = VOLUME_PLAYING;
 
-    if (!rangeRandom(1000))
-        nsv = rangeRandom(sound_max_volume);
+    if (!rangeRandom(100))
+        nsv = VOLUME_PLAYING + rangeRandom(VOLUME_MAX - VOLUME_PLAYING);
 
-    sound_volume = step_toward(sound_volume, nsv);
+    sound_max_volume = approach(sound_max_volume, nsv, 1);
 
-    if (sound_volume < 0)
-        sound_volume = 0;
-    if (sound_volume > sound_max_volume)
-        sound_volume = sound_max_volume;
+    if (finished)
+        setGameState(GS_GAME);
 }
 
 
@@ -333,7 +329,9 @@ void OS_Globe() {
 
 #define ADJ 0
 
+
     interleaveChronoColour(&roller);
+    adjustLuminance(3);
 
     drawPlanet(0);
 
@@ -349,20 +347,16 @@ void OS_Globe() {
 
         case INFO_NAME:
 
-            drawString(FONT_LARGE, 0x8, 10, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
-                       planets[planet].name,
-                       _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - FONTLARGE_FONT_HEIGHT - 25 + ADJ);
+            drawString(FONT_LARGE, 0x8, 10, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planets[planet].name,
+                       _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - FONTLARGE_FONT_HEIGHT - 25);
             wait = 10;
             break;
 
 
         case INFO_PHYSICS:
-            drawString(FONT_COMPACT, 0x16, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0,    //
-                       planets[planet].physics,                                     //
-                       _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - 25 + 5 + ADJ);
+            drawString(FONT_COMPACT, 0x16, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planets[planet].physics,
+                       _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - 25 + 5);
             wait = 200;
-
-
             break;
 
 
@@ -401,7 +395,7 @@ void OS_Globe() {
 
 #ifdef HUFFMAN
 
-            phrase_decode(phrases[pif].data, huffBuff, sizeof(huffBuff));
+            phrase_decode(phrases[pif].data, huffBuff, PHRASE_BUF_SIZE);
             const char *p = huffBuff;
 
 #else
@@ -427,7 +421,6 @@ void OS_Globe() {
 
 
         case INFO_PLANETADVISOR:
-
             drawString(FONT_COMPACT, 0x8, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, "=_Planet@Visor", pa_lines);
             pa_lines += TITLE_HEIGHT + INFO_GAP;
             wait = 25;
@@ -435,7 +428,6 @@ void OS_Globe() {
 
 
         case INFO_INFO:
-
 #ifdef HUFFMAN
             drawString(FONT_COMPACT, 0xD8, 4, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, huffBuff, pa_lines);
 #else
@@ -479,17 +471,25 @@ void OS_Globe() {
 
         case INFO_FADE_DOWN:
 
-            if (luminance == lumTarget) {
 
-                myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
-                lumTarget = 0;
-                infoPhase = INFO_FADEUP;
-                planet = nextPlanet();
-
-            }
+            if (luminance == lumTarget)
+                finished = true;
 
             else
                 infoPhase = INFO_FADE_DOWN;
+            break;
+
+            // if (luminance == lumTarget) {
+
+            //     myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
+            //     //                lumTarget = 0;
+            //     infoPhase = INFO_FADEUP;
+            //     planet = nextPlanet();
+
+            // }
+
+            // else
+            //     finished = true;
 
             break;
         }

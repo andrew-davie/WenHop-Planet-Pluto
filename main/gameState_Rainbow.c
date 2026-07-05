@@ -14,6 +14,8 @@ void initKernel_Rainbow() {
 
 
 void initGameState_Rainbow() {
+    luminance = -15;
+    lumTarget = 0;
     frame = 0;
 }
 
@@ -37,6 +39,7 @@ void VB_Rainbow() {
 }
 
 void OS_Rainbow() {
+    adjustLuminance(3);
 }
 
 // EOF

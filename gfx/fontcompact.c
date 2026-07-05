@@ -93,19 +93,19 @@ static const unsigned char char_038[FONTCOMPACT_FONT_HEIGHT] = {
     0b00000000   // 🟦🟦
 };
 
-/* '''  ASCII 39  width=1px  1 byte(s)/row */
+/* '''  ASCII 39  width=2px  1 byte(s)/row */
 static const unsigned char char_039[FONTCOMPACT_FONT_HEIGHT] = {
-    0b00000000,  // 🟦
-    0b00000001,  // 🟨
-    0b00000001,  // 🟨
-    0b00000001,  // 🟨
-    0b00000000,  // 🟦
-    0b00000000,  // 🟦
-    0b00000000,  // 🟦
-    0b00000000,  // 🟦
-    0b00000000,  // 🟦
-    0b00000000,  // 🟦
-    0b00000000   // 🟦
+    0b00000001,  // 🟦🟨
+    0b00000001,  // 🟦🟨
+    0b00000010,  // 🟨🟦
+    0b00000010,  // 🟨🟦
+    0b00000000,  // 🟦🟦
+    0b00000000,  // 🟦🟦
+    0b00000000,  // 🟦🟦
+    0b00000000,  // 🟦🟦
+    0b00000000,  // 🟦🟦
+    0b00000000,  // 🟦🟦
+    0b00000000   // 🟦🟦
 };
 
 /* '('  ASCII 40  width=5px  1 byte(s)/row */
@@ -1391,7 +1391,7 @@ const unsigned char fontcompact_charWidths[] = {
       4  /* '$' ASCII 36 */,
       2  /* '%' ASCII 37 */,
       2  /* '&' ASCII 38 */,
-      1  /* ''' ASCII 39 */,
+      2  /* ''' ASCII 39 */,
       5  /* '(' ASCII 40 */,
       4  /* ')' ASCII 41 */,
       7  /* '*' ASCII 42 */,

@@ -3,21 +3,21 @@ START_SKULL = *
     DEF
 
     DEFPTR SKULL_COLUBK
+    DEFPTR SKULL_COLUPF
+    DEFPTR SKULL_COLUP0
     DEFPTR SKULL_PF1_LEFT
     DEFPTR SKULL_PF2_LEFT
     DEFPTR SKULL_PF1_RIGHT
     DEFPTR SKULL_PF2_RIGHT
-    DEFPTR SKULL_AUDV0
-    DEFPTR SKULL_AUDC0
-    DEFPTR SKULL_AUDF0
-    DEFPTR SKULL_COLUPF
-    DEFPTR SKULL_COLUP0
     DEFPTR SKULL_GRP0A
     DEFPTR SKULL_GRP1A
     DEFPTR SKULL_GRP0B
     DEFPTR SKULL_GRP1B
     DEFPTR SKULL_GRP0C
     DEFPTR SKULL_GRP1C
+    DEFPTR SKULL_AUDV0
+    DEFPTR SKULL_AUDC0
+    DEFPTR SKULL_AUDF0
 
 ;-------------------------------------------------------------------------------
 
@@ -63,11 +63,16 @@ VB_kernelSkull
                     ldx #0
                     stx ENAM0
                     stx ENAM1
-                    stx COLUBK
+                    ; stx COLUBK
                     ; stx COLUP0
                     ; stx COLUP1
                     stx COLUPF
 
+                    lda #_DS_SKULL_COLUBK_DATA
+                    sta COLUBK                      ; todo: fix -- we only have 1 BK not a screenfull
+
+                    ; ldx #$20
+                    ; stx COLUBK
                     ; ldx #>_colubk
                     ; stx DSPTR
                     ; ldx #<_colubk
@@ -77,7 +82,7 @@ VB_kernelSkull
                     ; sta COLUPF
 
 
-                    ldx #%00000001
+                    ldx #%01
                     stx CTRLPF              ; reflect PF
 
                     jsr positionSpritesSkull

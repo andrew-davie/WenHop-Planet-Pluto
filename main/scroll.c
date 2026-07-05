@@ -37,15 +37,13 @@ void clamp(int *v, int min, int max) {
 
 int approach(int current, int target, int speed) {
 
+
     int diff = target - current;
-
     if (diff > speed)
-        return current + speed;
-
+        diff = speed;
     if (diff < -speed)
-        return current - speed;
-
-    return target;
+        diff = -speed;
+    return current + diff;
 }
 
 

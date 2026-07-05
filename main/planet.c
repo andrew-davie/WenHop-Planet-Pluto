@@ -5,13 +5,13 @@
 #include "spinningGlobe/bloodworld.h"
 #include "spinningGlobe/earth.h"
 #include "spinningGlobe/green1.h"
+#include "spinningGlobe/jupiter.h"
 #include "spinningGlobe/lava.h"
 #include "spinningGlobe/moon.h"
 #include "spinningGlobe/neptune.h"
 #include "spinningGlobe/pangea.h"
 #include "spinningGlobe/terra.h"
 #include "spinningGlobe/titan.h"
-
 
 const unsigned char neptune_ntsc_palette_override[3] = {
     0x92, /* palette[1] = (28,56,144) */
@@ -73,6 +73,11 @@ const unsigned char terra_ntsc_palette_override[3] = {
     0x42, /* palette[4] = (172,80,48) */
 };
 
+const unsigned char jupiter_ntsc_palette_override[3] = {
+    0x28, /* palette[1] = (44,48,0) */
+    0x46, /* palette[2] = (132,24,0) */
+    0x26, /* palette[4] = (172,80,48) */
+};
 
 // TODO: run spinningGlobe/make.sh to re-gen the planet data
 //       run python3 spinningGlobe/planet-gen.py to create new planet images
@@ -103,7 +108,7 @@ const struct GLOBE planets[] = {
 
     {">_Earth", ">6900 km|9$81 m/s^", 1, earth_map, earth_charset, earth_ntsc_palette_override},                   // 1
     {">_Xe'drith", ">1500 km|3$2 g", -1, lava_map, lava_charset, lava_ntsc_palette_override},                      // 2
-    {">_Terror", ">16900 km|9$2 g", 1, terra_map, terra_charset, terra_ntsc_palette_override},                     // 0
+    {">_Terror", ">16900 km|9$2 g", 1, jupiter_map, jupiter_charset, jupiter_ntsc_palette_override},               // 0
     {">_Neptune", ">9874 km|1$14 g", 1, neptune_map, neptune_charset, neptune_ntsc_palette_override},              // 3
     {">_WASP-76b", ">14566 km|1$02 g", -1, green1_map, green1_charset, green1_ntsc_palette_override},              // 4
     {">_Skumveil", ">42000 km|3$1415926 g", -1, pangea_map, pangea_charset, pangea_ntsc_palette_override},         // 5

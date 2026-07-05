@@ -96,29 +96,38 @@ Atari NTSC palette: see comment in the palette table below (same sourced
 USAGE
 -----
     python3 atari_scanline_blend.py input.png [-o OUTPUT_PREFIX]
+                                     [--width 48] [--height 198]
                                      [--sigma 1.0] [--radius 3]
                                      [--rounds 10] [--sweeps 3]
                                      [--metric luma] [--seeds 3]
                                      [--smoothness 0.01] [--swaps]
                                      [--frames 1|2]
 
-Screen is WIDTH x HEIGHT (currently 48x198). Source images are assumed to
-already be at the correct display aspect ratio before this tool is
-called -- it does a plain resize, no letterboxing or cropping.
+Screen is WIDTH x HEIGHT, configurable via --width/--height (default 48x198).
+Source images are assumed to already be at the correct display aspect ratio
+before this tool is called -- it does a plain resize, no letterboxing or
+cropping. If you change --width, you likely need to adjust WIDTH_STRETCH's
+underlying assumption too (see comment above WIDTH_STRETCH) to keep preview
+PNGs' aspect ratio honest.
 """
 import argparse
 import numpy as np
 from PIL import Image
 
+# WIDTH/HEIGHT/BYTES_PER_ROW/WIDTH_STRETCH are defaults, overridden from the
+# command line (--width/--height) in main() before anything else runs. Every
+# function below reads these as module globals (not captured at def-time),
+# so reassigning them up front is enough to retarget the whole tool at a
+# different screen size.
 WIDTH = 48
 HEIGHT = 198
-BYTES_PER_ROW = WIDTH // 8   # 6 (48 divides evenly into bytes, no padding needed)
+BYTES_PER_ROW = (WIDTH + 7) // 8   # ceil-div: pads the last byte if WIDTH isn't a multiple of 8
 UPSCALE = 6
 # Correct for non-square Atari pixels in preview PNGs. Calibrated at WIDTH=40
-# assuming ~160 visible colour clocks (4 clocks/pixel -> stretch 4x). At 48
-# columns across the same physical visible width that's ~160/48 = 3.33
-# clocks/pixel -- scaled proportionally. Revisit if the real pixel geometry
-# for 48-wide mode is different from this assumption.
+# assuming ~160 visible colour clocks (4 clocks/pixel -> stretch 4x). At other
+# widths across the same physical visible width that's 160/WIDTH clocks/pixel
+# -- scaled proportionally. Revisit if the real pixel geometry assumed here
+# is wrong for your target width.
 WIDTH_STRETCH = 4 * (40 / WIDTH)
 
 # --------------------------------------------------------------------------
@@ -642,12 +651,22 @@ typedef struct {{
     return header_path, source_path
 
 
-def save_preview(arr, path, upscale=UPSCALE, width_stretch=WIDTH_STRETCH):
+def save_preview(arr, path, upscale=None, width_stretch=None):
     """Render at `upscale` in both axes, then stretch width by an extra
     `width_stretch` factor to correct for the Atari's non-square pixels:
     each playfield pixel is several TV colour-clocks wide, so a naive 1:1
     pixel render looks far too tall/narrow compared to what actually
-    appears on screen."""
+    appears on screen.
+
+    upscale/width_stretch default to the CURRENT module-level UPSCALE/
+    WIDTH_STRETCH, looked up at call time -- NOT bound as literal default
+    argument values, since those are only evaluated once at module load
+    and would silently go stale after main() retargets WIDTH_STRETCH for
+    a custom --width."""
+    if upscale is None:
+        upscale = UPSCALE
+    if width_stretch is None:
+        width_stretch = WIDTH_STRETCH
     img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), mode="RGB")
     w = int(round(arr.shape[1] * upscale * width_stretch))
     h = int(round(arr.shape[0] * upscale))
@@ -659,6 +678,14 @@ def main():
     ap = argparse.ArgumentParser(description="Convert an image into blended Atari 2600 scanlines.")
     ap.add_argument("image")
     ap.add_argument("-o", "--output-prefix", default=None)
+    ap.add_argument("--width", type=int, default=48,
+                    help="screen width in pixels/columns (default 48). Each "
+                         "column is solved independently, so this mainly "
+                         "affects runtime and horizontal detail.")
+    ap.add_argument("--height", type=int, default=198,
+                    help="screen height in scanlines (default 198, the Atari's "
+                         "visible NTSC scanline count -- only change this if "
+                         "you're targeting a non-standard display region.")
     ap.add_argument("--sigma", type=float, default=1.0, help="Gaussian blend falloff (default 1.0)")
     ap.add_argument("--radius", type=int, default=3, help="max scanline distance blended (default 3)")
     ap.add_argument("--rounds", type=int, default=10, help="outer optimisation rounds (default 10)")
@@ -695,6 +722,18 @@ def main():
                          "the runtime (solves N times).")
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args()
+
+    if args.width < 1 or args.height < 1:
+        ap.error("--width and --height must be positive")
+
+    # Retarget the whole module at the requested screen size. Every function
+    # below reads WIDTH/HEIGHT/BYTES_PER_ROW/WIDTH_STRETCH as globals looked
+    # up at call time, so this must happen before load_target/solve/etc run.
+    global WIDTH, HEIGHT, BYTES_PER_ROW, WIDTH_STRETCH
+    WIDTH = args.width
+    HEIGHT = args.height
+    BYTES_PER_ROW = (WIDTH + 7) // 8
+    WIDTH_STRETCH = 4 * (40 / WIDTH)
 
     prefix = args.output_prefix
     if prefix is None:
@@ -753,4 +792,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

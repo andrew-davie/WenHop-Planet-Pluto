@@ -15,7 +15,7 @@ unsigned char convertColour(unsigned char colour);
 void setPFColours(unsigned char *colours);
 void setPalette(int buf);
 void loadPalette();
-void adjustLuminance();
+void adjustLuminance(int speed);
 
 
 // EOF

@@ -35,6 +35,8 @@ void initGameState_CouchCompliant() {
     myMemsetInt((unsigned int *)(RAM + _BUF_CC_COLUBK), 0, _BUFFER_SIZE / 4);
     myMemsetInt((unsigned int *)(RAM + _BUF_CC_COLUPF), 0, _BUFFER_SIZE / 4);
 
+    // luminance = -15;
+    lumTarget = 0;
     colx = 0;
     frame = 0;
 }
@@ -85,6 +87,7 @@ void VB_CouchCompliant() {
 }
 
 void OS_CouchCompliant() {
+    adjustLuminance(3);
 }
 
 // EOF

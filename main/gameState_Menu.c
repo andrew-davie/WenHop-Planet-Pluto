@@ -158,7 +158,8 @@ void drawPF(int buffer, const unsigned char image[66][4][3]) {
 
 void initGameState_Menu() {
 
-
+    luminance = -15;
+    lumTarget = 0;
     frame = 0;
 }
 
@@ -206,8 +207,10 @@ void VB_Menu() {
     if (!drawNextChar()) {
     }
 
-    // if (frame > 125)
-    //     setGameState(GS_GAME);
+    if (frame > 200)
+        lumTarget = -15;
+    if (frame > 250)
+        setGameState(GS_GLOBE);
 }
 
 
@@ -269,6 +272,7 @@ __attribute__((nonstring)) const char Level[][6] = {
 
 void OS_Menu() {
 
+
     //    myMemset((unsigned char *)(RAM + _BUF_MENU_PF), 0, _SCANLINES);
 
     base2++;
@@ -312,6 +316,8 @@ void OS_Menu() {
     // Draw ICC menu PF background
 
     interleaveChronoColour(&roller);
+    adjustLuminance(3);
+
     setPFColours((unsigned char *)(RAM + _BUF_MENU_COLUPF));
 
     drawPF(_BUF_MENU_PF, gfx_image_WenHop_png);

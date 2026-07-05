@@ -112,6 +112,7 @@ SRCS = \
  \
  grid6.c \
  \
+ spinningGlobe/jupiter.c \
  spinningGlobe/lava.c \
  spinningGlobe/titan.c \
  spinningGlobe/green1.c \
@@ -281,6 +282,7 @@ make_rom: prep
 		-o$(OUTPUT)/$(CUSTOMNAME).bin
 	mkdir -p ROMs
 	cp $(OUTPUT)/$(CUSTOMNAME).bin ROMs/$(DATED_ROM).bin
+	dd bs=1024 count=120 if=$(OUTPUT)/$(CUSTOMNAME).bin of=ROMs/$(DATED_ROM)_120K.bin	
 
 
 ###############################################################################

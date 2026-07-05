@@ -1,5 +1,10 @@
 todo:
 
+vox speech
+
+physics engine rather than BD engine
+
+
 star swipe import from BD
 rain particles from BD
 

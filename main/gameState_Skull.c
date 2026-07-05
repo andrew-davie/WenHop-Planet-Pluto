@@ -6,16 +6,21 @@
 #include "colour.h"
 #include "draw.h"
 #include "grid6.h"
+#include "joystick.h"
 #include "main.h"
 #include "menuCharacterSet.h"
 #include "random.h"
 #include "reverseBits.h"
 #include "savekey.h"
+
+#include "scroll.h"
 // #include "skull/main/main.h"
 #include "sound.h"
 
+#include "../gfx/fontcompact.h"
+
 #define CHAMP_VOL 100
-#define DURATION_SKULL 180
+#define DURATION_SKULL 18000
 #define PRESENTS_LUM 8
 #define FADE_SPEED 17000
 #define FADE_SHIFT 16
@@ -357,6 +362,7 @@ void initDataStreams_Skull() {
         {_DS_SKULL_AUDV0, _BUF_AUDV},
         {_DS_SKULL_AUDC0, _BUF_AUDC},
         {_DS_SKULL_AUDF0, _BUF_AUDF},
+
         {_DS_SKULL_COLUPF, _BUF_SKULL_COLUPF},
         {_DS_SKULL_COLUP0, _BUF_SKULL_COLUP0},
 
@@ -388,9 +394,8 @@ void initKernel_Skull() {
 
     myMemsetInt((unsigned int *)(RAM + _SKULL_BUFFERS_START), 0, _SKULL_BUFFERS_SIZE / 4);
 
-
-    draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0,    //
-                gfx_grid_suchislife_gif, gfx_grid_suchislife_gif_HEIGHT, 175, 0xF4);
+    // draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0,    //
+    //             gfx_grid_suchislife_gif, gfx_grid_suchislife_gif_HEIGHT, 175, 0xF4);
 }
 
 
@@ -419,9 +424,14 @@ void initGameState_Skull() {
     // loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
     // loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
 
-    myMemsetInt((unsigned int *)(RAM + _BUF_SKULL_PF), 0, _BUFFER_SIZE * 10 / 4);
+    // myMemsetInt((unsigned int *)(RAM + _BUF_SKULL_PF), 0, _BUFFER_SIZE * 10 / 4);
 
+    luminance = -15;
+    lumTarget = 0;
     frame = 0;
+
+
+    drawString(FONT_COMPACT, 0x1A, 3, _BUF_SKULL_GRP, _BUF_SKULL_COLUP0, ">See|you in|the next|LIFE!!!", 150);
 }
 
 
@@ -531,6 +541,8 @@ void doDrawBitmap(const unsigned char *shape, int x, int y) {
     }
 }
 
+static int blink = 200;
+
 
 void drawICCSkull() {
 
@@ -543,7 +555,7 @@ void drawICCSkull() {
     if (true) {    //|| (GAME_RESET_PRESSED && GAME_SELECT_PRESSED)) {
 
 
-        const unsigned char skullPalette[] = {0xF6, 0xF6, 0xF8};    // green eyes!
+        const unsigned char skullPalette[] = {0xFA, 0xF6, 0xF8};    // green eyes!
         // unsigned char skullPalette[] = {0xF6, 0xF6, 0xF6};
         drawPalette(skullPalette);
 
@@ -617,24 +629,35 @@ void drawICCSkull() {
         doDrawBitmap(__componentskulla, 8, skully);
         doDrawBitmap(__componentskullb, 16, skully);
 
-        if (!(sin & 3)) {
+        if (!(frame & 1)) {
 
-            int difference = eyeXOffset - eyeX;
-            eyeX += (difference > 0) - (difference < 0);
-            difference = eyeYOffset - eyeY;
-            eyeY += (difference > 0) - (difference < 0);
+            eyeX = approach(eyeX, eyeXOffset, 1);
+            eyeY = approach(eyeY, eyeYOffset, 1);
 
             if (!eyeRelocate--) {
                 eyeXOffset = rangeRandom(3) - 1;
                 eyeYOffset = rangeRandom(3) - 1;
-                eyeRelocate = 10 + rangeRandom(10);
+                eyeRelocate = 30 + 2 + rangeRandom(10);
+
+                if (!eyeXOffset && !eyeYOffset)
+                    eyeRelocate += 30;    // 100;
             }
         }
 
         int iy = 73 + eyeY * 3 + skully;
 
-        doDrawBitmap(__skullEye, 8 + eyeX, iy);
-        doDrawBitmap(__skullEye, 15 + eyeX, iy);
+
+        //        if (!eyeXOffset && !eyeYOffset)
+        blink--;
+
+        if (!(!eyeXOffset && !eyeYOffset) || blink > 0) {
+            doDrawBitmap(__skullEye, 8 + eyeX, iy);
+            doDrawBitmap(__skullEye, 15 + eyeX, iy - 2);
+        }
+
+        if (blink < -10) {
+            blink = 250 + rangeRandom(50);
+        }
     }
 }
 
@@ -643,23 +666,45 @@ void VB_Skull() {
 
     initDataStreams_Skull();
     drawICCSkull();
+    getJoystick();
 
-    FLASH(0x28, 10);
+    if (luminance == lumTarget)
+        drawNextChar();
 
-    if (frame > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
+    if (!(inpt4 & 0x80))    // > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
         setGameState(GS_MENU);
 }
+
 
 void OS_Skull() {
 
     interleaveChronoColour(&roller);
+    adjustLuminance(2);
+
     setPFColours((unsigned char *)(RAM + _BUF_SKULL_COLUPF));
     setPalette(_BUF_SKULL_COLUBK);
 
 
-    unsigned int *p = (unsigned int *)(RAM + _BUF_SKULL_PF);
-    for (int i = 0; i < _BUFFER_SIZE; i++)    // 4 buffers @ int
-        *p++ = 0;                             // getRandom32();
+    static int skullBGFlash = 0;
+
+    if (luminance == lumTarget) {
+
+        if (!skullBGFlash || !rangeRandom(100)) {
+            int intens = rangeRandom(5) + 4;
+            skullBGFlash = 0x20 + intens;
+            if (intens >= 6)
+                blink = 0;
+        }
+
+        if (!(frame & 7) && skullBGFlash != 0x20)
+            skullBGFlash--;
+    }
+
+    unsigned char *p = (unsigned char *)(RAM + _BUF_SKULL_COLUBK);
+    *p = skullBGFlash;
+
+
+    myMemsetInt((unsigned int *)(RAM + _BUF_SKULL_PF), 0, _BUFFER_SIZE);    // 4 buffers @ int
 }
 
 // EOF

@@ -92,7 +92,7 @@ struct trackInfo {
 
 #define MUSIC_MAX 4 /* max number of music tracks */
 #define VOLUME_NONPLAYING 900
-#define VOLUME_PLAYING 400
+#define VOLUME_PLAYING 600
 #define VOLUME_MAX 1024
 
 extern struct trackInfo music[MUSIC_MAX];
@@ -107,8 +107,6 @@ void killRepeatingAudio();
 void initAudio(bool killTracks);
 void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument);
 void startMusic();
-
-int step_toward(int current, int target);
 
 
 #pragma GCC diagnostic push

@@ -1157,7 +1157,7 @@ const struct caveHandler caveList[] = {
 
     // {caveA3, none},    //
     // {caveMace, none},
-    {caveTest, none},
+    // {caveTest, none},
 
     {caveUseWall, none},    //
     {caveA4, none},         //

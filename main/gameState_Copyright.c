@@ -86,6 +86,8 @@ void initGameState_Copyright() {
 
     presentsColour = 2 << FADE_SHIFT;
 
+    luminance = -15;
+    lumTarget = 0;
     frame = 0;
 }
 
@@ -97,7 +99,7 @@ void VB_Copyright() {
 
     if (frame < DURATION_COPYRIGHT) {
 
-#define CGSPACER 4
+#define CGSPACER 8
 #define TOP (_SCANLINES / 2 - BAND - 15)
 #define CGP (gfx_grid_champgames_champ_gif_HEIGHT)
 #define BAND (CGP + CGSPACER * 2)
@@ -123,9 +125,9 @@ void VB_Copyright() {
             *spc++ = 0x6;
 
             if (tvSystem == _TV_SYSTEM_NTSC)
-                *c++ = convertColour(sl < TOP + BAND ? 0x90 : 0x40);
+                *c++ = convertColour(sl < TOP + BAND ? 0xC4 : 0x16);
             else
-                *c++ = convertColour(sl < TOP + BAND ? 0x92 : 0x42);
+                *c++ = convertColour(sl < TOP + BAND ? 0xC4 : 0x16);
         }
 
         // for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++) {
@@ -134,9 +136,9 @@ void VB_Copyright() {
 
 
         draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_champ_gif,
-                    gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 8);
+                    gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 0);
         draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_games_gif,
-                    gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 8);
+                    gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 0);
 
 
         if (frame > 60) {
@@ -174,6 +176,7 @@ void VB_Copyright() {
 }
 
 void OS_Copyright() {
+    adjustLuminance(3);
 }
 
 // EOF

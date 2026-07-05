@@ -9,7 +9,8 @@
    returns : characters written, excluding null */
 int phrase_decode(const uint8_t *src, char *dst, int max_len);
 
-#define PHRASE_COUNT 115
+#define PHRASE_COUNT     115
+#define PHRASE_BUF_SIZE  130  /* longest decoded phrase + null */
 
 typedef struct {
     const uint8_t *data;

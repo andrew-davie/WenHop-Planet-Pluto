@@ -73,6 +73,8 @@ USAGE
                                             [--smoothness 0.01] [--quiet]
 """
 import argparse
+import sys
+import time
 import numpy as np
 
 import atari_scanline_blend as base
@@ -102,19 +104,27 @@ def compute_frame_jump(color_idxs, ons, height, width):
 
 
 def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
-                          sigma=1.0, radius=3, verbose=True, **kwargs):
+                          sigma=1.0, radius=3, verbose=True, terse=False, **kwargs):
+    """terse=False (default): full progress -- every DBS round of every
+    frame-solve prints its running SSE, so a long run never goes silent
+    for more than a fraction of a second. terse=True: only announce each
+    frame-solve starting and each outer round finishing (no per-DBS-round
+    spam) -- a quieter middle ground between full detail and --quiet."""
     if n_frames < 2:
         raise ValueError("n_frames must be >= 2 -- use the base tool directly for a single frame")
 
     height, width = base.HEIGHT, base.WIDTH
+    inner_verbose = verbose and not terse
 
     # ---- initial guess: reuse the existing one-pass forward scheme as a
     # perfectly reasonable, cheap starting point (it already satisfies the
     # "average == target" constraint approximately; we're just going to
     # let every frame react to every other frame's current state instead
     # of freezing each one the moment it's first solved). ----
+    if verbose:
+        print(f"=== initial pass: one-pass forward solve, {n_frames} frame(s) ===", flush=True)
     init = base.solve_n_frame(target, n_frames=n_frames, seeds=seeds,
-                               sigma=sigma, radius=radius, verbose=False, **kwargs)
+                               sigma=sigma, radius=radius, verbose=inner_verbose, **kwargs)
     color_idxs = list(init["color_idxs"])
     ons = list(init["ons"])
     blendeds = list(init["blendeds"])
@@ -124,23 +134,36 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
         avg = s / n_frames
         return (float(np.sum((target - avg) ** 2)) / (height * width * 3)) ** 0.5
 
+    t_start = time.monotonic()
     if verbose:
-        print(f"[init, one-pass forward] RMS = {score(cur_sum):.2f}")
+        print(f"[init, one-pass forward] RMS = {score(cur_sum):.2f}  [{time.monotonic()-t_start:.1f}s elapsed]",
+              flush=True)
 
+    round_durations = []
     for outer in range(1, outer_rounds + 1):
+        round_t0 = time.monotonic()
         for i in range(n_frames):
+            if verbose:
+                print(f"--- outer round {outer}/{outer_rounds}, solving frame {i+1}/{n_frames} "
+                      f"(seeds={seeds}) [{time.monotonic()-t_start:.1f}s elapsed total] ---", flush=True)
             other_sum = cur_sum - blendeds[i]
             this_target = n_frames * target - other_sum
             result = base.solve_best_of(this_target, seeds=seeds, sigma=sigma, radius=radius,
-                                         tag=f"[outer{outer} frame{i}] ", verbose=False, **kwargs)
+                                         tag=f"[outer{outer} frame{i}] ", verbose=inner_verbose, **kwargs)
             color_idx_i, on_i, blended_i, rmse_i, werr_i = result
             cur_sum = cur_sum - blendeds[i] + blended_i
             color_idxs[i] = color_idx_i
             ons[i] = on_i
             blendeds[i] = blended_i
 
+        round_durations.append(time.monotonic() - round_t0)
         if verbose:
-            print(f"[outer round {outer}/{outer_rounds}] RMS = {score(cur_sum):.2f}")
+            avg_round = sum(round_durations) / len(round_durations)
+            remaining_rounds = outer_rounds - outer
+            eta = avg_round * remaining_rounds
+            elapsed = time.monotonic() - t_start
+            print(f"[outer round {outer}/{outer_rounds}] RMS = {score(cur_sum):.2f}  "
+                  f"[{elapsed:.1f}s elapsed, ~{eta:.0f}s remaining at current pace]", flush=True)
 
     final_rmse = score(cur_sum)
     averaged = cur_sum / n_frames
@@ -151,6 +174,14 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
 
 
 def main():
+    # See atari_scanline_blend.py's main() for why: without this, piping or
+    # redirecting output can make Python fully-buffer stdout, so a long run
+    # looks completely silent for minutes even though it's working.
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except AttributeError:
+        pass
+
     ap = argparse.ArgumentParser(description="Cyclic (bidirectional) N-frame Atari scanline solver.")
     ap.add_argument("image")
     ap.add_argument("-o", "--output-prefix", default=None)
@@ -172,7 +203,11 @@ def main():
                           "the whole point of this tool vs. the base one). Cost scales linearly "
                           "with this. Brand-new algorithm, no established plateau point yet -- "
                           "watch the printed per-round RMS and judge for yourself.")
-    ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--quiet", action="store_true", help="suppress all progress output")
+    ap.add_argument("--terse", action="store_true",
+                     help="show frame-start and outer-round-finish progress (with elapsed/ETA "
+                          "timing) but suppress the per-DBS-round SSE spam within each frame-solve. "
+                          "A middle ground between full detail (default) and --quiet.")
     args = ap.parse_args()
 
     if args.width < 1 or args.height < 1:
@@ -195,18 +230,19 @@ def main():
     solve_kwargs = dict(rounds=args.rounds, sweeps=args.sweeps, metric=args.metric,
                          smoothness=args.smoothness)
 
+    overall_t0 = time.monotonic()
     result = solve_n_frame_cyclic(target, n_frames=args.frames, outer_rounds=args.outer_rounds,
                                    seeds=args.seeds, sigma=args.sigma, radius=args.radius,
-                                   verbose=not args.quiet, **solve_kwargs)
+                                   verbose=not args.quiet, terse=args.terse, **solve_kwargs)
 
     color_idxs, ons = result["color_idxs"], result["ons"]
     header_path, source_path = base.write_c_files_n_frame(prefix, color_idxs, ons)
 
     recon_path = f"{prefix}_reconstructed.png"
     base.save_preview(result["averaged"], recon_path)
-    print(f"Wrote {header_path}")
-    print(f"Wrote {source_path}")
-    print(f"Wrote {recon_path}  (the {args.frames}-frame cyclically-averaged perceived result)")
+    print(f"Wrote {header_path}", flush=True)
+    print(f"Wrote {source_path}", flush=True)
+    print(f"Wrote {recon_path}  (the {args.frames}-frame cyclically-averaged perceived result)", flush=True)
 
     for i in range(args.frames):
         raw_i = np.zeros((base.HEIGHT, base.WIDTH, 3), dtype=np.float64)
@@ -214,13 +250,16 @@ def main():
             raw_i[y][ons[i][y]] = base.PALETTE_RGB[color_idxs[i][y]]
         raw_path = f"{prefix}_frame{i}_raw.png"
         base.save_preview(raw_i, raw_path)
-        print(f"Wrote {raw_path}  (raw unblended TIA pixels, frame {i})")
+        print(f"Wrote {raw_path}  (raw unblended TIA pixels, frame {i})", flush=True)
 
     jump = compute_frame_jump(color_idxs, ons, base.HEIGHT, base.WIDTH)
-    print(f"Final cyclic {args.frames}-frame RMS (unweighted RGB, 0-255 scale): {result['final_rmse']:.2f}")
+    total_elapsed = time.monotonic() - overall_t0
+    print(f"Final cyclic {args.frames}-frame RMS (unweighted RGB, 0-255 scale): {result['final_rmse']:.2f}", flush=True)
     print(f"Mean cyclic frame-to-frame raw-pixel RMS jump: {jump:.2f}  "
-          f"(flicker-magnitude metric -- compare to the RMS above)")
+          f"(flicker-magnitude metric -- compare to the RMS above)", flush=True)
+    print(f"Total solve time: {total_elapsed:.1f}s", flush=True)
 
 
 if __name__ == "__main__":
     main()
+    

@@ -78,7 +78,7 @@ VB_kernelCopyright
                     sta WSYNC
                     sta HMOVE
 
-                    ldx #$FC
+                    ldx #$FF
                     stx PF2                    
 
                     rts

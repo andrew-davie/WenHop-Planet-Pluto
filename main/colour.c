@@ -33,6 +33,7 @@ void interleaveChronoColour(int *r) {
         *r = 0;
 }
 
+
 unsigned char TranslateColour[] = {0x00, 0x20, 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0,
                                    0xD0, 0xB0, 0x90, 0x70, 0x70, 0x50, 0x20, 0x40};
 
@@ -132,18 +133,13 @@ void setPFColours(unsigned char *colours) {
     }
 }
 
-int step_toward(int current, int target) {
-    int diff = target - current;
-    return current + (diff > 0) - (diff < 0);
-}
-
-void adjustLuminance() {
+void adjustLuminance(int speed) {
 
     static signed char lumSpeed = 0;
 
     if (--lumSpeed < 0) {
-        luminance = step_toward(luminance, lumTarget);
-        lumSpeed = 3;
+        luminance = approach(luminance, lumTarget, 1);
+        lumSpeed = speed;
     }
 }
 
@@ -236,10 +232,8 @@ void setBackgroundPalette(unsigned char *cx) {
 
 void setPalette(int buf) {
 
-
-    //  interleaveColour();
-
-    unsigned char bgCol = colubk;    // tmp flashTime ? ARENA_COLOUR : 0;
+    unsigned char bgCol = colubk;
+    // rangeRandom(15) + 0x20;    // convertColour(0x28);    // colubk;    // tmp flashTime ? ARENA_COLOUR : 0;
     const int shift = 16;
 
     int i = 0;
@@ -443,7 +437,7 @@ const unsigned char colourPool[][4] = {
 
 void loadPalette() {
 
-    luminance = 0;
+    lumTarget = 0;
 
     unsigned char *c = (unsigned char *)colourPool;
     currentPalette = rangeRandom(sizeof(colourPool) / sizeof(colourPool[0]));
