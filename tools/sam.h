@@ -1,5 +1,5 @@
-#ifndef TOYSTORY_H
-#define TOYSTORY_H
+#ifndef SAM_H
+#define SAM_H
 
 #include <stdint.h>
 
@@ -14,7 +14,7 @@
  * ScanLine is defined once and shared verbatim across every file this
  * tool generates. The 3 individual frame arrays are file-local
  * (static) -- the only thing this translation unit exports is
- * toystory_screen_frames, a table of 3 pointers in cycle order. Index it
+ * sam_screen_frames, a table of 3 pointers in cycle order. Index it
  * by a running frame counter (mod SCREEN_NUM_FRAMES) exactly as usual --
  * the display-side code does not change at all versus the unrolled
  * scheme.
@@ -59,7 +59,7 @@ typedef struct {
 
 #endif /* ATARI_SCANLINE_TYPE_H */
 
-/* e.g. toystory_screen_frames[frame_counter % SCREEN_NUM_FRAMES] */
-extern const ScanLine * const toystory_screen_frames[SCREEN_NUM_FRAMES];
+/* e.g. sam_screen_frames[frame_counter % SCREEN_NUM_FRAMES] */
+extern const ScanLine * const sam_screen_frames[SCREEN_NUM_FRAMES];
 
-#endif /* TOYSTORY_H */
+#endif /* SAM_H */

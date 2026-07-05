@@ -19,6 +19,17 @@
 
 #include "../gfx/fontcompact.h"
 
+
+#include "../tools/dh.h"
+#include "../tools/donald.h"
+#include "../tools/lena.h"
+#include "../tools/playboy.h"
+#include "../tools/sam.h"
+#include "../tools/toystory.h"
+
+void rasterBleed(const ScanLine **frames, int cycles, int y);
+
+
 #define CHAMP_VOL 100
 #define DURATION_SKULL 18000
 #define PRESENTS_LUM 8
@@ -394,7 +405,7 @@ void initKernel_Skull() {
 
     myMemsetInt((unsigned int *)(RAM + _SKULL_BUFFERS_START), 0, _SKULL_BUFFERS_SIZE / 4);
 
-    // draw6Bitmap(_BUF_SKULL_GRP, _BUF_SKULL_COLUP0,    //
+    // draw6Bitmap(_BUF_SKULL_GRP, _B
     //             gfx_grid_suchislife_gif, gfx_grid_suchislife_gif_HEIGHT, 175, 0xF4);
 }
 
@@ -431,7 +442,7 @@ void initGameState_Skull() {
     frame = 0;
 
 
-    drawString(FONT_COMPACT, 0x1A, 3, _BUF_SKULL_GRP, _BUF_SKULL_COLUP0, ">See|you in|the next|LIFE!!!", 150);
+    //    drawString(FONT_COMPACT, 0x1A, 3, _BUF_SKULL_GRP, _BUF_SKULL_COLUP0, "=B\\=1$3}S\\=1$4}f\\=3", 20);
 }
 
 
@@ -665,11 +676,34 @@ void drawICCSkull() {
 void VB_Skull() {
 
     initDataStreams_Skull();
-    drawICCSkull();
+    // drawICCSkull();
     getJoystick();
 
-    if (luminance == lumTarget)
-        drawNextChar();
+    static int cycleImage = 0;
+
+    static const ScanLine **images[] = {
+        sam_screen_frames,
+        donald_screen_frames,
+        // lena_screen_frames,
+        toystory_screen_frames,
+        dh_screen_frames,
+        //        playboy_screen_frames,
+    };
+
+
+    if (!(frame & 127)) {
+        cycleImage++;
+        if (cycleImage >= sizeof(images) / sizeof(images[0]))
+            cycleImage = 0;
+    }
+
+    // rasterBleed(toystory_screen_frames, 1);
+    // rasterBleed(toystory_screen_frames, 3);
+    // rasterBleed(sam_screen_frames, 3);
+    rasterBleed(images[cycleImage], 3, 50);
+
+    // if (luminance == lumTarget)
+    //     drawNextChar();
 
     if (!(inpt4 & 0x80))    // > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
         setGameState(GS_MENU);
@@ -687,18 +721,18 @@ void OS_Skull() {
 
     static int skullBGFlash = 0;
 
-    if (luminance == lumTarget) {
+    // if (luminance == lumTarget) {
 
-        if (!skullBGFlash || !rangeRandom(100)) {
-            int intens = rangeRandom(5) + 4;
-            skullBGFlash = 0x20 + intens;
-            if (intens >= 6)
-                blink = 0;
-        }
+    //     if (!skullBGFlash || !rangeRandom(100)) {
+    //         int intens = rangeRandom(5) + 4;
+    //         skullBGFlash = 0x20 + intens;
+    //         if (intens >= 6)
+    //             blink = 0;
+    //     }
 
-        if (!(frame & 7) && skullBGFlash != 0x20)
-            skullBGFlash--;
-    }
+    //     if (!(frame & 7) && skullBGFlash != 0x20)
+    //         skullBGFlash--;
+    // }
 
     unsigned char *p = (unsigned char *)(RAM + _BUF_SKULL_COLUBK);
     *p = skullBGFlash;
@@ -706,5 +740,32 @@ void OS_Skull() {
 
     myMemsetInt((unsigned int *)(RAM + _BUF_SKULL_PF), 0, _BUFFER_SIZE);    // 4 buffers @ int
 }
+
+// RasterBleed testbed
+
+
+void rasterBleed(const ScanLine **frames, int cycles, int y) {
+
+    static int f = 0;
+    if (++f >= cycles)
+        f = 0;
+
+    const ScanLine *s = frames[f];
+    unsigned char *dest = (unsigned char *)(RAM + _BUF_SKULL_GRP + y);
+    unsigned char *colr = (unsigned char *)(RAM + _BUF_SKULL_COLUP0 + y);
+
+    for (int i = 0; i < 128; i++) {
+
+        for (int col = 0; col < 6; col++)
+            *(dest + col * _BUFFER_SIZE) = s->bits[col];
+        dest++;
+
+        *colr++ = s->colour;
+        s++;
+    }
+
+    // we'll use roller for frame# for the first test
+}
+
 
 // EOF

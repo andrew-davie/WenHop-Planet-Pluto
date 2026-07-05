@@ -127,6 +127,13 @@ SRCS = \
  ../gfx/alphanumeric.c \
  ../gfx/fontcompact.c \
  ../gfx/fontlarge.c \
+ \
+ ../tools/sam.c \
+ ../tools/playboy.c \
+ ../tools/donald.c \
+ ../tools/toystory.c \
+ ../tools/lena.c \
+ ../tools/dh.c \
 
 
 
@@ -153,6 +160,10 @@ spinningGlobe/%.o: $(BASE)/spinningGlobe/%.c $(BASE)/$(DASM_TO_C)
 	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
 
 ../gfx/%.o: ../gfx/%.c $(BASE)/$(DASM_TO_C)
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
+
+../tools/%.o: ../tools/%.c $(BASE)/$(DASM_TO_C)
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
 

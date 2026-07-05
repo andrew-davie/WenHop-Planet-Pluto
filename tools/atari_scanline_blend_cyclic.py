@@ -70,7 +70,7 @@ USAGE
                                             [--sigma 1.0] [--radius 3]
                                             [--rounds 8] [--sweeps 3]
                                             [--metric luma] [--seeds 2]
-                                            [--smoothness 0.01] [--quiet]
+                                            [--smoothness auto|0.5] [--quiet]
 """
 import argparse
 import sys
@@ -115,6 +115,15 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
 
     height, width = base.HEIGHT, base.WIDTH
     inner_verbose = verbose and not terse
+    # See atari_scanline_blend.py's solve_n_frame() for the full rationale
+    # (white/grey flicker fix, opt-in, default 0). Anchored to frame 0's
+    # CURRENT colour throughout, same as the base tool -- even though
+    # frame 0 itself gets re-solved every outer round here (unlike the
+    # base tool, where it's solved once and never revisited), reusing
+    # "whatever frame 0 currently holds" as everyone else's reference is
+    # the simplest consistent choice and needs no special first-round case
+    # beyond not anchoring frame 0 to itself.
+    temporal_weight = kwargs.pop("temporal_weight", 0.0)
 
     # ---- initial guess: reuse the existing one-pass forward scheme as a
     # perfectly reasonable, cheap starting point (it already satisfies the
@@ -124,7 +133,8 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
     if verbose:
         print(f"=== initial pass: one-pass forward solve, {n_frames} frame(s) ===", flush=True)
     init = base.solve_n_frame(target, n_frames=n_frames, seeds=seeds,
-                               sigma=sigma, radius=radius, verbose=inner_verbose, **kwargs)
+                               sigma=sigma, radius=radius, verbose=inner_verbose,
+                               temporal_weight=temporal_weight, **kwargs)
     color_idxs = list(init["color_idxs"])
     ons = list(init["ons"])
     blendeds = list(init["blendeds"])
@@ -148,8 +158,11 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
                       f"(seeds={seeds}) [{time.monotonic()-t_start:.1f}s elapsed total] ---", flush=True)
             other_sum = cur_sum - blendeds[i]
             this_target = n_frames * target - other_sum
+            tref = base.PALETTE_RGB[color_idxs[0]] if i > 0 else None
             result = base.solve_best_of(this_target, seeds=seeds, sigma=sigma, radius=radius,
-                                         tag=f"[outer{outer} frame{i}] ", verbose=inner_verbose, **kwargs)
+                                         tag=f"[outer{outer} frame{i}] ", verbose=inner_verbose,
+                                         temporal_ref_colours=tref, temporal_weight=temporal_weight,
+                                         **kwargs)
             color_idx_i, on_i, blended_i, rmse_i, werr_i = result
             cur_sum = cur_sum - blendeds[i] + blended_i
             color_idxs[i] = color_idx_i
@@ -194,8 +207,36 @@ def main():
     ap.add_argument("--sweeps", type=int, default=3)
     ap.add_argument("--metric", choices=["luma", "rgb"], default="luma")
     ap.add_argument("--seeds", type=int, default=2)
-    ap.add_argument("--smoothness", type=float, default=0.01)
+    ap.add_argument("--smoothness", type=base._smoothness_arg, default="auto",
+                     help="see atari_scanline_blend.py --help for the full rationale -- "
+                          "this is now a CEILING, not a flat penalty: it's scaled per row "
+                          "by how tied that row's own palette match is (full strength on a "
+                          "genuine near-tie, ~0 on an already-decisive row), which is what "
+                          "fixed the cel-art lock-in (a Donald Duck jacket rendering flat "
+                          "grey) WITHOUT reintroducing chattering-hue noise elsewhere in "
+                          "the same image -- a whole-image background-fraction guess was "
+                          "tried first and failed, because a single image can need both "
+                          "regimes in different rows. 'auto' (default) just means 'use the "
+                          "recommended ceiling, 0.5'. Pass an explicit number to change the "
+                          "ceiling; 0 disables the mechanism entirely.")
+    ap.add_argument("--saturation", type=float, default=1.0,
+                     help="saturation multiplier applied to the source before resizing (default "
+                          "1.0). See atari_scanline_blend.py --help for why this exists -- real "
+                          "hardware read as washed out even at a single static frame, so it's not "
+                          "a temporal-averaging artifact; compensate on the input instead of the "
+                          "display.")
+    ap.add_argument("--brightness", type=float, default=1.0,
+                     help="brightness multiplier applied to the source before resizing (default 1.0).")
     ap.add_argument("--frames", type=int, default=3, help="number of frames in the cyclic sequence (>=2, default 3)")
+    ap.add_argument("--temporal-weight", type=float, default=0.0,
+                     help="see atari_scanline_blend.py --help for the full rationale -- cross-frame "
+                          "penalty biasing every frame toward reusing frame 0's colour on a given "
+                          "row, but only where that colour is near-grey and reuse is cheap. Default "
+                          "0 (off): found a real RMS cost on photographic content (lena), so this is "
+                          "opt-in, not a smart default. Validated value for flat/cel-art content with "
+                          "large white areas: 2.0 (donald.jpg: cut white-belly frame-to-frame swing "
+                          "~9%%, fixed a couple of stray wrong-hue rows there too). Don't enable for "
+                          "photographic source material.")
     ap.add_argument("--outer-rounds", type=int, default=4,
                      help="how many full cyclic relaxation passes across all frames (default 4). "
                           "Each pass re-solves every frame against the residual left by all OTHER "
@@ -203,6 +244,21 @@ def main():
                           "the whole point of this tool vs. the base one). Cost scales linearly "
                           "with this. Brand-new algorithm, no established plateau point yet -- "
                           "watch the printed per-round RMS and judge for yourself.")
+    ap.add_argument("--roll-scanlines", action="store_true",
+                     help="see atari_scanline_blend.py --help for the full rationale AND for "
+                          "an important correction: an earlier version of this flag rolled at "
+                          "1-row granularity and broke colours almost everywhere, because the "
+                          "vertical blend (radius --radius) means a row's solved colour is "
+                          "only correct next to ITS OWN solved neighbours. Now rolls in bands "
+                          "of --roll-band-height rows instead. Mathematically inert on the "
+                          "time-averaged perceived image (pure reordering); does not change "
+                          "the RMS or frame-jump numbers this tool prints, only the spatial "
+                          "correlation of the change those numbers can't show.")
+    ap.add_argument("--roll-band-height", type=int, default=None,
+                     help="only meaningful with --roll-scanlines. See atari_scanline_blend.py "
+                          "--help for the measured boundary-cost trade-off (default: 8x "
+                          "--radius, minimum 16). This tool prints the real affected-row count "
+                          "for your actual settings when the flag is used.")
     ap.add_argument("--quiet", action="store_true", help="suppress all progress output")
     ap.add_argument("--terse", action="store_true",
                      help="show frame-start and outer-round-finish progress (with elapsed/ETA "
@@ -225,10 +281,15 @@ def main():
         b = args.image.rsplit("/", 1)[-1].rsplit(".", 1)[0]
         prefix = b + "_cyclic"
 
-    target = base.load_target(args.image)
+    target = base.load_target(args.image, saturation=args.saturation, brightness=args.brightness)
+
+    if args.smoothness == "auto":
+        smoothness_value = base.auto_smoothness(target, verbose=not args.quiet)
+    else:
+        smoothness_value = args.smoothness
 
     solve_kwargs = dict(rounds=args.rounds, sweeps=args.sweeps, metric=args.metric,
-                         smoothness=args.smoothness)
+                         smoothness=smoothness_value, temporal_weight=args.temporal_weight)
 
     overall_t0 = time.monotonic()
     result = solve_n_frame_cyclic(target, n_frames=args.frames, outer_rounds=args.outer_rounds,
@@ -236,7 +297,33 @@ def main():
                                    verbose=not args.quiet, terse=args.terse, **solve_kwargs)
 
     color_idxs, ons = result["color_idxs"], result["ons"]
-    header_path, source_path = base.write_c_files_n_frame(prefix, color_idxs, ons)
+
+    # Jump metric is computed on the PRE-roll frames deliberately: rolling
+    # is a pure reordering that leaves per-pixel change magnitude the same
+    # (every row still switches to a different original frame's data every
+    # video frame either way) -- what it changes is spatial correlation,
+    # which this scalar metric can't show. Compute it against the actual
+    # solved frames so the number keeps meaning what it's always meant,
+    # rather than silently reporting something that looks unchanged for a
+    # different reason each time --roll-scanlines is toggled.
+    jump = compute_frame_jump(color_idxs, ons, base.HEIGHT, base.WIDTH)
+
+    roll_band_height = None
+    if args.roll_scanlines:
+        roll_band_height = args.roll_band_height if args.roll_band_height is not None \
+            else max(16, 8 * args.radius)
+        seam_rows = base.roll_seam_row_count(base.HEIGHT, roll_band_height, args.radius)
+        color_idxs, ons = base.roll_scanlines(color_idxs, ons, roll_band_height, radius=args.radius)
+        if not args.quiet:
+            print(f"Rolled scanlines: band height {roll_band_height} rows. "
+                  f"{seam_rows}/{base.HEIGHT} rows ({100*seam_rows/base.HEIGHT:.0f}%) have a "
+                  f"mixed-frame blend window near a band boundary and will show a "
+                  f"locally-wrong blend there -- see roll_scanlines() docstring in "
+                  f"atari_scanline_blend.py.", flush=True)
+
+    header_path, source_path = base.write_c_files_n_frame(prefix, color_idxs, ons,
+                                                           rolled=args.roll_scanlines,
+                                                           roll_band_height=roll_band_height)
 
     recon_path = f"{prefix}_reconstructed.png"
     base.save_preview(result["averaged"], recon_path)
@@ -250,16 +337,17 @@ def main():
             raw_i[y][ons[i][y]] = base.PALETTE_RGB[color_idxs[i][y]]
         raw_path = f"{prefix}_frame{i}_raw.png"
         base.save_preview(raw_i, raw_path)
-        print(f"Wrote {raw_path}  (raw unblended TIA pixels, frame {i})", flush=True)
+        note = "  (rolled composite -- diagonal patchwork of all N solves by design)" if args.roll_scanlines else ""
+        print(f"Wrote {raw_path}  (raw unblended TIA pixels, frame {i}){note}", flush=True)
 
-    jump = compute_frame_jump(color_idxs, ons, base.HEIGHT, base.WIDTH)
     total_elapsed = time.monotonic() - overall_t0
     print(f"Final cyclic {args.frames}-frame RMS (unweighted RGB, 0-255 scale): {result['final_rmse']:.2f}", flush=True)
     print(f"Mean cyclic frame-to-frame raw-pixel RMS jump: {jump:.2f}  "
-          f"(flicker-magnitude metric -- compare to the RMS above)", flush=True)
+          f"(flicker-magnitude metric -- compare to the RMS above; computed pre-roll, "
+          f"see comment above -- rolling doesn't change this number, only spatial "
+          f"correlation, which this metric can't capture)", flush=True)
     print(f"Total solve time: {total_elapsed:.1f}s", flush=True)
 
 
 if __name__ == "__main__":
     main()
-    
