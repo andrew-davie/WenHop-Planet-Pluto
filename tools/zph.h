@@ -1,5 +1,5 @@
-#ifndef SAM_H
-#define SAM_H
+#ifndef ZPH_H
+#define ZPH_H
 
 #include <stdint.h>
 
@@ -14,8 +14,8 @@
  * ScanLine is defined once and shared verbatim across every file this
  * tool generates. The 3 individual frame arrays are file-local
  * (static) -- the only thing this translation unit exports is
- * sam_screen_frames, a table of 3 pointers in cycle order. Index it
- * by a running frame counter (mod SAM_NUM_FRAMES): cycle frame 0, 1,
+ * zph_screen_frames, a table of 3 pointers in cycle order. Index it
+ * by a running frame counter (mod ZPH_NUM_FRAMES): cycle frame 0, 1,
  * ..., 2, back to 0, forever. Only frame0 was solved to look
  * reasonable on its own; every later frame was solved to correct whatever
  * residual error the frames before it left behind, so that the
@@ -27,7 +27,7 @@
  * correction term, not a picture in its own right.
  */
 
-#define SAM_NUM_FRAMES 3
+#define ZPH_NUM_FRAMES 3
 
 #ifndef ATARI_SCANLINE_TYPE_H
 #define ATARI_SCANLINE_TYPE_H
@@ -43,9 +43,9 @@ typedef struct {
 
 #endif /* ATARI_SCANLINE_TYPE_H */
 
-#define SAM_PARAMS "image=sam.png width=48 height=128 sigma=1.0 radius=5 rounds=8 sweeps=3 metric=luma seeds=6 smoothness=0.5 saturation=1.0 brightness=1.0 frames=3 outer_rounds=8 temporal_weight=0.0 roll_scanlines=False roll_band_height=None frame_scheme=cumulative"
+#define ZPH_PARAMS "image=zph.png width=48 height=128 sigma=1.0 radius=5 rounds=8 sweeps=3 metric=luma seeds=4 smoothness=0.5 saturation=1.0 brightness=1.0 frames=3 outer_rounds=4 temporal_weight=0.0 roll_scanlines=False roll_band_height=None frame_scheme=cumulative"
 
-/* e.g. sam_screen_frames[frame_counter % SAM_NUM_FRAMES] */
-extern const ScanLine * const sam_screen_frames[SAM_NUM_FRAMES];
+/* e.g. zph_screen_frames[frame_counter % ZPH_NUM_FRAMES] */
+extern const ScanLine * const zph_screen_frames[ZPH_NUM_FRAMES];
 
-#endif /* SAM_H */
+#endif /* ZPH_H */

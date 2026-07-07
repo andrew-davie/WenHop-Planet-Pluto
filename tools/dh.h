@@ -15,35 +15,19 @@
  * tool generates. The 3 individual frame arrays are file-local
  * (static) -- the only thing this translation unit exports is
  * dh_screen_frames, a table of 3 pointers in cycle order. Index it
- * by a running frame counter (mod SCREEN_NUM_FRAMES) exactly as usual --
- * the display-side code does not change at all versus the unrolled
- * scheme.
- *
- * IMPORTANT: --roll-scanlines was used (band height 24), so
- * these 3 arrays are NOT the raw per-frame solves -- they are
- * already-rolled composites. Array k's row y holds original solved frame
- * (k + y // 24) %% 3's row y data: every
- * 24-row BAND of the screen is staggered to a different
- * original frame, instead of the whole screen flipping between frames in
- * lockstep. Over one full 3-frame cycle every row still visits
- * all 3 original frames' data once each (same 1/3-weighted
- * temporal average as always -- this is a pure reordering, not a
- * re-solve), so the perceived static image is unchanged; what's
- * different is that frame-to-frame change is spread across bands instead
- * of hitting the whole screen at the same instant. Rows within a band's
- * interior have a fully self-consistent vertical-blend neighbourhood
- * (matching what the solver assumed); rows near a band boundary
- * straddle two original frames' data and will show a locally-wrong
- * blend there -- that's an unavoidable, quantified cost of this
- * technique, not a bug (an EARLIER version of this tool rolled at
- * 1-row granularity, which put ~100%% of rows in that "wrong blend"
- * state -- visibly broken colours, found and fixed). See
- * roll_scanlines() in atari_scanline_blend.py for the full history and
- * roll_seam_row_count() to quantify the boundary cost for your own
- * --height/--radius/--roll-band-height combination.
+ * by a running frame counter (mod DH_NUM_FRAMES): cycle frame 0, 1,
+ * ..., 2, back to 0, forever. Only frame0 was solved to look
+ * reasonable on its own; every later frame was solved to correct whatever
+ * residual error the frames before it left behind, so that the
+ * 1/3-weighted temporal average the eye perceives from the full
+ * cycle (combined with the usual vertical scanline blending within each
+ * individual frame) lands closer to the source image than fewer frames
+ * could manage. Do not display any frame after frame0 on its own
+ * expecting it to look like the picture -- it won't; each is a
+ * correction term, not a picture in its own right.
  */
 
-#define SCREEN_NUM_FRAMES 3
+#define DH_NUM_FRAMES 3
 
 #ifndef ATARI_SCANLINE_TYPE_H
 #define ATARI_SCANLINE_TYPE_H
@@ -59,7 +43,9 @@ typedef struct {
 
 #endif /* ATARI_SCANLINE_TYPE_H */
 
-/* e.g. dh_screen_frames[frame_counter % SCREEN_NUM_FRAMES] */
-extern const ScanLine * const dh_screen_frames[SCREEN_NUM_FRAMES];
+#define DH_PARAMS "image=dh.jpg width=48 height=128 sigma=1.0 radius=5 rounds=8 sweeps=3 metric=luma seeds=6 smoothness=0.5 saturation=1.0 brightness=1.0 frames=3 outer_rounds=8 temporal_weight=0.0 roll_scanlines=False roll_band_height=None frame_scheme=cumulative"
+
+/* e.g. dh_screen_frames[frame_counter % DH_NUM_FRAMES] */
+extern const ScanLine * const dh_screen_frames[DH_NUM_FRAMES];
 
 #endif /* DH_H */

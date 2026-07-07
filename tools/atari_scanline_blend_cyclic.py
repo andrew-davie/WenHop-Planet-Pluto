@@ -104,17 +104,73 @@ def compute_frame_jump(color_idxs, ons, height, width):
 
 
 def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
-                          sigma=1.0, radius=3, verbose=True, terse=False, **kwargs):
+                          sigma=1.0, radius=3, verbose=True, terse=False,
+                          frame_scheme="cumulative", **kwargs):
     """terse=False (default): full progress -- every DBS round of every
     frame-solve prints its running SSE, so a long run never goes silent
     for more than a fraction of a second. terse=True: only announce each
     frame-solve starting and each outer round finishing (no per-DBS-round
-    spam) -- a quieter middle ground between full detail and --quiet."""
+    spam) -- a quieter middle ground between full detail and --quiet.
+
+    frame_scheme="cumulative" (default): the original cyclic scheme this
+    file was built around -- solve_n_frame() initial pass + outer-round
+    residual refinement (see below). Real accuracy cost/benefit measured
+    directly against "joint": cumulative gets ~30-40% lower RMS from each
+    frame's full iterative closed-form colour refinement, but can collapse
+    a whole frame to flat grey (or a wrong hue, if patched) on an awkward
+    residual -- check the per-frame _raw.png previews for that. "joint"
+    can't produce that collapse but was reported directly on a real render
+    as looking flatter/less vibrant overall, and two follow-up fixes
+    (row-jitter smoothing, outer-round refinement against the real
+    achieved blend) didn't close the gap -- a real, still-open trade-off,
+    not a default to take lightly either way.
+
+    frame_scheme="joint": initialise with
+    atari_scanline_blend.py's solve_n_frame_joint() -- every frame's
+    colour sequence decided together, per row, as the best REAL achievable
+    average of real palette entries (see its docstring) -- and then RETURN
+    THAT DIRECTLY, skipping the outer-round refinement loop below entirely.
+    That loop's whole mechanism is per-frame residual-chasing
+    (this_target = n_frames*target - other_sum, i.e. exactly the
+    architecture solve_n_frame_joint() was built to avoid -- see
+    solve_colour_triplets()'s docstring for why that's fragile: confirmed
+    directly that running outer-round refinement on top of an
+    already-good joint result reintroduces the same collapse/wrong-hue
+    risk, since every frame it touches -- including frame 0, unlike the
+    base tool's own one-shot scheme -- becomes residual-driven the moment
+    outer-round refinement runs). outer_rounds is ignored (with a note) in
+    this mode. Pass frame_scheme="cumulative" for the old behaviour
+    (solve_n_frame() initial pass + this file's own outer-round cyclic
+    refinement), kept for comparison."""
     if n_frames < 2:
         raise ValueError("n_frames must be >= 2 -- use the base tool directly for a single frame")
 
     height, width = base.HEIGHT, base.WIDTH
     inner_verbose = verbose and not terse
+    temporal_weight = kwargs.pop("temporal_weight", 0.0)
+
+    def score(s):
+        avg = s / n_frames
+        return (float(np.sum((target - avg) ** 2)) / (height * width * 3)) ** 0.5
+
+    if frame_scheme == "joint":
+        if n_frames != 3:
+            raise ValueError("frame_scheme='joint' currently only supports n_frames == 3 "
+                              "(frame count is fixed project-wide anyway)")
+        if verbose:
+            print(f"=== joint pass: {n_frames}-frame colour sequences solved together ===",
+                  flush=True)
+            if outer_rounds:
+                print(f"(outer_rounds={outer_rounds} ignored: the joint scheme doesn't use "
+                      f"outer-round residual refinement -- see solve_n_frame_cyclic()'s "
+                      f"docstring)", flush=True)
+        result = base.solve_n_frame_joint(target, n_frames=n_frames, seeds=seeds,
+                                           sigma=sigma, radius=radius, verbose=inner_verbose,
+                                           **kwargs)
+        if verbose:
+            print(f"[joint] RMS = {result['final_rmse']:.2f}", flush=True)
+        return result
+
     # See atari_scanline_blend.py's solve_n_frame() for the full rationale
     # (white/grey flicker fix, opt-in, default 0). Anchored to frame 0's
     # CURRENT colour throughout, same as the base tool -- even though
@@ -123,7 +179,6 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
     # "whatever frame 0 currently holds" as everyone else's reference is
     # the simplest consistent choice and needs no special first-round case
     # beyond not anchoring frame 0 to itself.
-    temporal_weight = kwargs.pop("temporal_weight", 0.0)
 
     # ---- initial guess: reuse the existing one-pass forward scheme as a
     # perfectly reasonable, cheap starting point (it already satisfies the
@@ -159,10 +214,23 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
             other_sum = cur_sum - blendeds[i]
             this_target = n_frames * target - other_sum
             tref = base.PALETTE_RGB[color_idxs[0]] if i > 0 else None
+            # Every frame here (including frame 0, unlike the base tool's
+            # one-shot solve_n_frame) is fit against a RESIDUAL --
+            # "what this frame needs to be given every other frame's
+            # CURRENT commitment" -- not a direct photographed target, once
+            # we're inside outer-round refinement. See _fit_cost_table's
+            # docstring: the anti-grey chroma bias isn't trustworthy
+            # against a residual (confirmed: it chases whatever hue the
+            # residual arithmetic points at, which produced an obvious
+            # wrong magenta cast on a real photo), so it's forced off here
+            # for every frame, unless the caller explicitly overrode it.
+            outer_kwargs = dict(kwargs)
+            if "chroma_bias_scale" not in outer_kwargs:
+                outer_kwargs["chroma_bias_scale"] = 0.0
             result = base.solve_best_of(this_target, seeds=seeds, sigma=sigma, radius=radius,
                                          tag=f"[outer{outer} frame{i}] ", verbose=inner_verbose,
                                          temporal_ref_colours=tref, temporal_weight=temporal_weight,
-                                         **kwargs)
+                                         **outer_kwargs)
             color_idx_i, on_i, blended_i, rmse_i, werr_i = result
             cur_sum = cur_sum - blendeds[i] + blended_i
             color_idxs[i] = color_idx_i
@@ -209,16 +277,16 @@ def main():
     ap.add_argument("--seeds", type=int, default=2)
     ap.add_argument("--smoothness", type=base._smoothness_arg, default="auto",
                      help="see atari_scanline_blend.py --help for the full rationale -- "
-                          "this is now a CEILING, not a flat penalty: it's scaled per row "
-                          "by how tied that row's own palette match is (full strength on a "
-                          "genuine near-tie, ~0 on an already-decisive row), which is what "
-                          "fixed the cel-art lock-in (a Donald Duck jacket rendering flat "
-                          "grey) WITHOUT reintroducing chattering-hue noise elsewhere in "
-                          "the same image -- a whole-image background-fraction guess was "
-                          "tried first and failed, because a single image can need both "
-                          "regimes in different rows. 'auto' (default) just means 'use the "
-                          "recommended ceiling, 0.5'. Pass an explicit number to change the "
-                          "ceiling; 0 disables the mechanism entirely.")
+                          "this solves every scanline's colour for the whole column in one "
+                          "shot (dynamic programming / Viterbi over all rows at once), not "
+                          "row-by-row, which is what structurally fixed the false-consensus "
+                          "grey-banding defect a real photographic portrait exposed (long "
+                          "runs of rows locking into flat grey with no single row in the run "
+                          "decisively grey on its own) while still keeping the Donald Duck "
+                          "cel-art jacket flat and not reintroducing chattering-hue noise. "
+                          "'auto' (default) means 'use the recommended value, 0.5'. Pass an "
+                          "explicit number to change it directly; 0 disables the mechanism "
+                          "entirely (pure per-row nearest-palette-match).")
     ap.add_argument("--saturation", type=float, default=1.0,
                      help="saturation multiplier applied to the source before resizing (default "
                           "1.0). See atari_scanline_blend.py --help for why this exists -- real "
@@ -238,12 +306,32 @@ def main():
                           "~9%%, fixed a couple of stray wrong-hue rows there too). Don't enable for "
                           "photographic source material.")
     ap.add_argument("--outer-rounds", type=int, default=4,
-                     help="how many full cyclic relaxation passes across all frames (default 4). "
-                          "Each pass re-solves every frame against the residual left by all OTHER "
-                          "frames' CURRENT state (both directions, wraparound included -- this is "
-                          "the whole point of this tool vs. the base one). Cost scales linearly "
-                          "with this. Brand-new algorithm, no established plateau point yet -- "
-                          "watch the printed per-round RMS and judge for yourself.")
+                     help="only used by --frame-scheme cumulative (ignored, with a note, by the "
+                          "default 'joint' scheme -- see --frame-scheme). How many full cyclic "
+                          "relaxation passes across all frames. Each pass re-solves every frame "
+                          "against the residual left by all OTHER frames' CURRENT state (both "
+                          "directions, wraparound included). Cost scales linearly with this.")
+    ap.add_argument("--frame-scheme", choices=["joint", "cumulative"], default="cumulative",
+                     help="'cumulative' (default): the original cyclic scheme this file was "
+                          "built around -- solve_n_frame() initial pass + outer-round residual "
+                          "refinement, each frame getting full iterative closed-form colour "
+                          "refinement (measured ~30-40%% lower RMS than 'joint' on real test "
+                          "images -- that's where most of the accuracy comes from). Known "
+                          "failure mode: residual-chasing (in either the initial pass or "
+                          "outer-round refinement) can collapse a whole frame to flat grey, or "
+                          "chase a residual into an obviously wrong saturated hue if patched "
+                          "with an anti-grey bias -- an architectural problem, confirmed on a "
+                          "real photographic portrait. Check the per-frame _raw.png previews for "
+                          "a whole frame reading as flat grey or an odd solid colour; if you see "
+                          "that, try 'joint'. 'joint': every frame's colour sequence decided "
+                          "TOGETHER, per row, as the best real achievable average of real "
+                          "palette entries (see atari_scanline_blend.py's solve_n_frame_joint() "
+                          "docstring) -- structurally can't produce that collapse, but reported "
+                          "directly on a real render as looking flatter/less vibrant overall "
+                          "(confirmed real RMS cost; two follow-up fixes -- row-jitter "
+                          "smoothing and outer-round refinement against the real achieved blend "
+                          "-- neither closed the gap, so this is a real, still-open trade-off). "
+                          "--outer-rounds is ignored (with a note) in 'joint' mode.")
     ap.add_argument("--roll-scanlines", action="store_true",
                      help="see atari_scanline_blend.py --help for the full rationale AND for "
                           "an important correction: an earlier version of this flag rolled at "
@@ -294,7 +382,8 @@ def main():
     overall_t0 = time.monotonic()
     result = solve_n_frame_cyclic(target, n_frames=args.frames, outer_rounds=args.outer_rounds,
                                    seeds=args.seeds, sigma=args.sigma, radius=args.radius,
-                                   verbose=not args.quiet, terse=args.terse, **solve_kwargs)
+                                   verbose=not args.quiet, terse=args.terse,
+                                   frame_scheme=args.frame_scheme, **solve_kwargs)
 
     color_idxs, ons = result["color_idxs"], result["ons"]
 
@@ -321,9 +410,17 @@ def main():
                   f"locally-wrong blend there -- see roll_scanlines() docstring in "
                   f"atari_scanline_blend.py.", flush=True)
 
+    params_str = base.build_params_string(
+        image=args.image, width=base.WIDTH, height=base.HEIGHT, sigma=args.sigma,
+        radius=args.radius, rounds=args.rounds, sweeps=args.sweeps, metric=args.metric,
+        seeds=args.seeds, smoothness=smoothness_value, saturation=args.saturation,
+        brightness=args.brightness, frames=args.frames, outer_rounds=args.outer_rounds,
+        temporal_weight=args.temporal_weight, roll_scanlines=args.roll_scanlines,
+        roll_band_height=roll_band_height, frame_scheme=args.frame_scheme)
     header_path, source_path = base.write_c_files_n_frame(prefix, color_idxs, ons,
                                                            rolled=args.roll_scanlines,
-                                                           roll_band_height=roll_band_height)
+                                                           roll_band_height=roll_band_height,
+                                                           params=params_str)
 
     recon_path = f"{prefix}_reconstructed.png"
     base.save_preview(result["averaged"], recon_path)

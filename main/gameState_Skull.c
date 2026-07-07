@@ -2,32 +2,16 @@
 
 #include "cdfjplus.h"
 
-#include "caveData.h"
+#include "bitPatterns.h"
 #include "colour.h"
 #include "draw.h"
-#include "grid6.h"
 #include "joystick.h"
 #include "main.h"
-#include "menuCharacterSet.h"
 #include "random.h"
+#include "rasterBleed.h"
 #include "reverseBits.h"
-#include "savekey.h"
-
 #include "scroll.h"
-// #include "skull/main/main.h"
 #include "sound.h"
-
-#include "../gfx/fontcompact.h"
-
-
-#include "../tools/dh.h"
-#include "../tools/donald.h"
-#include "../tools/lena.h"
-#include "../tools/playboy.h"
-#include "../tools/sam.h"
-#include "../tools/toystory.h"
-
-void rasterBleed(const ScanLine **frames, int cycles, int y);
 
 
 #define CHAMP_VOL 100
@@ -442,7 +426,8 @@ void initGameState_Skull() {
     frame = 0;
 
 
-    //    drawString(FONT_COMPACT, 0x1A, 3, _BUF_SKULL_GRP, _BUF_SKULL_COLUP0, "=B\\=1$3}S\\=1$4}f\\=3", 20);
+    // drawString(FONT_COMPACT, 0x16, 3, _BUF_SKULL_GRP, _BUF_SKULL_COLUP0, "=_RasterBleed_}James O'Brien}@ZPH", 20);
+    drawString(FONT_COMPACT, 0x16, 3, _BUF_SKULL_GRP, _BUF_SKULL_COLUP0, "=_RasterBleed_", 20);
 }
 
 
@@ -680,40 +665,121 @@ void VB_Skull() {
     getJoystick();
 
     static int cycleImage = 0;
-
-    static const ScanLine **images[] = {
-        sam_screen_frames,
-        donald_screen_frames,
-        // lena_screen_frames,
-        toystory_screen_frames,
-        dh_screen_frames,
-        //        playboy_screen_frames,
-    };
+    // static int cycleDelay = 120;
+    // static int flashFrames = 0;
+    // static int pauseFrames = 0;
 
 
-    if (!(frame & 127)) {
-        cycleImage++;
-        if (cycleImage >= sizeof(images) / sizeof(images[0]))
-            cycleImage = 0;
+    // if (!(frame & 3)) {
+    //     cycleImage++;
+    //     if (cycleImage >= sizeof(images) / sizeof(images[0]))
+    //         cycleImage = 0;
+    // }
+
+
+    // typedef struct {
+    //     int flash_frames; /* frames the face is shown this round   */
+    //     int pause_frames; /* frames the skull is shown after it     */
+    // } Step;
+
+
+    // static const Step schedule[] = {
+    //     {1, 90}, {1, 60}, {2, 60}, {2, 40}, {3, 40}, {3, 25}, {5, 25}, {5, 15},
+    //     {8, 15}, {8, 8},  {13, 8}, {13, 4}, {21, 4}, {21, 2}, {34, 1},
+    // };
+
+
+    // static int chanceZPH = 10;
+
+
+    // static int bs = 1;
+    // static int del = 1;
+    // static int pdel = -170;
+
+    // static int pSkull = 200;
+    // static int minf = 0;
+
+    // if (++minf > 2) {
+
+    //     minf = 0;
+    //     cycleImage = 0;    // zph
+    //     if (rangeRandom(100) < pSkull)
+    //         cycleImage = 1;    // skull
+
+    //     if (++del > (pdel >> 1)) {
+
+    //         del = 0;
+    //         pdel++;
+    //         if (pSkull > 0)
+    //             pSkull--;
+    //     }
+    // }
+
+    // static int de = 0;
+    // if (--de) {
+
+    //     if (!rangeRandom(50))
+    //         cycleImage ^= 1;
+    //     de = 10;
+    // }
+
+
+#define RAMP_FRAMES 260u /* how many calls the transition takes  */
+#define THRESH_MAX 0xFFFFFFFFu
+#define THRESH_STEP (THRESH_MAX / RAMP_FRAMES) /* compile-time constant  */
+
+    static unsigned int threshold = 0;
+    static int done = 0;
+    static int icc = -400;
+    static int latep = 0;
+
+    if (!done && ++icc > 2) {
+
+        icc = 0;
+
+        unsigned int r = getRandom32();
+        cycleImage = (r < threshold) ? 1 : 0;
+
+        if (threshold >= THRESH_MAX - THRESH_STEP) {
+            done = 1; /* about to saturate: lock instead of risking overflow */
+        } else {
+            threshold += THRESH_STEP;
+        }
     }
 
-    // rasterBleed(toystory_screen_frames, 1);
-    // rasterBleed(toystory_screen_frames, 3);
-    // rasterBleed(sam_screen_frames, 3);
-    rasterBleed(images[cycleImage], 3, 50);
+    // if (done)
+    //     cycleImage = 1;
 
-    // if (luminance == lumTarget)
-    //     drawNextChar();
 
-    if (!(inpt4 & 0x80))    // > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
-        setGameState(GS_MENU);
+    if (done) {
+        latep++;
+        if (latep > 500)
+            cycleImage = 2;
+
+        if (latep > 750) {
+            icc = -400;
+            done = 0;
+            latep = 0;
+            threshold = 0;
+        }
+    }
+
+
+    rasterBleed(TOYSTORY_FRAME, 50);
+
+
+    if (luminance == lumTarget)
+        drawNextChar();
+
+    // if (!(inpt4 & 0x80))    // > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
+    //     setGameState(GS_MENU);
 }
 
 
 void OS_Skull() {
 
     interleaveChronoColour(&roller);
-    adjustLuminance(2);
+    adjustLuminance(1);
 
     setPFColours((unsigned char *)(RAM + _BUF_SKULL_COLUPF));
     setPalette(_BUF_SKULL_COLUBK);
@@ -739,32 +805,6 @@ void OS_Skull() {
 
 
     myMemsetInt((unsigned int *)(RAM + _BUF_SKULL_PF), 0, _BUFFER_SIZE);    // 4 buffers @ int
-}
-
-// RasterBleed testbed
-
-
-void rasterBleed(const ScanLine **frames, int cycles, int y) {
-
-    static int f = 0;
-    if (++f >= cycles)
-        f = 0;
-
-    const ScanLine *s = frames[f];
-    unsigned char *dest = (unsigned char *)(RAM + _BUF_SKULL_GRP + y);
-    unsigned char *colr = (unsigned char *)(RAM + _BUF_SKULL_COLUP0 + y);
-
-    for (int i = 0; i < 128; i++) {
-
-        for (int col = 0; col < 6; col++)
-            *(dest + col * _BUFFER_SIZE) = s->bits[col];
-        dest++;
-
-        *colr++ = s->colour;
-        s++;
-    }
-
-    // we'll use roller for frame# for the first test
 }
 
 

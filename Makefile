@@ -100,6 +100,7 @@ SRCS = \
  menuCharacterSet.c \
  particle.c \
  planet.c \
+ rasterBleed.c \
  reverseBits.c \
  schedule.c \
  score.c \
@@ -134,6 +135,10 @@ SRCS = \
  ../tools/toystory.c \
  ../tools/lena.c \
  ../tools/dh.c \
+ ../tools/obama.c \
+ ../tools/buzz.c \
+ ../tools/skull.c \
+ ../tools/zph.c \
 
 
 
