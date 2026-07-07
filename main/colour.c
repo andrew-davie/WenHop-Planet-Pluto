@@ -37,7 +37,7 @@ void interleaveChronoColour(int *r) {
 unsigned char TranslateColour[] = {0x00, 0x20, 0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0,
                                    0xD0, 0xB0, 0x90, 0x70, 0x70, 0x50, 0x20, 0x40};
 
-unsigned char TranslateSecamColour[] = {0, 0xE, 0xC, 4, 4, 6, 6, 2, 2, 2, 8, 8, 8, 8, 0xC, 0xC};
+unsigned char TranslateSecamColour[] = {0, 0xC, 0xC, 4, 4, 6, 6, 2, 2, 2, 8, 8, 8, 8, 0xC, 0xC};
 
 unsigned char secamConvert(unsigned char col) {
     unsigned char c = TranslateSecamColour[col >> 4];

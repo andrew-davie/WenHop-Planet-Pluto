@@ -267,7 +267,7 @@ const unsigned char sampleExit[] = {
 //     CMD_STOP,
 // };
 
-const struct AudioTable AudioSamples[SFX_MAX] = {
+const struct AudioTable AudioSamples[] = {
 
     // audio data, priority, flags
 

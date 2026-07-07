@@ -96,6 +96,7 @@ SRCS = \
  gameState_Rainbow.c \
  gameState_Skull.c \
  gameState_Globe.c \
+ gameState_RasterBleed.c \
  \
  menuCharacterSet.c \
  particle.c \

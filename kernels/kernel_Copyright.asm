@@ -79,7 +79,12 @@ VB_kernelCopyright
                     sta HMOVE
 
                     ldx #$FF
-                    stx PF2                    
+                    stx PF2  
+
+                    lda #_DS_CP_COLUP0_DATA
+                    sta COLUP0
+                    sta COLUP1
+
 
                     rts
 

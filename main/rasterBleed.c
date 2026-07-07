@@ -10,263 +10,58 @@
 #include "rasterBleed.h"
 
 
-// extern const ScanLine *const skull_screen_frames[SCREEN_NUM_FRAMES];
-// extern const ScanLine *const toystory_screen_frames[SCREEN_NUM_FRAMES];
-
 typedef struct {
     const ScanLine *const *frames;
     int count;
 } ScanFrame;
 
-const ScanFrame frame_set[MAX_FRAME] = {
+const ScanFrame frame_set[] = {
 
-    [SKULL_FRAME] = {skull_screen_frames, SKULL_NUM_FRAMES},             //
-    [ZPH_FRAME] = {zph_screen_frames, ZPH_NUM_FRAMES},                   //
-    [SAM_FRAME] = {sam_screen_frames, SAM_NUM_FRAMES},                   //
-    [DH_FRAME] = {dh_screen_frames, DH_NUM_FRAMES},                      //
-    [TOYSTORY_FRAME] = {toystory_screen_frames, TOYSTORY_NUM_FRAMES},    //
+    [SKULL_FRAME] = {skull_screen_frames, SKULL_NUM_FRAMES},    //
+    //[ZPH_FRAME] = {zph_screen_frames, ZPH_NUM_FRAMES},          //
+    //[SAM_FRAME] = {sam_screen_frames, SAM_NUM_FRAMES},          //
+    //[DH_FRAME] = {dh_screen_frames, DH_NUM_FRAMES},                      //
+    //[TOYSTORY_FRAME] = {toystory_screen_frames, TOYSTORY_NUM_FRAMES},    //
 };
 
-static_assert(sizeof(frame_set) / sizeof(frame_set[0]) == MAX_FRAME, "frame_set/enum mismatch");
+static_assert(sizeof(frame_set) / sizeof(frame_set[0]) == MAX_RASTERBLEED_FRAME, "frame_set/enum mismatch");
 
-
-// const int FRAME_SETS_MAX = sizeof(frame_set) / sizeof(frame_set[0]);
-
-
-/* atariNTSC[hue][luma] — hue 0-15, luma 0-7.
-   Colour byte = (hue << 4) | (luma << 1); bit 0 unused.
-   Source: Atari2600 NTSC palette (Wikimedia Commons / lospec.com) */
-static const RGB atariNTSC[16][8] = {
-    // clang-format off
-
-    {{0x00, 0x00, 0x00}, {0x40, 0x40, 0x40}, {0x6c, 0x6c, 0x6c}, {0x90, 0x90, 0x90}, //
-     {0xb0, 0xb0, 0xb0}, {0xc8, 0xc8, 0xc8}, {0xdc, 0xdc, 0xdc}, {0xec, 0xec, 0xec}}, // hue 0
-    /*hue 1*/
-    {{0x44, 0x44, 0x00},
-     {0x64, 0x64, 0x10},
-     {0x84, 0x84, 0x24},
-     {0xa0, 0xa0, 0x34},
-     {0xb8, 0xb8, 0x40},
-     {0xd0, 0xd0, 0x50},
-     {0xe8, 0xe8, 0x5c},
-     {0xfc, 0xfc, 0x68}},
-    /*hue 2*/
-    {{0x70, 0x28, 0x00},
-     {0x84, 0x44, 0x14},
-     {0x98, 0x5c, 0x28},
-     {0xac, 0x78, 0x3c},
-     {0xbc, 0x8c, 0x4c},
-     {0xcc, 0xa0, 0x5c},
-     {0xdc, 0xb4, 0x68},
-     {0xfc, 0xbc, 0x94}},
-    /*hue 3*/
-    {{0x84, 0x18, 0x00},
-     {0x98, 0x34, 0x18},
-     {0xac, 0x50, 0x30},
-     {0xc0, 0x68, 0x48},
-     {0xd0, 0x80, 0x5c},
-     {0xe0, 0x94, 0x70},
-     {0xec, 0xa8, 0x80},
-     {0xfc, 0xb4, 0xb4}},
-    /*hue 4*/
-    {{0x88, 0x00, 0x00},
-     {0x9c, 0x20, 0x20},
-     {0xb0, 0x3c, 0x3c},
-     {0xc0, 0x58, 0x58},
-     {0xd0, 0x70, 0x70},
-     {0xe0, 0x88, 0x88},
-     {0xec, 0xa0, 0xa0},
-     {0xec, 0xb0, 0xe0}},
-    /*hue 5*/
-    {{0x78, 0x00, 0x5c},
-     {0x8c, 0x20, 0x74},
-     {0xa0, 0x3c, 0x88},
-     {0xb0, 0x58, 0x9c},
-     {0xc0, 0x70, 0xb0},
-     {0xd0, 0x84, 0xc0},
-     {0xdc, 0x9c, 0xd0},
-     {0xd4, 0xb0, 0xfc}},
-    /*hue 6*/
-    {{0x48, 0x00, 0x78},
-     {0x60, 0x20, 0x90},
-     {0x78, 0x3c, 0xa4},
-     {0x8c, 0x58, 0xb8},
-     {0xa0, 0x70, 0xcc},
-     {0xb4, 0x84, 0xdc},
-     {0xc4, 0x9c, 0xec},
-     {0xbc, 0xb4, 0xfc}},
-    /*hue 7*/
-    {{0x14, 0x00, 0x84},
-     {0x30, 0x20, 0x98},
-     {0x4c, 0x3c, 0xac},
-     {0x68, 0x58, 0xc0},
-     {0x7c, 0x70, 0xd0},
-     {0x94, 0x88, 0xe0},
-     {0xa8, 0xa0, 0xec},
-     {0xa4, 0xb8, 0xfc}},
-    /*hue 8*/
-    {{0x00, 0x00, 0x88},
-     {0x1c, 0x20, 0x9c},
-     {0x38, 0x40, 0xb0},
-     {0x50, 0x5c, 0xc0},
-     {0x68, 0x74, 0xd0},
-     {0x7c, 0x8c, 0xe0},
-     {0x90, 0xa4, 0xec},
-     {0xa4, 0xc8, 0xfc}},
-    /*hue 9*/
-    {{0x00, 0x18, 0x7c},
-     {0x1c, 0x38, 0x90},
-     {0x38, 0x54, 0xa8},
-     {0x50, 0x70, 0xbc},
-     {0x68, 0x88, 0xcc},
-     {0x7c, 0x9c, 0xdc},
-     {0x90, 0xb4, 0xec},
-     {0xa4, 0xe0, 0xfc}},
-    /*hue10*/
-    {{0x00, 0x2c, 0x5c},
-     {0x1c, 0x4c, 0x78},
-     {0x38, 0x68, 0x90},
-     {0x50, 0x84, 0xac},
-     {0x68, 0x9c, 0xc0},
-     {0x7c, 0xb4, 0xd4},
-     {0x90, 0xcc, 0xe8},
-     {0xa4, 0xfc, 0xd4}},
-    /*hue11*/
-    {{0x00, 0x40, 0x2c},
-     {0x1c, 0x5c, 0x48},
-     {0x38, 0x7c, 0x64},
-     {0x50, 0x9c, 0x80},
-     {0x68, 0xb4, 0x94},
-     {0x7c, 0xd0, 0xac},
-     {0x90, 0xe4, 0xc0},
-     {0xb8, 0xfc, 0xb8}},
-    /*hue12*/
-    {{0x00, 0x3c, 0x00},
-     {0x20, 0x5c, 0x20},
-     {0x40, 0x7c, 0x40},
-     {0x5c, 0x9c, 0x5c},
-     {0x74, 0xb4, 0x74},
-     {0x8c, 0xd0, 0x8c},
-     {0xa4, 0xe4, 0xa4},
-     {0xc8, 0xfc, 0xa4}},
-    /*hue13*/
-    {{0x14, 0x38, 0x00},
-     {0x34, 0x5c, 0x1c},
-     {0x50, 0x7c, 0x38},
-     {0x6c, 0x98, 0x50},
-     {0x84, 0xb4, 0x68},
-     {0x9c, 0xcc, 0x7c},
-     {0xb4, 0xe4, 0x90},
-     {0xe0, 0xec, 0x9c}},
-    /*hue14*/
-    {{0x2c, 0x30, 0x00},
-     {0x4c, 0x50, 0x1c},
-     {0x68, 0x70, 0x34},
-     {0x84, 0x8c, 0x4c},
-     {0x9c, 0xa8, 0x64},
-     {0xb4, 0xc0, 0x78},
-     {0xcc, 0xd4, 0x88},
-     {0xfc, 0xe0, 0x8c}},
-    /*hue15*/
-    {{0x44, 0x28, 0x00},
-     {0x64, 0x48, 0x18},
-     {0x84, 0x68, 0x30},
-     {0xa0, 0x84, 0x44},
-     {0xb8, 0x9c, 0x58},
-     {0xd0, 0xb4, 0x6c},
-     {0xe8, 0xcc, 0x7c},
-     {0xff, 0xff, 0xff}}
-    // clang-format on
-};
-
-static inline RGB decodeAtariColour(unsigned char c) {
-    int hue = (c >> 4) & 0x0F;
-    int luma = (c >> 1) & 0x07;
-    return atariNTSC[hue][luma];
-}
-
-/* Linear-blend two Atari colours in RGB space, then snap back to the
-   nearest real palette entry. xFrac = fraction of colour A in the
-   result, 0-255 (0 = pure B, 255 = pure A). */
-unsigned char blendAtariColour(unsigned char a, unsigned char b, int xFrac) {
-    RGB ca = decodeAtariColour(a);
-    RGB cb = decodeAtariColour(b);
-
-    int r = (ca.r * xFrac + cb.r * (255 - xFrac)) >> 8;
-    int g = (ca.g * xFrac + cb.g * (255 - xFrac)) >> 8;
-    int bch = (ca.b * xFrac + cb.b * (255 - xFrac)) >> 8;
-
-    int bestHue = 0, bestLuma = 0;
-    long bestDist = -1;
-
-    for (int hue = 0; hue < 1; hue++) {
-        for (int luma = 0; luma < 8; luma++) {
-            const RGB *p = &atariNTSC[hue][luma];
-            long dr = p->r - r, dg = p->g - g, db = p->b - bch;
-            long dist = dr * dr + dg * dg + db * db;
-            if (bestDist < 0 || dist < bestDist) {
-                bestDist = dist;
-                bestHue = hue;
-                bestLuma = luma;
-            }
-        }
-    }
-    return (unsigned char)((bestHue << 4) | (bestLuma << 1));
-}
 
 void rasterBleed(int image, int y) {
 
-    if (image < 0 || image >= MAX_FRAME)
+    if (image < 0 || image >= MAX_RASTERBLEED_FRAME    //
+        || y < -127 || y >= _SCANLINES)
         return;
 
-    static int f[MAX_FRAME] = {0};
+    static int f[MAX_RASTERBLEED_FRAME] = {0};
     if (++f[image] >= frame_set[image].count)
         f[image] = 0;
 
-    unsigned char *dest = (unsigned char *)(RAM + _BUF_SKULL_GRP + y);
-    unsigned char *colr = (unsigned char *)(RAM + _BUF_SKULL_COLUP0 + y);
 
-    const ScanLine *const frm = frame_set[image].frames[f[image]];
+    const ScanLine *frm = frame_set[image].frames[f[image]];
 
-    for (int i = 0; i < 128; i++) {
+    int height = 128;
+
+    if (y < 0) {
+        height += y;
+        frm -= y;
+        y = 0;
+    }
+
+    if (y + height >= _SCANLINES) {
+        height = _SCANLINES - 1 - y;
+    }
+
+
+    unsigned char *dest = (unsigned char *)(RAM + _BUF_RASTER_BLEED_GRP) + y;
+    unsigned char *colr = (unsigned char *)(RAM + _BUF_RASTER_BLEED_COLUP0) + y;
+
+    for (int i = 0; i < height; i++) {
         for (int col = 0; col < 6; col++)
-            *(dest + i + col * _BUFFER_SIZE) = frm[i].bits[col];
+            *(dest + col * _BUFFER_SIZE) = frm[i].bits[col];
+        dest++;
         *colr++ = convertColour(frm[i].colour);
     }
 }
-
-/*
-
-
-void rasterBleed(int image1, int image2, unsigned char blend, int cycles, int y) {
-
-    static int f1 = 0;
-    static int f2 = 0;
-
-    if (++f1 >= frame_set[image1].count)
-        f1 = 0;
-    if (++f2 >= frame_set[image2].count)
-        f2 = 0;
-
-    unsigned char *dest = (unsigned char *)(RAM + _BUF_SKULL_GRP + y);
-    unsigned char *colr = (unsigned char *)(RAM + _BUF_SKULL_COLUP0 + y);
-
-    const ScanLine *cf1 = frame_set[image1].frames[f1];
-    const ScanLine *cf2 = frame_set[image1].frames[f2];
-
-    for (int i = 0; i < 128; i++) {
-
-        for (int col = 0; col < 6; col++)
-            *(dest + col * _BUFFER_SIZE) = blendAtariColour(cf1[i].bits[col], cf2[i].bits[col], 128);
-        dest++;
-
-        *colr++ = convertColour(frame_set[image1].frames[f1][i].colour);
-    }
-}
-
-out[row].colour = blendAtariColour(a[row].colour, b[row].colour, xPercent);
-
-*/
-
 
 // EOF

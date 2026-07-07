@@ -83,22 +83,40 @@ _BUFFERS = *
 END_BUFFERS SET *
     endif
 
-
 ;-------------------------------------------------------------------------------
 
     SEG.U GS_COPYRIGHT
     ORG _BUFFERS
 
     DEFBUF 2, COPYRIGHT_JUMP
-    DEFBUF 6, COPYRIGHT_GRP
-    DEFBUF 2, COPYRIGHT_PF
+
     DEFBUF 1, COPYRIGHT_COLUPF
     DEFBUF 1, COPYRIGHT_COLUP0
     DEFBUF 1, COPYRIGHT_COLUBK
 
+    DEFBUF 4, COPYRIGHT_PF
+    DEFBUF 6, COPYRIGHT_GRP
+
     if * > END_BUFFERS
 END_BUFFERS SET *
     endif
+
+
+; ;-------------------------------------------------------------------------------
+
+;     SEG.U GS_RASTER_BLEED
+;     ORG _BUFFERS
+
+;     DEFBUF 2, RASTER_BLEED_JUMP
+;     DEFBUF 6, RASTER_BLEED_GRP
+;     DEFBUF 2, RASTER_BLEED_PF
+;     DEFBUF 1, RASTER_BLEED_COLUPF
+;     DEFBUF 1, RASTER_BLEED_COLUP0
+;     DEFBUF 1, RASTER_BLEED_COLUBK
+
+;     if * > END_BUFFERS
+; END_BUFFERS SET *
+;     endif
 
 
 ;-------------------------------------------------------------------------------

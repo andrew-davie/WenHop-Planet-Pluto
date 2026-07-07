@@ -263,6 +263,7 @@ void (*const initialiseGameState[GS_MAX])() = {
     initGameState_Game,              // 6  GS_GAME
     initGameState_Skull,             // 7  GS_SKULL
     initGameState_Globe,             // 8  GS_GLOBE
+    initGameState_RasterBleed,       // 9  GS_RASTER_BLEED
 };
 
 void (*const initialiseKernel[_KERNEL_MAX])() = {
@@ -275,6 +276,7 @@ void (*const initialiseKernel[_KERNEL_MAX])() = {
     initKernel_Game,              // 5
     initKernel_Skull,             // 6
     initKernel_Globe,             // 7
+    initKernel_RasterBleed,       // 8
 };
 
 //------------------------------------------------------------------------------
@@ -363,6 +365,7 @@ void (*const verticalBlank[GS_MAX])() = {
     VB_Game,              // 6
     VB_Skull,             // 7
     VB_Globe,             // 8
+    VB_RasterBleed,       // 9
 };
 
 void runARM_VerticalBlank() {
@@ -390,6 +393,7 @@ void (*const overscan[GS_MAX])() = {
     OS_Game,              // 6  GS_GAME
     OS_Skull,             // 7  GS_SKULL
     OS_Globe,             // 8  GS_GLOBE
+    OS_RasterBleed,       // 9 GS_RASTER_BLEED
 };
 
 int whichKernel[GS_MAX] = {
@@ -403,6 +407,7 @@ int whichKernel[GS_MAX] = {
     _KERNEL_GAME,              // 6 GS_GAME
     _KERNEL_SKULL,             // 7 GS_SKULL
     _KERNEL_GLOBE,             // 8 GS_GLOBE
+    _KERNEL_COPYRIGHT,         // 9 GS_RASTER_BLEED
 };
 
 int intim;

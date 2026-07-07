@@ -14,5 +14,6 @@ void initKernel_Menu();
 void initKernel_Game();
 void initKernel_Skull();
 void initKernel_Globe();
+void initKernel_RasterBleed();
 
 // EOF

@@ -5,6 +5,7 @@
 #include "bitPatterns.h"
 #include "colour.h"
 #include "draw.h"
+#include "gameState.h"
 #include "joystick.h"
 #include "main.h"
 #include "random.h"
@@ -424,10 +425,6 @@ void initGameState_Skull() {
     luminance = -15;
     lumTarget = 0;
     frame = 0;
-
-
-    // drawString(FONT_COMPACT, 0x16, 3, _BUF_SKULL_GRP, _BUF_SKULL_COLUP0, "=_RasterBleed_}James O'Brien}@ZPH", 20);
-    drawString(FONT_COMPACT, 0x16, 3, _BUF_SKULL_GRP, _BUF_SKULL_COLUP0, "=_RasterBleed_", 20);
 }
 
 
@@ -661,118 +658,14 @@ void drawICCSkull() {
 void VB_Skull() {
 
     initDataStreams_Skull();
-    // drawICCSkull();
+    drawICCSkull();
     getJoystick();
 
-    static int cycleImage = 0;
-    // static int cycleDelay = 120;
-    // static int flashFrames = 0;
-    // static int pauseFrames = 0;
+    // if (luminance == lumTarget)
+    //     drawNextChar();
 
-
-    // if (!(frame & 3)) {
-    //     cycleImage++;
-    //     if (cycleImage >= sizeof(images) / sizeof(images[0]))
-    //         cycleImage = 0;
-    // }
-
-
-    // typedef struct {
-    //     int flash_frames; /* frames the face is shown this round   */
-    //     int pause_frames; /* frames the skull is shown after it     */
-    // } Step;
-
-
-    // static const Step schedule[] = {
-    //     {1, 90}, {1, 60}, {2, 60}, {2, 40}, {3, 40}, {3, 25}, {5, 25}, {5, 15},
-    //     {8, 15}, {8, 8},  {13, 8}, {13, 4}, {21, 4}, {21, 2}, {34, 1},
-    // };
-
-
-    // static int chanceZPH = 10;
-
-
-    // static int bs = 1;
-    // static int del = 1;
-    // static int pdel = -170;
-
-    // static int pSkull = 200;
-    // static int minf = 0;
-
-    // if (++minf > 2) {
-
-    //     minf = 0;
-    //     cycleImage = 0;    // zph
-    //     if (rangeRandom(100) < pSkull)
-    //         cycleImage = 1;    // skull
-
-    //     if (++del > (pdel >> 1)) {
-
-    //         del = 0;
-    //         pdel++;
-    //         if (pSkull > 0)
-    //             pSkull--;
-    //     }
-    // }
-
-    // static int de = 0;
-    // if (--de) {
-
-    //     if (!rangeRandom(50))
-    //         cycleImage ^= 1;
-    //     de = 10;
-    // }
-
-
-#define RAMP_FRAMES 260u /* how many calls the transition takes  */
-#define THRESH_MAX 0xFFFFFFFFu
-#define THRESH_STEP (THRESH_MAX / RAMP_FRAMES) /* compile-time constant  */
-
-    static unsigned int threshold = 0;
-    static int done = 0;
-    static int icc = -400;
-    static int latep = 0;
-
-    if (!done && ++icc > 2) {
-
-        icc = 0;
-
-        unsigned int r = getRandom32();
-        cycleImage = (r < threshold) ? 1 : 0;
-
-        if (threshold >= THRESH_MAX - THRESH_STEP) {
-            done = 1; /* about to saturate: lock instead of risking overflow */
-        } else {
-            threshold += THRESH_STEP;
-        }
-    }
-
-    // if (done)
-    //     cycleImage = 1;
-
-
-    if (done) {
-        latep++;
-        if (latep > 500)
-            cycleImage = 2;
-
-        if (latep > 750) {
-            icc = -400;
-            done = 0;
-            latep = 0;
-            threshold = 0;
-        }
-    }
-
-
-    rasterBleed(cycleImage, 50);
-
-
-    if (luminance == lumTarget)
-        drawNextChar();
-
-    // if (!(inpt4 & 0x80))    // > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
-    //     setGameState(GS_MENU);
+    if (!(inpt4 & 0x80))    // > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
+        setGameState(GS_COPYRIGHT);
 }
 
 

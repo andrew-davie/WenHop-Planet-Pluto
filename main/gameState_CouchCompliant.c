@@ -83,7 +83,8 @@ void VB_CouchCompliant() {
 
     else
         //        setGameState(GS_RAINBOW);
-        setGameState(GS_MENU);
+        //    setGameState(GS_MENU);
+        setGameState(GS_RASTER_BLEED);
 }
 
 void OS_CouchCompliant() {

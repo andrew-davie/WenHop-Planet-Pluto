@@ -14,6 +14,7 @@ enum GAME_STATE {
     GS_GAME,               // 6
     GS_SKULL,              // 7
     GS_GLOBE,              // 8
+    GS_RASTER_BLEED,       // 9
 
     GS_MAX
 
@@ -50,4 +51,9 @@ void OS_Skull();
 void initGameState_Globe();
 void VB_Globe();
 void OS_Globe();
+
+void initGameState_RasterBleed();
+void VB_RasterBleed();
+void OS_RasterBleed();
+
 // EOF

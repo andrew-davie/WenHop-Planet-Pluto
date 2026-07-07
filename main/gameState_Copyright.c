@@ -135,18 +135,31 @@ void VB_Copyright() {
         // }
 
 
-        draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_champ_gif,
-                    gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 0);
-        draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_games_gif,
-                    gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 0);
+        drawString(FONT_LARGE, 0, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=DR.BOO'S", 66);
+        while (drawNextChar())
+            ;
+        drawString(FONT_LARGE, 0, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=PYJAMAS", 88);
+        while (drawNextChar())
+            ;
+
+        // draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_champ_gif,
+        //             gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 0);
+        // draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_games_gif,
+        //             gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 0);
 
 
         if (frame > 60) {
             if (presentsColour < (PRESENTS_LUM << FADE_SHIFT))
                 presentsColour += FADE_SPEED;
 
-            draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
-                        gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, (presentsColour >> FADE_SHIFT));
+
+            drawString(FONT_COMPACT, 0x16, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=   presents   ", 115);
+            while (drawNextChar())
+                ;
+
+            // draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
+            //             gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, (presentsColour >>
+            //             FADE_SHIFT));
         }
 
         if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 70) {
@@ -169,7 +182,8 @@ void VB_Copyright() {
     else {
 
         // setGameState(GS_GAME);
-        setGameState(GS_COUCH_COMPLIANT);
+        // setGameState(GS_COUCH_COMPLIANT);
+        setGameState(GS_RASTER_BLEED);
 
         RAM[_SK_RESET] = 0;    // superfluous when singleton
     }
