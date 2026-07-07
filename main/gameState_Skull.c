@@ -765,7 +765,7 @@ void VB_Skull() {
     }
 
 
-    rasterBleed(TOYSTORY_FRAME, 50);
+    rasterBleed(cycleImage, 50);
 
 
     if (luminance == lumTarget)
