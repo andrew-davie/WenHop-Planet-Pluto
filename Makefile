@@ -140,6 +140,7 @@ SRCS = \
  ../tools/buzz.c \
  ../tools/skull.c \
  ../tools/zph.c \
+ ../tools/parrot.c \
 
 
 

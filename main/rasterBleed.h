@@ -13,11 +13,13 @@
 #include "../tools/donald.h"
 #include "../tools/lena.h"
 #include "../tools/obama.h"
+#include "../tools/parrot.h"
 #include "../tools/playboy.h"
 #include "../tools/sam.h"
 #include "../tools/skull.h"
 #include "../tools/toystory.h"
 #include "../tools/zph.h"
+
 
 // Re-using COPYRIGHT buffers, but alias just for readability
 #define _BUF_RASTER_BLEED_JUMP _BUF_COPYRIGHT_JUMP
@@ -29,7 +31,8 @@
 
 
 enum {
-    SKULL_FRAME,
+    PARROT_FRAME,
+    // SKULL_FRAME,
     // ZPH_FRAME,
     // SAM_FRAME,
     // DH_FRAME,

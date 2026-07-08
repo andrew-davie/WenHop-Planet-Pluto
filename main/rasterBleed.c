@@ -16,8 +16,8 @@ typedef struct {
 } ScanFrame;
 
 const ScanFrame frame_set[] = {
-
-    [SKULL_FRAME] = {skull_screen_frames, SKULL_NUM_FRAMES},    //
+    [PARROT_FRAME] = {parrot_screen_frames, PARROT_NUM_FRAMES},    //
+    //    [SKULL_FRAME] = {skull_screen_frames, SKULL_NUM_FRAMES},    //
     //[ZPH_FRAME] = {zph_screen_frames, ZPH_NUM_FRAMES},          //
     //[SAM_FRAME] = {sam_screen_frames, SAM_NUM_FRAMES},          //
     //[DH_FRAME] = {dh_screen_frames, DH_NUM_FRAMES},                      //
@@ -35,23 +35,9 @@ void rasterBleed(int image, int y) {
 
     static int f[MAX_RASTERBLEED_FRAME] = {0};
 
-    static int delayr = 30;
-    static int ct = 0;
 
-    if (++ct >= delayr) {
-
-        if (!(frame & 3)) {
-            if (delayr > 0)
-                delayr--;
-        }
-        ct = 0;
-
-
-        if (++f[image] >= frame_set[image].count) {
-            f[image] = 0;
-        }
-    }
-
+    if (++f[image] >= frame_set[image].count)
+        f[image] = 0;
 
     const ScanLine *frm = frame_set[image].frames[f[image]];
 
