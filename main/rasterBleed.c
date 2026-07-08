@@ -34,8 +34,23 @@ void rasterBleed(int image, int y) {
         return;
 
     static int f[MAX_RASTERBLEED_FRAME] = {0};
-    if (++f[image] >= frame_set[image].count)
-        f[image] = 0;
+
+    static int delayr = 30;
+    static int ct = 0;
+
+    if (++ct >= delayr) {
+
+        if (!(frame & 3)) {
+            if (delayr > 0)
+                delayr--;
+        }
+        ct = 0;
+
+
+        if (++f[image] >= frame_set[image].count) {
+            f[image] = 0;
+        }
+    }
 
 
     const ScanLine *frm = frame_set[image].frames[f[image]];
@@ -54,7 +69,7 @@ void rasterBleed(int image, int y) {
 
 
     unsigned char *dest = (unsigned char *)(RAM + _BUF_RASTER_BLEED_GRP) + y;
-    unsigned char *colr = (unsigned char *)(RAM + _BUF_RASTER_BLEED_COLUP0) + y;
+    unsigned char *colr = (unsigned char *)(RAM + _BUF_RASTER_BLEED_COLUP0) + y - 2;
 
     for (int i = 0; i < height; i++) {
         for (int col = 0; col < 6; col++)

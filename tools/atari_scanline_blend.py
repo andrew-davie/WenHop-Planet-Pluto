@@ -5,11 +5,15 @@ atari_scanline_blend.py -- convert an image into 198 single-colour Atari
 vertically with their nearby scanlines, reconstruct the source image as
 closely as possible in a single video frame.
 
-Optionally (--frames 2) also solves a SECOND frame that alternates with
-the first every other video frame; the eye's persistence of vision then
-temporally averages the two (50/50) on top of the usual vertical spatial
-blend, letting the pair reconstruct the source more closely than either
-frame could alone. See solve_two_frame() for the maths.
+Optionally (--frames N) also solves N-1 further frames that cycle with the
+first, one per video frame; the eye's persistence of vision then temporally
+averages all N (equal weight each) on top of the usual vertical spatial
+blend, letting the set reconstruct the source more closely than fewer
+frames could. --frame-scheme picks how each frame's own colours are chosen
+(cumulative residual-chasing vs. a joint per-row solve); --frame-mode picks
+whether frames are then relaxed against each other across the whole set
+(cyclic, the default) or left as a single one-pass solve (forward). See
+solve_n_frame(), solve_n_frame_joint() and solve_n_frame_cyclic().
 
 MODEL
 -----
@@ -101,7 +105,11 @@ USAGE
                                      [--rounds 10] [--sweeps 3]
                                      [--metric luma] [--seeds 3]
                                      [--smoothness auto|0.5] [--swaps]
-                                     [--frames 1|2]
+                                     [--saturation 1.0] [--brightness 1.0]
+                                     [--frames N] [--frame-scheme cumulative|joint]
+                                     [--frame-mode cyclic|forward] [--outer-rounds 4]
+                                     [--temporal-weight 0.0] [--roll-scanlines]
+                                     [--roll-band-height N] [--terse] [--quiet]
 
 Screen is WIDTH x HEIGHT, configurable via --width/--height (default 48x198).
 Source images are assumed to already be at the correct display aspect ratio
@@ -156,7 +164,6 @@ _NTSC_HEX = [
     "482c00", "694d14", "866a26", "a28638", "bb9f47", "d2b656", "e8cc63", "fce070",
 ]
 
-
 def _hex_to_rgb(h):
     return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
 
@@ -176,7 +183,7 @@ PALETTE_BYTES, PALETTE_RGB = _build_palette()   # 128 entries each
 
 # 128x128 matrix of squared RGB distances between every pair of palette
 # entries -- the "transition cost" table for solve_colour_sequence()'s
-# column-wide DP. Computed once; never changes (palette is fixed).
+# column-wide DP.
 PALETTE_PAIRWISE_DIST2 = np.sum(
     (PALETTE_RGB[:, None, :] - PALETTE_RGB[None, :, :]) ** 2, axis=-1)
 
@@ -184,20 +191,12 @@ PALETTE_PAIRWISE_DIST2 = np.sum(
 # used to weight R/G/B error so the optimiser spends its on/off budget on
 # differences the eye actually notices, rather than treating all three
 # channels as equally important. The blue weight is bumped well above the
-# literal BT.601 value (0.114 -> 0.25): confirmed on real hardware (and
-# reproduced/diagnosed here) that the literal coefficient makes blue error
-# nearly free in the palette-snap step, which doesn't matter for BT.601's
-# original purpose (continuous-tone video, where an isolated channel error
-# gets masked by surrounding detail) but is a real problem here, where a
-# single wrong hue is a whole discrete, isolated scanline colour with
-# nothing to mask it -- e.g. a scanline that should read as flesh tone
-# snapping to a garish blue/purple palette entry because that entry
-# matched R/G slightly better and blue barely counted against it. Verified
-# directly: reproduced the exact anomalous rows on a real photo, confirmed
-# the palette snap was choosing the literal luma-weighted argmin correctly
-# (not a bug in the snap logic), and confirmed raising the blue weight to
-# 0.25 eliminates the anomaly on every test image tried (lena, parrot,
-# reef) while leaving overall RMS the same or slightly better, not worse.
+# literal BT.601 value (0.114 -> 0.25): BT.601's low blue weight assumes an
+# isolated channel error gets masked by surrounding continuous-tone detail,
+# which doesn't hold here -- a wrong hue is a whole discrete, isolated
+# scanline colour with nothing to mask it (e.g. a flesh-tone row snapping to
+# a garish blue/purple palette entry because blue barely counted against
+# the match). 0.25 removes that failure mode without costing overall RMS.
 LUMA_WEIGHTS = np.array([0.299, 0.587, 0.25])
 RGB_WEIGHTS = np.array([1.0, 1.0, 1.0])
 
@@ -210,225 +209,39 @@ def get_weights(metric):
     raise ValueError(f"unknown metric {metric!r}")
 
 
-def nearest_palette_index(colour, weights=RGB_WEIGHTS):
-    d = np.sum(weights * (PALETTE_RGB - colour) ** 2, axis=1)
-    return int(np.argmin(d))
-
-
-SMOOTHNESS_MARGIN_SCALE = 600.0
 
 # Channel-spread (max-min, 0-255 scale) below which a colour counts as
-# "achromatic" for the cross-frame temporal-stability term below; see
+# "achromatic" for the cross-frame temporal-stability term; see
 # achromatic_factor() and the temporal_ref/temporal_weight params on
-# nearest_palette_index_smooth().
+# solve_colour_sequence().
 ACHROMATIC_SATURATION_THRESHOLD = 40.0
 
-# Same-units-as-d scale for how quickly the temporal-stability term backs
-# off as reusing temporal_ref's exact colour costs more fit error; see the
-# "reuse_cost"/"reuse_ok" computation in nearest_palette_index_smooth().
-# temporal_weight defaults to 0 (the whole mechanism is inert) precisely
-# because no single scale value here was found safe for every image --
-# 500 cost lena real RMS for a small donald win, 3000 gave donald its best
-# measured improvement but fully reproduced lena's regression at
-# temporal_weight>0. Since this is opt-in (temporal_weight=0 by default,
-# see solve()), tuned for the case it's meant for: 3000 is the value
-# validated against donald's white-belly flicker specifically. Don't
-# assume it's safe on photographic content -- it measurably isn't.
+# Same-units-as-cost scale for how quickly the cross-frame temporal-
+# stability term (solve_colour_sequence()'s reuse_cost/reuse_ok) backs off
+# as reusing temporal_ref's exact colour costs more fit error. Opt-in
+# (temporal_weight=0 by default, see solve()) and tuned specifically for
+# donald.jpg's white-belly flicker case -- not validated as safe on
+# photographic content, where forcing reuse of a stale reference colour
+# can cost real accuracy.
 TEMPORAL_REUSE_COST_SCALE = 3000.0
-
-def nearest_palette_index_smooth(colour, weights, neighbours, smoothness,
-                                  margin_scale=SMOOTHNESS_MARGIN_SCALE,
-                                  temporal_ref=None, temporal_weight=0.0):
-    """Like nearest_palette_index, but also penalises palette choices that
-    are far from already-committed neighbouring scanlines' colours. This
-    exists because plain per-line least-squares snapping, with no penalty
-    for jumping to a totally different hue than the line next to it, lets
-    smooth photographic gradients (skin tones etc) come out as jittery
-    hue-shifting noise: many different quantised palette entries are all
-    nearly-equally-good fits for any *single* line in isolation, so the
-    greedy per-line solve chatters between them arbitrarily even though the
-    source barely changes row to row. Blending in a same-units squared
-    distance to each neighbour's colour breaks close ties in favour of
-    smoothness, without overriding a genuinely large jump when the fit
-    error actually justifies one.
-
-    `smoothness` is only ever applied at a fraction of its face value: this
-    line's own weighted distance `d` is sorted, and the gap between the
-    best and second-best palette candidates (the "margin", in the same
-    squared-distance units as `d` itself) sets how much of `smoothness` is
-    actually used -- full strength when the margin is near zero (a genuine
-    near-tie, exactly the case this was built for), decaying toward zero
-    as the margin grows (a line that already has a clear, decisive best
-    match on its own).
-
-    This replaces an earlier version that applied `smoothness` at face
-    value on every line regardless of margin, and a version after that
-    which tried to guess a single smoothness value for an entire image
-    from its background-fill fraction (auto_smoothness(), now unused).
-    Both were wrong for the same underlying reason: an image can contain
-    BOTH regimes at once. Directly confirmed on a cel-art test image (a
-    Donald Duck cutout on a black background) -- some rows are a large,
-    decisive, saturated flat colour fill (jacket blue: margin in the
-    thousands) while others are ambiguous near-flat shading/outline
-    transitions only a few rows away (margin near zero) -- so ANY single
-    smoothness constant for the whole image is wrong somewhere: high
-    enough to fix the ambiguous rows and the decisive fill rows get
-    dragged into a false, sticky consensus with a wrong neighbour and
-    lock there (confirmed: solid blue jacket rendered flat grey); low
-    enough to leave the decisive rows alone and the ambiguous rows revert
-    to the original chattering-hue-noise defect (confirmed on real
-    hardware: reintroduced wrong-hue speckling everywhere except the
-    jacket once smoothness was dropped to fix the jacket). Scaling by
-    each row's OWN margin fixes both at once without knowing anything
-    about image content: donald.jpg outliers (see the outlier-row check
-    used throughout this project's real-hardware debugging) went from
-    56-58/128 per frame (smoothness=0, jacket correct but rest chattering)
-    or effectively the whole jacket wrong (smoothness=0.5 flat) down to
-    2-13/128 per frame at margin_scale=300, then 3-9/128 at margin_scale=600
-    -- and lena/toystory/skin (the photographic test set) stayed at zero
-    outliers throughout with RMS unchanged or slightly improved, not
-    regressing, at every margin_scale tried. 600 (raised from an initial
-    300) was needed to also clear a smaller but real second symptom: on
-    the same donald image, a smooth blue-jacket-to-white-body transition
-    (a gradient, not a hard edge) still let an isolated wrong hue
-    (a saturated orange, 0x3A) through at 300 in the cumulative scheme's
-    later correcting frames specifically -- 600 removed it. This is a
-    tuned constant, not a derived one -- revisit if a future image breaks
-    it, and don't assume 600 is a ceiling; keep raising it if a similar
-    smooth-gradient region keeps producing isolated wrong-hue rows,
-    checking lena/toystory/skin after each raise to confirm the
-    photographic case still isn't paying a real cost.
-
-    `temporal_ref`/`temporal_weight` are a separate, later addition
-    addressing a different complaint: on a multi-frame sequence, white
-    and near-grey rows were reported as visibly flickerier on real
-    hardware than coloured ones, even after outlier rows (wrong hue
-    entirely) were fixed. Measured directly: white/near-white regions
-    had the LARGEST absolute frame-to-frame colour swing of any region
-    tested (~181 RGB-units, vs ~160 for a saturated blue jacket and ~135
-    for yellow), because achromatic content has only ~8 discrete grey
-    palette rungs to hit a target brightness with -- no hue axis to help
-    -- so independently-solved frames tend to hop between adjacent rungs
-    to average out right. That swing is also perceptually worse than a
-    same-sized swing elsewhere: human vision is well-documented to be
-    far more sensitive to LUMINANCE flicker than to CHROMINANCE flicker
-    at a given temporal rate (the physical basis for NTSC/PAL using much
-    less colour bandwidth than luminance bandwidth without looking
-    worse) -- so a grey rung-hop reads as real flicker where a similar
-    hue wobble in a saturated area mostly wouldn't.
-
-    The fix is a second cross-*frame* (not cross-row) penalty: pass the
-    colour an earlier-solved frame already committed to this same row as
-    `temporal_ref`, and a row that's currently being fit to something
-    near-grey will be pulled toward reusing that exact rung rather than
-    drifting to an adjacent one.
-
-    First attempt gated this purely on achromatic_factor(temporal_ref)
-    and it was a real regression, not just a smaller win than hoped:
-    tested on lena (2-frame), RMS went 27.4 -> 34.5 even at a fairly low
-    temporal_weight, and stayed there however low the achromatic
-    threshold was set. Root cause: lena has meaningfully-sized grey
-    regions (hair highlights etc) that are grey *and* need frame 1 to
-    commit to a genuinely different shade than frame 0 to properly close
-    the residual gap -- that's the entire reason a second frame exists.
-    Forcing those rows to reuse frame 0's rung stopped frame 1 correcting
-    them at all. Donald's white belly is a different case: a huge, flat,
-    near-uniform region where many adjacent grey rungs are all roughly
-    equally good fits for either frame, so reusing frame 0's pick costs
-    almost nothing -- but "achromatic" alone can't tell these two cases
-    apart.
-
-    Second attempt gated on the SAME margin used for the spatial
-    smoothness term (best-vs-second-best distance among this row's own
-    candidates), reasoning that a near-tie means reuse is free. Also
-    didn't fix lena -- because that's the wrong question. A tie among
-    this row's own candidates says nothing about how far frame 0's
-    SPECIFIC colour is from any of them; lena's hair highlights can have
-    several closely-tied candidates that are ALL far from frame 0's
-    (different, also-reasonable) pick, so margin alone still let a
-    costly reuse through.
-
-    What actually works: directly compute what it costs to reuse
-    temporal_ref instead of this row's own best answer -- the distance
-    from `colour` to temporal_ref specifically, minus the distance to the
-    true best candidate. Near zero cost means temporal_ref IS basically
-    the best answer anyway (donald's belly: reuse is free). A large cost
-    means temporal_ref is a poor fit here regardless of what else is tied
-    (lena's hair: frame 1 genuinely needs to differ), and the term backs
-    off. Verified: lena's RMS returned to its temporal_weight=0 baseline
-    (this is now near-inert on lena, as it should be) while donald's
-    belly fix is unaffected (its reuse cost is near zero, so the term
-    fires at full strength there)."""
-    d = np.sum(weights * (PALETTE_RGB - colour) ** 2, axis=1)
-    if smoothness > 0 and neighbours:
-        part = np.partition(d, 1)
-        margin = part[1] - part[0]
-        effective_smoothness = smoothness * (margin_scale / (margin_scale + margin))
-        for nb in neighbours:
-            d = d + effective_smoothness * np.sum((PALETTE_RGB - nb) ** 2, axis=1)
-    if temporal_ref is not None and temporal_weight > 0:
-        d_own = np.sum(weights * (PALETTE_RGB - colour) ** 2, axis=1)
-        d_best = d_own.min()
-        ref_idx = int(np.argmin(np.sum((PALETTE_RGB - temporal_ref) ** 2, axis=1)))
-        reuse_cost = d_own[ref_idx] - d_best
-        reuse_ok = TEMPORAL_REUSE_COST_SCALE / (TEMPORAL_REUSE_COST_SCALE + reuse_cost)
-        eff_temporal = temporal_weight * achromatic_factor(temporal_ref) * reuse_ok
-        if eff_temporal > 0:
-            d = d + eff_temporal * np.sum((PALETTE_RGB - temporal_ref) ** 2, axis=1)
-    return int(np.argmin(d))
-
-
-nearest_palette_index_smooth.__doc__ += """
-
-SUPERSEDED as of solve_colour_sequence() below -- solve() no longer calls
-this function. Kept only for reference/backward compatibility. Root
-problem found on a real photographic portrait (not cel-art): this
-function's neighbour penalty only ever compares a row to its immediate
-neighbour's ALREADY-CHOSEN colour, applied greedily top-to-bottom. That
-has no memory of how far a chain of small, locally-reasonable nudges has
-drifted from any individual row's own true colour -- confirmed directly:
-long runs of 10-30 consecutive rows locking into a flat grey consensus
-(a "band"), even though no single row in the run was decisively grey on
-its own. Lowering `smoothness` shortens the runs but reintroduces the
-original chattering-hue defect this function was built to fix -- every
-value tried traded one visible defect for the other, never eliminating
-both. solve_colour_sequence() replaces the greedy per-row chain with an
-exact whole-column optimum (dynamic programming / Viterbi), which
-structurally cannot drift arbitrarily far from any row's own fit cost,
-because every row's real cost is counted in the objective, not just its
-relative offset from an already-drifted neighbour."""
 
 
 # Scale multiplying --smoothness (0-1ish) into the per-row-pair transition
-# cost used by solve_colour_sequence(). Calibrated empirically against
-# zph.png (a real photographic portrait) by directly measuring the two
-# quantities this trades off: a typical row's fit-cost gap between its
-# best and second-best palette candidate is ~100-300 (weighted RGB units
-# squared); a typical pair of DIFFERENT palette entries is ~26000 apart
-# (PALETTE_PAIRWISE_DIST2). So transition_scale needs to be a small
-# fraction of 1 for the DP to actually weigh fit cost against transition
-# cost, rather than one swamping the other.
+# cost used by solve_colour_sequence(). A typical row's fit-cost gap
+# between its best and second-best palette candidate is ~100-300 (weighted
+# RGB units squared); a typical pair of DIFFERENT palette entries is
+# ~26000 apart (PALETTE_PAIRWISE_DIST2). So transition_scale needs to be a
+# small fraction of 1 for the DP to weigh fit cost against transition cost
+# rather than one swamping the other.
 #
-# This calibration exposed a real, structural property of the whole-column
-# DP that the old per-row greedy mechanism did NOT have: past a fairly
-# sharp threshold (empirically, SMOOTHNESS_DP_SCALE times smoothness=0.5
-# above roughly 0.25-0.5 on zph.png), the DP doesn't degrade gracefully --
-# it snaps an ENTIRE frame's whole 128-row column to a single flat grey,
-# because at that point no isolated run of true-colour rows anywhere in
-# the column can pay back its own entry+exit transition cost, so "never
-# leave the achromatic chain" becomes the global optimum outright. This is
-# a genuine phase transition (confirmed: identical output across
-# SMOOTHNESS_DP_SCALE=100 through 4000, all fully collapsed; the old
-# placeholder value of 4000 was deep in this collapsed regime the whole
-# time it went untested). It is arguably worse than the old mechanism's
-# defect (which never fully consumed 128/128 rows in one frame), so this
-# constant is deliberately calibrated to sit well inside the safe,
-# fit-cost-respecting regime across the tool's full --smoothness 0-1
-# range, not just at the default of 0.5. Confirmed safe (no collapse,
-# balanced cross-frame spread, RMS within ~2% of the smoothness=0
-# baseline) at --smoothness 0.0/0.2/0.5/0.8/1.0 on zph.png, and re-checked
-# against donald.jpg (see calibration notes below) to confirm the original
-# cel-art fix -- flat jacket, no outline chatter -- still holds.
+# Past a fairly sharp threshold (smoothness above roughly 0.25-0.5 at this
+# scale) the whole-column DP doesn't degrade gracefully: it snaps an
+# entire frame's column to a single flat grey, because no isolated run of
+# true-colour rows can pay back its own entry+exit transition cost, so
+# "never leave the achromatic chain" becomes the global optimum outright.
+# This constant is calibrated to keep the full --smoothness 0-1 range
+# inside the safe, fit-cost-respecting regime rather than anywhere near
+# that collapse.
 SMOOTHNESS_DP_SCALE = 0.15
 
 # Phase-2 colour refinement recomputes every row's ideal continuous target
@@ -438,68 +251,50 @@ SMOOTHNESS_DP_SCALE = 0.15
 # update on a coupled system (each row's blend affects, and is affected by,
 # its neighbours) can 2-cycle: round N's column-wide choice shifts the
 # blended state enough that round N+1's fresh correction favours flipping
-# straight back, forever. Confirmed on real data (zph.png): weighted SSE
-# alternated between two values every single round instead of decreasing,
-# with the "final" answer arbitrarily depending on whether `rounds` happened
-# to be odd or even. Damping the correction before it's handed to the DP
-# (a standard fix for Jacobi-relaxation oscillation) breaks the 2-cycle by
-# under-shooting each round instead of matching the full correction, so
-# consecutive rounds nudge in the same direction rather than swapping.
+# straight back, forever, with the final answer arbitrarily depending on
+# whether `rounds` happened to be odd or even. Damping the correction
+# before it's handed to the DP (a standard fix for Jacobi-relaxation
+# oscillation) breaks the 2-cycle by under-shooting each round instead of
+# matching the full correction, so consecutive rounds nudge in the same
+# direction rather than swapping.
 PHASE2_RELAXATION = 0.5
 
 
-PALETTE_SPREAD = PALETTE_RGB.max(axis=1) - PALETTE_RGB.min(axis=1)  # (128,)
+# (128,). Per-entry channel spread (max-min) of the NTSC palette above.
+PALETTE_SPREAD = PALETTE_RGB.max(axis=1) - PALETTE_RGB.min(axis=1)
 
 # Weight on a bias term added in _fit_cost_table() that penalises a
 # palette candidate for being LESS saturated (smaller max-min channel
 # spread) than the row's own target colour, proportional to the square of
-# that saturation shortfall. Root cause this exists to fix, found by
-# decoding actual per-row fit costs on zph.png (a real photographic
-# portrait): plain weighted-RGB squared distance regularly ranks a FLAT
-# GREY palette entry as the closest match to a moderately-saturated warm
-# skin tone (e.g. target (145,107,86), spread 59) -- not a near-tie, grey
-# won outright (511 vs 613 for the best chromatic candidate, and that gap
-# held under unweighted RGB distance too, 1797 vs 1918). This is a real
-# palette-gamut property, not a bug in the target or the metric weights:
-# the 128 available (hue, luma) points on real NTSC/TIA hardware just
-# don't include a softly-saturated warm hue at every luma level, so grey
-# can legitimately minimise total squared channel error even though it
-# throws away the hue entirely. Squared-RGB-error is a bad perceptual
-# proxy for that specific trade-off: a viewer reads "skin tone gone grey"
-# as a much worse defect than "skin tone slightly the wrong saturation",
-# but plain distance doesn't know that -- it'll happily pick "no hue at
-# all" over "correct hue, imperfect saturation" whenever grey's total
-# error happens to be lower. This bias term corrects for it directly:
-# candidates that are already at least as saturated as the target pay no
-# penalty (deficit clamps to 0), so it never overrides a genuinely-better
-# chromatic match or forces colour onto rows that are genuinely neutral
-# in the source (their own target_spread is already small, so there's
-# nothing for cand_spread to fall short of). Calibrated against zph.png
-# (eliminates the flat-grey skin-tone bands entirely at this value, RMS
-# cost ~8%) and checked against donald.jpg (does not force colour onto
-# genuinely-grey/white regions -- background, highlights -- confirmed by
-# checking that no row with a near-neutral SOURCE target gets pushed
-# above spread 40 by this term).
+# that saturation shortfall. Plain weighted-RGB squared distance regularly
+# ranks a flat grey palette entry as the closest match to a moderately-
+# saturated warm skin tone -- not a near-tie, grey wins outright, because
+# the 128 available (hue, luma) points on real NTSC/TIA hardware don't
+# include a softly-saturated warm hue at every luma level, so grey can
+# legitimately minimise total squared channel error while throwing away
+# the hue entirely. Squared-RGB-error is a bad perceptual proxy for that
+# trade-off: a viewer reads "skin tone gone grey" as a much worse defect
+# than "skin tone slightly the wrong saturation". This bias term corrects
+# for it directly: candidates already at least as saturated as the target
+# pay no penalty (deficit clamps to 0), so it never overrides a
+# genuinely-better chromatic match or forces colour onto rows that are
+# genuinely neutral in the source.
 CHROMA_BIAS_SCALE = 1.0
 
 # Ceiling on the target spread used by the bias above. Needed because
 # continuous_targets isn't always a real, in-gamut colour: in a multi-frame
-# solve, frames after the first are fit against a RESIDUAL ("what's still
-# needed after already-committed frames"), computed as (i+1)*target -
-# cumulative -- and that arithmetic routinely produces per-channel values
-# outside 0-255 (confirmed on zph.png's frame 1: R ranged -80 to +294) with
-# nominal spread well past anything the palette can actually reach (up to
-# 182, vs. the palette's own largest spread of 168). Feeding that
-# uncapped into the bias above backfires: it doesn't just discourage grey,
-# it discourages EVERYTHING except the most saturated entries in the whole
-# palette, regardless of whether that hue is anywhere near correct --
-# confirmed directly, this produced an obvious, wrong magenta cast across
-# the reconstructed 3-frame average that wasn't there before. Capping the
-# spread fed into the deficit calculation at a real photographic image's
-# typical on-pixel spread (well under the palette's max) keeps the bias
-# doing its one job -- stop grey from beating a moderately-saturated real
-# colour -- without also chasing an out-of-gamut residual's inflated,
-# not-really-a-colour spread number.
+# cumulative solve, frames after the first are fit against a RESIDUAL
+# ("what's still needed after already-committed frames"), and that
+# arithmetic routinely produces per-channel values outside 0-255 with a
+# nominal spread well past anything the palette can actually reach.
+# Feeding that uncapped into the bias above backfires: instead of just
+# discouraging grey, it discourages everything except the most saturated
+# palette entries regardless of whether that hue is anywhere near correct
+# (chasing an out-of-gamut residual toward a wrong, saturated hue). Capping
+# the spread fed into the deficit calculation at a real photographic
+# image's typical on-pixel spread keeps the bias doing its one job -- stop
+# grey from beating a moderately-saturated real colour -- without also
+# chasing a residual's inflated, not-really-a-colour spread number.
 CHROMA_BIAS_SPREAD_CAP = 60.0
 
 
@@ -517,13 +312,10 @@ def _fit_cost_table(continuous_targets, weights, valid_mask=None, chroma_bias_sc
     passes 0.0 for every frame after the first: frames 1..n-1 are fit
     against a mathematical RESIDUAL, not a real photographed colour (see its
     docstring and CHROMA_BIAS_SPREAD_CAP's comment for why that matters) --
-    confirmed directly that applying this bias to a residual target chases
-    the largest available spread in whatever direction the residual
-    arithmetic happens to point, which need not be a sensible hue at all
-    (a real run produced an obvious, wrong magenta cast in frames 1-2 of a
-    photographic portrait, even with CHROMA_BIAS_SPREAD_CAP in place). The
-    bias is only trustworthy against a genuine, directly-photographed
-    target, which is exactly frame 0.
+    the bias would chase the largest available spread in whatever direction
+    the residual arithmetic happens to point, which need not be a sensible
+    hue at all. The bias is only trustworthy against a genuine,
+    directly-photographed target, which is exactly frame 0.
 
     valid_mask (optional, one bool per row): rows where this is False
     (typically: no on-pixels this round, so nothing currently visible
@@ -547,42 +339,36 @@ def _fit_cost_table(continuous_targets, weights, valid_mask=None, chroma_bias_sc
 
 def solve_colour_sequence(fit_cost, transition_scale, temporal_ref_colours=None, temporal_weight=0.0):
     """Choose one palette index per row, for the WHOLE column at once, by
-    exact dynamic programming (Viterbi) instead of the greedy per-row scan
-    nearest_palette_index_smooth() used to do. Minimises, over the entire
-    column jointly:
+    exact dynamic programming (Viterbi). Minimises, over the entire column
+    jointly:
 
         sum_y fit_cost[y, idx_y]
       + sum_y transition_scale * ||palette[idx_y] - palette[idx_{y-1}]||^2
 
-    i.e. exactly the same kind of trade-off the old mechanism was
-    approximating (this row's own fit vs. staying close to its neighbour),
-    but solved exactly rather than greedily. This is the direct fix for
-    the banding defect nearest_palette_index_smooth() could produce: a
-    greedy chain only ever compares against an already-committed
-    neighbour and can drift indefinitely as long as each individual step
-    looks locally cheap, with no accounting for how far the whole run has
-    strayed from any row's own true colour. The DP cannot do this --
-    every row's real fit_cost is counted in the total, in full, no matter
-    how long a "consensus" run around it is, so a long run of a colour
-    that's a poor fit for most of the rows in it is only ever chosen if
-    it's genuinely the cheapest whole-column answer, not an artifact of
-    left-to-right propagation.
+    i.e. each row's own fit cost traded off against staying close to its
+    neighbour, solved exactly rather than greedily: every row's real
+    fit_cost is counted in the total, in full, no matter how long a
+    "consensus" run around it is, so a long run of a colour that's a poor
+    fit for most of the rows in it is only ever chosen if it's genuinely
+    the cheapest whole-column answer -- it cannot drift arbitrarily far
+    from any row's own true colour the way a greedy row-by-row chain can.
+    A row with a large gap between its best and second-best candidate
+    naturally resists being pulled off that best candidate, because the DP
+    weighs the real fit_cost difference between candidates directly, so
+    one flat transition_scale is enough (no separate per-row adaptive
+    scaling needed).
 
-    A useful side effect, verified rather than assumed: this needs no
-    separate per-row margin-based adaptive scaling the way the old
-    mechanism did (see SMOOTHNESS_MARGIN_SCALE) -- a row with a large gap
-    between its best and second-best candidate naturally resists being
-    pulled off that best candidate here too, because the DP is weighing
-    the REAL fit_cost difference between candidates directly, not a
-    heuristic proxy for it. One flat transition_scale is enough.
-
-    `temporal_ref_colours`/`temporal_weight`: same cross-FRAME (not
-    cross-row) mechanism as before (see nearest_palette_index_smooth's
-    docstring for the full reuse-cost rationale) -- applied here as a
-    per-row additive bias to fit_cost before running the DP, since it
-    compares each row to a fixed external reference colour, not to its
-    neighbours, so it doesn't interact with the transition term at all.
-    """
+    `temporal_ref_colours`/`temporal_weight`: a cross-FRAME (not cross-row)
+    stability term, applied as a per-row additive bias to fit_cost before
+    running the DP. It biases a row toward reusing an earlier-solved
+    frame's colour on that same row when the row is near-achromatic
+    (see achromatic_factor()) and reuse costs little (reuse_cost/reuse_ok
+    below) -- white/grey rows have the least hue information to keep an
+    independently-solved frame's colour choice pinned to the same rung, so
+    they're the rows most prone to visible frame-to-frame flicker; biasing
+    only near-achromatic, low-reuse-cost rows avoids forcing a genuinely
+    different colour where one is needed (e.g. a highlight that legitimately
+    differs frame to frame) while damping flicker where reuse is free."""
     height, n_pal = fit_cost.shape
     cost = fit_cost.copy()
     if temporal_ref_colours is not None and temporal_weight > 0:
@@ -617,10 +403,10 @@ def solve_colour_sequence(fit_cost, transition_scale, temporal_ref_colours=None,
 def achromatic_factor(rgb, threshold=ACHROMATIC_SATURATION_THRESHOLD):
     """1.0 for a fully grey/white colour (max channel == min channel),
     ramping linearly down to 0.0 once the channel spread reaches
-    `threshold`. Used to gate the cross-frame temporal-stability term in
-    nearest_palette_index_smooth() so it only fires for near-achromatic
-    rows -- see that function's temporal_ref/temporal_weight params for
-    why grey specifically needs this and colour doesn't."""
+    `threshold`. Gates the cross-frame temporal-stability term in
+    solve_colour_sequence() so it only fires for near-achromatic rows --
+    those are the rows most prone to visible frame-to-frame flicker (see
+    solve_colour_sequence()'s docstring)."""
     spread = float(np.max(rgb) - np.min(rgb))
     return max(0.0, min(1.0, 1.0 - spread / threshold))
 
@@ -631,18 +417,13 @@ def load_target(path, saturation=1.0, brightness=1.0):
     -- this does a plain resize, no letterboxing/cropping.
 
     saturation/brightness (both default 1.0 = no change) are applied to
-    the full-resolution source BEFORE resizing, via PIL's ImageEnhance --
-    a compensating push in the other direction from real hardware, since
-    the 128-colour palette plus binary on/off plus vertical blend against
+    the full-resolution source BEFORE resizing, via PIL's ImageEnhance.
+    The 128-colour palette plus binary on/off plus vertical blend against
     black neighbours structurally pulls the reconstructed image's
-    perceived brightness/saturation down from the source's (confirmed on
-    real hardware: identical washed-out look at --frames 1, so it's not a
-    multi-frame temporal-averaging artifact -- it's inherent to fitting a
-    photographic image through this constrained representation). Rather
-    than accept that, or rely on adjusting the physical display (which
-    the user explicitly wants to avoid touching), boost the input before
-    the optimiser ever sees it, so its target is already closer to what
-    needs to land on screen."""
+    perceived brightness/saturation down from the source's, independent of
+    frame count -- rather than compensate on the physical display, this
+    boosts the input before the optimiser ever sees it, so its target is
+    already closer to what needs to land on screen."""
     img = Image.open(path).convert("RGB")
     if saturation != 1.0:
         img = ImageEnhance.Color(img).enhance(saturation)
@@ -654,43 +435,24 @@ def load_target(path, saturation=1.0, brightness=1.0):
 
 def estimate_background_fraction(target, luma_threshold=24.0):
     """Fraction of pixels in the resized target that are near-black
-    (off-canvas/background). Kept for inspection/debugging; no longer
-    used by the smoothness mechanism itself -- see auto_smoothness()."""
+    (off-canvas/background). Purely informational -- see auto_smoothness()."""
     luma = target.mean(axis=-1)
     return float((luma < luma_threshold).mean())
 
 
-def auto_smoothness(target, ceiling=0.5, bg_threshold=0.3, floor=0.0, verbose=True):
-    """RETIRED as the active smoothness mechanism -- kept only so old calls
-    don't break, and because the history here is instructive. Always
-    returns `ceiling` now (default 0.5) rather than doing background-based
-    detection; the real fix lives in nearest_palette_index_smooth()'s
-    per-row margin scaling instead. Read on for why this approach itself
-    had to be abandoned, not just retuned.
-
-    This function's original idea: classify the WHOLE image as either
-    "photographic" (needs smoothness=0.5 to stop flesh-tone-style hue
-    chatter) or "sparse cel-art cutout on black" (needs smoothness=0,
-    because a Donald Duck test image showed 0.5 locking a large flat blue
-    region into flat grey), using background-pixel fraction as the
-    classifier. That fixed the Donald Duck jacket -- and then broke on
-    the very same image: with smoothness forced to ~0 for the whole
-    frame, the jacket was correct but every ambiguous near-flat shading
-    and outline region elsewhere in that same picture reverted to the
-    original chattering-hue defect (confirmed on real hardware: 56-58 out
-    of 128 rows per frame were hue-family outliers). Donald Duck isn't
-    uniformly one regime or the other -- it contains large, decisive,
-    saturated flat-fill rows (margin in the thousands) directly next to
-    ambiguous near-tied ones (margin near zero), sometimes a handful of
-    rows apart. No single whole-image constant, however cleverly chosen,
-    can be right for both at once. The fix had to move from "one number
-    per image" to "one number per row, based on that row's own fit
-    quality" -- see nearest_palette_index_smooth()."""
+def auto_smoothness(target, ceiling=0.5, verbose=True):
+    """Recommended --smoothness value for --smoothness auto. Always
+    returns `ceiling` (default 0.5) -- the actual adaptation to image
+    content happens per-row inside solve_colour_sequence()'s DP, not at
+    the whole-image level, since a single image can contain both large
+    decisive flat-fill regions and ambiguous near-tied ones that would
+    need opposite whole-image smoothness values. Prints the background
+    (near-black) pixel fraction as a diagnostic only; it doesn't affect
+    the returned value."""
     bg_frac = estimate_background_fraction(target)
     if verbose:
-        print(f"[smoothness] background fraction = {bg_frac:.1%} (informational only -- "
-              f"per-row margin scaling in nearest_palette_index_smooth() does the real "
-              f"work now); using ceiling = {ceiling}", flush=True)
+        print(f"[smoothness] background fraction = {bg_frac:.1%} (informational only); "
+              f"using ceiling = {ceiling}", flush=True)
     return ceiling
 
 
@@ -726,27 +488,23 @@ def solve(target, sigma=1.0, radius=3, rounds=10, sweeps=3, seed=0,
         """Weighted squared error for a single (or batch of) RGB diff(s)."""
         return np.sum(weights * diff ** 2, axis=-1)
 
-    # --- initialise colours: one whole-column DP pass, not a per-row scan -
-    # (see solve_colour_sequence() -- this replaces the old greedy
-    # nearest_palette_index_smooth() sweep, which could drift into long,
-    # false-consensus grey bands on real photographic content).
+    # --- initialise colours: one whole-column DP pass (solve_colour_sequence()),
+    # not a per-row scan, so the initial guess can't drift into a long
+    # false-consensus run the way a greedy row-by-row pass could.
     #
     # The per-row target is the average of that row's non-near-black
-    # pixels only, not the whole row. Found by direct inspection of a real
-    # failure: on a row that's mostly black canvas with a small
-    # saturated-colour subject (e.g. 15 of 48 columns are a blue glove,
-    # the rest black background), the WHOLE-row average is dark and
-    # desaturated enough that it's a genuinely decisive (large-margin)
-    # match for a dark grey palette entry -- not a close tie with blue, a
-    # confident win for the wrong answer. The later per-round
-    # colour-refinement step already fits on-pixels only (correctly), but
-    # a bad enough initial guess can still get stuck (the on/off pattern
-    # co-adapts to the wrong initial colour before refinement gets a
-    # chance to correct it). Excluding near-black pixels from the AVERAGE
-    # up front -- a cheap proxy for "pixels likely to end up on" -- gives
-    # the initial guess a fair start instead of diluting it with
-    # background. Falls back to the whole-row average for genuinely
-    # all-background rows (nothing to exclude to).
+    # pixels only, not the whole row. On a row that's mostly black canvas
+    # with a small saturated-colour subject (e.g. a small coloured object
+    # against a black background), the whole-row average is dark and
+    # desaturated enough to be a decisive match for a dark grey palette
+    # entry -- a confident win for the wrong answer, not a close tie. The
+    # later per-round colour-refinement step already fits on-pixels only
+    # (correctly), but a bad enough initial guess can still get stuck (the
+    # on/off pattern co-adapts to the wrong initial colour before
+    # refinement gets a chance to correct it). Excluding near-black pixels
+    # from the average up front -- a cheap proxy for "pixels likely to end
+    # up on" -- gives the initial guess a fair start. Falls back to the
+    # whole-row average for genuinely all-background rows.
     if fixed_color_idx is not None:
         color_idx = np.array(fixed_color_idx, dtype=np.int64).copy()
     else:
@@ -984,34 +742,15 @@ def solve_best_of(target, seeds=3, tag="", **kwargs):
     return best
 
 
-def blended_from(color_idx, on, sigma=1.0, radius=3):
-    """Rebuild the within-frame vertically-blended display from a
-    committed (colour_idx, on) pair -- used to score a frame on its own,
-    and to compute the residual a second correcting frame should target."""
-    colour = PALETTE_RGB[color_idx]
-    kernel = make_kernel(sigma, radius)
-    offsets = sorted(kernel)
-    b = np.zeros((HEIGHT, WIDTH, 3), dtype=np.float64)
-    for d in offsets:
-        w = kernel[d]
-        if w == 0:
-            continue
-        y0, y1 = max(0, -d), min(HEIGHT, HEIGHT - d)
-        src = on[y0 + d:y1 + d, :, None] * colour[y0 + d:y1 + d, None, :]
-        b[y0:y1] += w * src
-    return b
-
-
 # Weight and cap for the anti-grey chroma bias used by
 # solve_colour_triplets() below -- same idea and same units as
 # CHROMA_BIAS_SCALE/CHROMA_BIAS_SPREAD_CAP (see their comments), just
 # applied to a CANDIDATE AVERAGE (of up to 3 real palette entries) instead
-# of a single candidate. Kept as separate constants because this is
-# comparing against a genuine, always-real-photo target (never a residual
-# -- see solve_n_frame_joint()'s docstring for why that distinction is the
-# whole point of this function), so there's no reason its calibration has
-# to match the single-frame constants exactly, even though empirically the
-# same values worked well in testing.
+# of a single candidate. Kept as separate constants because this always
+# compares against a genuine, real-photo target (never a residual -- see
+# solve_n_frame_joint()'s docstring for why that distinction is the whole
+# point of this function), so there's no requirement its calibration match
+# the single-frame constants, even though the same values work well here too.
 JOINT_CHROMA_BIAS_SCALE = 1.0
 JOINT_CHROMA_BIAS_SPREAD_CAP = 60.0
 
@@ -1022,27 +761,23 @@ def solve_colour_triplets(row_targets, weights, n_frames=3,
                            k_a=16, k_partner=6):
     """For every row, choose a MULTISET of n_frames real palette entries
     (repeats allowed) whose AVERAGE best matches that row's own target
-    colour -- the joint alternative to the old cumulative-residual scheme.
+    colour -- the joint alternative to solve_n_frame()'s cumulative-residual
+    scheme.
 
-    Root problem this replaces: the old scheme (solve_n_frame()) solves
-    frame 0 directly against the real target, then frame 1 against
-    whatever's LEFT OVER (a residual, (i+1)*target - cumulative), then
-    frame 2 against what's left after that. A residual is not a real,
-    in-gamut colour -- confirmed directly on zph.png, one frame's residual
-    ranged from -80 to +294 per channel -- so a frame fit against it is
-    fitting something that may not resemble any achievable colour at all.
-    Every attempt to patch that up locally (anti-grey bias on later frames,
-    capping the residual's nominal spread, referencing the real photo's
-    spread instead of the residual's) either let a whole frame collapse to
-    flat grey or chase an out-of-gamut residual into a wrong, saturated hue
-    (confirmed: an obvious magenta cast on a real photo). The problem was
-    architectural, not a tuning problem: solving frames SEQUENTIALLY, each
-    one blind to what the others will need, has no way to avoid painting
-    one of them into a corner.
+    solve_n_frame() solves frame 0 directly against the real target, then
+    frame 1 against whatever's left over (a residual, (i+1)*target -
+    cumulative), then frame 2 against what's left after that. A residual is
+    not a real, in-gamut colour, so a frame fit against it is fitting
+    something that may not resemble any achievable colour at all -- an
+    awkward-enough residual can leave a whole frame collapsed to flat grey,
+    or chase a wrong saturated hue if patched with an anti-grey bias. The
+    problem is architectural: solving frames sequentially, each one blind to
+    what the others will need, has no way to avoid painting one of them into
+    a corner.
 
-    This function sidesteps that entirely by never computing a residual in
-    the first place. For n_frames == 3 specifically (frame count is fixed
-    project-wide), it searches three families of REAL, achievable averages
+    This function sidesteps that by never computing a residual in the first
+    place. For n_frames == 3 specifically (frame count is fixed
+    project-wide), it searches three families of real, achievable averages
     per row and keeps whichever actually scores best against the target:
 
       - single: one palette entry, used all 3 frames (repeated 3x)
@@ -1058,21 +793,14 @@ def solve_colour_triplets(row_targets, weights, n_frames=3,
     term below corrects for that raw-distance quirk, exactly as
     CHROMA_BIAS_SCALE does for the single-frame case -- see its comment).
 
-    A separate "flicker" penalty (discouraging the 2:1/1:1:1 options'
-    constituent colours from being far apart) was prototyped and rejected:
-    at any weight strong enough to matter it either did nothing (weak) or
-    collapsed EVERY row to the single-colour option (strong enough to
-    actually constrain anything) -- there is no middle ground, because
-    genuine temporal dithering only ever helps when the constituent colours
-    ARE far apart (that's what makes their average reach a target no
-    single palette entry can). Frame-to-frame jump this large is already a
-    known, already-accepted property of this whole cycling technique (see
-    the "flicker-magnitude metric" printed by the CLI, historically ~70 RMS
-    units even under the old scheme) -- what actually matters for keeping
-    it from looking broken is per-FRAME column continuity (handled by
-    assign_triplet_to_frames(), not here) and eliminating flat-frame
-    collapse (handled by the chroma bias above), not raw distance between
-    the frames.
+    There is no separate penalty discouraging the 2:1/1:1:1 options'
+    constituent colours from being far apart: genuine temporal dithering
+    only helps when the constituent colours ARE far apart (that's what lets
+    their average reach a target no single palette entry can), so
+    constraining that distance directly trades away the technique's whole
+    benefit. Per-FRAME column continuity is handled separately by
+    assign_triplet_to_frames(); flat-frame collapse is handled by the chroma
+    bias above.
 
     Returns (chosen, cost): chosen is (HEIGHT, n_frames) int array of
     palette indices (unordered -- caller assigns them to frame slots), cost
@@ -1100,8 +828,7 @@ def solve_colour_triplets(row_targets, weights, n_frames=3,
     # Candidate "first" colours for the 2:1 and 1:1:1 searches: the top-K
     # single-match candidates per row (cheap prefilter; the true best combo
     # essentially always has at least one of its members near a strong
-    # single-match candidate in practice -- confirmed on real test images
-    # that widening K further doesn't change the outcome).
+    # single-match candidate in practice).
     order = np.argsort(cost_single, axis=1)[:, :k_a]                     # (H,k_a)
 
     # ---- 2:1 split: candidate A appears twice, B once ----
@@ -1189,30 +916,16 @@ def assign_triplet_to_frames(triplets):
 # Scale multiplying --smoothness (0-1ish) into the transition cost used by
 # the per-frame column-smoothing pass below (solve_n_frame_joint()'s
 # smooth_frame_column()). Needed because solve_colour_triplets() decides
-# every row completely independently -- nothing links row y's choice to
-# row y+1's -- and that leaves real row-to-row jitter WITHIN a single
-# frame's own column (confirmed directly on zph.png: mean row-to-row RGB
-# jump ~43, comparable in magnitude to the jump BETWEEN frames that the
-# whole technique already accepts). Visually this reads as a fine,
-# incoherent speckle rather than the coarser, more deliberate-looking
-# dithering the old scheme produced -- reported directly as looking "bland
-# and almost monochrome" on a real render, even though per-pixel
-# saturation metrics came out equal or higher than the old scheme (the
-# fine alternation between different hues gets partially averaged out by
-# the eye's own spatial integration, the same mechanism this tool
-# deliberately exploits ACROSS frames, just happening unintentionally
-# WITHIN one frame's column here).
-#
-# This smoothing runs as a second DP pass per frame, anchoring each row's
-# fit cost to the jointly-chosen colour (never a residual) with a
+# every row completely independently -- nothing links row y's choice to row
+# y+1's -- which leaves real row-to-row jitter WITHIN a single frame's own
+# column, visually a fine incoherent speckle rather than a deliberate-looking
+# dither. This smoothing runs as a second DP pass per frame, anchoring each
+# row's fit cost to the jointly-chosen colour (never a residual) with a
 # transition cost identical in form to solve_colour_sequence()'s. Same
-# sharp-cliff behaviour as SMOOTHNESS_DP_SCALE was found here too (any of
-# 20-200 collapsed every column to one flat colour, fit_rmse ballooning
-# from ~4 to ~50+) -- calibrated instead in the same much smaller range
-# that worked there, chosen so the default --smoothness 0.5 lands at a
-# transition_scale of ~0.3: cuts the mean row-to-row jump roughly in half
-# (43 -> ~23) for a moderate, bounded fit-cost increase, without fully
-# flattening any column.
+# sharp-cliff collapse behaviour as SMOOTHNESS_DP_SCALE applies here too, so
+# this is calibrated in the same small range: the default --smoothness 0.5
+# lands at a transition_scale of ~0.3, enough to meaningfully cut row-to-row
+# jitter for a bounded fit-cost increase without flattening any column.
 JOINT_SMOOTHING_DP_SCALE = 0.6
 
 
@@ -1274,18 +987,14 @@ def solve_n_frame_joint(target, n_frames=3, seeds=3, sigma=1.0, radius=3,
     # after solving all n_frames frames' on/off masks against the current
     # per-row targets, measure the actual achieved average, fold the
     # remaining error back into next round's per-row target, and redo the
-    # (still fully joint, never-a-per-frame-residual) triplet search. This
-    # closed a real accuracy gap found on zph.png (a real photographic
-    # portrait, reported as looking "bland and almost monochrome" without
-    # this): the one-shot crude-average version left final RMS ~40% worse
-    # than the old (architecturally fragile) scheme's; this halves that
-    # gap in 2 extra rounds. Unlike the old scheme's residual-chasing, the
-    # correction here is applied EQUALLY to all n_frames frames' shared
-    # target every round, not handed to one frame alone to fix by itself --
-    # confirmed this does not reintroduce the flat-grey/wrong-hue collapse
-    # (still goes through solve_colour_triplets()'s chroma-bias-corrected
-    # search every round, so grey still has to win fairly, and no single
-    # frame is ever singled out to close an awkward leftover alone).
+    # (still fully joint, never-a-per-frame-residual) triplet search. The
+    # correction is applied EQUALLY to all n_frames frames' shared target
+    # every round, never handed to one frame alone to fix by itself, so this
+    # doesn't reintroduce the flat-grey/wrong-hue collapse the cumulative
+    # scheme is prone to: every round still goes through solve_colour_
+    # triplets()'s chroma-bias-corrected search, so grey still has to win
+    # fairly, and no single frame is ever singled out to close an awkward
+    # leftover alone.
     cur_target = likely_on_avgs.copy()
     color_idxs, ons, blendeds = None, None, None
     t_start = time.monotonic()
@@ -1364,15 +1073,11 @@ def solve_n_frame(target, n_frames=2, seeds=3, sigma=1.0, radius=3, **kwargs):
     after it. So a 3-frame run's frame0 and frame1 are byte-identical to a
     standalone 2-frame run's (same seeds) -- you can ship a 2-frame result
     now and bolt on a 3rd correcting frame later without regenerating or
-    recompiling the earlier ones. An earlier version of this function
-    instead redistributed the remaining gap evenly across all frames still
-    to come (so frame1 of a 3-frame run only closed half the gap, saving
-    the rest for frame2); that version is NOT prefix-compatible, since
-    frame1's target depended on the total frame count. Tested both on a
-    real photo at matching settings and their final RMS was statistically
-    indistinguishable (within seed noise, ~0.2% apart, sign flipping
-    depending on seed) -- so this scheme's extensibility is free, not a
-    quality trade-off.
+    recompiling the earlier ones. (Redistributing the remaining gap evenly
+    across all frames still to come, instead, is not prefix-compatible --
+    frame1's target would then depend on the total frame count -- and
+    measured no better on final RMS, so prefix-compatibility is free here,
+    not a quality trade-off.)
 
     Frame 0's target is (0+1)*target - 0 == target exactly, so it's just
     the ordinary single-frame fit (and its own RMS-vs-target is a fair
@@ -1381,14 +1086,14 @@ def solve_n_frame(target, n_frames=2, seeds=3, sigma=1.0, radius=3, **kwargs):
     `temporal_weight` (default 0, off) adds a cross-frame stability term:
     frames 1..n-1 are biased toward reusing frame 0's already-committed
     colour on a given row, but ONLY where that colour is near-achromatic
-    (see nearest_palette_index_smooth()'s temporal_ref/temporal_weight
-    docs for the full rationale -- this exists to stop white/grey areas
-    flickering between adjacent palette rungs across the cycling frames,
-    a defect confirmed on real hardware and measurably the largest
-    frame-to-frame colour swing of any region tested). Anchoring
-    everything to frame 0 specifically (not "the previous frame") keeps
-    this prefix-compatible: frame 0 is identical regardless of n_frames,
-    so every later frame's anchor is too.
+    (see solve_colour_sequence()'s temporal_ref/temporal_weight docs for
+    the full rationale -- this exists to stop white/grey areas flickering
+    between adjacent palette rungs across the cycling frames, since
+    achromatic content has the largest frame-to-frame colour swing of any
+    region: no hue axis to help hit a target brightness, only ~8 discrete
+    grey rungs). Anchoring everything to frame 0 specifically (not "the
+    previous frame") keeps this prefix-compatible: frame 0 is identical
+    regardless of n_frames, so every later frame's anchor is too.
     """
     if n_frames < 1:
         raise ValueError("n_frames must be >= 1")
@@ -1411,19 +1116,15 @@ def solve_n_frame(target, n_frames=2, seeds=3, sigma=1.0, radius=3, **kwargs):
         # residual, so it's never applied to frames 1..n-1 (those always
         # fit a residual). It's ALSO forced off for frame 0 here whenever
         # n_frames > 1, even though frame 0's own target is the direct
-        # photo -- confirmed directly that turning it on for frame 0 alone
-        # still regresses the OTHER frames: making frame 0 fit its target
-        # more accurately (less grey) leaves a different, harder residual
-        # for frame 1 to close, and frame 1 responded by collapsing to
-        # near-total flat grey across 111/128 rows (worse than the
-        # original defect this bias was built to fix). The multi-frame
-        # cumulative-residual scheme's cross-frame balance is fragile in
-        # a way a per-row fit-cost tweak on just one frame can't safely
-        # touch -- fixing it properly needs the frames' colour budgets
-        # solved jointly, not this greedy frame-by-frame scheme. So for
-        # n_frames > 1 the bias defaults off everywhere, preserving the
-        # verified-safe cross-frame balance, unless the caller explicitly
-        # overrides chroma_bias_scale themselves (single-frame calls via
+        # photo: making frame 0 fit its target more accurately (less grey)
+        # leaves a different, harder residual for frame 1 to close, and
+        # this cumulative scheme's cross-frame balance is fragile in a way
+        # a per-row fit-cost tweak on just one frame can't safely touch --
+        # fixing that properly needs the frames' colour budgets solved
+        # jointly (see solve_n_frame_joint()), not this greedy frame-by-
+        # frame scheme. So for n_frames > 1 the bias defaults off
+        # everywhere, unless the caller explicitly overrides
+        # chroma_bias_scale themselves (single-frame calls via
         # solve_best_of()/solve() directly are unaffected and keep the
         # bias on by default).
         frame_kwargs = dict(kwargs)
@@ -1460,6 +1161,213 @@ def solve_n_frame(target, n_frames=2, seeds=3, sigma=1.0, radius=3, **kwargs):
     }
 
 
+def compute_frame_jump(color_idxs, ons, height, width):
+    """Mean cyclic (wraparound included) frame-to-frame RMS difference in
+    actual raw displayed pixels (colour if on, else black) -- the real
+    physical stimulus at any given screen dot across the frame cycle, and
+    therefore the relevant flicker-magnitude metric. Compare this against
+    the final time-averaged RMS: if the jump is much bigger than the
+    final RMS, most of what's happening is high-contrast strobing, not
+    gentle blending."""
+    n = len(color_idxs)
+    raws = []
+    for i in range(n):
+        colour = PALETTE_RGB[color_idxs[i]]
+        raw = np.zeros((height, width, 3), dtype=np.float64)
+        raw[ons[i]] = colour[np.nonzero(ons[i])[0]]
+        raws.append(raw)
+    jumps = []
+    for i in range(n):
+        j = (i + 1) % n
+        diff = raws[i] - raws[j]
+        jumps.append((np.sum(diff ** 2) / (height * width * 3)) ** 0.5)
+    return float(np.mean(jumps))
+
+
+def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
+                          sigma=1.0, radius=3, verbose=True, terse=False,
+                          frame_scheme="cumulative", **kwargs):
+    """N-frame solve using CYCLIC (bidirectional) relaxation across frames,
+    instead of solve_n_frame()'s one-way forward/causal residual chase.
+
+    THE PROBLEM WITH THE PLAIN FORWARD SCHEME: solve_n_frame() is strictly
+    causal -- frame i's target only depends on frames already solved
+    before it (0..i-1). Frame 0 is solved with zero knowledge that a last
+    frame will eventually need to close the loop back to it, nothing is
+    ever revisited once solved, and there's no notion of "wraparound"
+    (frame N-1 back to frame 0) during solving at all -- only in the final
+    display cycle. On a real multi-frame result the frame-to-frame
+    raw-pixel RMS jump can come out larger than the final time-averaged
+    RMS error and nearly as large as the whole image's own dynamic range --
+    a real risk of visible flicker on hardware (the same mechanism as
+    sprite-multiplexing flicker on real Atari 2600s), not just a
+    theoretical concern.
+
+    THE CYCLIC ALTERNATIVE: treat "sum of all N frames == N*target" as a
+    symmetric, cyclic constraint with no privileged starting frame, and
+    enforce it with Gauss-Seidel-style coordinate descent ACROSS FRAMES
+    (the same kind of alternating local-search convergence this module
+    already uses within a single frame for DBS + colour refinement, just
+    one level up):
+        1. Get an initial guess for all N frames (reuse the existing
+           one-pass solve_n_frame() -- a perfectly good starting point,
+           just not a converged one).
+        2. Repeat for `outer_rounds` passes: for each frame i (0..N-1), in
+           order, other_sum = sum of all OTHER frames' current blended
+           output (this includes frames on BOTH sides of i once at least
+           one full pass has happened, wraparound included -- frame 0
+           gets to react to frame N-1's current state, not just frame
+           N-1 reacting to it); this_target = N*target - other_sum (what
+           frame i needs to contribute for the full cyclic average to hit
+           target exactly); re-solve frame i against this_target,
+           replacing its old colour/on-off state.
+        3. Stop after `outer_rounds` passes -- there's no established
+           plateau point yet the way there is for the inner --rounds;
+           watch the printed per-round RMS and judge for yourself whether
+           it's still improving.
+    NOT guaranteed to converge monotonically -- each frame's re-solve is a
+    full independent local search, not a small nudge, so outer rounds can
+    oscillate rather than settle. Per-round RMS and the frame-jump metric
+    are printed/returned specifically so that's visible, not hidden.
+
+    terse=False (default): full progress -- every DBS round of every
+    frame-solve prints its running SSE, so a long run never goes silent
+    for more than a fraction of a second. terse=True: only announce each
+    frame-solve starting and each outer round finishing (no per-DBS-round
+    spam) -- a quieter middle ground between full detail and verbose=False.
+
+    frame_scheme="cumulative" (default): solve_n_frame() initial pass +
+    outer-round residual refinement (above). Gets meaningfully lower RMS
+    than "joint" from each frame's full iterative closed-form colour
+    refinement, but can collapse a whole frame to flat grey (or a wrong
+    hue, if patched) on an awkward residual -- check the per-frame
+    _raw.png previews for that. "joint" can't produce that collapse but
+    reads flatter/less vibrant overall, and neither row-jitter smoothing
+    nor outer-round refinement against the real achieved blend closes that
+    gap -- a real, still-open trade-off, not a default to take lightly
+    either way.
+
+    frame_scheme="joint": initialise with solve_n_frame_joint() -- every
+    frame's colour sequence decided together, per row, as the best REAL
+    achievable average of real palette entries (see its docstring) -- and
+    RETURN THAT DIRECTLY, skipping the outer-round refinement loop below
+    entirely. That loop's whole mechanism is per-frame residual-chasing
+    (this_target = n_frames*target - other_sum, i.e. exactly the
+    architecture solve_n_frame_joint() was built to avoid -- see
+    solve_colour_triplets()'s docstring for why that's fragile: running
+    outer-round refinement on top of an already-good joint result would
+    reintroduce the same collapse/wrong-hue risk, since every frame it
+    touches -- including frame 0, unlike the plain forward scheme's own
+    one-shot solve -- becomes residual-driven the moment outer-round
+    refinement runs). outer_rounds is ignored (with a note) in this mode."""
+    if n_frames < 2:
+        raise ValueError("n_frames must be >= 2 -- use --frames 1 for a single static frame")
+
+    height, width = HEIGHT, WIDTH
+    inner_verbose = verbose and not terse
+    temporal_weight = kwargs.pop("temporal_weight", 0.0)
+
+    def score(s):
+        avg = s / n_frames
+        return (float(np.sum((target - avg) ** 2)) / (height * width * 3)) ** 0.5
+
+    if frame_scheme == "joint":
+        if n_frames != 3:
+            raise ValueError("frame_scheme='joint' currently only supports n_frames == 3 "
+                              "(frame count is fixed project-wide anyway)")
+        if verbose:
+            print(f"=== joint pass: {n_frames}-frame colour sequences solved together ===",
+                  flush=True)
+            if outer_rounds:
+                print(f"(outer_rounds={outer_rounds} ignored: the joint scheme doesn't use "
+                      f"outer-round residual refinement -- see solve_n_frame_cyclic()'s "
+                      f"docstring)", flush=True)
+        result = solve_n_frame_joint(target, n_frames=n_frames, seeds=seeds,
+                                      sigma=sigma, radius=radius, verbose=inner_verbose,
+                                      **kwargs)
+        if verbose:
+            print(f"[joint] RMS = {result['final_rmse']:.2f}", flush=True)
+        return result
+
+    # See solve_n_frame() for the full rationale (white/grey flicker fix,
+    # opt-in, default 0). Anchored to frame 0's CURRENT colour throughout,
+    # same as the plain forward scheme -- even though frame 0 itself gets
+    # re-solved every outer round here (unlike the forward scheme, where
+    # it's solved once and never revisited), reusing "whatever frame 0
+    # currently holds" as everyone else's reference is the simplest
+    # consistent choice and needs no special first-round case beyond not
+    # anchoring frame 0 to itself.
+
+    # ---- initial guess: reuse the existing one-pass forward scheme as a
+    # perfectly reasonable, cheap starting point (it already satisfies the
+    # "average == target" constraint approximately; we're just going to
+    # let every frame react to every other frame's current state instead
+    # of freezing each one the moment it's first solved). ----
+    if verbose:
+        print(f"=== initial pass: one-pass forward solve, {n_frames} frame(s) ===", flush=True)
+    init = solve_n_frame(target, n_frames=n_frames, seeds=seeds,
+                          sigma=sigma, radius=radius, verbose=inner_verbose,
+                          temporal_weight=temporal_weight, **kwargs)
+    color_idxs = list(init["color_idxs"])
+    ons = list(init["ons"])
+    blendeds = list(init["blendeds"])
+    cur_sum = sum(blendeds)
+
+    t_start = time.monotonic()
+    if verbose:
+        print(f"[init, one-pass forward] RMS = {score(cur_sum):.2f}  [{time.monotonic()-t_start:.1f}s elapsed]",
+              flush=True)
+
+    round_durations = []
+    for outer in range(1, outer_rounds + 1):
+        round_t0 = time.monotonic()
+        for i in range(n_frames):
+            if verbose:
+                print(f"--- outer round {outer}/{outer_rounds}, solving frame {i+1}/{n_frames} "
+                      f"(seeds={seeds}) [{time.monotonic()-t_start:.1f}s elapsed total] ---", flush=True)
+            other_sum = cur_sum - blendeds[i]
+            this_target = n_frames * target - other_sum
+            tref = PALETTE_RGB[color_idxs[0]] if i > 0 else None
+            # Every frame here (including frame 0, unlike the plain
+            # forward scheme's one-shot solve) is fit against a RESIDUAL --
+            # "what this frame needs to be given every other frame's
+            # CURRENT commitment" -- not a direct photographed target, once
+            # we're inside outer-round refinement. See _fit_cost_table's
+            # docstring: the anti-grey chroma bias isn't trustworthy
+            # against a residual (it would chase whatever hue the residual
+            # arithmetic points at, which need not be a sensible hue at
+            # all), so it's forced off here for every frame, unless the
+            # caller explicitly overrode it.
+            outer_kwargs = dict(kwargs)
+            if "chroma_bias_scale" not in outer_kwargs:
+                outer_kwargs["chroma_bias_scale"] = 0.0
+            result = solve_best_of(this_target, seeds=seeds, sigma=sigma, radius=radius,
+                                    tag=f"[outer{outer} frame{i}] ", verbose=inner_verbose,
+                                    temporal_ref_colours=tref, temporal_weight=temporal_weight,
+                                    **outer_kwargs)
+            color_idx_i, on_i, blended_i, rmse_i, werr_i = result
+            cur_sum = cur_sum - blendeds[i] + blended_i
+            color_idxs[i] = color_idx_i
+            ons[i] = on_i
+            blendeds[i] = blended_i
+
+        round_durations.append(time.monotonic() - round_t0)
+        if verbose:
+            avg_round = sum(round_durations) / len(round_durations)
+            remaining_rounds = outer_rounds - outer
+            eta = avg_round * remaining_rounds
+            elapsed = time.monotonic() - t_start
+            print(f"[outer round {outer}/{outer_rounds}] RMS = {score(cur_sum):.2f}  "
+                  f"[{elapsed:.1f}s elapsed, ~{eta:.0f}s remaining at current pace]", flush=True)
+
+    final_rmse = score(cur_sum)
+    averaged = cur_sum / n_frames
+    return {
+        "color_idxs": color_idxs, "ons": ons, "blendeds": blendeds,
+        "final_rmse": final_rmse, "averaged": averaged,
+    }
+
+
 def roll_seam_row_count(height, band_height, radius):
     """How many rows have a "mixed" vertical-blend neighbourhood under
     roll_scanlines() at the given band_height -- i.e. rows whose
@@ -1482,53 +1390,37 @@ def roll_scanlines(color_idxs, ons, band_height, radius=3):
     staggered, instead of every scanline in the whole screen flipping to
     the same frame at the same instant.
 
-    THIS FUNCTION WAS WRONG IN AN EARLIER VERSION -- rolling at 1-row
-    granularity (rolled[k][y] = original[(k + y) % N][y] for every single
-    y) was shipped, tested "correct" against its own reordering formula,
-    and reported as inert on the perceived average. All of that was true
-    and verified -- and still resulted in visibly wrong colours on real
-    hardware. Root cause, found by re-examining the actual display model
-    rather than trusting the byte-level check alone: solve()'s vertical
-    blend has a real physical radius (default 3, i.e. every displayed row
-    is smeared with a Gaussian-weighted mix of the 3 rows above and below
-    it -- composite bleed / scanline proximity, the whole basis this
-    tool's colour choices are optimised against). A row's solved colour
-    and on/off pattern are only a good answer TOGETHER WITH its solved
-    neighbours from the SAME frame -- that's what the solver actually
-    targeted. Swap in a neighbour's row from a DIFFERENT original frame
-    (solved against a different residual target) and the physical blend
-    the real hardware produces was never optimised for that combination
-    at all. At 1-row granularity, with radius=3 (a 7-row window) and only
-    3 possible frames, essentially every row on screen has at least one
-    neighbour from a different frame within its blend window --
-    confirmed directly: 128/128 rows have a mixed-frame blend window at
-    band_height=1, for both radius=1 and radius=3. That's not a rare seam
-    artifact, it's systemic -- which matches "colours are incorrect"
-    being an immediate, general complaint rather than a subtle one.
+    Rolling must happen in BANDS of `band_height` consecutive rows, not
+    single rows: rolled[k][y] = original[(k + y // band_height) % N][y].
+    solve()'s vertical blend has a real physical radius (default 3 -- every
+    displayed row is smeared with a Gaussian-weighted mix of the rows above
+    and below it), and a row's solved colour and on/off pattern are only a
+    good answer TOGETHER WITH its solved neighbours from the SAME frame --
+    that's what the solver actually targeted. Rolling at 1-row granularity
+    swaps in a neighbour's row from a different original frame (solved
+    against a different residual target) for essentially every row on
+    screen, so the physical blend the real hardware produces was never
+    optimised for that combination -- a systemic wrong-colours defect, not
+    a rare seam artifact.
 
-    The fix: roll in BANDS of `band_height` consecutive rows, not single
-    rows -- rolled[k][y] = original[(k + y // band_height) % N][y]. Any
-    row more than `radius` rows away from a band boundary has an entirely
-    self-consistent blend window (every row in it belongs to the same
-    original frame, exactly matching what the solver assumed); only rows
-    within `radius` of a boundary still straddle two frames and pay the
-    same cost the old version paid everywhere. Larger band_height means
-    fewer boundaries and fewer affected rows, at the cost of coarser
-    (less spatially-scattered) decorrelation; see roll_seam_row_count()
-    to quantify this trade-off for your actual --height/--radius rather
-    than guessing, and the --roll-band-height help text for measured
-    examples at height=128, radius=3 (1: 100%% of rows affected, 7: 84%%,
-    14: 41%%, 32: 14%%, 64: 5%%). There is no band_height that gets this
-    to zero while still changing anything -- some boundary cost is the
-    unavoidable price of this technique; band_height just controls how
-    much of it you pay for how much decorrelation.
+    Banding fixes this: any row more than `radius` rows away from a band
+    boundary has an entirely self-consistent blend window (every row in it
+    belongs to the same original frame, exactly matching what the solver
+    assumed); only rows within `radius` of a boundary still straddle two
+    frames and pay that cost. Larger band_height means fewer boundaries and
+    fewer affected rows, at the cost of coarser (less spatially-scattered)
+    decorrelation; see roll_seam_row_count() to quantify this trade-off for
+    your actual --height/--radius, and the --roll-band-height help text for
+    measured examples. There is no band_height that eliminates the boundary
+    cost while still changing anything -- it's the unavoidable price of
+    this technique; band_height just controls how much of it you pay for
+    how much decorrelation.
 
     Per-row full-cycle coverage (and therefore the temporal average, the
     `averaged` preview, and the final RMS this tool reports) is unaffected
     by band_height -- for any fixed row y, as k runs 0..N-1, (k + y //
-    band_height) % N still visits every value 0..N-1 exactly once. Only
-    the WITHIN-INSTANT spatial consistency changes, which is exactly the
-    thing that broke before.
+    band_height) % N still visits every value 0..N-1 exactly once. Only the
+    WITHIN-INSTANT spatial consistency changes.
 
     No-ops (returns the inputs unchanged) for N<2, since there's nothing
     to stagger with a single frame."""
@@ -1700,7 +1592,7 @@ def write_c_files_n_frame(prefix, color_idxs, ons, rolled=False, roll_band_heigh
  * IMPORTANT: --roll-scanlines was used (band height {roll_band_height}), so
  * these {n_frames} arrays are NOT the raw per-frame solves -- they are
  * already-rolled composites. Array k's row y holds original solved frame
- * (k + y // {roll_band_height}) %% {n_frames}'s row y data: every
+ * (k + y // {roll_band_height}) % {n_frames}'s row y data: every
  * {roll_band_height}-row BAND of the screen is staggered to a different
  * original frame, instead of the whole screen flipping between frames in
  * lockstep. Over one full {n_frames}-frame cycle every row still visits
@@ -1713,12 +1605,10 @@ def write_c_files_n_frame(prefix, color_idxs, ons, rolled=False, roll_band_heigh
  * (matching what the solver assumed); rows near a band boundary
  * straddle two original frames' data and will show a locally-wrong
  * blend there -- that's an unavoidable, quantified cost of this
- * technique, not a bug (an EARLIER version of this tool rolled at
- * 1-row granularity, which put ~100%% of rows in that "wrong blend"
- * state -- visibly broken colours, found and fixed). See
- * roll_scanlines() in atari_scanline_blend.py for the full history and
- * roll_seam_row_count() to quantify the boundary cost for your own
- * --height/--radius/--roll-band-height combination.
+ * technique, not a bug. See roll_scanlines() in atari_scanline_blend.py
+ * for the full rationale and roll_seam_row_count() to quantify the
+ * boundary cost for your own --height/--radius/--roll-band-height
+ * combination.
  */"""
     else:
         frame_doc = f""" * ScanLine is defined once and shared verbatim across every file this
@@ -1860,39 +1750,26 @@ def main():
                          "consistency preference, applied by solving every "
                          "scanline's colour in one shot (a dynamic-programming / "
                          "Viterbi pass over all rows at once -- see "
-                         "solve_colour_sequence()), not row-by-row. History: this "
-                         "used to be a CEILING on a per-row penalty against each "
-                         "row's already-committed neighbour, applied greedily "
-                         "top-to-bottom; that greedy version had no memory of how "
-                         "far a chain of small, locally-reasonable nudges had "
-                         "drifted from any individual row's true colour, and on a "
-                         "real photographic portrait it could lock 10-30 "
-                         "consecutive rows into a false flat-grey consensus even "
-                         "though no single row in the run was decisively grey on "
-                         "its own (confirmed by decoding actual compiled hardware "
-                         "bytes). The whole-column solve fixes that structurally: "
-                         "every row's real fit cost is counted in one global "
-                         "objective, not just its offset from a possibly-already-"
-                         "wrong neighbour, so it can't drift arbitrarily far from "
-                         "any row's own true match. It has a different failure mode "
-                         "instead, found and calibrated against: pushed too high, "
-                         "it doesn't degrade gradually -- an entire frame's whole "
-                         "column can snap to one flat colour outright, because at "
-                         "that point no isolated run of true-colour rows anywhere "
-                         "can pay back its own entry+exit transition cost. The "
-                         "internal scale (SMOOTHNESS_DP_SCALE) is calibrated so the "
-                         "full 0-1 range stays inside the safe, fit-cost-respecting "
-                         "regime on real test images (a photographic portrait and "
-                         "a flat-cel-art cutout) rather than anywhere near that "
-                         "cliff. 'auto' (default) means 'use the recommended "
-                         "value, 0.5'. Pass an explicit number to change it "
-                         "directly; 0 disables the mechanism entirely (pure "
-                         "per-row nearest-palette-match, independent of neighbours).")
+                         "solve_colour_sequence()), not row-by-row, so every row's "
+                         "real fit cost is counted in one global objective and it "
+                         "can't drift arbitrarily far from any row's own true "
+                         "match. Pushed too high it doesn't degrade gradually -- "
+                         "an entire frame's whole column can snap to one flat "
+                         "colour outright, because at that point no isolated run "
+                         "of true-colour rows can pay back its own entry+exit "
+                         "transition cost. The internal scale (SMOOTHNESS_DP_SCALE) "
+                         "is calibrated so the full 0-1 range stays inside the "
+                         "safe, fit-cost-respecting regime rather than anywhere "
+                         "near that cliff. 'auto' (default) means 'use the "
+                         "recommended value, 0.5'. Pass an explicit number to "
+                         "change it directly; 0 disables the mechanism entirely "
+                         "(pure per-row nearest-palette-match, independent of "
+                         "neighbours).")
     ap.add_argument("--swaps", action="store_true",
                     help="enable adjacent-pixel swap moves in addition to flips "
-                         "(off by default: tested extensively and it consistently "
-                         "converges to WORSE results here, not better -- see comments "
-                         "in solve(). Left in for experimentation, not recommended.")
+                         "(off by default: consistently converges to worse "
+                         "results than flips alone -- see comments in solve(). "
+                         "Left in for experimentation, not recommended.")
     ap.add_argument("--frames", type=int, default=1,
                     help="1 (default): a single static frame. N>1: also solve "
                          "N-1 further 'correcting' frames that, cycled one per "
@@ -1907,52 +1784,71 @@ def main():
                          "leftover residual, frame 2 against what's left after that -- "
                          "each frame gets full iterative closed-form colour refinement "
                          "(see solve()'s phase 2), which is where most of its accuracy "
-                         "comes from (measured ~30-40%% lower RMS than 'joint' on real "
-                         "test images). Known failure mode: an awkward-enough residual "
-                         "can leave a WHOLE frame's worth of rows collapsed to flat grey, "
-                         "or chase the residual into a wrong saturated hue if patched "
-                         "with an anti-grey bias -- an architectural problem with solving "
-                         "frames sequentially and blind to each other, confirmed on a "
-                         "real photographic portrait. Check the per-frame _raw.png previews "
-                         "for a whole frame reading as flat grey or an odd solid colour; "
-                         "if you see that, try 'joint' instead. 'joint': every frame's "
-                         "colour sequence decided TOGETHER, per row, as the best real "
-                         "achievable average of up to 3 real palette entries (see "
-                         "solve_n_frame_joint()/solve_colour_triplets()'s docstrings) -- "
-                         "structurally can't produce that collapse/wrong-hue failure, "
-                         "verified with real per-row colour dumps, but reported directly "
-                         "on a real render as looking flatter/less vibrant overall than "
-                         "'cumulative' (confirmed: real RMS cost, and two follow-up "
-                         "attempts to close the gap -- smoothing the joint choice's own "
-                         "row-to-row jitter, and iterative outer-round refinement against "
-                         "the real achieved blend -- neither fixed it, so this is a real, "
-                         "still-open trade-off, not a bug to tune away).")
+                         "comes from (meaningfully lower RMS than 'joint'). Known failure "
+                         "mode: an awkward-enough residual can leave a whole frame's worth "
+                         "of rows collapsed to flat grey, or chase the residual into a "
+                         "wrong saturated hue if patched with an anti-grey bias -- an "
+                         "architectural problem with solving frames sequentially and blind "
+                         "to each other. Check the per-frame _raw.png previews for a whole "
+                         "frame reading as flat grey or an odd solid colour; if you see "
+                         "that, try 'joint' instead. 'joint': every frame's colour sequence "
+                         "decided TOGETHER, per row, as the best real achievable average of "
+                         "up to 3 real palette entries (see solve_n_frame_joint()/"
+                         "solve_colour_triplets()'s docstrings) -- structurally can't "
+                         "produce that collapse/wrong-hue failure, but reads flatter/less "
+                         "vibrant overall than 'cumulative', and neither smoothing the "
+                         "joint choice's own row-to-row jitter nor iterative outer-round "
+                         "refinement against the real achieved blend closes that gap -- a "
+                         "real, still-open trade-off, not a bug to tune away.")
+    ap.add_argument("--frame-mode", choices=["cyclic", "forward"], default="cyclic",
+                    help="only meaningful with --frames > 1. 'cyclic' (default): after the "
+                         "initial --frame-scheme solve, run --outer-rounds passes of "
+                         "Gauss-Seidel-style relaxation ACROSS frames -- each frame in turn "
+                         "re-solved against a residual computed from every OTHER frame's "
+                         "CURRENT state, wraparound included (frame 0 gets to react to the "
+                         "last frame's state, not just the other way around). Fixes a real "
+                         "problem with the plain one-pass scheme: the frame-to-frame "
+                         "raw-pixel RMS jump can come out larger than the final "
+                         "time-averaged RMS -- a real flicker risk on hardware, not just "
+                         "theory (see solve_n_frame_cyclic()'s docstring). Only applies "
+                         "when --frame-scheme cumulative; under 'joint' the outer-round "
+                         "loop is skipped entirely (residual-chasing on top of an "
+                         "already-good joint result would reintroduce the same "
+                         "collapse/wrong-hue risk 'joint' exists to avoid), so 'cyclic' and "
+                         "'forward' behave identically there. 'forward': the original "
+                         "one-pass scheme, no cross-frame relaxation -- kept for "
+                         "comparison/debugging and for cases where --outer-rounds' extra "
+                         "runtime (roughly outer_rounds x N-frame cost, on top of the "
+                         "initial solve) isn't worth it.")
+    ap.add_argument("--outer-rounds", type=int, default=4,
+                    help="only used by --frame-mode cyclic with --frame-scheme cumulative "
+                         "(ignored, with a note, otherwise -- see --frame-mode). How many "
+                         "full cyclic relaxation passes across all frames. Cost scales "
+                         "linearly with this.")
+    ap.add_argument("--terse", action="store_true",
+                    help="only meaningful with --frame-mode cyclic. Show frame-start and "
+                         "outer-round-finish progress (with elapsed/ETA timing) but suppress "
+                         "the per-DBS-round SSE spam within each frame-solve. A middle ground "
+                         "between full detail (default) and --quiet.")
     ap.add_argument("--temporal-weight", type=float, default=0.0,
                     help="only meaningful with --frames > 1. Cross-FRAME (not "
                          "cross-row) penalty that biases frames 1..N-1 toward "
                          "reusing frame 0's already-committed colour on a given "
                          "row, but only where that colour is near-grey AND "
                          "reusing it costs this row's own fit little (see "
-                         "nearest_palette_index_smooth()'s temporal_ref docs). "
-                         "Exists because white/near-white regions were found to "
-                         "have the LARGEST frame-to-frame colour swing of any "
-                         "region tested, and -- being pure luminance with no hue "
-                         "to mask it -- read as visibly flickerier on real "
-                         "hardware than a similar-sized swing in a coloured area "
-                         "(human vision is well-documented to be far more "
-                         "sensitive to luminance flicker than chrominance "
-                         "flicker at a given rate). Default 0 (off): tested and "
-                         "found a REAL cost on photographic content -- lena's "
-                         "RMS got measurably worse (its hair/highlight greys "
-                         "need frame 1 to genuinely differ from frame 0, not "
-                         "just look stable) even after two rounds of trying to "
-                         "gate this safely. Validated instead as an opt-in value "
-                         "for flat/cel-art content with large uniform white "
-                         "areas: try 2.0 for that case specifically (confirmed "
-                         "on a Donald Duck test image: cut the white belly's "
-                         "frame-to-frame swing by ~9%% and fixed a couple of "
-                         "stray wrong-hue rows there as a side effect, at low "
-                         "RMS cost on that image). Don't enable this for "
+                         "solve_colour_sequence()'s temporal_ref docs). Exists "
+                         "because white/near-white regions have the largest "
+                         "frame-to-frame colour swing of any region -- pure "
+                         "luminance with no hue to mask it reads as visibly "
+                         "flickerier on real hardware than a similar-sized swing "
+                         "in a coloured area (human vision is far more sensitive "
+                         "to luminance flicker than chrominance flicker at a "
+                         "given rate). Default 0 (off): costs real accuracy on "
+                         "photographic content, where hair/highlight greys "
+                         "genuinely need frame 1 to differ from frame 0, not just "
+                         "look stable. Useful as an opt-in value for flat/cel-art "
+                         "content with large uniform white areas: try 2.0 for "
+                         "that case specifically. Don't enable this for "
                          "photographic/gradient source material.")
     ap.add_argument("--roll-scanlines", action="store_true",
                     help="only meaningful with --frames > 1. Post-process the N solved "
@@ -1962,17 +1858,15 @@ def main():
                          "Mathematically inert on the perceived time-averaged image (a pure "
                          "reordering -- see roll_scanlines()) but spreads frame-to-frame "
                          "change across bands instead of hitting the whole screen at the "
-                         "same instant. IMPORTANT, found the hard way: rolling at 1-row "
-                         "granularity (the first version of this flag) broke colours almost "
-                         "everywhere, because this tool's vertical colour blend has a real "
-                         "radius (default 3) -- a row's solved colour is only correct next "
-                         "to ITS OWN solved neighbours, and 1-row rolling puts nearly every "
-                         "row next to a different frame's neighbours instead. --roll-band-height "
-                         "controls the size of the safe interior each band gets; see its help "
-                         "for the measured trade-off. Doesn't change the magnitude reported by "
-                         "any RMS/jump metric this tool prints -- only spatial correlation, "
-                         "which a scalar number can't show. Judge the actual result by eye on "
-                         "real hardware.")
+                         "same instant. Rolling at 1-row granularity would break colours "
+                         "almost everywhere, because this tool's vertical colour blend has a "
+                         "real radius (default 3) -- a row's solved colour is only correct "
+                         "next to ITS OWN solved neighbours -- so rolling always happens in "
+                         "bands. --roll-band-height controls the size of the safe interior "
+                         "each band gets; see its help for the measured trade-off. Doesn't "
+                         "change the magnitude reported by any RMS/jump metric this tool "
+                         "prints -- only spatial correlation, which a scalar number can't "
+                         "show. Judge the actual result by eye on real hardware.")
     ap.add_argument("--roll-band-height", type=int, default=None,
                     help="only meaningful with --roll-scanlines. Number of consecutive rows "
                          "that roll together as one unit (default: chosen from --radius, "
@@ -1983,21 +1877,19 @@ def main():
                          "band_height means more, smaller bands (finer decorrelation) but more "
                          "boundary rows paying that cost; larger means fewer, bigger bands "
                          "(coarser decorrelation, closer to no rolling at all) but a cleaner "
-                         "picture. Measured at height=128, radius=3: band_height=1 -> 100%% of "
-                         "rows affected (this is what broke colours before), 7 -> 84%%, "
-                         "14 -> 41%%, 32 -> 14%%, 64 -> 5%%. This tool prints the real count "
-                         "for your actual --height/--radius/--roll-band-height when the flag "
-                         "is used -- don't guess, read that number before trusting the result.")
+                         "picture. This tool prints the real affected-row count for your "
+                         "actual --height/--radius/--roll-band-height when the flag is used -- "
+                         "don't guess, read that number before trusting the result.")
     ap.add_argument("--saturation", type=float, default=1.0,
                     help="saturation multiplier applied to the source image before resizing "
-                         "(default 1.0 = unchanged; >1 boosts, <1 mutes). Real-hardware testing "
-                         "showed the reconstructed image reads as washed out/desaturated even at "
-                         "--frames 1 (i.e. it's not a multi-frame temporal-averaging artifact -- "
-                         "it's structural to fitting a photo through a 128-colour palette plus "
-                         "binary on/off plus vertical blend against black neighbours, which "
-                         "systematically pulls saturation down). Rather than compensate on the "
-                         "display, push the input the other way before the optimiser sees it. "
-                         "Start around 1.3-1.6 and compare against your actual hardware.")
+                         "(default 1.0 = unchanged; >1 boosts, <1 mutes). The reconstructed "
+                         "image reads as washed out/desaturated even at --frames 1 (i.e. it's "
+                         "not a multi-frame temporal-averaging artifact -- it's structural to "
+                         "fitting a photo through a 128-colour palette plus binary on/off plus "
+                         "vertical blend against black neighbours, which systematically pulls "
+                         "saturation down). Rather than compensate on the display, push the "
+                         "input the other way before the optimiser sees it. Start around "
+                         "1.3-1.6 and compare against your actual hardware.")
     ap.add_argument("--brightness", type=float, default=1.0,
                     help="brightness multiplier applied to the source image before resizing "
                          "(default 1.0 = unchanged), same rationale as --saturation.")
@@ -2015,7 +1907,6 @@ def main():
     HEIGHT = args.height
     BYTES_PER_ROW = (WIDTH + 7) // 8
     WIDTH_STRETCH = 4 * (40 / WIDTH)
-
     prefix = args.output_prefix
     if prefix is None:
         base = args.image.rsplit("/", 1)[-1].rsplit(".", 1)[0]
@@ -2042,7 +1933,8 @@ def main():
                         metric=args.metric, seeds=args.seeds, smoothness=smoothness_value,
                         swaps=args.swaps, saturation=args.saturation, brightness=args.brightness,
                         frames=args.frames, temporal_weight=args.temporal_weight,
-                        frame_scheme=args.frame_scheme)
+                        frame_scheme=args.frame_scheme, frame_mode=args.frame_mode,
+                        outer_rounds=args.outer_rounds if args.frames > 1 else None)
 
     if args.frames == 1:
         color_idx, on, blended, rmse, werror = solve_best_of(target, **solve_kwargs)
@@ -2066,11 +1958,18 @@ def main():
         print(f"Final RMS colour error (unweighted RGB, 0-255 scale): {rmse:.2f}")
         print(f"Final weighted ({args.metric}) SSE: {werror:.1f}")
     else:
-        if args.frame_scheme == "joint":
-            if args.frames != 3:
-                ap.error("--frame-scheme joint currently only supports --frames 3 "
-                         "(frame count is fixed project-wide anyway); pass "
-                         "--frame-scheme cumulative to use another frame count")
+        if args.frame_scheme == "joint" and args.frames != 3:
+            ap.error("--frame-scheme joint currently only supports --frames 3 "
+                     "(frame count is fixed project-wide anyway); pass "
+                     "--frame-scheme cumulative to use another frame count")
+
+        if args.frame_mode == "cyclic":
+            result = solve_n_frame_cyclic(target, n_frames=args.frames,
+                                           outer_rounds=args.outer_rounds,
+                                           terse=args.terse,
+                                           frame_scheme=args.frame_scheme,
+                                           **solve_kwargs)
+        elif args.frame_scheme == "joint":
             result = solve_n_frame_joint(target, n_frames=args.frames, **solve_kwargs)
         else:
             result = solve_n_frame(target, n_frames=args.frames, **solve_kwargs)
@@ -2116,9 +2015,21 @@ def main():
                 note = ""  # joint scheme: every frame is a real, directly-computed frame
             print(f"Wrote {raw_path}  (raw unblended TIA pixels, frame {i}){note}")
 
-        if result["rmse_first"] is not None:
+        if result.get("rmse_first") is not None:
             print(f"1-frame RMS would have been: {result['rmse_first']:.2f}")
-        print(f"{args.frames}-frame alternating RMS (unweighted RGB, 0-255 scale): {result['final_rmse']:.2f}")
+        rms_label = "cyclic" if args.frame_mode == "cyclic" else "alternating"
+        print(f"{args.frames}-frame {rms_label} RMS (unweighted RGB, 0-255 scale): {result['final_rmse']:.2f}")
+
+        # Computed post-roll on/off aside: rolling is a pure reordering that
+        # leaves per-pixel change magnitude the same (every row still
+        # switches to a different original frame's data every video frame
+        # either way) -- what changes is spatial correlation, which this
+        # scalar metric can't show either way, so it's fine to compute
+        # after the (optional) roll step above.
+        jump = compute_frame_jump(color_idxs, ons, HEIGHT, WIDTH)
+        print(f"Mean frame-to-frame raw-pixel RMS jump: {jump:.2f}  (flicker-magnitude "
+              f"metric -- compare to the RMS above; if it's much bigger, most of what's "
+              f"happening is high-contrast strobing, not gentle blending)")
 
 
 if __name__ == "__main__":

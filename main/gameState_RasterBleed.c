@@ -56,6 +56,7 @@ void initGameState_RasterBleed() {
     frame = 0;
 
     myMemsetInt((unsigned int *)(RAM + _BUF_RASTER_BLEED_COLUPF), 0, _BUFFER_SIZE);
+    myMemsetInt((unsigned int *)(RAM + _BUF_RASTER_BLEED_GRP), 0, 6 * _BUFFER_SIZE / 4);
     // drawString(FONT_COMPACT, 0x16, 10, _BUF_RASTER_BLEED_GRP, _BUF_RASTER_BLEED_COLUP0, "=_RasterBleed_", 10);
 }
 
@@ -71,6 +72,7 @@ void VB_RasterBleed() {
         if (++cycleImage >= MAX_RASTERBLEED_FRAME)
             cycleImage = 0;
     }
+
 
     static int y = (_SCANLINES - 128) >> 1;    //_SCANLINES - 30;
     rasterBleed(cycleImage, y);

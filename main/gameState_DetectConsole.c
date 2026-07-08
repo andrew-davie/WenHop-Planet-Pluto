@@ -95,8 +95,8 @@ void VB_DetectConsole() {
         armCycles = (armCycles * (64 * 0x10000 / 76)) >> 16;        // cycles/INTIM
 
         //        // setGameState(GS_GLOBE);
-        setGameState(GS_COPYRIGHT);
-        // setGameState(GS_RASTER_BLEED);
+        // setGameState(GS_COPYRIGHT);
+        setGameState(GS_RASTER_BLEED);
         // setGameState(GS_SKULL);
     }
     }
