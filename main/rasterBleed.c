@@ -15,21 +15,24 @@ typedef struct {
     int count;
 } ScanFrame;
 
-const ScanFrame frame_set[] = {
-    [PARROT_FRAME] = {parrot_screen_frames, PARROT_NUM_FRAMES},    //
-    //    [SKULL_FRAME] = {skull_screen_frames, SKULL_NUM_FRAMES},    //
+const ScanFrame frame_set[MAX_RASTERBLEED_FRAME] = {
+    // [LENA_FRAME] = {lena_screen_frames, LENA_NUM_FRAMES},    //
+    [PIRATE_FRAME] = {pirate_screen_frames, PIRATE_NUM_FRAMES},    //
+
+    // [PARROT_FRAME] = {parrot_screen_frames, PARROT_NUM_FRAMES},    //
+    [SKULL_FRAME] = {skull_screen_frames, SKULL_NUM_FRAMES},    //
     //[ZPH_FRAME] = {zph_screen_frames, ZPH_NUM_FRAMES},          //
     //[SAM_FRAME] = {sam_screen_frames, SAM_NUM_FRAMES},          //
     //[DH_FRAME] = {dh_screen_frames, DH_NUM_FRAMES},                      //
     //[TOYSTORY_FRAME] = {toystory_screen_frames, TOYSTORY_NUM_FRAMES},    //
 };
 
-static_assert(sizeof(frame_set) / sizeof(frame_set[0]) == MAX_RASTERBLEED_FRAME, "frame_set/enum mismatch");
+// static_assert(sizeof(frame_set) / sizeof(frame_set[0]) == MAX_RASTERBLEED_FRAME, "frame_set/enum mismatch");
 
 
 void rasterBleed(int image, int y) {
 
-    if (image < 0 || image >= MAX_RASTERBLEED_FRAME    //
+    if (image < 0 || image >= MAX_RASTERBLEED_FRAME || frame_set[image].count == 0    //
         || y < -127 || y >= _SCANLINES)
         return;
 

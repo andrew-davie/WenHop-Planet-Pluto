@@ -141,6 +141,7 @@ SRCS = \
  ../tools/skull.c \
  ../tools/zph.c \
  ../tools/parrot.c \
+ ../tools/pirate.c \
 
 
 

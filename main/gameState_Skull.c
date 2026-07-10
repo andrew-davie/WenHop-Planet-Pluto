@@ -665,7 +665,8 @@ void VB_Skull() {
     //     drawNextChar();
 
     if (!(inpt4 & 0x80))    // > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
-        setGameState(GS_COPYRIGHT);
+        setGameState(GS_GAME);
+    // setGameState(GS_COPYRIGHT);
 }
 
 

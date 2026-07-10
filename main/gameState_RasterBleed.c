@@ -69,13 +69,13 @@ void VB_RasterBleed() {
 
     static int cycleImage = 0;
     if (!(frame & 127)) {
-        if (++cycleImage >= MAX_RASTERBLEED_FRAME)
+        while (++cycleImage >= MAX_RASTERBLEED_FRAME)
             cycleImage = 0;
     }
 
 
     static int y = (_SCANLINES - 128) >> 1;    //_SCANLINES - 30;
-    rasterBleed(cycleImage, y);
+    rasterBleed(PIRATE_FRAME, y);
 
 
     if (luminance == lumTarget)

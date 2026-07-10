@@ -134,11 +134,12 @@ void VB_Copyright() {
         //     *l++ = *r++ = *c++ = *spc++ = 0;
         // }
 
-
-        drawString(FONT_LARGE, 0, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=DR.BOO'S", 66);
+        drawString(FONT_LARGE, 0xC2, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=Grumpy", 66);
         while (drawNextChar())
             ;
-        drawString(FONT_LARGE, 0, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=PYJAMAS", 88);
+
+
+        drawString(FONT_LARGE, 0x14, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=Wizard", 82);
         while (drawNextChar())
             ;
 
@@ -153,7 +154,7 @@ void VB_Copyright() {
                 presentsColour += FADE_SPEED;
 
 
-            drawString(FONT_COMPACT, 0x16, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=   presents   ", 115);
+            drawString(FONT_COMPACT, 0x14, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=PRODUCT", 95);
             while (drawNextChar())
                 ;
 
@@ -183,7 +184,7 @@ void VB_Copyright() {
 
         // setGameState(GS_GAME);
         // setGameState(GS_COUCH_COMPLIANT);
-        setGameState(GS_RASTER_BLEED);
+        // setGameState(GS_RASTER_BLEED);
 
         RAM[_SK_RESET] = 0;    // superfluous when singleton
     }

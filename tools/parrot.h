@@ -15,30 +15,16 @@
  * tool generates. The 3 individual frame arrays are file-local
  * (static) -- the only thing this translation unit exports is
  * parrot_screen_frames, a table of 3 pointers in cycle order. Index it
- * by a running frame counter (mod PARROT_NUM_FRAMES) exactly as usual --
- * the display-side code does not change at all versus the unrolled
- * scheme.
- *
- * IMPORTANT: --roll-scanlines was used (band height 16), so
- * these 3 arrays are NOT the raw per-frame solves -- they are
- * already-rolled composites. Array k's row y holds original solved frame
- * (k + y // 16) % 3's row y data: every
- * 16-row BAND of the screen is staggered to a different
- * original frame, instead of the whole screen flipping between frames in
- * lockstep. Over one full 3-frame cycle every row still visits
- * all 3 original frames' data once each (same 1/3-weighted
- * temporal average as always -- this is a pure reordering, not a
- * re-solve), so the perceived static image is unchanged; what's
- * different is that frame-to-frame change is spread across bands instead
- * of hitting the whole screen at the same instant. Rows within a band's
- * interior have a fully self-consistent vertical-blend neighbourhood
- * (matching what the solver assumed); rows near a band boundary
- * straddle two original frames' data and will show a locally-wrong
- * blend there -- that's an unavoidable, quantified cost of this
- * technique, not a bug. See roll_scanlines() in atari_scanline_blend.py
- * for the full rationale and roll_seam_row_count() to quantify the
- * boundary cost for your own --height/--radius/--roll-band-height
- * combination.
+ * by a running frame counter (mod PARROT_NUM_FRAMES): cycle frame 0, 1,
+ * ..., 2, back to 0, forever. Only frame0 was solved to look
+ * reasonable on its own; every later frame was solved to correct whatever
+ * residual error the frames before it left behind, so that the
+ * 1/3-weighted temporal average the eye perceives from the full
+ * cycle (combined with the usual vertical scanline blending within each
+ * individual frame) lands closer to the source image than fewer frames
+ * could manage. Do not display any frame after frame0 on its own
+ * expecting it to look like the picture -- it won't; each is a
+ * correction term, not a picture in its own right.
  */
 
 #define PARROT_NUM_FRAMES 3
@@ -57,7 +43,7 @@ typedef struct {
 
 #endif /* ATARI_SCANLINE_TYPE_H */
 
-#define PARROT_PARAMS "image=parrot.jpg width=48 height=128 sigma=1.0 radius=1 rounds=10 sweeps=3 metric=luma seeds=5 smoothness=0.5 swaps=False saturation=1.0 brightness=1.0 frames=3 temporal_weight=0.0 frame_scheme=cumulative frame_mode=cyclic outer_rounds=10 roll_scanlines=True roll_band_height=16"
+#define PARROT_PARAMS "image=parrot.jpg width=48 height=128 sigma=1.0 radius=3 rounds=10 sweeps=3 metric=luma seeds=4 smoothness=0.5 swaps=False saturation=1.0 brightness=1.0 frames=3 temporal_weight=0.0 frame_scheme=cumulative frame_mode=cyclic outer_rounds=10 line_exhaustive_k=None line_exhaustive_dither=None line_exhaustive_max_luma_spread=None line_exhaustive_flicker_weight=None line_exhaustive_spatial_dither=None roll_scanlines=False roll_band_height=None"
 
 /* e.g. parrot_screen_frames[frame_counter % PARROT_NUM_FRAMES] */
 extern const ScanLine * const parrot_screen_frames[PARROT_NUM_FRAMES];

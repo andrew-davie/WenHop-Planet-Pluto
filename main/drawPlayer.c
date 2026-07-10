@@ -120,7 +120,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
 
         const unsigned char *spr = spriteShape[*playerAnimation];
-        if (!*spr)
+        if (!spr)
             return;    // shape not defined
 
         int shapeHeight = *spr++;

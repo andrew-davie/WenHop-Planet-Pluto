@@ -43,7 +43,7 @@ typedef struct {
 
 #endif /* ATARI_SCANLINE_TYPE_H */
 
-#define SKULL_PARAMS "image=skull.png width=48 height=128 sigma=1.0 radius=3 rounds=10 sweeps=3 metric=luma seeds=3 smoothness=0.5 swaps=False saturation=1.0 brightness=1.0 frames=3 temporal_weight=0.0 frame_scheme=cumulative frame_mode=cyclic outer_rounds=8 roll_scanlines=False roll_band_height=None"
+#define SKULL_PARAMS "image=skull.png width=48 height=128 sigma=1.0 radius=3 rounds=10 sweeps=3 metric=luma seeds=4 smoothness=0.5 swaps=False saturation=1.0 brightness=1.0 frames=3 temporal_weight=0.0 frame_scheme=cumulative frame_mode=cyclic outer_rounds=10 line_exhaustive_k=None line_exhaustive_dither=None line_exhaustive_max_luma_spread=None line_exhaustive_flicker_weight=None line_exhaustive_spatial_dither=None roll_scanlines=False roll_band_height=None"
 
 /* e.g. skull_screen_frames[frame_counter % SKULL_NUM_FRAMES] */
 extern const ScanLine * const skull_screen_frames[SKULL_NUM_FRAMES];

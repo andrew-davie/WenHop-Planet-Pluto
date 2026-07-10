@@ -14,6 +14,7 @@
 #include "../tools/lena.h"
 #include "../tools/obama.h"
 #include "../tools/parrot.h"
+#include "../tools/pirate.h"
 #include "../tools/playboy.h"
 #include "../tools/sam.h"
 #include "../tools/skull.h"
@@ -31,12 +32,14 @@
 
 
 enum {
+    LENA_FRAME,
     PARROT_FRAME,
-    // SKULL_FRAME,
-    // ZPH_FRAME,
-    // SAM_FRAME,
-    // DH_FRAME,
-    // TOYSTORY_FRAME,
+    SKULL_FRAME,
+    ZPH_FRAME,
+    SAM_FRAME,
+    DH_FRAME,
+    TOYSTORY_FRAME,
+    PIRATE_FRAME,
 
     MAX_RASTERBLEED_FRAME,
 };
