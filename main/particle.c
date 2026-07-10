@@ -145,8 +145,8 @@ unsigned char turn_toward(unsigned char current, unsigned char target, unsigned 
 
 void drawMace() {
 
-    if (T1TC > availableIdleTime - 3000)
-        return;
+    // if (T1TC > availableIdleTime - 3000)
+    //     return;
 
     if (playerDead || !(weapon & WEAPON_MACE))
         return;
@@ -272,8 +272,8 @@ unsigned char *getBoardAddress(int x, int y) {
 
 void drawGun() {
 
-    if (T1TC > availableIdleTime - 3000)
-        return;
+    // if (T1TC > availableIdleTime - 3000)
+    //     return;
 
 
     for (int i = 0; i < TOOL_MAX; i++)
@@ -414,8 +414,8 @@ void drawParticles() {
 
     for (int i = 0; i < PARTICLE_COUNT; i++) {
 
-        if (T1TC > availableIdleTime - 500)
-            return;
+        // if (T1TC > availableIdleTime - 500)
+        //     return;
 
         if (particle[i].age) {
 

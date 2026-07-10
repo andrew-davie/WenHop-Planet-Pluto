@@ -44,12 +44,20 @@ const enum FaceDirectionX faceDirectionDef[] = {
     FACE_LEFT,
 };
 
-const signed char animDeltaX[] = {
+const signed int animDeltaX[] = {
     0,
-    -CHAR_TRIX_X * 6,
+    -CHAR_X * 0x10000 / MOVE_SPEED,
     0,
-    -CHAR_TRIX_X * 6,
+    -CHAR_X * 0x10000 / MOVE_SPEED,
 };
+
+const signed int animDeltaY[] = {
+    CHAR_Y * 0x10000 / MOVE_SPEED,     //
+    0,                                 //
+    -CHAR_Y * 0x10000 / MOVE_SPEED,    //
+    0                                  //
+};
+
 
 const unsigned char mineAnimation[] = {
     ID_MineUp,
@@ -337,10 +345,10 @@ bool checkHighPriorityMove(int dir) {
 
                 if (!autoMoveFrameCount) {
 
-                    autoMoveFrameCount = ((gameSpeed) << playerSlow);
+                    autoMoveFrameCount = ((MOVE_SPEED) << playerSlow);
 
                     autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
-                    autoMoveY = autoMoveDeltaY = -(ydir[dir] * (CHAR_TRIX_Y * 4)) >> playerSlow;
+                    autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
                 }
 
                 handled = true;
@@ -456,10 +464,10 @@ bool checkHighPriorityMove(int dir) {
             //     // *me = FLAG(CH_DUST_ROCK_0);
             //     *me = FLAG(CH_BLANK);
 
-            playerSlow = 1;
+            playerSlow = 0;
             if (!autoMoveFrameCount && ((Attribute[destType] & (ATT_DIRT | ATT_WATERFLOW)) || destType == TYPE_LAVA)) {
 
-                playerSlow = 1;    // tmp ((Attribute[destType] & ATT_WATERFLOW)) ? 2 : 1;
+                // playerSlow = 1;    // tmp ((Attribute[destType] & ATT_WATERFLOW)) ? 2 : 1;
 
                 ADDAUDIO(SFX_DIRT);
                 // dirtFlag = true;
@@ -475,10 +483,10 @@ bool checkHighPriorityMove(int dir) {
 
             if (!autoMoveFrameCount) {
 
-                autoMoveFrameCount = ((gameSpeed) << playerSlow);
+                autoMoveFrameCount = (MOVE_SPEED << playerSlow);
 
                 autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
-                autoMoveY = autoMoveDeltaY = -(ydir[dir] * (CHAR_TRIX_Y * 4)) >> playerSlow;
+                autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
             }
 
             handled = true;
@@ -596,7 +604,7 @@ bool checkLowPriorityMove(int dir) {
 
             // fixSurroundingConglomerates(meOffset);
 
-            waitForNothing = 6;
+            waitForNothing = 1;
             startPlayerAnimation(ID_Stand);
 
             pushCounter = 0;
@@ -671,11 +679,11 @@ void movePlayer(unsigned char *me) {
         // tapDelay = 0;
     }
 
-    if (waitForNothing) {
-        --waitForNothing;
-        usableSWCHA = 0xFF;
-        return;
-    }
+    // if (waitForNothing) {
+    //     --waitForNothing;
+    //     usableSWCHA = 0xFF;
+    //     return;
+    // }
 
     if (autoMoveFrameCount)
         return;

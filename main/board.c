@@ -18,6 +18,7 @@
 #include "player.h"
 #include "random.h"
 #include "schedule.h"
+#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 #include "wyrm.h"
@@ -203,12 +204,6 @@ void setupBoardScanner() {
 
         setSchedule(SCHEDULE_PROCESS_BOARD);
 
-        // if (theCave->flags & CAVEDEF_ROCK_GENERATE) {
-        //     unsigned char *const generator = RAM + _BOARD + 40 + 19;
-        //     if (Attribute[CharToType[GET(*generator)]] & ATT_BLANK)
-        //         *generator = CH_ROCK_FALLING;
-        // }
-
         processBoardSquares();
     }
 }
@@ -218,7 +213,6 @@ void processBoardSquares() {
 
 
     while (T1TC < availableIdleTime) {
-
 
         me = RAM + _BOARD + boardRow * _1ROW + boardCol;
 

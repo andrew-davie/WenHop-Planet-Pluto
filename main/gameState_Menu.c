@@ -207,10 +207,10 @@ void VB_Menu() {
     if (!drawNextChar()) {
     }
 
-    if (frame > 200)
+    if (frame > 20)
         lumTarget = -15;
-    if (frame > 250)
-        setGameState(GS_GLOBE);
+    if (frame > 50)
+        setGameState(GS_GAME);    // GS_GLOBE);
 }
 
 

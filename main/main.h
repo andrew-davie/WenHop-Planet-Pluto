@@ -22,6 +22,7 @@
 #define CHAR_CENTER_X (CHAR_TRIX_X >> 1)
 #define CHAR_CENTER_Y (CHAR_TRIX_Y >> 1)
 
+#define CHAR_X (4 * CHAR_TRIX_X)
 #define CHAR_Y (3 * CHAR_TRIX_Y)
 
 #define BOARD_TRIX_X (_BOARD_COLS * CHAR_TRIX_X)
@@ -49,7 +50,8 @@
 #define ATTRIBUTE(x) (Attribute[TYPEOF(x)])
 #define ATTRIBUTE_BIT(x, y) (ATTRIBUTE(x) & (y))
 
-#define SPEED_BASE 8
+#define SPEED_BASE 5
+#define MOVE_SPEED 15
 
 #define FLAG_THISFRAME 0x80
 

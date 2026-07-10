@@ -651,12 +651,12 @@ const unsigned char caveA2[] = {
 
     0, STEEL, CH_DIRT,
 
-    5,
+    2,
     CH_BLANK, 100, 10, 5, 0, 20,
     CH_GEODOGE, 50, 10, 5, 0, 20,
-    CH_PUSH_RIGHT, 0, 10, 5, 0, 20,
-    CH_PUSH_UP, 0, 10, 5, 0, 20,
-    CH_PUSH_DOWN, 0, 10, 5, 0, 20,
+    // CH_PUSH_RIGHT, 0, 10, 5, 0, 20,
+    // CH_PUSH_UP, 0, 10, 5, 0, 20,
+    // CH_PUSH_DOWN, 0, 10, 5, 0, 20,
 //    CH_WYRM_HEAD_U, 50,20,30,40,50,
 
     //   CH_BLANK,       60, 255,   0, 255,  10,
@@ -1160,9 +1160,9 @@ const struct caveHandler caveList[] = {
     // {caveTest, none},
 
     {caveUseWall, none},    //
-    {caveA4, none},         //
-    {caveA, none},          //
     {caveA2, none},         //
+    {caveA4, none},         //
+    // {caveA, none},          //
 
     {caveWyrms, empty},         //
     {starsAndStripes, spec},    //

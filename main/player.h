@@ -41,8 +41,6 @@ extern const signed char *playerAnimation;
 extern const signed char *playerAnimationLoop;
 extern unsigned int playerAnimationCount;
 
-extern const unsigned short reciprocal[];
-
 void processAnimationCommand();
 void updatePlayerAnimation();
 void startPlayerAnimation(enum AnimationIdent animID);

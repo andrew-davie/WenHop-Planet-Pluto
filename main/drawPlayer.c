@@ -57,10 +57,15 @@ void initSprites() {
         0x44,    // 15 BDY2
     };
 
+    int oldlum = luminance;
+    luminance = 0;
+
     for (int i = 0; i < 16; i++) {
         playerBaseColour[i] = dynamicPlayerColours[i] = convertColour(playerColour[i]) + rcol;
         postProcessPlayerColours[i] = dynamicPlayerColours[i] & 0xF0;
     }
+
+    luminance = oldlum;
 }
 
 const unsigned char cx[][4] = {

@@ -290,6 +290,7 @@ void (*const runFunc[])() = {
     runARM_Overscan,         // _RUNARM_OS_VBLANK
 };
 
+
 int main() {    // <-- 6507/ARM interfaced here!
 
     (*runFunc[RAM[_RUN_FUNC]])();
@@ -370,14 +371,13 @@ void (*const verticalBlank[GS_MAX])() = {
 
 void runARM_VerticalBlank() {
 
-    availableIdleTime = 20000;    // tmp RAM[_INTIM] * armCycles;
+    actualScore = RAM[_INTIM] * armCycles;
+    availableIdleTime = 75000;    // tmp RAM[_INTIM] * armCycles;
 
-    if (gameState == nextGameState) {
+    if (gameState == nextGameState)
         (*verticalBlank[gameState])();
-    }
 
-    // common to ALL VBs...
-    // insert code here
+    // common to ALL VB...
 }
 
 // -----------------------------------------------------------------------------
@@ -415,7 +415,8 @@ int intim;
 
 void runARM_Overscan() {
 
-    availableIdleTime = 10000;    // RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
+
+    availableIdleTime = 75000;    // RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
 
     if (gameState != nextGameState) {
 
@@ -431,7 +432,7 @@ void runARM_Overscan() {
     (*overscan[gameState])();
 
 
-    // common to ALL OS routines...
+    // common to ALL OS...
 
     playAudio();
 
@@ -452,18 +453,10 @@ void runARM_Overscan() {
 
 // Controller Handler - converts raw input to debounced pulsed wait and repeat
 // timings
+
 void HandleControls() {
 
     unsigned short SWCH_input = (unsigned short)RAM[_SWCHA];
-
-    // if ((RAM[_INPT4] & 0b10000000))
-    // 	SWCH_input |= 0x0100;
-    // if ((RAM[_INPT5] & 0b10000000))
-    // 	SWCH_input |= 0x0200;
-    // if ((RAM[_SWCHB] & 0b00000001))
-    // 	SWCH_input |= 0x0400;
-    // if ((RAM[_SWCHB] & 0b00000010))
-    // 	SWCH_input |= 0x0800;
 
     SWCH_input |= ((RAM[_INPT4] >> 7) & 1) << 8      //
                   | ((RAM[_INPT5] >> 7) & 1) << 9    //

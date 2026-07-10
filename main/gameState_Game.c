@@ -97,7 +97,7 @@ void initGameState_Game() {
 
     myMemsetInt((unsigned int *)(RAM + _GAME_BUFFERS_START), 0, _GAME_BUFFERS_SIZE / 4);
 
-    gameSpeed = 6;
+    gameSpeed = SPEED_BASE;
     gameFrame = gameSpeed;    // force rollover
     gameTick = 0;
 
@@ -131,14 +131,6 @@ void VB_Game() {
     T1TC = 0;
     T1TCR = 1;
 
-
-    // if (!rangeRandom(500)) {
-    //     //        FLASH(0x94,4);
-
-    //     loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
-    //     loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
-    // }
-
     initDataStreams_Game();
 
     gameFrame++;
@@ -168,28 +160,24 @@ void VB_Game() {
         shakeX = shakeY = 0;
 #endif
 
-    // extern int actualScore;
-    // actualScore = RAM[_SWCHB];
-
-    //    if (frame > 20000)
     if (RAM[_SWCHB] != 0x3F)
-        setGameState(GS_SKULL);    // GS_COUCH_COMPLIANT);
+        setGameState(GS_MENU);    // SKULL);    // GS_COUCH_COMPLIANT);
 
     processCharAnimations();
     setPalette(_BUF_GAME_COLUBK);
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
+        drawScore();
         drawPlayerSprite();
 
         drawMace();
         drawRope();
         drawGun();
-
         drawParticles();
     }
 
-    scheduledTasks();
+    scheduledTasks();    // gets the MOST time
 }
 
 void OS_Game() {
@@ -209,17 +197,14 @@ void OS_Game() {
     updatePlayerAnimation();
     scroll();
 
-    if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
-
+    if (gameSchedule != SCHEDULE_UNPACK_CAVE)
         drawScreen();
-        drawScore();
-        drawPlayerSprite();
-    }
 
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;
 
-    scheduledTasks();
+
+    scheduledTasks();    // gets the LEAST time because of drawScreen (~78K already used)
 }
 
 // EOF
