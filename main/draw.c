@@ -2,10 +2,18 @@
 
 #include "defines_dasm.h"
 
+#include "animations.h"
+#include "attribute.h"
 #include "bitPatterns.h"
 #include "cdfjplus.h"    // <- contains references from defines_dasm.h
+#include "characterset.h"
 #include "colour.h"
 #include "draw.h"
+#include "drawScreen.h"
+#include "mellon.h"
+#include "player.h"
+#include "reverseBits.h"
+#include "scroll.h"
 #include "sound.h"
 
 #include "../gfx/alphanumeric.h"
@@ -430,6 +438,250 @@ bool drawNextChar() {
     }
 
     return ps && *ps;
+}
+
+
+// const unsigned char _CHAR_WYRM_2[CHAR_Y] = {
+
+//     0b01111, 0b00000, 0b01111,  // 00 |◼️🟪🟪🟪🟪|
+//     0b01111, 0b00000, 0b01111,  // 01 |◼️🟪🟪🟪🟪|
+//     0b01111, 0b00000, 0b01111,  // 02 |◼️🟪🟪🟪🟪|
+//     0b01111, 0b00100, 0b01111,  // 03 |◼️🟪⬜️🟪🟪|
+//     0b00001, 0b01110, 0b01111,  // 04 |◼️🟥🟥🟥🟪|
+//     0b01011, 0b00100, 0b01111,  // 05 |◼️🟪🟥🟪🟪|
+//     0b01111, 0b00100, 0b01111,  // 06 |◼️🟪⬜️🟪🟪|
+//     0b01111, 0b00000, 0b01111,  // 07 |◼️🟪🟪🟪🟪|
+//     0b01111, 0b00000, 0b01111,  // 08 |◼️🟪🟪🟪🟪|
+//     0b01111, 0b00000, 0b01111,  // 09 |◼️🟪🟪🟪🟪|
+// };
+
+/*
+
+
+void doDrawBitmap(const unsigned char *shape, int x, int y) {
+
+    unsigned char *pf_FL = RAM + _BUF_SKULL_PF + y;
+    unsigned char *pf_CL = pf_FL + _SCANLINES;
+    unsigned char *pf_CR = pf_CL + _SCANLINES;
+    unsigned char *pf_FR = pf_CR + _SCANLINES;
+
+    int size = shape[0];
+    const unsigned char *bf = shape + 1;
+
+    int baseRoll = roller;
+
+    union g {
+        int bGraphic;
+        unsigned char g[4];
+    } gfx;
+
+    union masker {
+        int mask;
+        unsigned char mask2[4];
+    } mask;
+
+    for (int i = 0; i < size; i += 3) {
+
+        mask.mask = ((bf[0] | bf[1] | bf[2]) << x) ^ 0xFFFFFFFF;
+
+        for (int line = 0; line < 3; line++) {
+
+            gfx.bGraphic = bf[baseRoll] << x;
+
+
+            *pf_FL = (*pf_FL & mask.mask2[3]) | gfx.g[3];                              // far left
+            *pf_CL = (*pf_CL & reverseBits[mask.mask2[2]]) | reverseBits[gfx.g[2]];    // center left
+            *pf_CR = (*pf_CR & mask.mask2[1]) | gfx.g[1];                              // center right
+            *pf_FR = (*pf_FR & reverseBits[mask.mask2[0]]) | reverseBits[gfx.g[0]];    // far right
+
+            if (++baseRoll > 2)
+                baseRoll = 0;
+
+            pf_FL++;
+            pf_CL++;
+            pf_FR++;
+            pf_CR++;
+        }
+
+        bf += 3;
+    }
+}
+*/
+
+
+// void drawCharacterPart(int ch, int x, int y, unsigned char *buffer) {
+
+//     // draw to a 20-wide buffer (left or right side of screen)
+
+//     if (x >= 20 || x <= -CHAR_X)
+//         return;
+
+//     const unsigned char *shape = charSet[ch];
+
+//     for (int i = 0; i < CHAR_TRIX_Y; i++) {
+
+
+//         int lineShape = *shape << (19 - CHAR_TRIX_X - x);
+
+//         *buffer &= mask;
+//         *buffer |= ();
+
+
+//     }
+
+
+// }
+
+
+// void drawCharacter(int ch, int x, int y) {
+
+//     if (ch >= CH_MAX)
+//         return;
+
+//     unsigned char *buffer;
+
+//     buffer = (unsigned char *)(RAM +_BUF_GAME_PF0_LEFT);
+//     drawCharacterPart(ch, x, y, buffer);
+
+//     buffer = (unsigned char *)(RAM +_BUF_GAME_PF0_RIGHT);
+//     drawCharacterPart(ch, x - 20, y, buffer);
+
+// }
+
+
+void blitShape(int ch, int shift, int y, int offset) {
+
+    //            X, (also SHIFT! when we go "<<20>>shift")
+    //        |  |0   |      1 |        |  |2         3
+    //        |  |0123|45178901|23456789|  |01234517890123456789
+    //
+    // starting shape is        XXXXXXXX
+    //
+    // ending shapes....                                               X=
+    // -------+  +----+--------+--------+  +--------------------+
+    // XXXXXXX|  |X   |        |        |  |                    |*     -7 (shift <-- 19)
+    //  XXXXXX|  |XX  |        |        |  |                    |      -6 (shift <-- 18)
+    //   XXXXX|  |XXX |        |        |  |                    |      -5 (shift <-- 17)
+    //    XXXX|  |XXXX|        |        |  |                    |      -4 (shift <-- 16)
+    //     XXX|  |XXXX|X       |        |  |                    |      -3 (shift <-- 15)
+    //      XX|  |XXXX|XX      |        |  |                    |      -2 (shift <-- 14)
+    //       X|  |XXXX|XXX     |        |  |                    |      -1 (shift <-- 13)
+    //        |  |XXXX|XXXX    |        |  |                    |-----  0 (shift <-- 12)
+    //        |  | XXX|XXXXX   |        |  |                    |       1 (shift <-- 11)
+    //        |  |  XX|XXXXXX  |        |  |                    |       2 (shift <-- 10)
+    //        |  |   X|XXXXXXX |        |  |                    |       3 (shift <--  9)
+    //        |  |    |XXXXXXXX|        |  |                    |       4 (shift <--  8)
+    //        |  |    | XXXXXXX|X       |  |                    |       5 (shift <--  7)
+    //        |  |    |  XXXXXX|XX      |  |                    |       6 (shift <--  6)
+    //        |  |    |   XXXXX|XXX     |  |                    |       7 (shift <--  5)
+    //        |  |    |    XXXX|XXXX    |  |                    |       8 (shift <--  4)
+    //        |  |    |     XXX|XXXXX   |  |                    |       9 (shift <--  3)
+    //        |  |    |      XX|XXXXXX  |  |                    |      10 (shift <--  2)
+    //        |  |    |       X|XXXXXXX |  |                    |      11 (shift <--  1)
+    //        |  |    |        |XXXXXXXX|  |                    |      12 (shift <--  0)
+    //        |  |    |        | XXXXXXX|  |X                   |*     13 (shift      1 -->)
+    //        |  |    |        |  XXXXXX|  |XX                  |      14 (shift      2 -->)
+    //        |  |    |        |   XXXXX|  |XXX                 |      15 (shift      3 -->)
+    //        |  |    |        |    XXXX|  |XXXX                |      16 (shift      4 -->)
+    //        |  |    |        |     XXX|  |XXXXX               |      17 (shift      5 -->)
+    //        |  |    |        |      XX|  |XXXXXX              |      18 (shift      6 -->)
+    //        |  |    |        |       X|  |XXXXXXX             |------19 (shift      7 -->)
+    //        |  |    |        |        |  |XXXXXXXX            |      20 (shift      8 -->)
+    //        (not used)
+    // -------+  +----+--------+--------+  +--------------------+
+
+    int height = CHAR_Y;
+
+    unsigned char *p1 = RAM + offset + y;
+    unsigned char *p2 = p1 + _BUFFER_SIZE;
+    unsigned char *p3 = p2 + _BUFFER_SIZE;
+
+    int modifier = y;
+
+    //    if (y >= 0)
+    while (modifier > 2)
+        modifier -= 3;
+
+    //  else
+    while (modifier < 0)
+        modifier += 3;
+
+
+    int bitsh = 19 - shift;
+
+    const char nextRoller[] = {1, 2, 0, 1, 2, 0, 1, 2, 0};
+
+    for (int trix = 0; trix < height && y < _SCANLINES; trix += 3) {
+
+        if (y >= 0) {
+
+            const unsigned char *fp = charSet[ch];
+
+            unsigned int mask = fp[trix] | fp[trix + 1] | fp[trix + 2];
+            mask <<= bitsh;
+            mask = ~mask;
+
+            unsigned char m1 = mask >> (16 + 7);
+            m1 = reverseBits[m1];
+            unsigned char m2 = mask >> (8 + 7);
+            unsigned char m3 = mask >> 7;
+            m3 = reverseBits[m3];
+
+#define INNER(r)                                                                                                       \
+    {                                                                                                                  \
+        unsigned int shiftCh = fp[trix + nextRoller[roller + r + modifier]];                                           \
+        shiftCh <<= bitsh;                                                                                             \
+                                                                                                                       \
+        *(p1 + r) = (*(p1 + r) & m1) | reverseBits[(unsigned char)(shiftCh >> (16 + 7))];                              \
+        *(p2 + r) = (*(p2 + r) & m2) | shiftCh >> (8 + 7);                                                             \
+        *(p3 + r) = (*(p3 + r) & m3) | reverseBits[(shiftCh >> 7) & 0xFF];                                             \
+    }
+
+            INNER(0)
+            INNER(1)
+            INNER(2)
+        }
+
+        p1 += 3;
+        p2 += 3;
+        p3 += 3;
+
+        y += 3;
+    }
+}
+
+void drawAttachedChar(int ch) {
+
+    ch = GET(ch);
+    int type = CharToType[ch];
+
+    if (Animate[type])
+        ch = revectorChar[*Animate[type]];
+    else
+        ch = revectorChar[ch];
+
+    int ay = 0;
+    int autoY = autoMoveY;
+    while (autoY > 0) {
+        autoY -= 3;
+        ay++;
+    }
+
+    int y = playerY * CHAR_Y - (scrollY >> 16) * 3 + autoMoveY - 20;
+
+
+    int trixX =
+        ((playerX - 1) * CHAR_TRIX_X) + -(scrollX >> 16) + (faceDirection * (frameAdjustX + (autoMoveX >> 2))) + 2;
+
+    // y = trixY;
+
+    if (y + CHAR_Y >= 0 && y < _SCANLINES && trixX > -8 && trixX < 40) {
+        if (trixX > -8 && trixX < 20)
+            blitShape(ch, trixX, y, _BUF_GAME_PF0_LEFT);
+
+        if (trixX > 12 && trixX < 40)
+            blitShape(ch, trixX - 20, y, _BUF_GAME_PF0_RIGHT);
+    }
 }
 
 

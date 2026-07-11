@@ -1,13 +1,17 @@
 #include "animations.h"
 #include "defines_dasm.h"
 
+#include "gameState.h"
+
 #include "cdfjplus.h"
 
 #include "animations.h"
+#include "attribute.h"
 #include "board.h"
 #include "caveData.h"
 #include "colour.h"
 #include "decodeCaves.h"
+#include "draw.h"
 #include "drawPlayer.h"
 #include "drawScreen.h"
 #include "gameState.h"
@@ -25,9 +29,10 @@
 #include "swipe.h"
 #include "wyrm.h"
 
-
 extern const unsigned char trackGridLockMelodyIntro[];
 extern const unsigned char trackGridLockBase[];
+
+int attachment = 0;
 
 void initDataStreams_Game() {
 
@@ -175,6 +180,8 @@ void VB_Game() {
         drawRope();
         drawGun();
         drawParticles();
+
+        drawAttachedChar(attachment);
     }
 
     scheduledTasks();    // gets the MOST time

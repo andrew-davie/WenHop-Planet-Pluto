@@ -737,41 +737,6 @@ const unsigned char _CHAR_WATER_3[CHAR_Y] = {
 
 const unsigned char _CHAR_WATERFLOW_0[] = {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     0b10010,    // 12     1/2/3
     0b01100,    // 13
     0b11110,    // 14
@@ -1689,7 +1654,6 @@ const unsigned char _CHAR_WYRM_2[CHAR_Y] = {
 // clang-format on
 
 const unsigned char *const charSet[] = {
-
 
 
     // see ChName @ attribute.h

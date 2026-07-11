@@ -300,13 +300,13 @@ void processTypes() {
 
             ADDAUDIO(SFX_EXPLODE);
             // FLASH(0x26, 8);
-            nDots(20, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 80, 7);
+            nDots(8, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 80, 7);
             *me = FLAG(CH_DUST_0);
         }
 
-        else {
-            nDots(1, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 50, 5);
-        }
+        // else {
+        //     nDots(1, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 50, 5);
+        // }
         break;
     }
 
@@ -1358,7 +1358,7 @@ void surroundingConglomerate(int col, int row) {
         //          return;
 
         unsigned char *pos = RAM + _BOARD + row * _1ROW + col;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 4; i < 5; i++) {
 
             unsigned char *offsetPos = pos + dirOffset[i];
             if (Attribute[CharToType[GET(*offsetPos)]] & ATT_GEODOGE) {

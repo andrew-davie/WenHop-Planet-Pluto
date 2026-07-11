@@ -9,7 +9,7 @@
 #include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
-#include "drawscreen.h"
+#include "drawScreen.h"
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"
@@ -401,12 +401,25 @@ void drawRope() {
 }
 
 struct Particle particle[PARTICLE_COUNT];
+int particleStack[PARTICLE_COUNT];
+int particleStackPointer;
+
+int pushParticle(int prt) {
+    particleStack[particleStackPointer++] = prt;
+}
+
+int popParticle() {
+    return particleStackPointer ? particleStack[--particleStackPointer] : -1;
+}
 
 
 void initParticles() {
 
-    for (int i = 0; i < PARTICLE_COUNT; i++)
+    particleStackPointer = 0;
+    for (int i = 0; i < PARTICLE_COUNT; i++) {
         particle[i].age = 0;
+        pushParticle(i);
+    }
 }
 
 
@@ -460,14 +473,17 @@ void drawParticles() {
                 break;
             }
 
-            if (!drawBit(x, y, particle[i].colour))
+            if (!drawBit(x, y, particle[i].colour)) {
                 particle[i].age = 0;
+                pushParticle(i);
+            }
 
             else {
 
-                --particle[i].age;
-
-                particle[i].distance += particle[i].speed;
+                if (!--particle[i].age)
+                    pushParticle(i);
+                else
+                    particle[i].distance += particle[i].speed;
             }
         }
     }
@@ -483,24 +499,32 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
         int line = dotY - (scrollY >> 16);
         if (line >= 0 && line < (_SCANLINES / 3 - 1)) {
 
-            int oldest = 0;
-            while (++whichDrop < PARTICLE_COUNT && particle[whichDrop].age)
-                if (particle[whichDrop].age < particle[oldest].age)
-                    oldest = whichDrop;
 
-            if (whichDrop == PARTICLE_COUNT)
-                whichDrop = oldest;
+            // TODO: could add a priority here, and if we can't pop then a one-pass kill lower priority
 
-            particle[whichDrop].type = type;
-            particle[whichDrop].x = dotX << 8;
 
-            particle[whichDrop].y = dotY << 8;
-            particle[whichDrop].speed = 0;
-            particle[whichDrop].age = age;
-            particle[whichDrop].colour = colour;
+            whichDrop = popParticle();
+            if (whichDrop >= 0) {
 
-            particle[whichDrop].dir = getRandom32();    // 16.16 angle
-            particle[whichDrop].distance = 96;          // 16.16 speed
+                // int oldest = 0;
+                // while (++whichDrop < PARTICLE_COUNT && particle[whichDrop].age)
+                //     if (particle[whichDrop].age < particle[oldest].age)
+                //         oldest = whichDrop;
+
+                // if (whichDrop == PARTICLE_COUNT)
+                //     whichDrop = oldest;
+
+                particle[whichDrop].type = type;
+                particle[whichDrop].x = dotX << 8;
+
+                particle[whichDrop].y = dotY << 8;
+                particle[whichDrop].speed = 0;
+                particle[whichDrop].age = age;
+                particle[whichDrop].colour = colour;
+
+                particle[whichDrop].dir = getRandom32();    // 16.16 angle
+                particle[whichDrop].distance = 96;          // 16.16 speed
+            }
         }
     }
 

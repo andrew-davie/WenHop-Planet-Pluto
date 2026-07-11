@@ -7,6 +7,7 @@
 #include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
+#include "gameState.h"
 #include "kernels.h"
 #include "main.h"
 #include "mellon.h"
@@ -214,6 +215,39 @@ bool checkHighPriorityMove(int dir) {
         return false;
 
     getRandom32();
+
+
+    if (!waitRelease) {
+        if (!(inpt4 & 0x80)) {
+
+            if (attachment) {
+
+                unsigned char *meOffset = me + dirOffset[dir];
+                if (Attribute[CharToType[GET(*meOffset)]] & ATT_BLANK) {
+                    *meOffset = FLAG(attachment);
+
+                    nDots(3, playerX, playerY, PT_SPIRAL, 25, 3 + ((xdir[dir] * CHAR_TRIX_X) >> 1) + rangeRandom(5) - 2,
+                          4 + ((ydir[dir] * CHAR_TRIX_Y) >> 1) + rangeRandom(5) - 2, 100, 2);
+                    attachment = 0;
+                    waitRelease = true;
+                }
+            }
+
+            else {
+
+
+                unsigned char *meOffset = me + dirOffset[dir];
+                if (!attachment && !(inpt4 & 0x80)) {
+                    if (Attribute[CharToType[GET(*meOffset)]] & ATT_PICKUP) {
+
+                        attachment = *meOffset;
+                        *meOffset = FLAG(CH_BLANK);
+                        waitRelease = true;
+                    }
+                }
+            }
+        }
+    }
 
 
     if (faceDirectionDef[dir] && faceDirection != faceDirectionDef[dir]) {
@@ -558,8 +592,8 @@ bool checkLowPriorityMove(int dir) {
                 if (destType == TYPE_INSULATOR) {
 
 
-                    // nDots(PARTICLE_COUNT, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5, 40,
-                    // 2); onOff[boardCol] = false;    // disableInsulator(meOffset); return true;
+                    // nDots(PARTICLE_COUNT, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5,
+                    // 40, 2); onOff[boardCol] = false;    // disableInsulator(meOffset); return true;
                 }
 
                 else {

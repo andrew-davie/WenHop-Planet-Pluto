@@ -237,6 +237,7 @@ DEFINE_ENUM_WITH_BIT_VALUES(TypeAttributes,
     ATT(PAD),                   // 24
     ATT(CRUSHES),               // 25
     ATT(CORNER),                // 26
+    ATT(PICKUP),                // 27
 );
 
 #define POS_CORNER 26

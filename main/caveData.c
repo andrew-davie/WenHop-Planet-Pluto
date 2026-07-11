@@ -61,10 +61,10 @@ const unsigned char caveUseWall[] = {
     200, 200, 200, 200, 200,
 
     WEAPON_MACE,                    // 0
-    WEAPON_PIPE,                    // 1
-    WEAPON_PIPE,                    // 2
-    WEAPON_PIPE,                    // 3
-    WEAPON_PIPE,                    // 4
+    WEAPON_MACE,                    // 1
+    WEAPON_MACE,                    // 2
+    WEAPON_MACE,                    // 3
+    WEAPON_MACE,                    // 4
 
     CAVEDEF_LOCK_Y,CH_STEELWALL, CH_BLANK,           // flags, border, fill
 
@@ -180,7 +180,7 @@ const unsigned char caveWyrms[] = {
 
 
     CH_DOORCLOSED, 5, 4,
-    CH_MELLON_HUSK_BIRTH, 5, 5,
+    CH_MELLON_HUSK_BIRTH, 5, 7,
 
     DRAW_EOF,
 
@@ -269,9 +269,9 @@ const unsigned char caveMace[] = {
 const unsigned char caveTest[] = {
     // clang-format off
 
-    20,     // milling
+    0,     // milling
     10, 15, // doge $
-    5,      //              ,          // rain
+    0,      //              ,          // rain
 
     
     10, 11, 50, 56, 8, // randomiser[level]
@@ -286,13 +286,13 @@ const unsigned char caveTest[] = {
 
     0, STEEL, CH_DIRT,
 
-    3,
-    CH_BLANK, 60, 255, 0, 255, 10,
-    CH_PEBBLE1, 5, 0, 240, 0, 20,
-    CH_PEBBLE2, 5, 0, 240, 0, 20,
+    1,
+ CH_BLANK, 60, 255, 0, 255, 10,
+    // CH_PEBBLE1, 5, 0, 240, 0, 20,
+    // CH_PEBBLE2, 5, 0, 240, 0, 20,
 
 
-    CH_DOORCLOSED, 38, 16,
+    // CH_DOORCLOSED, 38, 16,
     CH_MELLON_HUSK_BIRTH, 20, 10,
 
     DRAW_EOF,
@@ -1154,18 +1154,18 @@ void empty() {
 const struct caveHandler caveList[] = {
 
     // cave definition, condition handler
+    // {caveTest, none},
 
     // {caveA3, none},    //
     // {caveMace, none},
-    // {caveTest, none},
-
-    {caveUseWall, none},    //
-    {caveA2, none},         //
-    {caveA4, none},         //
-    // {caveA, none},          //
-
+    {caveUseWall, none},        //
     {caveWyrms, empty},         //
     {starsAndStripes, spec},    //
+
+    {caveA2, none},    //
+    {caveA4, none},    //
+    // {caveA, none},          //
+
 
     //    caveFast,
     //    caveA5,  // bad

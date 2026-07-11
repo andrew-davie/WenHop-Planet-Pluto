@@ -20,22 +20,27 @@ const unsigned char AnimateStar[] = {
 
 const unsigned char AnimateStarExplode[] = {
 
+    CH_STAR,12,
+    CH_DOGE_04,6,
     CH_BLANK,3,
     CH_DOGE_04,3,
-    CH_STAR,3,
-    CH_DOGE_04,3,
 
+    CH_STAR,12,
+    CH_DOGE_04,6,
     CH_BLANK,3,
     CH_DOGE_04,3,
-    CH_STAR,3,
-    CH_DOGE_04,3,
-
-        CH_BLANK,3,
-    CH_DOGE_04,3,
-    CH_STAR,3,
+    CH_STAR,12,
+    CH_DOGE_04,6,
+    CH_BLANK,3,
     CH_DOGE_04,3,
 
 
+    CH_STAR,12,
+    CH_DOGE_04,6,
+    CH_BLANK,3,
+    CH_DOGE_04,3,
+    CH_STAR,12,
+    CH_DOGE_04,3,
     CH_DUST_0,0,
 };
 
