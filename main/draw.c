@@ -596,7 +596,7 @@ void blitShape(int ch, int shift, int y, int offset) {
     unsigned char *p2 = p1 + _BUFFER_SIZE;
     unsigned char *p3 = p2 + _BUFFER_SIZE;
 
-    int modifier = y;
+    int modifier = y + 1;
 
     //    if (y >= 0)
     while (modifier > 2)
@@ -606,7 +606,7 @@ void blitShape(int ch, int shift, int y, int offset) {
     while (modifier < 0)
         modifier += 3;
 
-
+    int r = 2;
     int bitsh = 19 - shift;
 
     const char nextRoller[] = {1, 2, 0, 1, 2, 0, 1, 2, 0};
@@ -667,7 +667,7 @@ void drawAttachedChar(int ch) {
         ay++;
     }
 
-    int y = playerY * CHAR_Y - (scrollY >> 16) * 3 + autoMoveY - 20;
+    int y = playerY * CHAR_Y - (scrollY >> 16) * 3 + autoMoveY - 20 + 1;
 
 
     int trixX =

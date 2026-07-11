@@ -7,6 +7,7 @@ enum ObjectType {
 
     // update Attribute[] in attribute.c
     // update AnimateBase[] in animations.c
+    // update PickupCharacter[] in animations.c
 
 
     TYPE_BLANK,                    // 00      ASSUMED == 0 in code

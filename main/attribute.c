@@ -1,5 +1,11 @@
 #include "attribute.h"
 
+
+const char BaseChar[] = {
+
+
+};
+
 const enum ObjectType CharToType[] = {
 
     // see ChName for corresponding character name/number
@@ -182,7 +188,7 @@ const unsigned int Attribute[] = {
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 04 TYPE_OUTBOX,
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 05 TYPE_STEELWALL,
     _ |PAD| _ |MLT| _ |PH1| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ |ROL|PUP , // 06 TYPE_ROCK,
-    _ |PAD| _ |MLT| _ |PH4| _ |GND|CVY| _ | _ | _ | _ | _ | _ | _ |PSH|GRB| _ | _ | _ |XPD| _ | _ |ROL| _  , // 07 TYPE_DOGE,
+    _ |PAD| _ |MLT| _ |PH4| _ |GND|CVY| _ | _ | _ | _ | _ | _ | _ |PSH|GRB| _ | _ | _ |XPD| _ | _ |ROL|PUP , // 07 TYPE_DOGE,
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 08 TYPE_MELLON_HUSK_PRE,
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ |QUI| _ | _ |SQB|PSH| _ | _ | _ | _ |XPD| _ | _ | _ | _  , // 09 TYPE_MELLON_HUSK,
    CNR|PAD| _ | _ |DIS|PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRT| _ |PER|XPD| _ | _ | _ | _  , // 10 TYPE_PEBBLE1,

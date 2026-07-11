@@ -305,6 +305,59 @@ const unsigned char *const AnimateBase[] = {
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
 
+const unsigned char PickupCharacter[] = {
+
+    0,                // 00 TYPE_BLANK
+    0,                // 01 TYPE_DIRT
+    0,                // 02 TYPE_BRICKWALL
+    0,                // 03 TYPE_OUTBOX_PRE
+    0,                // 04 TYPE_OUTBOX
+    0,                // 05 TYPE_STEELWALL
+    CH_ROCK,          // 06 TYPE_ROCK
+    CH_DOGE_00,       // 07 TYPE_DOGE
+    0,                // 08 TYPE_MELLON_HUSK_PRE
+    0,                // 09 TYPE_MELLON_HUSK
+    0,                // 10 TYPE_PEBBLE1
+    0,                // 11 TYPE_DUST_0
+    0,                // 12 TYPE_DOGE_FALLING
+    0,                // 13 TYPE_ROCK_FALLING
+    0,                // 14 TYPE_DUST_ROCK
+    0,                // 15 TYPE_CONVERT_GEODE_TO_DOGE
+    0,                // 16 TYPE_PUSHER
+    0,                // 17 TYPE_PUSHER_VERT
+    0,                // 18 TYPE_WYRM
+    CH_GEODOGE,       // 19 TYPE_GEODOGE
+    0,                // 20 TYPE_GEODOGE_FALLING
+    0,                // 21 TYPE_LAVA
+    0,                // 22 TYPE_PEBBLE_ROCK    (pebble to geodoge)
+    0,                // 23 TYPE_FLIP_GRAVITY
+    0,                // 24 TYPE_BLOCK
+    0,                // 25 TYPE_GRINDER
+    0,                // 26 TYPE_HUB
+    0,                // 27 TYPE_WATER
+    0,                // 28 TYPE_WATERFLOW0
+    0,                // 29 TYPE_WATERFLOW1
+    0,                // 30 TYPE_WATERFLOW2
+    0,                // 31 TYPE_WATERFLOW3
+    0,                // 32 TYPE_WATERFLOW4
+    0,                // 33 TYPE_TAP
+    0,                // 34 TYPE_OUTLET
+    0,                // 35 TYPE_GRINDER1
+    0,                // 36 TYPE_BELT
+    0,                // 37 TYPE_BELT1
+    0,                // 38 TYPE_CONVERT_PIPE
+    0,                // 39 TYPE_DOGE_FALLING2
+    0,                // 40 TYPE_ROCK_PEBBLE (geodoge disintegrating)
+    0,                // 41 TYPE_ELECTRIC_0
+    0,                // 42 TYPE_INSULATOR
+    CH_STAR,          // 43 TYPE_STAR
+    0,                // 44 TYPE_STAR_FALLING
+    0,                // 45 TYPE_STAR_EXPLODE
+    CH_ROCK_BONUS,    // 46 TYPE_ROCK_BONUS
+
+};
+
+_Static_assert(sizeof(PickupCharacter) / sizeof(PickupCharacter[0]) == TYPE_MAX, "PickupCharacter table wrong size");
 
 void initCharAnimations() {
 

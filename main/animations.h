@@ -7,6 +7,7 @@
 #define ANIM_JUMP 254
 
 extern const unsigned char *const AnimateBase[];
+extern const unsigned char PickupCharacter[];
 extern const unsigned char *Animate[];
 extern char AnimCount[];
 

@@ -409,23 +409,23 @@ void processTypes() {
 
     case TYPE_GEODOGE:
 
-        if ((!(theCave->flags & CAVEDEF_STAR_STATIC)) && !rangeRandom(250)) {
-            *me = FLAG(CH_ROCK_PEBBLE_1);
-            // FLASH(0x42, 10);
-            //  nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
-            nDots(10, boardCol, boardRow, PT_TWO, 10, 3, 7, 100, 7);
-        }
-
-        // else if (!rangeRandom(3)) {
-
-        //     static const int xy[] = {1, -1, _1ROW, -_1ROW};
-        //     unsigned char *d = me + xy[getRandom32() & 3];
-        //     if (GET(*d) == CH_DIRT)
-        //         *d = rangeRandom(2) + CH_PEBBLE1;
+        // if ((!(theCave->flags & CAVEDEF_STAR_STATIC)) && !rangeRandom(250)) {
+        //     *me = FLAG(CH_ROCK_PEBBLE_1);
+        //     // FLASH(0x42, 10);
+        //     //  nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
+        //     nDots(10, boardCol, boardRow, PT_TWO, 10, 3, 7, 100, 7);
         // }
 
-        else
-            processCharGeoDogeAndRock();
+        // // else if (!rangeRandom(3)) {
+
+        // //     static const int xy[] = {1, -1, _1ROW, -_1ROW};
+        // //     unsigned char *d = me + xy[getRandom32() & 3];
+        // //     if (GET(*d) == CH_DIRT)
+        // //         *d = rangeRandom(2) + CH_PEBBLE1;
+        // // }
+
+        // else
+        processCharGeoDogeAndRock();
 
         surroundingConglomerate(boardCol, boardRow);
         break;

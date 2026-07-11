@@ -230,6 +230,7 @@ bool checkHighPriorityMove(int dir) {
                           4 + ((ydir[dir] * CHAR_TRIX_Y) >> 1) + rangeRandom(5) - 2, 100, 2);
                     attachment = 0;
                     waitRelease = true;
+                    return true;
                 }
             }
 
@@ -238,11 +239,13 @@ bool checkHighPriorityMove(int dir) {
 
                 unsigned char *meOffset = me + dirOffset[dir];
                 if (!attachment && !(inpt4 & 0x80)) {
-                    if (Attribute[CharToType[GET(*meOffset)]] & ATT_PICKUP) {
+                    unsigned char pickup = PickupCharacter[CharToType[GET(*meOffset)]];
+                    if (pickup) {
 
-                        attachment = *meOffset;
-                        *meOffset = FLAG(CH_BLANK);
+                        attachment = pickup;
+                        *meOffset = FLAG(CH_DUST_0);
                         waitRelease = true;
+                        return true;
                     }
                 }
             }
