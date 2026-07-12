@@ -7,7 +7,7 @@
 #include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"
-#include "player.h"
+#include "playerAnimation.h"
 #include "scroll.h"
 
 int scrollX, scrollY;

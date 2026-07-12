@@ -20,7 +20,7 @@
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"
-#include "player.h"
+#include "playerAnimation.h"
 #include "random.h"
 #include "schedule.h"
 #include "score.h"
@@ -189,6 +189,7 @@ void VB_Game() {
         drawAttachedChar(attachment);
     }
 
+
     scheduledTasks();    // gets the MOST time
 }
 
@@ -209,8 +210,10 @@ void OS_Game() {
     updatePlayerAnimation();
     scroll();
 
+    int ss = T1TC;
     if (gameSchedule != SCHEDULE_UNPACK_CAVE)
         drawScreen(2);
+    actualScore = T1TC - ss;
 
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;

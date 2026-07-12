@@ -477,7 +477,6 @@ void OS_Globe() {
 
             else
                 infoPhase = INFO_FADE_DOWN;
-            break;
 
             // if (luminance == lumTarget) {
 

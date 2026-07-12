@@ -372,7 +372,7 @@ void (*const verticalBlank[GS_MAX])() = {
 void runARM_VerticalBlank() {
 
     actualScore = RAM[_INTIM] * armCycles;
-    availableIdleTime = 75000;    // tmp RAM[_INTIM] * armCycles;
+    availableIdleTime = RAM[_INTIM] * armCycles;    // 75000
 
     if (gameState == nextGameState)
         (*verticalBlank[gameState])();
@@ -416,7 +416,7 @@ int intim;
 void runARM_Overscan() {
 
 
-    availableIdleTime = 75000;    // RAM[_INTIM] * armCycles;    // --> 64 /76 * 4452
+    availableIdleTime = RAM[_INTIM] * armCycles;    // 75000    // --> 64 /76 * 4452
 
     if (gameState != nextGameState) {
 
@@ -546,6 +546,9 @@ void initNewGame() {
 
 void initNextLife() {
 
+    pulsePlayerColour = 0;
+}
+
 
 #if 0
 
@@ -624,10 +627,6 @@ void initNextLife() {
     setScoreCycle(SCORELINE_CAVELEVEL);
 }
 #endif
-
-
-    pulsePlayerColour = 0;
-}
 
 
 void initDataStreams(const struct dataStreams *streams, int streamCount) {

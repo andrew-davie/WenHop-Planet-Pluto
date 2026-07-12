@@ -5,7 +5,7 @@
 #include "bitpatterns.h"
 #include "mellon.h"
 #include "particle.h"
-#include "player.h"
+#include "playerAnimation.h"
 #include "sound.h"
 #include "sprites.h"
 

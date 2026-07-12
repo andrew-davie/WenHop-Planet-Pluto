@@ -268,7 +268,7 @@ int decodeExplicitData(int /*sfx*/) {
 void StoreObject(int x, int y, objectType anObject) {
 
     // guard rails (debugging) ...
-    if (x < 0 || x > _BOARD_COLS        //
+    if (x < 0 || x >= _BOARD_COLS       //
         || y < 0 || y >= _BOARD_ROWS    //
         || anObject >= CH_MAX)
         return;    // MAJOR bug but recover (?)

@@ -22,12 +22,19 @@ kernelGame
 
     ; runVectoredCode[kernel] comes here
 
-_gameLoop ; @3
+                    lda #_DS_GAME_COLUP1_DATA
+                    sta COLUP1                      ; 5 @76
+
                     lda #_DS_GAME_COLUP0_DATA
                     sta COLUP0                      ; 5
 
                     lda #_DS_GAME_COLUBK_DATA
-                    sta WSYNC                       ; 5
+
+                    sta WSYNC
+                    jmp 0
+
+
+_gameLoop ; @3
 
                     sta COLUBK                      ; 3
 
@@ -56,14 +63,21 @@ _gameLoop ; @3
                     lda #_DS_GAME_PF2_RIGHT_DATA
                     sta PF2                         ; 5
 
-                    SLEEP 10
+                    SLEEP 13
 
                     lda #_DS_GAME_COLUP1_DATA
                     sta COLUP1                      ; 5 @76
 
+
+                    lda #_DS_GAME_COLUP0_DATA
+                    sta COLUP0                      ; 5
+
+                    lda #_DS_GAME_COLUBK_DATA
+
                     jmp 0                           ; 3
 
-_gameExit           lda #0
+_gameExit           sta WSYNC
+                    lda #0
                     sta PF0
                     sta PF1
                     sta PF2

@@ -5,6 +5,7 @@
 #include "cdfjplus.h"
 
 #include "board.h"
+#include "colour.h"
 #include "decodeCaves.h"
 #include "main.h"
 #include "schedule.h"
@@ -41,12 +42,8 @@ void scheduledTasks() {
 
     (*scheduleFunc[gameSchedule])();
 
-    // if (T1TC > availableIdleTime)
-    //     while (true)
-    //         ;
-
-    // while (T1TC < availableIdleTime)
-    //     ;
+    if (T1TC > availableIdleTime)
+        FLASH(0x94, 4);
 }
 
 

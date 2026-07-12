@@ -156,7 +156,7 @@ enum AttributeAlias {
     RKF = ATT_BLANK,                   //
     MIN = ATT_MINE,                    //
     WTF = ATT_WATERFLOW,               //
-    CVY = ATT_CONVERT,                 //
+    CVY = ATT_CONVEYOR,                //
     GND = ATT_GRIND,                   //
     PIP = ATT_PIPE,                    //
     PH4 = ATT_PHASE4,                  // processed every 4 frames
@@ -225,11 +225,11 @@ const unsigned int Attribute[] = {
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ |XPD| _ | _ | _ | _  , // 39 TYPE_DOGE_FALLING2
     _ |PAD| _ | _ |DIS|PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _ | _  , // 40 TYPE_ROCK_PEBBLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL| _  , // 41 TYPE_ELECTRIC
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ |MIN| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL| _  , // 42 TYPE_INSULATOR
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL| _  , // 42 TYPE_INSULATOR
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |GRB| _ | _ |PER| _ | _ | _ | _ |PUP , // 43 TYPE_STAR
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ | _ | _  , // 44 TYPE_STAR_FALLING
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 45 TYPE_STAR_EXPLODING
-    _ |PAD| _ |MLT| _ |PH1| _ |GND|CVY| _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ | _ | _ | _ |ROL|PUP , // 46 TYPE_ROCK_BONUS
+    _ |PAD| _ |MLT| _ |PH2| _ |GND|CVY| _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ | _ | _ | _ |ROL|PUP , // 46 TYPE_ROCK_BONUS
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|----+
 
     // clang-format on

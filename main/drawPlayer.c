@@ -13,7 +13,7 @@
 #include "colour.h"
 #include "drawPlayer.h"
 #include "mellon.h"
-#include "player.h"
+#include "playerAnimation.h"
 #include "random.h"
 #include "scroll.h"
 
@@ -113,13 +113,6 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
     int ypos = (playerY + 1) * CHAR_Y - y * 3 - frameAdjustY * gravity - 8 + autoMoveY - SCORE_SCANLINES;
     int xpos = playerX * CHAR_TRIX_X - x;
 
-
-    // static int txp = 0;
-    // if ((++txp >> 3) > 38)
-    //     txp = 0;
-    // xpos = txp >> 3;
-    // ypos = 20;    // tmp
-
     if (((frameAdjustY || frameAdjustX || autoMoveX || autoMoveY)) ||
         (xpos >= 0 && xpos < BOARD_TRIX_X && ypos >= 0 && ypos < _SCANLINES - CHAR_Y)) {
 
@@ -164,7 +157,6 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
         } else
             RAM[_P1_X] = RAM[_P0_X] + 8;
 
-        extern int gravity;
         int destLine = -1;
 
         if (gravity < 0)

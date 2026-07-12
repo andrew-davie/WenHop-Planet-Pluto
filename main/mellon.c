@@ -12,7 +12,7 @@
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"
-#include "player.h"
+#include "playerAnimation.h"
 #include "random.h"
 #include "score.h"
 #include "sound.h"
@@ -460,39 +460,39 @@ bool checkHighPriorityMove(int dir) {
 
         else if (destType == TYPE_STAR) {
 
-            if (!totalDogePossible) {
+            // if (!totalDogePossible) {
 
-                ADDAUDIO(SFX_ZAP2);
-                ADDAUDIO(SFX_WHOOSH);
-                weapon = theCave->weapon[level];
-                nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
-                // FLASH(0x2A, 4);
+            ADDAUDIO(SFX_ZAP2);
+            ADDAUDIO(SFX_WHOOSH);
+            weapon = theCave->weapon[level];
+            nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
+            // FLASH(0x2A, 4);
 
-                playerX += xdir[dir];
-                playerY += ydir[dir];
+            playerX += xdir[dir];
+            playerY += ydir[dir];
 
-                moveHusk(dir, me, meOffset);
+            moveHusk(dir, me, meOffset);
 
-                int dir2 = (gravity < 0) ? dir ^ 2 : dir;
+            int dir2 = (gravity < 0) ? dir ^ 2 : dir;
 
-                if (playerAnimationID != WalkAnimation[dir2])
-                    startPlayerAnimation(WalkAnimation[dir2]);
+            if (playerAnimationID != WalkAnimation[dir2])
+                startPlayerAnimation(WalkAnimation[dir2]);
 
-                if (!autoMoveFrameCount) {
+            if (!autoMoveFrameCount) {
 
-                    autoMoveFrameCount = ((MOVE_SPEED) << playerSlow);
+                autoMoveFrameCount = ((MOVE_SPEED) << playerSlow);
 
-                    autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
-                    autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
-                }
-
-                handled = true;
+                autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
+                autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
             }
 
-            else {
-                FLASH(0x40, 10);
-                ADDAUDIO(SFX_ROCK);
-            }
+            handled = true;
+            // }
+
+            // else {
+            //     FLASH(0x40, 10);
+            //     ADDAUDIO(SFX_ROCK);
+            // }
         }
 
 
@@ -690,47 +690,36 @@ bool checkLowPriorityMove(int dir) {
 
             if (Attribute[destType] & ATT_MINE) {
 
-                if (destType == TYPE_INSULATOR) {
+                addScore(VALUE_BREAK_GEODE);
+                *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
+
+                surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
+
+                // if (destType == TYPE_ROCK_BONUS) {
+
+                //     ADDAUDIO(SFX_DOGE2);
+
+                //     *meOffset = FLAG(CH_STAR);
+
+                // }
+
+                // else
+                if (destType == TYPE_ROCK) {
 
 
-                    // nDots(PARTICLE_COUNT, playerX, playerY, PT_SPIRAL2, 30, xOffset[dir] + 2, yOffset[dir] + 5,
-                    // 40, 2); onOff[boardCol] = false;    // disableInsulator(meOffset); return true;
-                }
+                    ADDAUDIO(SFX_ROCK);
 
-                else {
+                    nDots(10, playerX, playerY, PT_ONE, 30,
+                          xOffset[dir] + CHAR_CENTER_X /*+ rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1)*/,
+                          /*rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + */ yOffset[dir] + CHAR_CENTER_Y, 40, 2);
+                    nDots(10, playerX, playerY, PT_ONE, 15,
+                          xOffset[dir] + CHAR_CENTER_X + rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1),
+                          rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + yOffset[dir] + CHAR_CENTER_Y, 50, 3);
+                } else {
+                    ADDAUDIO(SFX_DOGE);
 
-
-                    addScore(VALUE_BREAK_GEODE);
-                    *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
-
-                    surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
-
-                    // if (destType == TYPE_ROCK_BONUS) {
-
-                    //     ADDAUDIO(SFX_DOGE2);
-
-                    //     *meOffset = FLAG(CH_STAR);
-
-                    // }
-
-                    // else
-                    if (destType == TYPE_ROCK) {
-
-
-                        ADDAUDIO(SFX_ROCK);
-
-                        nDots(10, playerX, playerY, PT_ONE, 30,
-                              xOffset[dir] + CHAR_CENTER_X /*+ rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1)*/,
-                              /*rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + */ yOffset[dir] + CHAR_CENTER_Y, 40, 2);
-                        nDots(10, playerX, playerY, PT_ONE, 15,
-                              xOffset[dir] + CHAR_CENTER_X + rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1),
-                              rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + yOffset[dir] + CHAR_CENTER_Y, 50, 3);
-                    } else {
-                        ADDAUDIO(SFX_DOGE);
-
-                        nDots(6, playerX, playerY, PT_TWO, 30, xOffset[dir] + CHAR_CENTER_X,
-                              yOffset[dir] + CHAR_CENTER_Y, 40, 7);
-                    }
+                    nDots(6, playerX, playerY, PT_TWO, 30, xOffset[dir] + CHAR_CENTER_X, yOffset[dir] + CHAR_CENTER_Y,
+                          40, 7);
                 }
             }
 

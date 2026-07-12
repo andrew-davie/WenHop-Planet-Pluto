@@ -1,33 +1,3 @@
-/*
- * sphere2600.c  —  fixed-point sphere texture renderer, 8-colour
- * ARM coprocessor, Atari 2600 cart. No FPU, no division in render loop.
- * No lighting.
- *
- * Colour model
- * ------------
- * 3 independent tile layers (R, G, B channel), each a 40x22 tile map.
- * Packed into one byte per tile: bits 0/1/2 = R/G/B.
- * Output pixel = colour index 0..7:
- *   0=black  1=red    2=green  3=yellow
- *   4=blue   5=magenta 6=cyan  7=white
- * Background (outside sphere) = 0.
- *
- * Tile storage
- * ------------
- * Three separate tile arrays, one per channel:
- *   uint8_t tiles_r[TEX_TX * TEX_TY * TEX_TH]
- *   uint8_t tiles_g[TEX_TX * TEX_TY * TEX_TH]
- *   uint8_t tiles_b[TEX_TX * TEX_TY * TEX_TH]
- * Each byte: MSB = leftmost pixel of that tile row.
- * Pass all three to sphere_render().
- *
- * Output : uint8_t out[SPHERE_W * SPHERE_H], values 0..7
- *
- * Tables  ~1510 B (unchanged from mono version)
- * UV mapping (unchanged):
- *   tx = (lon_a * 25) >> 4
- *   ty = ((lat_a + 32) * 11) >> 2
- */
 
 #include <math.h>
 #include <stdint.h>

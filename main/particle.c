@@ -13,7 +13,7 @@
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"
-#include "player.h"
+#include "playerAnimation.h"
 #include "random.h"
 #include "scroll.h"
 #include "sound.h"

@@ -15,7 +15,7 @@
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"
-#include "player.h"
+#include "playerAnimation.h"
 #include "random.h"
 #include "schedule.h"
 #include "score.h"
@@ -60,7 +60,7 @@ void genericPushReverse(int offsetX, int offsetY);
 void chainReact_GeoDogeToDoge();
 void chainReact_Pipe();
 void doRoll();
-void setInsulator(unsigned char *p, bool active);
+void setInsulator(unsigned char *p, int row, int col);
 
 //------------------------------------------------------------------------------
 
@@ -78,10 +78,10 @@ void calculateVisibleMasks() {
     myMemsetInt((unsigned int *)onScreenY, 0, sizeof(onScreenY) / 4);
 
     int sX = scrollX >> 16;
-    int eX = sX + 40;
+    int eX = sX + 40 + CHAR_TRIX_X;
     int x = (sX * (0x10000 / CHAR_TRIX_X)) >> 16;
 
-    for (int i = sX; i < eX; i += CHAR_TRIX_X)
+    for (int i = sX; i <= eX && i < 40; i += CHAR_TRIX_X)
         onScreenX[x++] = true;
 
     int sY = scrollY >> 16;
@@ -204,7 +204,8 @@ void setupBoardScanner() {
 
         setSchedule(SCHEDULE_PROCESS_BOARD);
 
-        processBoardSquares();
+
+        //        processBoardSquares();
     }
 }
 
@@ -212,7 +213,7 @@ void setupBoardScanner() {
 void processBoardSquares() {
 
 
-    while (T1TC < availableIdleTime) {
+    while (T1TC < availableIdleTime - 2000) {
 
         me = RAM + _BOARD + boardRow * _1ROW + boardCol;
 
@@ -325,12 +326,12 @@ void processTypes() {
                 // ADDAUDIO(SFX_DOGE3);
             }
 
-            if (--delay < 0) {
-                *me = FLAG(CH_STAR_EXPLODE);
-                startCharAnimation(TYPE_STAR_EXPLODE, AnimateStarExplode);
-                delay = 30;
-                break;
-            }
+            // if (--delay < 0) {
+            //     *me = FLAG(CH_STAR_EXPLODE);
+            //     startCharAnimation(TYPE_STAR_EXPLODE, AnimateStarExplode);
+            //     delay = 30;
+            //     break;
+            // }
         }
         // fall
 
@@ -445,31 +446,22 @@ void processTypes() {
 // }
 
 
-void setInsulator(unsigned char *p, bool active) {
-
-    // ADDAUDIO(SFX_ZAP);
-    // ADDAUDIO(SFX_ZAP2);
+void setInsulator(unsigned char *p, int row, int col) {
 
     int dir = _1ROW;
     p += dir;
 
-
-    if (!active) {
-        while (CharToType[GET(*p)] != TYPE_INSULATOR) {
-            if (CharToType[GET(*p)] == TYPE_ELECTRIC) {
+    if (!onOff[col]) {
+        while (++row < _BOARD_ROWS && CharToType[GET(*p)] != TYPE_INSULATOR) {
+            if (CharToType[GET(*p)] == TYPE_ELECTRIC)
                 *p = FLAG(CH_BLANK);
-                // break;
-            }
             p += dir;
         }
     }
 
     else {
 
-        int x = boardCol;
-        int y = boardRow + 1;
-
-        while (CharToType[GET(*p)] != TYPE_INSULATOR) {
+        while (++row < _BOARD_ROWS && CharToType[GET(*p)] != TYPE_INSULATOR) {
 
             int type2 = CharToType[GET(*p)];
             unsigned int att = Attribute[type2];
@@ -479,56 +471,21 @@ void setInsulator(unsigned char *p, bool active) {
                 //     FLASH(0x28, 10);
 
                 *p = FLAG(CH_ELECTRIC_0 + rangeRandom(4));
-                nDots(6, x, y, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                nDots(6, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
                 break;
             }
 
             else if (type2 == TYPE_ROCK_BONUS) {
 
                 *p = FLAG(CH_STAR);
-                nDots(6, x, y, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                nDots(6, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
                 break;
             }
 
             p += dir;
-            y++;
         }
     }
 }
-
-
-// void disableInsulator(unsigned char *p) {
-
-//     ADDAUDIO(SFX_ZAP);
-//     ADDAUDIO(SFX_ZAP2);
-
-//     // FLASH(0x2C, 10);
-
-//     //    bool disabled = false;
-//     int dir = (GET(*p) == CH_INSULATOR_TOP) ? _1ROW : -_1ROW;
-//     p += dir;
-
-//     if (CharToType[GET(*p)] == TYPE_ELECTRIC) {
-//         while (CharToType[GET(*p)] == TYPE_ELECTRIC) {
-//             //          disabled = true;
-//             *p = CH_BLANK;
-//             p += dir;
-//         }
-//     }
-
-//     else {
-
-//         // while (CharToType[GET(*p)] == TYPE_BLANK)
-//         //     p += dir;
-
-//         if (Attribute[CharToType[GET(*p)]] & (ATT_DISSOLVES | ATT_BLANK))
-//             *p = CH_ELECTRIC_0 + rangeRandom(4);
-
-//         else
-//             FLASH(0x44, 2);
-//     }
-// }
-
 
 bool onOff[_BOARD_COLS] = {true};
 
@@ -556,7 +513,7 @@ void processCreatures() {
     switch (creature) {
 
     case CH_INSULATOR_TOP:
-        setInsulator(me, onOff[boardCol]);
+        setInsulator(me, boardRow, boardCol);
         break;
 
     case CH_OUTLET:
@@ -804,6 +761,8 @@ void restartBoardScan() {
 
 
         if (oldDead != playerDead) {
+
+            attachment = 0;
 
             explodeCount = 6;
             explodeRadius = 10;
@@ -1347,12 +1306,16 @@ void explode(unsigned char *where, unsigned char explosionShape) {
         enum ObjectType type = CharToType[GET(*cell)];
         if (Attribute[type] & ATT_EXPLODABLE) {
 
-            if (CharToType[GET(*cell)] == TYPE_DOGE)
-                totalDogePossible--;
+            bool wasDoge = (type == TYPE_DOGE);
+            bool becomesDoge = (shape[i] == CH_DOGE_00);
+
+            if (wasDoge && !becomesDoge)
+                totalDogePossible--;    // a doge sitting here is being destroyed
+            else if (!wasDoge && becomesDoge)
+                totalDogePossible++;    // this cell is being turned into a new doge
+            // else: doge->doge (no change) or non-doge->non-doge (nothing to count)
 
             *cell = shape[i];
-            if (explosionShape == CH_DOGE_00)
-                totalDogePossible++;
         }
     }
 

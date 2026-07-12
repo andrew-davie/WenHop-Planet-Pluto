@@ -27,7 +27,7 @@ extern void *DDR;
 #define DS13PTR 13
 #define DS14PTR 14
 #define DS15PTR 15
-#define DS16PTR 16`
+#define DS16PTR 16
 #define DS17PTR 17
 #define DS18PTR 18
 #define DS19PTR 19
@@ -83,8 +83,8 @@ void setPointer(const int fetcher, const unsigned int offset);
 void setIncrement(const int fetcher, const unsigned char whole,
                          const unsigned char frac);
 
-; // Set waveform (32-byte offset in display data RAM)
-; void setWaveform(int wave, unsigned char offset);
+// Set waveform (32-byte offset in display data RAM)
+// void setWaveform(int wave, unsigned char offset);
 
 // Set DA sample address
 void setSamplePtr(unsigned int address);
@@ -123,7 +123,7 @@ unsigned int getPitch(unsigned int note);
 
 
 // Generate random number
-; unsigned int getRandom32();
+// unsigned int getRandom32();
 
 
 // Set memory area to fill value

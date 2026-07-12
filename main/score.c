@@ -791,7 +791,7 @@ void drawSpeedRun() {
 }
 
 void drawDoge() {
-    return;
+
     if (doges < 0) {
         scoreLineNew[1] = DIGIT_PLUS;
         // scoreLineNew[0] = DIGIT_DOGE;
@@ -872,7 +872,6 @@ void drawScore() {
     for (int i = 0; i < 10; i++)
         scoreLineNew[i] = DIGIT_SPACE;
 
-    scoreCycle = SCORELINE_CAVELEVEL;
 
     switch (scoreCycle) {
     case SCORELINE_TIME:

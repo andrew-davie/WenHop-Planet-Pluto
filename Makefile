@@ -81,7 +81,7 @@ SRCS = \
  joystick.c \
  main.c \
  mellon.c \
- player.c \
+ playerAnimation.c \
  random.c \
  savekey.c \
  sound.c \
@@ -257,6 +257,18 @@ bootstrap_defines: gfx
 	awk '$$1 ~ /^_/ {printf "#define %-25s 0x%s\n", $$1, $$2}' \
 		$(OUTPUT)/$(SOURCE).sym >> $(BASE)/$(DASM_TO_C).tmp
 	mv $(BASE)/$(DASM_TO_C).tmp $(BASE)/$(DASM_TO_C)
+
+# -----------------------------------------------------------------------------
+# planetHuffman.c/.h are GENERATED from planetInfo.c -- do not hand-edit.
+# Regenerate automatically whenever planetInfo.c or the encoder changes, so the
+# HUFFMAN and non-HUFFMAN builds can never silently diverge.
+# -----------------------------------------------------------------------------
+
+$(BASE)/planetHuffman.c: $(BASE)/planetInfo.c tools/huffman.py
+	cd $(BASE) && python3 $(CURDIR)/tools/huffman.py planetInfo.c planetHuffman
+
+$(BASE)/planetHuffman.h: $(BASE)/planetHuffman.c
+	@:
 
 # -----------------------------------------------------------------------------
 # Stage 3: arm

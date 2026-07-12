@@ -11,7 +11,7 @@
 #include "draw.h"
 #include "drawScreen.h"
 #include "mellon.h"
-#include "player.h"
+#include "playerAnimation.h"
 #include "reverseBits.h"
 #include "scroll.h"
 #include "sound.h"
@@ -193,7 +193,7 @@ const unsigned char justifyChar['~' - ' ' + 1] = {
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'U'         85
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'V'         86
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'W'         87
-    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'x'         88
+    🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'X'         88
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'Y'         89
     🟨🟦🟦🟦🟦🟨🟦🟦 ,    //   'Z'         90
     🟨🟦🟦🟦🟦🟦🟦🟦 ,    //   '['         91
@@ -686,11 +686,11 @@ void drawAttachedChar(int ch) {
     }
 
 
-    int y = playerY * CHAR_Y - (scrollY >> 16) * 3 + autoMoveY /*- 20 + 1*/ + (shakeY >> 16) + offsetY;
+    int y = playerY * CHAR_Y - (scrollY >> 16) * 3 + autoMoveY /*- 20 + 1*/ - (shakeY >> 16) + offsetY;
 
 
     int trixX = ((playerX - 1) * CHAR_TRIX_X) + -(scrollX >> 16) + (faceDirection * (frameAdjustX + (autoMoveX >> 2))) +
-                2 + (shakeX >> 16) - offsetX;
+                2 - (shakeX >> 16) - offsetX;
 
     // y = trixY;
 

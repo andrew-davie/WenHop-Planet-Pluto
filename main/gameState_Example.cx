@@ -15,7 +15,7 @@ void initGameState_Example() {
     frame = 0;
 }
 
-void VB_CouchCompliant() {
+void Example() {
 
     setPointer(DSJMP1PTR, _BUF_EXAMPLE_JUMP);
 
