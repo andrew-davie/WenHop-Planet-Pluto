@@ -231,7 +231,7 @@ void drawMace() {
 
 
     } else {
-        FLASH(0x28, 2);
+        // FLASH(0x28, 2);
         if (tool[0].dir == wantedDirection)
             wantedDirection = getRandom32();
         tool[0].dir = turn_toward(tool[0].dir, wantedDirection, 4);

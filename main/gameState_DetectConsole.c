@@ -98,7 +98,7 @@ void VB_DetectConsole() {
         armCycles = (armCycles * 7) >> 3;
 
         setGameState(GS_GAME);
-        // setGameState(GS_COPYRIGHT);
+        //  setGameState(GS_COPYRIGHT);
         // setGameState(GS_RASTER_BLEED);
         // setGameState(GS_SKULL);
     }

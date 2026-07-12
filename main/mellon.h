@@ -7,6 +7,16 @@ void initPlayer();
 void grabDoge();
 void bubbles(int count, int dripX, int dripY, int age, int /*speed*/);
 
+typedef struct {
+
+    signed char x;
+    signed char y;
+
+} OFFSET;
+
+
+extern const OFFSET *attachmentOffset;
+
 extern int frameAdjustX;
 extern int frameAdjustY;
 

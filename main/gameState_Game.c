@@ -33,6 +33,7 @@ extern const unsigned char trackGridLockMelodyIntro[];
 extern const unsigned char trackGridLockBase[];
 
 int attachment = 0;
+const OFFSET *attachmentOffset = 0;
 
 void initDataStreams_Game() {
 
@@ -171,9 +172,13 @@ void VB_Game() {
     processCharAnimations();
     setPalette(_BUF_GAME_COLUBK);
 
+    // if (gameSchedule != SCHEDULE_UNPACK_CAVE)
+    //     drawScreen(1);
+
+
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
-        drawScore();
+        // drawScore();
         drawPlayerSprite();
 
         drawMace();
@@ -205,7 +210,7 @@ void OS_Game() {
     scroll();
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE)
-        drawScreen();
+        drawScreen(2);
 
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;

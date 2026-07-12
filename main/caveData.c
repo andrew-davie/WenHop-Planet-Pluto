@@ -180,7 +180,7 @@ const unsigned char caveWyrms[] = {
 
 
     CH_DOORCLOSED, 5, 4,
-    CH_MELLON_HUSK_BIRTH, 5, 7,
+    CH_MELLON_HUSK_BIRTH, 5, 5,
 
     DRAW_EOF,
 

@@ -1659,127 +1659,128 @@ const unsigned char *const charSet[] = {
     // see ChName @ attribute.h
 
     char_parallaxBlank,              // 000 CH_BLANK,
-    _CHAR_DIRT,                      // 001 CH_DIRT,
-    _CHAR_BRICKWALL,                 // 002 CH_BRICKWALL,
-    _CHAR_DOOR,                      // 003 CH_DOORCLOSED,
-    _CHAR_DOOR,                      // 004 CH_DOOROPEN_0,
-    _CHAR_BLANK,                     // 005 CH_EXITBLANK,
-    _CHAR_STEELWALL,                 // 006 CH_STEELWALL,
-    _CHAR_PEBBLE1,                   // 007 CH_PEBBLE1,
-    _CHAR_PEBBLE2,                   // 008 CH_PEBBLE2,
-    _CHAR_ROCK,                      // 009 CH_ROCK,
-    _CHAR_ROCK,                      // 010 CH_ROCK_FALLING,
-    _CHAR_DOGE_00,                   // 011 CH_DOGE_00,
-    _CHAR_DOGE_00,                   // 012 CH_DOGE_FALLING,
-    _CHAR_BLANK,                     // 013 CH_MELLON_HUSK_BIRTH,
-    _CHAR_BLANK,                     // 014 CH_LAVA_BLANK,
-    _CHAR_LAVA_SMALL,                // 015 CH_LAVA_SMALL,
-    _CHAR_LAVA_MEDIUM,               // 016 CH_LAVA_MEDIUM,
-    _CHAR_LAVA_LARGE,                // 017 CH_LAVA_LARGE,
-    _CHAR_BLANK,                     // 018 CH_MELLON_HUSK,
-    _CHAR_DOGE_01,                   // 019 CH_DOGE_01,
-    _CHAR_DOGE_02,                   // 020 CH_DOGE_02,
-    _CHAR_DOGE_03,                   // 021 CH_DOGE_03,
-    _CHAR_DOGE_04,                   // 022 CH_DOGE_04,
-    _CHAR_DOGE_05,                   // 023 CH_DOGE_05,
-    _CHAR_DOGE_00,                   // 024 CH_DOGE_STATIC,
-    _CHAR_DOGE_PEBBLE,               // 025 CH_PEBBLE_ROCK,
-    _CHAR_DOGE_00,                   // 026 CH_ROCK_PEBBLE,
-    _CHAR_GEODOGE,                   // 027 CH_ROCK_PEBBLE_1,
-    _CHAR_DUST_0,                    // 028 CH_DUST_0,
-    _CHAR_DUST_1,                    // 029 CH_DUST_1,
-    _CHAR_DUST_2,                    // 030 CH_DUST_2,
-    _CHAR_GEODOGE,                   // 031 (00) CH_CONGLOMERATE,
-    _CHAR_ROCK_U,                    // 032 (01) CH_CONGLOMERATE_1,
-    _CHAR_ROCK_R,                    // 033 (02) CH_CONGLOMERATE_2,
-    _CHAR_ROCK_UR,                   // 034 (03) CH_CONGLOMERATE_3,
-    _CHAR_ROCK_D,                    // 035 (04) CH_CONGLOMERATE_4,
-    _CHAR_ROCK_UD,                   // 036 (05) CH_CONGLOMERATE_5,
-    _CHAR_ROCK_RD,                   // 037 (06) CH_CONGLOMERATE_6,
-    _CHAR_ROCK_URD,                  // 038 (07) CH_CONGLOMERATE_7,
-    _CHAR_ROCK_L,                    // 039 (08) CH_CONGLOMERATE_8,
-    _CHAR_ROCK_UL,                   // 040 (09) CH_CONGLOMERATE_9,
-    _CHAR_ROCK_RL,                   // 041 (10) CH_CONGLOMERATE_10,
-    _CHAR_ROCK_URL,                  // 042 (11) CH_CONGLOMERATE_11,
-    _CHAR_ROCK_DL,                   // 043 (12) CH_CONGLOMERATE_12,
-    _CHAR_ROCK_UDL,                  // 044 (13) CH_CONGLOMERATE_13,
-    _CHAR_ROCK_RDL,                  // 045 (14) CH_CONGLOMERATE_14,
-    _CHAR_ROCK_URDL,                 // 046 (15) CH_CONGLOMERATE_15,
-    _CHAR_DUST_ROCK_0,               // 047 CH_DUST_ROCK_0,
-    _CHAR_DUST_ROCK_1,               // 048 CH_DUST_ROCK_1,
-    _CHAR_DUST_ROCK_2,               // 049 CH_DUST_ROCK_2,
-    _CHAR_DOGE_00,                   // 050 CH_CONVERT_GEODE_TO_DOGE,
-    _CHAR_HORIZONTAL_BAR,            // 051 CH_HORIZONTAL_BAR,
-    _CHAR_PUSH_LEFT,                 // 052 CH_PUSH_LEFT,
-    _CHAR_PUSH_LEFT,                 // 053 CH_PUSH_LEFT_REVERSE,
-    _CHAR_PUSH_RIGHT,                // 054 CH_PUSH_RIGHT,
-    _CHAR_PUSH_RIGHT,                // 055 CH_PUSH_RIGHT_REVERSE,
-    _CHAR_VERTICAL_BAR,              // 056 CH_VERTICAL_BAR,
-    _CHAR_PUSH_UP,                   // 057 CH_PUSH_UP,
-    _CHAR_PUSH_UP,                   // 058 CH_PUSH_UP_REVERSE,
-    _CHAR_PUSH_DOWN,                 // 059 CH_PUSH_DOWN,
-    _CHAR_PUSH_DOWN,                 // 060 CH_PUSH_DOWN_REVERSE,
-    _CHAR_WYRM_0,                    // 061 CH_WYRM_BODY,
-    _CHAR_WYRM_2,                    // 062 CH_WYRM_VERT_BODY,
-    _CHAR_WYRM_CORNER_LD,            // 063 CH_WYRM_CORNER_LD,
-    _CHAR_WYRM_CORNER_RD,            // 064 CH_WYRM_CORNER_RD,
-    _CHAR_WYRM_CORNER_LU,            // 065 CH_WYRM_CORNER_LU,
-    _CHAR_WYRM_CORNER_RU,            // 066 CH_WYRM_CORNER_RU,
-    _CHAR_WYRM_HEAD_U,               // 067 CH_WYRM_HEAD_U,
-    _CHAR_WYRM_HEAD_R,               // 068 CH_WYRM_HEAD_R,
-    _CHAR_WYRM_HEAD_D,               // 069 CH_WYRM_HEAD_D,
-    _CHAR_WYRM_HEAD_L,               // 070 CH_WYRM_HEAD_L,
-    _CHAR_GEODOGE,                   // 071 CH_GEODOGE_FALLING,
-    _CHAR_FLIP_GRAVITY_0,            // 072 CH_GRAVITY,
-    _CHAR_FLIP_GRAVITY_1,            // 073 CH_GRAVITY,
-    _CHAR_FLIP_GRAVITY_2,            // 074 CH_GRAVITY,
-    _CHAR_BLOCK,                     // 075 CH_BLOCK,
-    _CHAR_GRINDER_0,                 // 076 CH_GRINDER_0,
-    _CHAR_GRINDER_1,                 // 077 CH_GRINDER_1
-    _CHAR_HUB,                       // 078 CH_HUB,
-    _CHAR_BLANK,                     // 079 CH_WATER_0,
-    _CHAR_WATERFLOW_0 + 00,          // 080 CH_WATERFLOW_0
-    _CHAR_WATERFLOW_0 + 12,          // 081 CH_WATERFLOW_1
-    _CHAR_WATERFLOW_0 + 24,          // 082 CH_WATERFLOW_2
-    _CHAR_WATERFLOW_0 + 36,          // 083 CH_WATERFLOW_3
-    _CHAR_WATERFLOW_0 + 48,          // 084 CH_WATERFLOW_4
-    _CHAR_TAP_0,                     // 085 CH_TAP_0,
-    _CHAR_HUB_1,                     // 086 CH_HUB_1
-    _CHAR_PUSH_DOWN,                 // 087 CH_OUTLET
-    _CHAR_TAP_1,                     // 088 CH_TAP_1
-    _CHAR_BELT_0,                    // 089 CH_BELT_0
-    _CHAR_BELT_1,                    // 090 CH_BELT_1
-    _CHAR_PUSH_DOWN2,                // 091 CH_PUSH_DOWN2,
-    _CHAR_GEODOGE,                   // 092 CH_GEODOGE_CONVERT
-    _CHAR_BLANK,                     // 093 CH_CONVERT_PIPE
-    _CHAR_WYRM_TAIL_U,               // 094 CH_WYRM_TAIL_U,
-    _CHAR_WYRM_TAIL_R,               // 095 CH_WYRM_TAIL_R,
-    _CHAR_WYRM_TAIL_D,               // 096 CH_WYRM_TAIL_D,
-    _CHAR_WYRM_TAIL_L,               // 097 CH_WYRM_TAIL_L,
-    _CHAR_DOGE_FALLING_TOP,          // 098 CH_DOGE_FALLING_TOP,
-    _CHAR_DOGE_FALLING_BOTTOM,       // 099 CH_DOGE_FALLING_BOTTOM,
-    _CHAR_ROCK_FALLING_TOP,          // 100 CH_ROCK_FALLING_TOP,
-    _CHAR_ROCK_FALLING_BOTTOM,       // 101 CH_ROCK_FALLING_BOTTOM,
-    _CHAR_GEODOGE_FALLING_TOP,       // 102 CH_GEODOGE_FALLING_TOP,
-    _CHAR_GEODOGE_FALLING_BOTTOM,    // 103 CH_GEODOGE_FALLING_BOTTOM,
-    _CHAR_DOGE_FALLING_TOP,          // 104 CH_DOGE_FALLING_TOP2,
-    _CHAR_DOGE_FALLING_BOTTOM,       // 105 CH_DOGE_FALLING_BOTTOM2,
-    _CHAR_DOGE_SIDE_1,               // 106 CH_DOGE_SIDE_1,
-    _CHAR_DOGE_SIDE_3,               // 107 CH_DOGE_SIDE_3
-    _CHAR_DOGE_SIDE_2,               // 108 CH_DOGE_SIDE_2
-    _CHAR_DOGE_SIDE_4,               // 109 CH_DOGE_SIDE_4
-    _CHAR_ELECTRIC_0,                // 110 CH_ELECTRIC_0
-    _CHAR_ELECTRIC_1,                // 111 CH_ELECTRIC_1
-    _CHAR_ELECTRIC_2,                // 112 CH_ELECTRIC_2
-    _CHAR_ELECTRIC_3,                // 113 CH_ELECTRIC_3
-    _CHAR_BROKEN_DIRT,               // 114 CH_BROKEN_DIRT
-    _CHAR_INSULATOR_TOP,             // 115 CH_INSULATOR_TOP
-    _CHAR_INSULATOR_BOTTOM,          // 116 CH_INSULATOR_BOTTOM
-    _CHAR_STAR,                      // 117 CH_STAR
-    _CHAR_STAR_TOP,                  // 118 CH_STAR_TOP
-    _CHAR_STAR_BOTTOM,               // 119 CH_STAR_BOTTOM
-    _CHAR_ROCK,                      // 120 CH_ROCK_BONUS
-    _CHAR_STAR,                      // 121 CH_STAR_EXPLODE
+    char_parallaxBlank,              // 001 CH_PLACEHOLDER,
+    _CHAR_DIRT,                      // 002 CH_DIRT,
+    _CHAR_BRICKWALL,                 // 003 CH_BRICKWALL,
+    _CHAR_DOOR,                      // 004 CH_DOORCLOSED,
+    _CHAR_DOOR,                      // 005 CH_DOOROPEN_0,
+    _CHAR_BLANK,                     // 006 CH_EXITBLANK,
+    _CHAR_STEELWALL,                 // 007 CH_STEELWALL,
+    _CHAR_PEBBLE1,                   // 008 CH_PEBBLE1,
+    _CHAR_PEBBLE2,                   // 009 CH_PEBBLE2,
+    _CHAR_ROCK,                      // 010 CH_ROCK,
+    _CHAR_ROCK,                      // 011 CH_ROCK_FALLING,
+    _CHAR_DOGE_00,                   // 012 CH_DOGE_00,
+    _CHAR_DOGE_00,                   // 013 CH_DOGE_FALLING,
+    _CHAR_BLANK,                     // 014 CH_MELLON_HUSK_BIRTH,
+    _CHAR_BLANK,                     // 015 CH_LAVA_BLANK,
+    _CHAR_LAVA_SMALL,                // 016 CH_LAVA_SMALL,
+    _CHAR_LAVA_MEDIUM,               // 017 CH_LAVA_MEDIUM,
+    _CHAR_LAVA_LARGE,                // 018 CH_LAVA_LARGE,
+    _CHAR_BLANK,                     // 019 CH_MELLON_HUSK,
+    _CHAR_DOGE_01,                   // 020 CH_DOGE_01,
+    _CHAR_DOGE_02,                   // 021 CH_DOGE_02,
+    _CHAR_DOGE_03,                   // 022 CH_DOGE_03,
+    _CHAR_DOGE_04,                   // 023 CH_DOGE_04,
+    _CHAR_DOGE_05,                   // 024 CH_DOGE_05,
+    _CHAR_DOGE_00,                   // 025 CH_DOGE_STATIC,
+    _CHAR_DOGE_PEBBLE,               // 026 CH_PEBBLE_ROCK,
+    _CHAR_DOGE_00,                   // 027 CH_ROCK_PEBBLE,
+    _CHAR_GEODOGE,                   // 028 CH_ROCK_PEBBLE_1,
+    _CHAR_DUST_0,                    // 029 CH_DUST_0,
+    _CHAR_DUST_1,                    // 030 CH_DUST_1,
+    _CHAR_DUST_2,                    // 031 CH_DUST_2,
+    _CHAR_GEODOGE,                   // 032 (00) CH_CONGLOMERATE,
+    _CHAR_ROCK_U,                    // 033 (01) CH_CONGLOMERATE_1,
+    _CHAR_ROCK_R,                    // 034 (02) CH_CONGLOMERATE_2,
+    _CHAR_ROCK_UR,                   // 035 (03) CH_CONGLOMERATE_3,
+    _CHAR_ROCK_D,                    // 036 (04) CH_CONGLOMERATE_4,
+    _CHAR_ROCK_UD,                   // 037 (05) CH_CONGLOMERATE_5,
+    _CHAR_ROCK_RD,                   // 038 (06) CH_CONGLOMERATE_6,
+    _CHAR_ROCK_URD,                  // 039 (07) CH_CONGLOMERATE_7,
+    _CHAR_ROCK_L,                    // 040 (08) CH_CONGLOMERATE_8,
+    _CHAR_ROCK_UL,                   // 041 (09) CH_CONGLOMERATE_9,
+    _CHAR_ROCK_RL,                   // 042 (10) CH_CONGLOMERATE_10,
+    _CHAR_ROCK_URL,                  // 043 (11) CH_CONGLOMERATE_11,
+    _CHAR_ROCK_DL,                   // 044 (12) CH_CONGLOMERATE_12,
+    _CHAR_ROCK_UDL,                  // 045 (13) CH_CONGLOMERATE_13,
+    _CHAR_ROCK_RDL,                  // 046 (14) CH_CONGLOMERATE_14,
+    _CHAR_ROCK_URDL,                 // 047 (15) CH_CONGLOMERATE_15,
+    _CHAR_DUST_ROCK_0,               // 048 CH_DUST_ROCK_0,
+    _CHAR_DUST_ROCK_1,               // 049 CH_DUST_ROCK_1,
+    _CHAR_DUST_ROCK_2,               // 050 CH_DUST_ROCK_2,
+    _CHAR_DOGE_00,                   // 051 CH_CONVERT_GEODE_TO_DOGE,
+    _CHAR_HORIZONTAL_BAR,            // 052 CH_HORIZONTAL_BAR,
+    _CHAR_PUSH_LEFT,                 // 053 CH_PUSH_LEFT,
+    _CHAR_PUSH_LEFT,                 // 054 CH_PUSH_LEFT_REVERSE,
+    _CHAR_PUSH_RIGHT,                // 055 CH_PUSH_RIGHT,
+    _CHAR_PUSH_RIGHT,                // 056 CH_PUSH_RIGHT_REVERSE,
+    _CHAR_VERTICAL_BAR,              // 057 CH_VERTICAL_BAR,
+    _CHAR_PUSH_UP,                   // 058 CH_PUSH_UP,
+    _CHAR_PUSH_UP,                   // 059 CH_PUSH_UP_REVERSE,
+    _CHAR_PUSH_DOWN,                 // 060 CH_PUSH_DOWN,
+    _CHAR_PUSH_DOWN,                 // 061 CH_PUSH_DOWN_REVERSE,
+    _CHAR_WYRM_0,                    // 062 CH_WYRM_BODY,
+    _CHAR_WYRM_2,                    // 063 CH_WYRM_VERT_BODY,
+    _CHAR_WYRM_CORNER_LD,            // 064 CH_WYRM_CORNER_LD,
+    _CHAR_WYRM_CORNER_RD,            // 065 CH_WYRM_CORNER_RD,
+    _CHAR_WYRM_CORNER_LU,            // 066 CH_WYRM_CORNER_LU,
+    _CHAR_WYRM_CORNER_RU,            // 067 CH_WYRM_CORNER_RU,
+    _CHAR_WYRM_HEAD_U,               // 068 CH_WYRM_HEAD_U,
+    _CHAR_WYRM_HEAD_R,               // 069 CH_WYRM_HEAD_R,
+    _CHAR_WYRM_HEAD_D,               // 070 CH_WYRM_HEAD_D,
+    _CHAR_WYRM_HEAD_L,               // 071 CH_WYRM_HEAD_L,
+    _CHAR_GEODOGE,                   // 072 CH_GEODOGE_FALLING,
+    _CHAR_FLIP_GRAVITY_0,            // 073 CH_GRAVITY,
+    _CHAR_FLIP_GRAVITY_1,            // 074 CH_GRAVITY,
+    _CHAR_FLIP_GRAVITY_2,            // 075 CH_GRAVITY,
+    _CHAR_BLOCK,                     // 076 CH_BLOCK,
+    _CHAR_GRINDER_0,                 // 077 CH_GRINDER_0,
+    _CHAR_GRINDER_1,                 // 078 CH_GRINDER_1
+    _CHAR_HUB,                       // 079 CH_HUB,
+    _CHAR_BLANK,                     // 080 CH_WATER_0,
+    _CHAR_WATERFLOW_0 + 00,          // 081 CH_WATERFLOW_0
+    _CHAR_WATERFLOW_0 + 12,          // 082 CH_WATERFLOW_1
+    _CHAR_WATERFLOW_0 + 24,          // 083 CH_WATERFLOW_2
+    _CHAR_WATERFLOW_0 + 36,          // 084 CH_WATERFLOW_3
+    _CHAR_WATERFLOW_0 + 48,          // 085 CH_WATERFLOW_4
+    _CHAR_TAP_0,                     // 086 CH_TAP_0,
+    _CHAR_HUB_1,                     // 087 CH_HUB_1
+    _CHAR_PUSH_DOWN,                 // 088 CH_OUTLET
+    _CHAR_TAP_1,                     // 089 CH_TAP_1
+    _CHAR_BELT_0,                    // 090 CH_BELT_0
+    _CHAR_BELT_1,                    // 091 CH_BELT_1
+    _CHAR_PUSH_DOWN2,                // 092 CH_PUSH_DOWN2,
+    _CHAR_GEODOGE,                   // 093 CH_GEODOGE_CONVERT
+    _CHAR_BLANK,                     // 094 CH_CONVERT_PIPE
+    _CHAR_WYRM_TAIL_U,               // 095 CH_WYRM_TAIL_U,
+    _CHAR_WYRM_TAIL_R,               // 096 CH_WYRM_TAIL_R,
+    _CHAR_WYRM_TAIL_D,               // 097 CH_WYRM_TAIL_D,
+    _CHAR_WYRM_TAIL_L,               // 098 CH_WYRM_TAIL_L,
+    _CHAR_DOGE_FALLING_TOP,          // 099 CH_DOGE_FALLING_TOP,
+    _CHAR_DOGE_FALLING_BOTTOM,       // 100 CH_DOGE_FALLING_BOTTOM,
+    _CHAR_ROCK_FALLING_TOP,          // 101 CH_ROCK_FALLING_TOP,
+    _CHAR_ROCK_FALLING_BOTTOM,       // 102 CH_ROCK_FALLING_BOTTOM,
+    _CHAR_GEODOGE_FALLING_TOP,       // 103 CH_GEODOGE_FALLING_TOP,
+    _CHAR_GEODOGE_FALLING_BOTTOM,    // 104 CH_GEODOGE_FALLING_BOTTOM,
+    _CHAR_DOGE_FALLING_TOP,          // 105 CH_DOGE_FALLING_TOP2,
+    _CHAR_DOGE_FALLING_BOTTOM,       // 106 CH_DOGE_FALLING_BOTTOM2,
+    _CHAR_DOGE_SIDE_1,               // 107 CH_DOGE_SIDE_1,
+    _CHAR_DOGE_SIDE_3,               // 108 CH_DOGE_SIDE_3
+    _CHAR_DOGE_SIDE_2,               // 109 CH_DOGE_SIDE_2
+    _CHAR_DOGE_SIDE_4,               // 110 CH_DOGE_SIDE_4
+    _CHAR_ELECTRIC_0,                // 111 CH_ELECTRIC_0
+    _CHAR_ELECTRIC_1,                // 112 CH_ELECTRIC_1
+    _CHAR_ELECTRIC_2,                // 113 CH_ELECTRIC_2
+    _CHAR_ELECTRIC_3,                // 114 CH_ELECTRIC_3
+    _CHAR_BROKEN_DIRT,               // 115 CH_BROKEN_DIRT
+    _CHAR_INSULATOR_TOP,             // 116 CH_INSULATOR_TOP
+    _CHAR_INSULATOR_BOTTOM,          // 117 CH_INSULATOR_BOTTOM
+    _CHAR_STAR,                      // 118 CH_STAR
+    _CHAR_STAR_TOP,                  // 119 CH_STAR_TOP
+    _CHAR_STAR_BOTTOM,               // 120 CH_STAR_BOTTOM
+    _CHAR_ROCK,                      // 121 CH_ROCK_BONUS
+    _CHAR_STAR,                      // 122 CH_STAR_EXPLODE
 };
 
 _Static_assert(sizeof(charSet) / sizeof(charSet[0]) == CH_MAX, "charSet table wrong size");

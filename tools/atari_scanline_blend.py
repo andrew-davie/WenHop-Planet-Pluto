@@ -239,17 +239,6 @@ TEMPORAL_REUSE_COST_SCALE = 3000.0
 # --smoothness 0-1 range inside the safe regime.
 SMOOTHNESS_DP_SCALE = 0.15
 
-# Scale multiplying swing_weight into the phase-2 colour-DP swing penalty
-# (solve()'s fit_cost addition). Raw squared-photopic-luma swing terms are
-# a different, much larger scale than fit_cost's own candidate gaps
-# (~1000-1500 typical) -- an unsealed swing_weight=1.0 added ~10000 for a
-# modest 100-luma mismatch, which drowned out hue-fit entirely and
-# produced flat greys/wrong-hue candidates (found on pirate.webp: rows
-# that should be skin tone came back pure grey or saturated red/orange).
-# This scale is separate from swing_weight's phase-1 (on/off DBS) use,
-# which operates on individual-pixel deltas at a different natural scale.
-SWING_DP_SCALE = 0.1
-
 # Phase-2 colour refinement uses a Jacobi-style batch update (every row's
 # correction computed from one shared start-of-round snapshot) rather than
 # sequential Gauss-Seidel, so the DP sees internally-consistent costs
@@ -455,21 +444,27 @@ def solve(target, sigma=1.0, radius=3, rounds=10, sweeps=3, seed=0,
     only needs solve() for its on/off-mask machinery from here on.
 
     `swing_weight`/`sibling_frames` (default 0.0/None, off): penalises this
-    frame for choosing a per-pixel perceived-luma (PHOTOPIC_WEIGHTS) value
-    -- across all n_frames -- that swings far from sibling frames' current
-    value at that pixel. Two real-hardware artefacts share this one cause
-    (a pixel's displayed brightness varying frame to frame) and get
-    penalised in the two places colour/on-off are actually decided:
+    frame for choosing a per-pixel RGB value -- across all n_frames -- that
+    swings far (full weighted-RGB distance via werr(), NOT luma alone) from
+    sibling frames' current value at that pixel. Luma alone is not enough:
+    a grey and a warm orange can have near-identical photopic luma while
+    being nothing alike (found on pirate.webp -- a luma-only version of
+    this penalty left a grey/orange row-to-row alternation completely
+    unpenalised, luma gap ~7 vs RGB distance ~97, and had zero effect at
+    any weight). Two real-hardware artefacts share this one cause (a
+    pixel's displayed colour varying frame to frame) and get penalised in
+    the two places colour/on-off are actually decided:
       - phase 1 (DBS flip sweep): on/off swing -- a pixel on in only some
         frames strobes full colour/black every cycle (~50% of on-canvas
         pixels affected, unmitigated, measured on real test images).
       - phase 2 (colour DP): same-colour-everywhere swing -- e.g. the
-        `cumulative` scheme's residual-chasing picks a different, sometimes
-        much brighter or dimmer, colour per frame for the same row even
-        with every frame fully on, reading as a static bright/dark band
-        rather than flicker (found via row-level frame-to-frame luma-swing
-        measurement on pirate.webp, concentrated exactly where local target
-        brightness changes fast).
+        `cumulative` scheme's residual-chasing picks a different colour per
+        frame for the same row even with every frame fully on, reading as
+        a static bright/busy band rather than flicker.
+    Both phases cost swing via werr(), the same weighted-squared-RGB-
+    distance function fit_cost itself uses, so swing_weight is on the same
+    natural scale as the fit-cost terms it's traded against -- no separate
+    scale constant to calibrate.
     sibling_frames is a list of (color_idx, on) for every OTHER frame's
     CURRENT state; only meaningful when called with sibling_frames from
     solve_n_frame_cyclic()'s outer-round loop, where every other frame's
@@ -511,13 +506,20 @@ def solve(target, sigma=1.0, radius=3, rounds=10, sweeps=3, seed=0,
             temporal_weight=temporal_weight,
             max_luma_spread=max_luma_spread)
     colour = PALETTE_RGB[color_idx]
-    colour_luma = colour @ PHOTOPIC_WEIGHTS if swing_weight > 0 else None
-    sibling_raw_luma = None
+    sibling_raw_rgb = None
     if swing_weight > 0 and sibling_frames:
-        sibling_raw_luma = np.zeros((len(sibling_frames), HEIGHT, WIDTH), dtype=np.float64)
+        # Full RGB, not luma: two colours can have near-identical photopic
+        # luma (e.g. a grey and a warm orange) while being nothing alike --
+        # found on pirate.webp, where a luma-only version of this penalty
+        # left a grey/orange row-to-row alternation completely unpenalised
+        # (luma gap ~7, RGB distance ~97) and had zero effect at any
+        # weight. werr() is reused so swing cost lands in the same units
+        # as fit_cost's own candidate-vs-target distance, rather than a
+        # separately-scaled quantity that has to be guessed and recalibrated.
+        sibling_raw_rgb = np.zeros((len(sibling_frames), HEIGHT, WIDTH, 3), dtype=np.float64)
         for k, (sib_idx, sib_on) in enumerate(sibling_frames):
-            sib_luma_on = PALETTE_RGB[sib_idx] @ PHOTOPIC_WEIGHTS   # (HEIGHT,)
-            sibling_raw_luma[k] = np.where(sib_on, sib_luma_on[:, None], 0.0)
+            sib_rgb_on = PALETTE_RGB[sib_idx]   # (HEIGHT,3)
+            sibling_raw_rgb[k] = np.where(sib_on[:, :, None], sib_rgb_on[:, None, :], 0.0)
 
     # --- initialise on/off: on if target closer to colour[y] than black -
     on = np.zeros((HEIGHT, WIDTH), dtype=bool)
@@ -584,15 +586,14 @@ def solve(target, sigma=1.0, radius=3, rounds=10, sweeps=3, seed=0,
                             new_pix = old_pix + (w * col if not cur_on else -w * col)
                             delta_total += werr(target[yy, x] - new_pix) - werr(target[yy, x] - old_pix)
                             affected.append((yy, new_pix))
-                        if sibling_raw_luma is not None:
-                            this_luma_on = colour_luma[y]
-                            cur_raw = this_luma_on if cur_on else 0.0
-                            new_raw = 0.0 if cur_on else this_luma_on
-                            sib = sibling_raw_luma[:, y, x]
-                            sib_max, sib_min = sib.max(), sib.min()
-                            cur_swing = max(sib_max, cur_raw) - min(sib_min, cur_raw)
-                            new_swing = max(sib_max, new_raw) - min(sib_min, new_raw)
-                            delta_total += swing_weight * (new_swing ** 2 - cur_swing ** 2)
+                        if sibling_raw_rgb is not None:
+                            zero3 = np.zeros(3)
+                            cur_raw = col if cur_on else zero3
+                            new_raw = zero3 if cur_on else col
+                            sib = sibling_raw_rgb[:, y, x]              # (n_sib, 3)
+                            cur_swing_cost = werr(sib - cur_raw).max()
+                            new_swing_cost = werr(sib - new_raw).max()
+                            delta_total += swing_weight * (new_swing_cost - cur_swing_cost)
                         if delta_total < -1e-9:
                             for yy, new_pix in affected:
                                 blended[yy, x] = new_pix
@@ -680,22 +681,24 @@ def solve(target, sigma=1.0, radius=3, rounds=10, sweeps=3, seed=0,
 
             fit_cost = _fit_cost_table(continuous_targets, weights, valid_mask=valid_mask,
                                         chroma_bias_scale=chroma_bias_scale)
-            if swing_weight > 0 and sibling_raw_luma is not None:
+            if swing_weight > 0 and sibling_raw_rgb is not None:
                 # Colour-choice swing: unlike the phase-1 flip penalty
                 # (single pixel), a row's colour applies to every on-pixel
                 # in it at once, so this is meaned rather than summed over
                 # the row's on-pixels -- keeps swing_weight's effective
-                # strength comparable between the two phases.
+                # strength comparable between the two phases. Uses werr()
+                # (full weighted-RGB distance), same as fit_cost itself, so
+                # the two terms are naturally on the same scale -- no
+                # separate fudge-factor constant to guess/recalibrate.
                 for y in range(HEIGHT):
                     xs_on = np.nonzero(on[y])[0]
                     if len(xs_on) == 0:
                         continue
-                    sib_row = sibling_raw_luma[:, y, xs_on]              # (n_sib, k)
-                    sib_max, sib_min = sib_row.max(axis=0), sib_row.min(axis=0)  # (k,)
-                    cand_luma = PALETTE_PERCEIVED_LUMA[:, None]          # (128,1)
-                    swing = (np.maximum(sib_max[None, :], cand_luma) -
-                             np.minimum(sib_min[None, :], cand_luma))    # (128,k)
-                    fit_cost[y] += swing_weight * SWING_DP_SCALE * np.mean(swing ** 2, axis=1)
+                    sib_row = sibling_raw_rgb[:, y, xs_on]                # (n_sib, k, 3)
+                    diff = PALETTE_RGB[:, None, None, :] - sib_row[None, :, :, :]  # (128,n_sib,k,3)
+                    costs = np.sum(weights * diff ** 2, axis=-1)          # (128, n_sib, k)
+                    swing_cost = costs.max(axis=1).mean(axis=1)           # (128,) worst sibling, meaned over on-pixels
+                    fit_cost[y] += swing_weight * swing_cost
             transition_scale = smoothness * SMOOTHNESS_DP_SCALE
             new_color_idx = solve_colour_sequence(fit_cost, transition_scale,
                                                    temporal_ref_colours=temporal_ref_colours,
@@ -721,9 +724,6 @@ def solve(target, sigma=1.0, radius=3, rounds=10, sweeps=3, seed=0,
                     blended[yy, xs_on] += w * delta_c
                 colour[y] = new_colour
                 color_idx[y] = new_color_idx[y]
-
-            if swing_weight > 0:
-                colour_luma = colour @ PHOTOPIC_WEIGHTS
 
         if verbose:
             elapsed = time.monotonic() - t_start
@@ -1198,10 +1198,34 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
     inner_verbose = verbose and not terse
     temporal_weight = kwargs.pop("temporal_weight", 0.0)
     swing_weight = kwargs.pop("swing_weight", 0.0)
+    swing_metric_weights = get_weights(kwargs.get("metric", "luma"))
 
     def score(s):
         avg = s / n_frames
         return (float(np.sum((target - avg) ** 2)) / (height * width * 3)) ** 0.5
+
+    def swing_cost(idxs, on_masks):
+        """Mean per-pixel worst-case pairwise werr() distance between all
+        n_frames' raw displayed RGB -- the SAME quantity/units solve()'s
+        swing_weight penalty minimises internally (see its docstring), so
+        round_selector below can add swing_weight * this directly, with no
+        separate scale constant to guess. 0.0 at swing_weight == 0 makes no
+        difference (never called), but computing it that way rather than
+        gating the WHOLE selector on `swing_weight > 0` matters: an earlier
+        version switched the selector to a different, unrelated metric
+        (frame_jump) for ANY nonzero swing_weight regardless of magnitude,
+        so even a vanishingly small weight (with negligible effect inside
+        solve() itself) could still discard a genuinely better round --
+        found via outer_rounds=0 vs 1 at swing_weight=1e-9 keeping the
+        worse (init) state instead of round 1's real improvement."""
+        raws = np.stack([np.where(on[:, :, None], PALETTE_RGB[idx][:, None, :], 0.0)
+                          for idx, on in zip(idxs, on_masks)], axis=0)  # (n_frames,H,W,3)
+        worst = np.zeros((height, width))
+        for i in range(n_frames):
+            for j in range(i + 1, n_frames):
+                d = np.sum(swing_metric_weights * (raws[i] - raws[j]) ** 2, axis=-1)
+                worst = np.maximum(worst, d)
+        return float(worst.mean())
 
     if frame_scheme == "joint":
         if n_frames != 3:
@@ -1251,15 +1275,19 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
 
     # Each outer round is a full independent re-solve per frame, so this
     # relaxation isn't guaranteed to improve monotonically -- snapshot the
-    # best-scoring state seen so far and return that. Selection metric is
-    # plain RMS, UNLESS swing_weight is active, in which case frame_jump
-    # is used instead: RMS-only selection was found to silently discard
-    # every round's flicker improvement (outer_rounds=2 vs 4 gave
-    # byte-identical output at swing_weight=1.0 before this fix, since
-    # trading RMS for less flicker is the whole point of swing_weight).
+    # best-scoring state seen so far and return that. Selector is
+    # round_rmse + swing_weight * swing_cost(...): continuous in
+    # swing_weight and exactly equal to plain RMS selection at
+    # swing_weight == 0, so it can't silently discard a round's fit
+    # quality over an arbitrarily tiny swing improvement (a fixed
+    # scale-blind switch to a different metric for ANY nonzero
+    # swing_weight was tried first and found to do exactly that -- see
+    # swing_cost()'s docstring). frame_jump is still computed and printed
+    # per round as a diagnostic; it no longer drives selection.
     best_score = score(cur_sum)
     best_jump = compute_frame_jump(color_idxs, ons, height, width)
-    best_selector = best_jump if swing_weight > 0 else best_score
+    best_swing = swing_cost(color_idxs, ons) if swing_weight > 0 else 0.0
+    best_selector = best_score + swing_weight * best_swing
     best_state = (list(color_idxs), list(ons), list(blendeds), cur_sum.copy())
     best_label = "init"
 
@@ -1302,7 +1330,8 @@ def solve_n_frame_cyclic(target, n_frames=3, outer_rounds=4, seeds=3,
         round_durations.append(time.monotonic() - round_t0)
         round_rmse = score(cur_sum)
         round_jump = compute_frame_jump(color_idxs, ons, height, width)
-        round_selector = round_jump if swing_weight > 0 else round_rmse
+        round_swing = swing_cost(color_idxs, ons) if swing_weight > 0 else 0.0
+        round_selector = round_rmse + swing_weight * round_swing
         if round_selector < best_selector:
             best_selector = round_selector
             best_score = round_rmse
@@ -1744,19 +1773,22 @@ def main():
                          "30-60.")
     ap.add_argument("--swing-weight", type=float, default=0.0,
                     help="only takes effect under --frame-mode cyclic (ignored, with a note, "
-                         "otherwise). Penalises a pixel's displayed perceived-brightness "
-                         "swinging far between frames, whichever of the two ways that happens: "
-                         "(1) a pixel on in only SOME of the N frames, strobing full colour/"
-                         "black every cycle (~50%% of on-canvas pixels affected, unmitigated, "
-                         "measured on real test images); (2) a row getting a different, "
-                         "sometimes much brighter/dimmer, colour per frame while fully on every "
-                         "frame -- reads as a static bright/dark band, not flicker, and is what "
+                         "otherwise). Penalises a pixel's displayed RGB colour swinging far "
+                         "between frames (full weighted-RGB distance, not luma alone -- a grey "
+                         "and a warm orange can share near-identical luma while looking nothing "
+                         "alike), whichever of two ways that happens: (1) a pixel on in only "
+                         "SOME of the N frames, strobing full colour/black every cycle (~50%% of "
+                         "on-canvas pixels affected, unmitigated, measured on real test images); "
+                         "(2) a row getting a different colour per frame while fully on every "
+                         "frame -- reads as a static bright/busy band, not flicker, and is what "
                          "--frame-scheme cumulative's residual-chasing tends to do where local "
-                         "target brightness changes fast. Default 0.0 (off). Measured on "
-                         "pirate.webp (48x128, 3 frames, radius=5): 1.0 cut the worst-affected "
-                         "row band's frame-to-frame luma swing ~36%% for +11%% RMS; 2.0 cut it "
-                         "~59%% for +26%% RMS, still correct hue/no grey-collapse at both. Try "
-                         "1.0 as a starting point.")
+                         "target brightness changes fast. Default 0.0 (off). Very sensitive: "
+                         "unlike most weights here this isn't a 0-1ish dial -- on pirate.webp "
+                         "(48x128, radius=5) 0.0001 was a no-op, 0.5-1.0 gave a real, correct-hue "
+                         "reduction in cross-frame RGB swing (~35-50%%) for a real RMS cost "
+                         "(~5-17%%), and cost climbed steeply past that. Try 0.5-1.0 and check the "
+                         "actual result -- this parameter has been wrong twice already; verify, "
+                         "don't assume.")
     ap.add_argument("--roll-scanlines", action="store_true",
                     help="only meaningful with --frames > 1. Post-process the N solved "
                          "frames into N 'rolled' composites where each --roll-band-height-row "

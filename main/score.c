@@ -763,6 +763,7 @@ void drawPlanetName() {
         scoreLineColour[i] = col++ & 7;
     }
 
+
     // scoreLineNew[1] = LETTER('P');
     // scoreLineNew[2] = LETTER('L');
     // scoreLineNew[3] = LETTER('A');
@@ -870,6 +871,8 @@ void drawScore() {
 
     for (int i = 0; i < 10; i++)
         scoreLineNew[i] = DIGIT_SPACE;
+
+    scoreCycle = SCORELINE_CAVELEVEL;
 
     switch (scoreCycle) {
     case SCORELINE_TIME:

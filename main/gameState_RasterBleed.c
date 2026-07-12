@@ -75,7 +75,7 @@ void VB_RasterBleed() {
 
 
     static int y = (_SCANLINES - 128) >> 1;    //_SCANLINES - 30;
-    rasterBleed(PIRATE_FRAME, y);
+    rasterBleed(PARROT_FRAME, y);
 
 
     if (luminance == lumTarget)

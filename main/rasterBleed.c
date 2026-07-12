@@ -19,8 +19,8 @@ const ScanFrame frame_set[MAX_RASTERBLEED_FRAME] = {
     // [LENA_FRAME] = {lena_screen_frames, LENA_NUM_FRAMES},    //
     [PIRATE_FRAME] = {pirate_screen_frames, PIRATE_NUM_FRAMES},    //
 
-    // [PARROT_FRAME] = {parrot_screen_frames, PARROT_NUM_FRAMES},    //
-    [SKULL_FRAME] = {skull_screen_frames, SKULL_NUM_FRAMES},    //
+    [PARROT_FRAME] = {parrot_screen_frames, PARROT_NUM_FRAMES},    //
+    [SKULL_FRAME] = {skull_screen_frames, SKULL_NUM_FRAMES},       //
     //[ZPH_FRAME] = {zph_screen_frames, ZPH_NUM_FRAMES},          //
     //[SAM_FRAME] = {sam_screen_frames, SAM_NUM_FRAMES},          //
     //[DH_FRAME] = {dh_screen_frames, DH_NUM_FRAMES},                      //

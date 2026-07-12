@@ -17,14 +17,12 @@
  * skull_screen_frames, a table of 3 pointers in cycle order. Index it
  * by a running frame counter (mod SKULL_NUM_FRAMES): cycle frame 0, 1,
  * ..., 2, back to 0, forever. Only frame0 was solved to look
- * reasonable on its own; every later frame was solved to correct whatever
- * residual error the frames before it left behind, so that the
- * 1/3-weighted temporal average the eye perceives from the full
- * cycle (combined with the usual vertical scanline blending within each
- * individual frame) lands closer to the source image than fewer frames
+ * reasonable on its own; every later frame corrects whatever residual
+ * error the frames before it left behind, so the 1/3-weighted
+ * temporal average lands closer to the source image than fewer frames
  * could manage. Do not display any frame after frame0 on its own
- * expecting it to look like the picture -- it won't; each is a
- * correction term, not a picture in its own right.
+ * expecting it to look like the picture -- each is a correction term,
+ * not a picture in its own right.
  */
 
 #define SKULL_NUM_FRAMES 3
@@ -43,7 +41,7 @@ typedef struct {
 
 #endif /* ATARI_SCANLINE_TYPE_H */
 
-#define SKULL_PARAMS "image=skull.png width=48 height=128 sigma=1.0 radius=3 rounds=10 sweeps=3 metric=luma seeds=4 smoothness=0.5 swaps=False saturation=1.0 brightness=1.0 frames=3 temporal_weight=0.0 frame_scheme=cumulative frame_mode=cyclic outer_rounds=10 line_exhaustive_k=None line_exhaustive_dither=None line_exhaustive_max_luma_spread=None line_exhaustive_flicker_weight=None line_exhaustive_spatial_dither=None roll_scanlines=False roll_band_height=None"
+#define SKULL_PARAMS "image=skull.png width=48 height=128 sigma=1.0 radius=5 rounds=10 sweeps=3 metric=luma seeds=6 smoothness=0.2 swaps=False saturation=1.5 brightness=1.5 frames=3 temporal_weight=0.0 frame_scheme=cumulative frame_mode=cyclic outer_rounds=12 roll_scanlines=False roll_band_height=None"
 
 /* e.g. skull_screen_frames[frame_counter % SKULL_NUM_FRAMES] */
 extern const ScanLine * const skull_screen_frames[SKULL_NUM_FRAMES];

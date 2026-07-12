@@ -667,11 +667,30 @@ void drawAttachedChar(int ch) {
         ay++;
     }
 
-    int y = playerY * CHAR_Y - (scrollY >> 16) * 3 + autoMoveY - 20 + 1;
+    int offsetX = 0;
+    int offsetY = 0;
+
+    if (attachmentOffset) {
+
+        offsetX = attachmentOffset->x;
+        offsetY = attachmentOffset->y;
 
 
-    int trixX =
-        ((playerX - 1) * CHAR_TRIX_X) + -(scrollX >> 16) + (faceDirection * (frameAdjustX + (autoMoveX >> 2))) + 2;
+        // if (!offsetX && !offsetY)
+        //     attachmentOffset = 0;
+
+        // else
+
+        if ((attachmentOffset + 1)->x || (attachmentOffset + 1)->y)
+            attachmentOffset++;
+    }
+
+
+    int y = playerY * CHAR_Y - (scrollY >> 16) * 3 + autoMoveY /*- 20 + 1*/ + (shakeY >> 16) + offsetY;
+
+
+    int trixX = ((playerX - 1) * CHAR_TRIX_X) + -(scrollX >> 16) + (faceDirection * (frameAdjustX + (autoMoveX >> 2))) +
+                2 + (shakeX >> 16) - offsetX;
 
     // y = trixY;
 

@@ -255,52 +255,53 @@ const unsigned char *const AnimateBase[] = {
     // be compromised by the conditional compilation. Beware.
 
     0,                     // 00 TYPE_BLANK
-    0,                     // 01 TYPE_DIRT
-    0,                     // 02 TYPE_BRICKWALL
-    0,                     // 03 TYPE_OUTBOX_PRE
-    AnimFlashOut,          // 04 TYPE_OUTBOX
-    0,                     // 05 TYPE_STEELWALL
-    0,                     // 06 TYPE_ROCK
-    AnimPulseDoge,         // 07 TYPE_DOGE
-    0,                     // 08 TYPE_MELLON_HUSK_PRE
-    AnimMellonHusk,        // 09 TYPE_MELLON_HUSK
-    0,                     // 10 TYPE_PEBBLE1
-    0,                     // 11 TYPE_DUST_0
-    0,                     // 12 TYPE_DOGE_FALLING
-    0,                     // 13 TYPE_ROCK_FALLING
-    0,                     // 14 TYPE_DUST_ROCK
-    0,                     // 15 TYPE_CONVERT_GEODE_TO_DOGE
-    0,                     // 16 TYPE_PUSHER
-    0,                     // 17 TYPE_PUSHER_VERT
-    0,                     // 18 TYPE_WYRM
-    0,                     // 19 TYPE_GEODOGE
-    0,                     // 20 TYPE_GEODOGE_FALLING
-    0,                     // 21 TYPE_LAVA
-    0,                     // 22 TYPE_PEBBLE_ROCK    (pebble to geodoge)
-    AnimateGravity,        // 23 TYPE_FLIP_GRAVITY
-    0,                     // 24 TYPE_BLOCK
-    AnimateGrinder,        // 25 TYPE_GRINDER
-    0,                     // 26 TYPE_HUB
-    0,                     // 27 TYPE_WATER
-    AnimateWaterFlow0,     // 28 TYPE_WATERFLOW0
-    AnimateWaterFlow1,     // 29 TYPE_WATERFLOW1
-    AnimateWaterFlow2,     // 30 TYPE_WATERFLOW2
-    AnimateWaterFlow3,     // 31 TYPE_WATERFLOW3
-    AnimateWaterFlow4,     // 32 TYPE_WATERFLOW4
-    0,                     // 33 TYPE_TAP
-    0,                     // 34 TYPE_OUTLET
-    AnimateGrinder1,       // 35 TYPE_GRINDER1
-    AnimateBelt,           // 36 TYPE_BELT
-    AnimateBelt1,          // 37 TYPE_BELT1
-    0,                     // 38 TYPE_CONVERT_PIPE
-    0,                     // 39 TYPE_DOGE_FALLING2
-    AnimateRockPebble,     // 40 TYPE_ROCK_PEBBLE (geodoge disintegrating)
-    0,                     // 41 TYPE_ELECTRIC_0
-    0,                     // 42 TYPE_INSULATOR
-    AnimateStar,           // 43 TYPE_STAR
-    0,                     // 44 TYPE_STAR_FALLING
-    AnimateStarExplode,    // 45 TYPE_STAR_EXPLODE
-    AnimateRockBonus,      // 46 TYPE_ROCK_BONUS
+    0,                     // 01 TYPE_PLACEHOLDER
+    0,                     // 02 TYPE_DIRT
+    0,                     // 03 TYPE_BRICKWALL
+    0,                     // 04 TYPE_OUTBOX_PRE
+    AnimFlashOut,          // 05 TYPE_OUTBOX
+    0,                     // 06 TYPE_STEELWALL
+    0,                     // 07 TYPE_ROCK
+    AnimPulseDoge,         // 08 TYPE_DOGE
+    0,                     // 09 TYPE_MELLON_HUSK_PRE
+    AnimMellonHusk,        // 10 TYPE_MELLON_HUSK
+    0,                     // 11 TYPE_PEBBLE1
+    0,                     // 12 TYPE_DUST_0
+    0,                     // 13 TYPE_DOGE_FALLING
+    0,                     // 14 TYPE_ROCK_FALLING
+    0,                     // 15 TYPE_DUST_ROCK
+    0,                     // 16 TYPE_CONVERT_GEODE_TO_DOGE
+    0,                     // 17 TYPE_PUSHER
+    0,                     // 18 TYPE_PUSHER_VERT
+    0,                     // 19 TYPE_WYRM
+    0,                     // 20 TYPE_GEODOGE
+    0,                     // 21 TYPE_GEODOGE_FALLING
+    0,                     // 22 TYPE_LAVA
+    0,                     // 23 TYPE_PEBBLE_ROCK    (pebble to geodoge)
+    AnimateGravity,        // 24 TYPE_FLIP_GRAVITY
+    0,                     // 25 TYPE_BLOCK
+    AnimateGrinder,        // 26 TYPE_GRINDER
+    0,                     // 27 TYPE_HUB
+    0,                     // 28 TYPE_WATER
+    AnimateWaterFlow0,     // 29 TYPE_WATERFLOW0
+    AnimateWaterFlow1,     // 30 TYPE_WATERFLOW1
+    AnimateWaterFlow2,     // 31 TYPE_WATERFLOW2
+    AnimateWaterFlow3,     // 32 TYPE_WATERFLOW3
+    AnimateWaterFlow4,     // 33 TYPE_WATERFLOW4
+    0,                     // 34 TYPE_TAP
+    0,                     // 35 TYPE_OUTLET
+    AnimateGrinder1,       // 36 TYPE_GRINDER1
+    AnimateBelt,           // 37 TYPE_BELT
+    AnimateBelt1,          // 38 TYPE_BELT1
+    0,                     // 39 TYPE_CONVERT_PIPE
+    0,                     // 40 TYPE_DOGE_FALLING2
+    AnimateRockPebble,     // 41 TYPE_ROCK_PEBBLE (geodoge disintegrating)
+    0,                     // 42 TYPE_ELECTRIC_0
+    0,                     // 43 TYPE_INSULATOR
+    AnimateStar,           // 44 TYPE_STAR
+    0,                     // 45 TYPE_STAR_FALLING
+    AnimateStarExplode,    // 46 TYPE_STAR_EXPLODE
+    AnimateRockBonus,      // 47 TYPE_ROCK_BONUS
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
@@ -308,56 +309,58 @@ _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "Animat
 const unsigned char PickupCharacter[] = {
 
     0,                // 00 TYPE_BLANK
-    0,                // 01 TYPE_DIRT
-    0,                // 02 TYPE_BRICKWALL
-    0,                // 03 TYPE_OUTBOX_PRE
-    0,                // 04 TYPE_OUTBOX
-    0,                // 05 TYPE_STEELWALL
-    CH_ROCK,          // 06 TYPE_ROCK
-    CH_DOGE_00,       // 07 TYPE_DOGE
-    0,                // 08 TYPE_MELLON_HUSK_PRE
-    0,                // 09 TYPE_MELLON_HUSK
-    0,                // 10 TYPE_PEBBLE1
-    0,                // 11 TYPE_DUST_0
-    0,                // 12 TYPE_DOGE_FALLING
-    0,                // 13 TYPE_ROCK_FALLING
-    0,                // 14 TYPE_DUST_ROCK
-    0,                // 15 TYPE_CONVERT_GEODE_TO_DOGE
-    0,                // 16 TYPE_PUSHER
-    0,                // 17 TYPE_PUSHER_VERT
-    0,                // 18 TYPE_WYRM
-    CH_GEODOGE,       // 19 TYPE_GEODOGE
-    0,                // 20 TYPE_GEODOGE_FALLING
-    0,                // 21 TYPE_LAVA
-    0,                // 22 TYPE_PEBBLE_ROCK    (pebble to geodoge)
-    0,                // 23 TYPE_FLIP_GRAVITY
-    0,                // 24 TYPE_BLOCK
-    0,                // 25 TYPE_GRINDER
-    0,                // 26 TYPE_HUB
-    0,                // 27 TYPE_WATER
-    0,                // 28 TYPE_WATERFLOW0
-    0,                // 29 TYPE_WATERFLOW1
-    0,                // 30 TYPE_WATERFLOW2
-    0,                // 31 TYPE_WATERFLOW3
-    0,                // 32 TYPE_WATERFLOW4
-    0,                // 33 TYPE_TAP
-    0,                // 34 TYPE_OUTLET
-    0,                // 35 TYPE_GRINDER1
-    0,                // 36 TYPE_BELT
-    0,                // 37 TYPE_BELT1
-    0,                // 38 TYPE_CONVERT_PIPE
-    0,                // 39 TYPE_DOGE_FALLING2
-    0,                // 40 TYPE_ROCK_PEBBLE (geodoge disintegrating)
-    0,                // 41 TYPE_ELECTRIC_0
-    0,                // 42 TYPE_INSULATOR
-    CH_STAR,          // 43 TYPE_STAR
-    0,                // 44 TYPE_STAR_FALLING
-    0,                // 45 TYPE_STAR_EXPLODE
-    CH_ROCK_BONUS,    // 46 TYPE_ROCK_BONUS
+    0,                // 01 TYPE_PLACEHOLDER
+    0,                // 02 TYPE_DIRT
+    0,                // 03 TYPE_BRICKWALL
+    CH_DOORCLOSED,    // 04 TYPE_OUTBOX_PRE
+    CH_DOOROPEN_0,    // 05 TYPE_OUTBOX
+    0,                // 06 TYPE_STEELWALL
+    CH_ROCK,          // 07 TYPE_ROCK
+    CH_DOGE_00,       // 08 TYPE_DOGE
+    0,                // 09 TYPE_MELLON_HUSK_PRE
+    0,                // 10 TYPE_MELLON_HUSK
+    0,                // 11 TYPE_PEBBLE1
+    0,                // 12 TYPE_DUST_0
+    0,                // 13 TYPE_DOGE_FALLING
+    0,                // 14 TYPE_ROCK_FALLING
+    0,                // 15 TYPE_DUST_ROCK
+    0,                // 16 TYPE_CONVERT_GEODE_TO_DOGE
+    0,                // 17 TYPE_PUSHER
+    0,                // 18 TYPE_PUSHER_VERT
+    0,                // 19 TYPE_WYRM
+    CH_GEODOGE,       // 20 TYPE_GEODOGE
+    0,                // 21 TYPE_GEODOGE_FALLING
+    0,                // 22 TYPE_LAVA
+    0,                // 23 TYPE_PEBBLE_ROCK    (pebble to geodoge)
+    0,                // 24 TYPE_FLIP_GRAVITY
+    0,                // 25 TYPE_BLOCK
+    0,                // 26 TYPE_GRINDER
+    0,                // 27 TYPE_HUB
+    0,                // 28 TYPE_WATER
+    0,                // 29 TYPE_WATERFLOW0
+    0,                // 30 TYPE_WATERFLOW1
+    0,                // 31 TYPE_WATERFLOW2
+    0,                // 32 TYPE_WATERFLOW3
+    0,                // 33 TYPE_WATERFLOW4
+    0,                // 34 TYPE_TAP
+    0,                // 35 TYPE_OUTLET
+    CH_GRINDER_0,     // 36 TYPE_GRINDER1
+    0,                // 37 TYPE_BELT
+    0,                // 38 TYPE_BELT1
+    0,                // 39 TYPE_CONVERT_PIPE
+    0,                // 40 TYPE_DOGE_FALLING2
+    0,                // 41 TYPE_ROCK_PEBBLE (geodoge disintegrating)
+    0,                // 42 TYPE_ELECTRIC_0
+    0,                // 43 TYPE_INSULATOR
+    CH_STAR,          // 44 TYPE_STAR
+    0,                // 45 TYPE_STAR_FALLING
+    0,                // 46 TYPE_STAR_EXPLODE
+    CH_ROCK_BONUS,    // 47 TYPE_ROCK_BONUS
 
 };
 
 _Static_assert(sizeof(PickupCharacter) / sizeof(PickupCharacter[0]) == TYPE_MAX, "PickupCharacter table wrong size");
+
 
 void initCharAnimations() {
 

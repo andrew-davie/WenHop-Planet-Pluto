@@ -30,6 +30,9 @@ bool handled;
 bool gearsActive;
 bool gearsWaitRelease;
 
+static unsigned char *meAtt;
+static bool drop = false;
+
 
 const enum JOYSTICK_DIRECTION joyDirectBit[] = {
     JOYSTICK_UP,
@@ -90,6 +93,10 @@ void initPlayer() {
 
     gearsActive = false;
     gearsWaitRelease = false;
+
+    drop = false;
+    attachment = 0;
+    attachmentOffset = 0;
 
     startPlayerAnimation(ID_Stand);    // tmp
     // startPlayerAnimation(ID_Stand);
@@ -203,6 +210,95 @@ void moveHusk(int dir, unsigned char *me, unsigned char *meOffset) {
 }
 
 
+const OFFSET sampleOffsetRight[] = {
+
+    {-5, -2 * 3}, {-5, -4 * 3}, {-4, -6 * 3}, {-4, -6 * 3}, {-3, -7 * 3},
+    {-2, -7 * 3}, {-1, -7 * 3}, {0, -8 * 3},  {0, 0},
+};
+
+const OFFSET sampleOffsetLeft[] = {
+
+    {5, -2 * 3}, {5, -4 * 3}, {4, -6 * 3}, {4, -6 * 3}, {3, -7 * 3}, {2, -7 * 3}, {1, -7 * 3}, {0, -8 * 3}, {0, 0},
+};
+
+const OFFSET sampleOffsetDown[] = {
+
+    {0, 8 * 3}, {-1, 5 * 3}, {-2, 2 * 3}, {-2, -2 * 3}, {-2, -5 * 3}, {-1, -6 * 3}, {-1, -7 * 3}, {0, -8 * 3}, {0, 0},
+};
+
+const OFFSET sampleOffsetUp[] = {
+    {1, -11 * 3}, {1, -12 * 3}, {1, -13 * 3}, {0, -14 * 3}, {0, -12 * 3},
+    {1, -10 * 3}, {1, -8 * 3},  {0, -8 * 3},  {0, 0},
+};
+
+
+const OFFSET *pickupOffset[] = {
+    sampleOffsetUp,       // up
+    sampleOffsetRight,    // right
+    sampleOffsetDown,     // down
+    sampleOffsetLeft,     // left
+};
+
+
+const OFFSET dropOffsetRight[] = {
+
+    {0, -8 * 3},     //
+    {-1, -7 * 3},    //
+    {-2, -7 * 3},    //
+    {-3, -7 * 3},    //
+    {-4, -6 * 3},    //
+    {-4, -6 * 3},    //
+    {-5, -4 * 3},    //
+    {-5, -2 * 3},    //
+    {0, 0},          //
+};
+
+const OFFSET dropOffsetLeft[] = {
+
+    {0, -8 * 3},    //
+    {1, -7 * 3},    //
+    {2, -7 * 3},    //
+    {3, -7 * 3},    //
+    {4, -6 * 3},    //
+    {4, -6 * 3},    //
+    {5, -4 * 3},    //
+    {5, -2 * 3},    //
+    {0, 0},         //
+};
+
+const OFFSET dropOffsetDown[] = {
+
+    {0, -8 * 3},     //
+    {-1, -7 * 3},    //
+    {-1, -6 * 3},    //
+    {-2, -5 * 3},    //
+    {-2, -2 * 3},    //
+    {-2, 2 * 3},     //
+    {-1, 5 * 3},     //
+    {0, 8 * 3},      //
+    {0, 0},          //
+};
+
+const OFFSET dropOffsetUp[] = {
+    {0, -8 * 3},     //
+    {1, -8 * 3},     //
+    {1, -10 * 3},    //
+    {0, -12 * 3},    //
+    {0, -14 * 3},    //
+    {1, -13 * 3},    //
+    {1, -12 * 3},    //
+    {1, -11 * 3},    //
+    {0, 0},          //
+};
+
+
+const OFFSET *dropOffset[] = {
+    dropOffsetUp,       // up
+    dropOffsetRight,    // right
+    dropOffsetDown,     // down
+    dropOffsetLeft,     // left
+};
+
 bool checkHighPriorityMove(int dir) {
 
     static int zapDelay = 0;
@@ -220,33 +316,35 @@ bool checkHighPriorityMove(int dir) {
     if (!waitRelease) {
         if (!(inpt4 & 0x80)) {
 
+            meAtt = me + dirOffset[dir];
+
             if (attachment) {
+                if (Attribute[CharToType[GET(*meAtt)]] & ATT_BLANK) {
 
-                unsigned char *meOffset = me + dirOffset[dir];
-                if (Attribute[CharToType[GET(*meOffset)]] & ATT_BLANK) {
-                    *meOffset = FLAG(attachment);
-
-                    nDots(3, playerX, playerY, PT_SPIRAL, 25, 3 + ((xdir[dir] * CHAR_TRIX_X) >> 1) + rangeRandom(5) - 2,
-                          4 + ((ydir[dir] * CHAR_TRIX_Y) >> 1) + rangeRandom(5) - 2, 100, 2);
-                    attachment = 0;
-                    waitRelease = true;
+                    // TODO: reserve square
+                    drop = true;
+                    attachmentOffset = dropOffset[dir];
+                    // waitRelease = true;
                     return true;
                 }
             }
 
             else {
 
+                unsigned char pickup = PickupCharacter[CharToType[GET(*meAtt)]];
+                if (pickup) {
 
-                unsigned char *meOffset = me + dirOffset[dir];
-                if (!attachment && !(inpt4 & 0x80)) {
-                    unsigned char pickup = PickupCharacter[CharToType[GET(*meOffset)]];
-                    if (pickup) {
+                    attachment = pickup;
 
-                        attachment = pickup;
-                        *meOffset = FLAG(CH_DUST_0);
-                        waitRelease = true;
-                        return true;
-                    }
+                    if (dir == 1 || dir == 2)
+                        attachment |= 0x80;
+
+
+                    attachmentOffset = pickupOffset[dir];
+
+                    *meAtt = FLAG(CH_DUST_0);
+                    waitRelease = true;
+                    return true;
                 }
             }
         }
@@ -560,9 +658,9 @@ bool checkLowPriorityMove(int dir) {
 
         // FLASH(0x94, 4);
 
-        if (!pushCounter)
-            if (destType == TYPE_ROCK_BONUS)
-                startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
+        // if (!pushCounter)
+        //     if (destType == TYPE_ROCK_BONUS)
+        //         startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
 
 
         if (++pushCounter > 1) {
@@ -607,15 +705,16 @@ bool checkLowPriorityMove(int dir) {
 
                     surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
 
-                    if (destType == TYPE_ROCK_BONUS) {
+                    // if (destType == TYPE_ROCK_BONUS) {
 
-                        ADDAUDIO(SFX_DOGE2);
+                    //     ADDAUDIO(SFX_DOGE2);
 
-                        *meOffset = FLAG(CH_STAR);
+                    //     *meOffset = FLAG(CH_STAR);
 
-                    }
+                    // }
 
-                    else if (destType == TYPE_ROCK) {
+                    // else
+                    if (destType == TYPE_ROCK) {
 
 
                         ADDAUDIO(SFX_ROCK);
@@ -685,6 +784,17 @@ void bubbles(int count, int dripX, int dripY, int age, int /*speed*/) {
 void movePlayer(unsigned char *me) {
 
     handled = false;
+
+
+    if (drop) {
+
+        attachmentOffset = 0;
+        *meAtt = attachment;
+        drop = false;
+        waitRelease = true;
+        attachment = 0;
+        return;
+    }
 
 
     if (pulsePlayerColour) {

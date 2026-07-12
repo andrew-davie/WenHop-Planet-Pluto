@@ -470,7 +470,9 @@ void setInsulator(unsigned char *p, bool active) {
         int y = boardRow + 1;
 
         while (CharToType[GET(*p)] != TYPE_INSULATOR) {
-            unsigned int att = Attribute[CharToType[GET(*p)]];
+
+            int type2 = CharToType[GET(*p)];
+            unsigned int att = Attribute[type2];
             if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES | ATT_BLANK)) {
 
                 // if (att & ATT_EXPLODABLE && !(att & ATT_BLANK))
@@ -480,6 +482,14 @@ void setInsulator(unsigned char *p, bool active) {
                 nDots(6, x, y, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
                 break;
             }
+
+            else if (type2 == TYPE_ROCK_BONUS) {
+
+                *p = FLAG(CH_STAR);
+                nDots(6, x, y, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                break;
+            }
+
             p += dir;
             y++;
         }

@@ -233,7 +233,7 @@ const unsigned int arenas[] = {
     _BUF_GAME_PF0_RIGHT,
 };
 
-void drawScreen() {    // --> cycles 62870 (@20230616)
+void drawScreen(int h) {    // --> cycles 62870 (@20230616)
 
     if (gameTick < 2)
         return;    // allow geodoge to coalesce
@@ -276,7 +276,7 @@ void drawScreen() {    // --> cycles 62870 (@20230616)
 
         const int height = _SCANLINES - scanline < CHAR_Y ? _SCANLINES - scanline : CHAR_Y;
 
-        p = RAM + _BOARD + row * _1ROW + characterX;
+        p = RAM + _BOARD /*+ h * 4*/ + row * _1ROW + characterX;
 
         for (int half = 0; half < 2; half++) {
 
