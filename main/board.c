@@ -117,7 +117,7 @@ void setupBoardScanner() {
 
     // After board scan complete, throttles until we're at correct FPS
 
-    int st = T1TC;
+    // int st = T1TC;
 
     if (gameFrame >= gameSpeed) {    // && !autoMoveFrameCount) {
 
@@ -207,11 +207,11 @@ void setupBoardScanner() {
         setSchedule(SCHEDULE_PROCESS_BOARD);
 
 
-        processBoardSquares();
+        //        processBoardSquares();
     }
 
-    if (T1TC - st > actualScore)
-        actualScore = T1TC - st;
+    // if (T1TC - st > actualScore)
+    //     actualScore = T1TC - st;
 }
 
 

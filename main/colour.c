@@ -117,7 +117,7 @@ void fadeBackgroundColour() {
     }
 }
 
-const unsigned char pfColour[] = {0x88, 0x28, 0xD8, 0xD8};
+const unsigned char pfColour[] = {0xA8, 0x28, 0xC8, 0xC8};    //{0x88, 0x28, 0xD8, 0xD8};
 
 void setPFColours(unsigned char *colours) {
 

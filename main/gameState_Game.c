@@ -211,7 +211,7 @@ void OS_Game() {
     scroll();
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE)
-        drawScreen(2);
+        drawScreen();
 
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;
