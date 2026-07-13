@@ -117,6 +117,8 @@ void setupBoardScanner() {
 
     // After board scan complete, throttles until we're at correct FPS
 
+    int st = T1TC;
+
     if (gameFrame >= gameSpeed) {    // && !autoMoveFrameCount) {
 
         //        doges = gameFrame;
@@ -205,8 +207,11 @@ void setupBoardScanner() {
         setSchedule(SCHEDULE_PROCESS_BOARD);
 
 
-        //        processBoardSquares();
+        processBoardSquares();
     }
+
+    if (T1TC - st > actualScore)
+        actualScore = T1TC - st;
 }
 
 
@@ -615,7 +620,7 @@ void processCreatures() {
         if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
             *next = FLAG(*me);
             *me = FLAG(CH_BLANK);
-            startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
+            // startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
         }
 
         break;
@@ -720,22 +725,22 @@ void processCreatures() {
 void restartBoardScan() {
 
     // // randomly place a new pebble
-    if (rangeRandom(256) < theCave->millingTime) {
+    // if (rangeRandom(256) < theCave->millingTime) {
 
 
-        int dX = playerX + rangeRandom(11) - 5;
-        int dY = playerY + rangeRandom(11) - 5;
+    //     int dX = playerX + rangeRandom(11) - 5;
+    //     int dY = playerY + rangeRandom(11) - 5;
 
-        if (dX >= 0 && dX < _BOARD_COLS && dY >= 0 && dY < _BOARD_ROWS) {
-            unsigned char *sq = RAM + _BOARD + dY * _1ROW + dX;
-            if (GET(*sq) == CH_DIRT)
-                *sq = FLAG(CH_PEBBLE1 + (getRandom32() & 1));
-        }
-    }
+    //     if (dX >= 0 && dX < _BOARD_COLS && dY >= 0 && dY < _BOARD_ROWS) {
+    //         unsigned char *sq = RAM + _BOARD + dY * _1ROW + dX;
+    //         if (GET(*sq) == CH_DIRT)
+    //             *sq = FLAG(CH_PEBBLE1 + (getRandom32() & 1));
+    //     }
+    // }
 
 
-    if (rangeRandom(256) < theCave->weather)
-        setShake(rangeRandom(20));
+    // if (rangeRandom(256) < theCave->weather)
+    //     setShake(rangeRandom(20));
 
     // Change insulator pattern
 

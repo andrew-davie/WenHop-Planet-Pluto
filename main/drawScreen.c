@@ -235,6 +235,8 @@ const unsigned int arenas[] = {
 
 void drawScreen(int h) {    // --> cycles 62870 (@20230616)
 
+    // int st = T1TC;
+
     if (gameTick < 2)
         return;    // allow geodoge to coalesce
 
@@ -307,21 +309,24 @@ void drawScreen(int h) {    // --> cycles 62870 (@20230616)
         scanline += height + lcount;
         lcount = 0;
     }
+
+    // if (T1TC - st > actualScore)
+    //     actualScore = T1TC - st;
 }
 
 
 bool drawBit(int x, int y, unsigned char colour) {
 
-    colour |= colour << 3;
-    colour >>= roller;
-
-    int line = (y - ((scrollY) >> 16)) * 3;
-    if (line < 0 || line >= _SCANLINES - 3)
+    int line = (y - (scrollY >> 16)) * 3;
+    if (line < 0 || line >= _SCANLINES - 2)
         return false;
 
-    int col = x - ((scrollX /** CHAR_TRIX_X*/) >> 16);
+    int col = x - (scrollX >> 16);
     if (col < 0 || col > SCREEN_TRIX_X - 1)
         return false;
+
+    colour |= colour << 3;
+    colour >>= roller;
 
     unsigned char *base = _BUF_GAME_PF0_LEFT + RAM + line;
 
@@ -332,26 +337,14 @@ bool drawBit(int x, int y, unsigned char colour) {
 
     base += ((col + 4) >> 3) * _BUFFER_SIZE;
 
-    int shift;
-    if (col < 4)
-        shift = col + 4;
+    static const unsigned int sh[] = {4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5, 6, 7};
 
-    else if (col < 12)
-        shift = 11 - col;
+    int shift = sh[col];
+    int mask = ~(1 << shift);
 
-    else
-        shift = (col - 12);
-
-    int bit = 1 << shift;
-
-    unsigned char mask0 = (colour) << shift;
-    unsigned char mask1 = (colour >> 1) << shift;
-    unsigned char mask2 = (colour >> 2) << shift;
-
-
-    base[0] = (base[0] & ~bit) | (bit & mask0);
-    base[1] = (base[1] & ~bit) | (bit & mask1);
-    base[2] = (base[2] & ~bit) | (bit & mask2);
+    base[0] = (base[0] & mask) | ((colour & 1) << shift);
+    base[1] = (base[1] & mask) | (((colour >> 1) & 1) << shift);
+    base[2] = (base[2] & mask) | (((colour >> 2) & 1) << shift);
 
     return true;
 }

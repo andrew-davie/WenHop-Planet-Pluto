@@ -95,7 +95,7 @@ unsigned char theCode;
 unsigned char theObject;
 
 
-int decodeExplicitData(int /*sfx*/) {
+int decodeExplicitData() {
 
     prng_a = last_prng_a;
     prng_b = last_prng_b;

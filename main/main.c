@@ -42,8 +42,8 @@ int shakeTime;
 void setShake(int time) {
 
     shakeTime = time;
-    if (time)
-        startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
+    // if (time)
+    //     startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
 }
 
 
@@ -371,8 +371,7 @@ void (*const verticalBlank[GS_MAX])() = {
 
 void runARM_VerticalBlank() {
 
-    actualScore = RAM[_INTIM] * armCycles;
-    availableIdleTime = RAM[_INTIM] * armCycles;    // 75000
+    availableIdleTime = RAM[_INTIM] * armCycles;
 
     if (gameState == nextGameState)
         (*verticalBlank[gameState])();

@@ -203,17 +203,15 @@ void OS_Game() {
     setScoreCycle(SCORELINE_SCORE);    // tmp
 
     interleaveChronoColour(&roller);
-    adjustLuminance(5);
+    adjustLuminance(2);
 
     setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
 
     updatePlayerAnimation();
     scroll();
 
-    int ss = T1TC;
     if (gameSchedule != SCHEDULE_UNPACK_CAVE)
         drawScreen(2);
-    actualScore = T1TC - ss;
 
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;

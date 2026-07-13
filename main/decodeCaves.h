@@ -38,7 +38,7 @@ struct CAVE_DEFINITION {
 extern struct CAVE_DEFINITION *theCave;
 
 void decodeCave(int cave);
-int decodeExplicitData(int sfx);
+int decodeExplicitData();
 
 enum DECODE_STATE {
     DECODE_NONE,
