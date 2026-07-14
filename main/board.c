@@ -217,7 +217,7 @@ void setupBoardScanner() {
 void processBoardSquares() {
 
 
-    while (T1TC < availableIdleTime - 3000) {
+    while (T1TC < availableIdleTime - 5000) {
 
         me = RAM + _BOARD + boardRow * _1ROW + boardCol;
 

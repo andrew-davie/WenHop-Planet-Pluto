@@ -150,16 +150,16 @@ mainGameLoop
 KO = (_SCANLINES - 192) * 76 / 64
 
 
-TimerOS             .byte 34           ; NTSC           262
-                    .byte (36+29)      ; PAL            312
-                    .byte 34           ; SECAM          262
-                    .byte 34           ; PAL60          262
+TimerOS             .byte 42           ; NTSC           262
+                    .byte (36+29+8)      ; PAL            312
+                    .byte 42           ; SECAM          262
+                    .byte 42           ; PAL60          262
 
 TimerVB
-                    .byte 34           ; NTSC           262
-                    .byte 34      ; PAL            312
-                    .byte 34           ; SECAM          262
-                    .byte 34           ; PAL60          262
+                    .byte 26           ; NTSC           262
+                    .byte 26      ; PAL            312
+                    .byte 26           ; SECAM          262
+                    .byte 26           ; PAL60          262
 
 
 ; EOF

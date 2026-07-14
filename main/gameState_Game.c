@@ -138,6 +138,13 @@ void VB_Game() {
     initDataStreams_Game();
 
     gameFrame++;
+    interleaveChronoColour(&roller);
+    adjustLuminance(2);
+
+
+    updatePlayerAnimation();
+    scroll();
+
 
 #if ENABLE_SHAKE
 
@@ -170,8 +177,8 @@ void VB_Game() {
     processCharAnimations();
     setPalette(_BUF_GAME_COLUBK);
 
-    if (gameSchedule != SCHEDULE_UNPACK_CAVE)
-        drawScreen(1);
+    // if (gameSchedule != SCHEDULE_UNPACK_CAVE)
+    //     drawScreen(1);
 
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
@@ -199,24 +206,16 @@ void OS_Game() {
 
     setScoreCycle(SCORELINE_SCORE);    // tmp
 
-    interleaveChronoColour(&roller);
-    adjustLuminance(2);
 
-    setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
-
-    updatePlayerAnimation();
-    scroll();
-
-    int st = T1TC;
-
-    if (gameSchedule != SCHEDULE_UNPACK_CAVE)
-        drawScreen(0);
+    if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
+        drawScreen();
+        // drawScreen(1);
+    }
 
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;
 
-    actualScore = T1TC - st;
-
+    setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
     scheduledTasks();    // gets the LEAST time because of drawScreen (~78K already used)
 }
 

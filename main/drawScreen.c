@@ -250,9 +250,7 @@ const unsigned int arenas[] = {
     _BUF_GAME_PF0_RIGHT,
 };
 
-void drawScreen(int half) {    // --> cycles 62870 (@20230616)
-
-    // int st = T1TC;
+void drawScreen() {    // --> cycles 62870 (@20230616)
 
     int sY = scrollY;
     int sX = scrollX;
@@ -291,40 +289,37 @@ void drawScreen(int half) {    // --> cycles 62870 (@20230616)
 
         const int height = _SCANLINES - scanline < CHAR_Y ? _SCANLINES - scanline : CHAR_Y;
 
-        p = RAM + half * 4 + _BOARD + row * _1ROW + characterX;
+        p = RAM + _BOARD + row * _1ROW + characterX;
 
-        //        for (int half = 0; half < 2; half++) {
+        for (int half = 0; half < 2; half++) {
 
-        unsigned char leftMask = !half && theCave->flags & CAVEDEF_LOCK_X ? 0b11100000 : 0b11110000;
+            unsigned char leftMask = !half && theCave->flags & CAVEDEF_LOCK_X ? 0b11100000 : 0b11110000;
 
-        grabCharacters();
+            grabCharacters();
 
-        unsigned char *pf0 = RAM + arenas[half] + scanline;
+            unsigned char *pf0 = RAM + arenas[half] + scanline;
 
-        for (int y = -lcount; y < height; y++) {
+            for (int y = -lcount; y < height; y++) {
 
-            int lineColour = rollDirect[roller][y];
+                int lineColour = rollDirect[roller][y];
 
-            int px = ((unsigned int)(img[0][lineColour] | corner[0][lineColour]) << 27 >> 7) |
-                     ((unsigned int)(img[1][lineColour] | corner[1][lineColour]) << 27 >> 12) |
-                     ((unsigned int)(img[2][lineColour] | corner[2][lineColour]) << 27 >> 17) |
-                     ((unsigned int)(img[3][lineColour] | corner[3][lineColour]) << 27 >> 22) |
-                     ((unsigned int)(img[4][lineColour] | corner[4][lineColour]) << 27 >> 27);
+                int px = ((unsigned int)(img[0][lineColour] | corner[0][lineColour]) << 27 >> 7) |
+                         ((unsigned int)(img[1][lineColour] | corner[1][lineColour]) << 27 >> 12) |
+                         ((unsigned int)(img[2][lineColour] | corner[2][lineColour]) << 27 >> 17) |
+                         ((unsigned int)(img[3][lineColour] | corner[3][lineColour]) << 27 >> 22) |
+                         ((unsigned int)(img[4][lineColour] | corner[4][lineColour]) << 27 >> 27);
 
-            px >>= shift;
+                px >>= shift;
 
-            *(pf0 + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)px];
-            *(pf0 + _BUFFER_SIZE) = px >> 8;
-            *pf0++ = reverseBits[px >> 16] & leftMask;
+                *(pf0 + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)px];
+                *(pf0 + _BUFFER_SIZE) = px >> 8;
+                *pf0++ = reverseBits[px >> 16] & leftMask;
+            }
         }
-        //      }
 
         scanline += height + lcount;
         lcount = 0;
     }
-
-    // if (T1TC - st > actualScore)
-    //     actualScore = T1TC - st;
 }
 
 
