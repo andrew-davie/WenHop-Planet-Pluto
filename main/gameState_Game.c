@@ -138,8 +138,6 @@ void VB_Game() {
     initDataStreams_Game();
 
     gameFrame++;
-    interleaveChronoColour(&roller);
-    adjustLuminance(2);
 
 
     updatePlayerAnimation();
@@ -193,6 +191,9 @@ void VB_Game() {
 
         drawAttachedChar(attachment);
     }
+
+    interleaveChronoColour(&roller);
+    adjustLuminance(2);
 
     scheduledTasks();    // gets the MOST time
 }
