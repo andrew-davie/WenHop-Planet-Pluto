@@ -1785,4 +1785,44 @@ const unsigned char *const charSet[] = {
 
 _Static_assert(sizeof(charSet) / sizeof(charSet[0]) == CH_MAX, "charSet table wrong size");
 
+
+const unsigned char *const geoDoge[] = {
+
+    _CHAR_GEODOGE,      // 032 (00) CH_CONGLOMERATE,
+    _CHAR_ROCK_U,       // 033 (01) CH_CONGLOMERATE_1,
+    _CHAR_ROCK_R,       // 034 (02) CH_CONGLOMERATE_2,
+    _CHAR_ROCK_UR,      // 035 (03) CH_CONGLOMERATE_3,
+    _CHAR_ROCK_D,       // 036 (04) CH_CONGLOMERATE_4,
+    _CHAR_ROCK_UD,      // 037 (05) CH_CONGLOMERATE_5,
+    _CHAR_ROCK_RD,      // 038 (06) CH_CONGLOMERATE_6,
+    _CHAR_ROCK_URD,     // 039 (07) CH_CONGLOMERATE_7,
+    _CHAR_ROCK_L,       // 040 (08) CH_CONGLOMERATE_8,
+    _CHAR_ROCK_UL,      // 041 (09) CH_CONGLOMERATE_9,
+    _CHAR_ROCK_RL,      // 042 (10) CH_CONGLOMERATE_10,
+    _CHAR_ROCK_URL,     // 043 (11) CH_CONGLOMERATE_11,
+    _CHAR_ROCK_DL,      // 044 (12) CH_CONGLOMERATE_12,
+    _CHAR_ROCK_UDL,     // 045 (13) CH_CONGLOMERATE_13,
+    _CHAR_ROCK_RDL,     // 046 (14) CH_CONGLOMERATE_14,
+    _CHAR_ROCK_URDL,    // 047 (15) CH_CONGLOMERATE_15,
+
+    // _CHAR_BLANK,              // 00
+    // _CHAR_BLANK,              // 01 U
+    // _CHAR_BLANK,              // 02 R
+    // _CHAR_INNER_CORNER_03,    // 03 RU
+    // _CHAR_BLANK,              // 04 D
+    // _CHAR_BLANK,              // 05 DU
+    // _CHAR_INNER_CORNER_06,    // 06 RD
+    // _CHAR_INNER_CORNER_07,    // 07 URD
+    // _CHAR_BLANK,              // 08 L
+    // _CHAR_INNER_CORNER_09,    // 09 LU
+    // _CHAR_BLANK,              // 10 LR
+    // _CHAR_INNER_CORNER_11,    // 11 LUR
+    // _CHAR_INNER_CORNER_12,    // 12 LD
+    // _CHAR_INNER_CORNER_13,    // 13 LDU
+    // _CHAR_INNER_CORNER_14,    // 14 LRD
+    // _CHAR_INNER_CORNER_15,    // 15 LURD
+
+};
+
+
 // EOF

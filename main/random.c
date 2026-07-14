@@ -8,12 +8,6 @@
 unsigned int prng_b;
 unsigned int prng_a;
 
-unsigned int cave_random_a, cave_random_b;
-
-
-// unsigned int Room_random_a, Room_random_b;
-
-// unsigned int rndX;
 
 void initRandom() {
 

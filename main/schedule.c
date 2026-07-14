@@ -36,13 +36,15 @@ void scheduleUnpackCave() {
 void scheduledTasks() {
 
 
+#if 1
+
+    // int st = T1TC;
+    // enum SCHEDULE sch = gameSchedule;    // capture before the call: setupBoardScanner() mutates
+    // gameSchedule to SCHEDULE_PROCESS_BOARD on its real-work
+    // path, so checking gameSchedule after the call missed it
+
+    enum SCHEDULE ogs = gameSchedule;
     int st = T1TC;
-
-    // while (gameSchedule < 0 || gameSchedule > SCHEDULE_PROCESS_BOARD)
-    //     ;
-
-
-#if 0
 
     static void (*const scheduleFunc[])() = {
 
@@ -53,12 +55,13 @@ void scheduledTasks() {
 
     (*scheduleFunc[gameSchedule])();
 
-    if (gameSchedule == SCHEDULE_START_SCAN)
-        if (T1TC - st > actualScore)
-            actualScore = T1TC - st;
+    // if (ogs == SCHEDULE_START_SCAN)
+    //     if (T1TC - st > actualScore)
+    //         actualScore = T1TC - st;
 
 #else
 
+    int st = T1TC;
 
     if (gameSchedule == SCHEDULE_UNPACK_CAVE)
         scheduleUnpackCave();
@@ -76,8 +79,9 @@ void scheduledTasks() {
 #endif
 
 
-    if (T1TC > availableIdleTime)
-        FLASH(0x94, 4);
+    // if (T1TC > availableIdleTime && ogs == 1)
+    //     actualScore = T1TC;
+    //        FLASH(0x94, 4);
 }
 
 

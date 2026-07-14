@@ -96,7 +96,7 @@ void modifyCharAtTip(int x, int y) {
         else if (type == TYPE_GEODOGE) {
             *b = CH_DOGE_00 | FLAG_THISFRAME;
             colour = 3;
-            surroundingConglomerate(xchar, ychar);
+            // surroundingConglomerate(xchar, ychar);
         }
 
         else if (type == TYPE_DIRT) {
@@ -145,7 +145,7 @@ unsigned char turn_toward(unsigned char current, unsigned char target, unsigned 
 
 void drawMace() {
 
-    // if (T1TC > availableIdleTime - 3000)
+    // if (T1TC > availableIdleTime - 5000)
     //     return;
 
     if (playerDead || !(weapon & WEAPON_MACE))

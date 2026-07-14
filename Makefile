@@ -313,7 +313,8 @@ make_rom: prep
 		-o$(OUTPUT)/$(CUSTOMNAME).bin
 	mkdir -p ROMs
 	cp $(OUTPUT)/$(CUSTOMNAME).bin ROMs/$(DATED_ROM).bin
-	dd bs=1024 count=120 if=$(OUTPUT)/$(CUSTOMNAME).bin of=ROMs/$(DATED_ROM)_120K.bin	
+	dd bs=1024 count=120 if=$(OUTPUT)/$(CUSTOMNAME).bin of=ROMs/$(DATED_ROM)_120K.bin
+	cp $(CUSTOMELF) ROMs/$(DATED_ROM).elf
 
 
 ###############################################################################

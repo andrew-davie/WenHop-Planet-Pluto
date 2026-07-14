@@ -13,6 +13,9 @@ enum WEAPON {
 
 struct CAVE_DEFINITION {
 
+    unsigned char bounds_l, bounds_t, bounds_r, bounds_b;
+
+
     unsigned char millingTime;
     unsigned char dogeValue;
     unsigned char extraDogeValue;

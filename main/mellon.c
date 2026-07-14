@@ -319,12 +319,21 @@ bool checkHighPriorityMove(int dir) {
             meAtt = me + dirOffset[dir];
 
             if (attachment) {
-                if (Attribute[CharToType[GET(*meAtt)]] & ATT_BLANK) {
 
-                    // TODO: reserve square
+                int type2 = CharToType[GET(*meAtt)];
+                if (Attribute[type2] & ATT_BLANK) {
+
+                    if (type2 == TYPE_GEODOGE)
+                        attachment = CH_GEODOGE_FALLING;
+
+                    else if (type2 == TYPE_ROCK)
+                        attachment = CH_ROCK_FALLING;
+
+                    if (dir == 1 || dir == 2)
+                        attachment |= 0x80;
+
                     drop = true;
                     attachmentOffset = dropOffset[dir];
-                    // waitRelease = true;
                     return true;
                 }
             }
@@ -334,11 +343,10 @@ bool checkHighPriorityMove(int dir) {
                 unsigned char pickup = PickupCharacter[CharToType[GET(*meAtt)]];
                 if (pickup) {
 
-                    attachment = pickup;
+                    attachment = GET(pickup);
 
                     if (dir == 1 || dir == 2)
                         attachment |= 0x80;
-
 
                     attachmentOffset = pickupOffset[dir];
 
@@ -693,7 +701,7 @@ bool checkLowPriorityMove(int dir) {
                 addScore(VALUE_BREAK_GEODE);
                 *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
 
-                surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
+                // surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
 
                 // if (destType == TYPE_ROCK_BONUS) {
 

@@ -99,23 +99,29 @@ void scroll() {
     scrollY += scrollSpeedY;
 
 
-    if (scrollX > SCROLL_MAX_X) {
-        scrollX = SCROLL_MAX_X;
+    int bounds_l = ((theCave->bounds_l) * CHAR_TRIX_X) << 16;
+    int bounds_r = ((theCave->bounds_r - 8) * CHAR_TRIX_X) << 16;
+    int bounds_t = ((theCave->bounds_t) * CHAR_TRIX_Y) << 16;
+    int bounds_b = ((theCave->bounds_b) * CHAR_TRIX_Y) << 16;
+
+
+    if (scrollX > bounds_r) {
+        scrollX = bounds_r;
         scrollSpeedX = 0;
     }
 
-    else if (scrollX < SCROLL_MIN_X) {
-        scrollX = SCROLL_MIN_X;
+    else if (scrollX < bounds_l) {
+        scrollX = bounds_l;
         scrollSpeedX = 0;
     }
 
-    if (scrollY > SCROLL_MAX_Y) {
-        scrollY = SCROLL_MAX_Y;
+    if (scrollY > bounds_b) {
+        scrollY = bounds_b;
         scrollSpeedY = 0;
     }
 
-    else if (scrollY < SCROLL_MIN_Y) {
-        scrollY = SCROLL_MIN_Y;
+    else if (scrollY < bounds_t) {
+        scrollY = bounds_t;
         scrollSpeedY = 0;
     }
 

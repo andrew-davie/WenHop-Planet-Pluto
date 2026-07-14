@@ -40,8 +40,8 @@ int activeStar;
 int lastActiveStar;
 bool single;
 
-void convertWaterAndLavaObjects();
-void processTypes();
+
+bool processTypes();
 void processCreatures();
 void restartBoardScan();
 
@@ -130,7 +130,6 @@ void setupBoardScanner() {
         processWyrms();
 
         gameFrame = 0;
-        gameTick++;
 
         lastActiveStar = activeStar;
         activeStar = 0;
@@ -207,7 +206,7 @@ void setupBoardScanner() {
         setSchedule(SCHEDULE_PROCESS_BOARD);
 
 
-        //        processBoardSquares();
+        // processBoardSquares();
     }
 
     // if (T1TC - st > actualScore)
@@ -218,7 +217,7 @@ void setupBoardScanner() {
 void processBoardSquares() {
 
 
-    while (T1TC < availableIdleTime - 2000) {
+    while (T1TC < availableIdleTime - 3000) {
 
         me = RAM + _BOARD + boardRow * _1ROW + boardCol;
 
@@ -228,12 +227,14 @@ void processBoardSquares() {
 
             type = CharToType[creature];
 
+            // Any blanks/dissolves underwater/lava gets transformed to water/lava chars
             if (isVisible(boardCol, boardRow))
-                convertWaterAndLavaObjects();
+                if (boardRow * CHAR_TRIX_Y >= lavaSurfaceTrixel && Attribute[type] & ATT_CONVERT)
+                    *me = showLava ? CH_LAVA_BLANK : CH_WATER;
 
             if (Attribute[type] & isActive[selectorCounter & 3]) {
-                processTypes();
-                processCreatures();
+                if (!processTypes())
+                    processCreatures();
             }
         }
 
@@ -285,16 +286,7 @@ void processBoardSquares() {
 }
 
 
-void convertWaterAndLavaObjects() {
-
-    // Any blanks/dissolves underwater/lava gets transformed to water/lava chars
-
-    if (boardRow * CHAR_TRIX_Y >= lavaSurfaceTrixel && Attribute[type] & ATT_CONVERT)
-        *me = showLava ? CH_LAVA_BLANK : CH_WATER;
-}
-
-
-void processTypes() {
+bool processTypes() {
 
     switch (type) {
 
@@ -303,16 +295,10 @@ void processTypes() {
 
         activeStar++;
         if (*Animate[TYPE_STAR_EXPLODE] == CH_DUST_0) {
-
             ADDAUDIO(SFX_EXPLODE);
-            // FLASH(0x26, 8);
             nDots(8, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 80, 7);
             *me = FLAG(CH_DUST_0);
         }
-
-        // else {
-        //     nDots(1, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 50, 5);
-        // }
         break;
     }
 
@@ -321,30 +307,19 @@ void processTypes() {
         static int activeDelay = 0;
         static int delay = 30;
 
-
         if (!lastActiveStar) {
-
             if (--activeDelay < 0) {
                 activeDelay = (delay >> 1) + 1;
-
                 ADDAUDIO(SFX_SPACE);
-                // ADDAUDIO(SFX_DOGE3);
             }
-
-            // if (--delay < 0) {
-            //     *me = FLAG(CH_STAR_EXPLODE);
-            //     startCharAnimation(TYPE_STAR_EXPLODE, AnimateStarExplode);
-            //     delay = 30;
-            //     break;
-            // }
         }
+
         // fall
 
         unsigned char *next = me + _1ROW;
         if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
             *next = FLAG(CH_STAR_FALLING_BOTTOM);
             *me = FLAG(CH_STAR_FALLING_TOP);
-
             nDots(5, boardCol, boardRow, PT_TWO, 40, CHAR_CENTER_X, CHAR_CENTER_Y, 40, 2);
         }
 
@@ -352,18 +327,9 @@ void processTypes() {
         break;
     }
 
-    case TYPE_ELECTRIC: {
-        // if (!rangeRandom(10))
-        //     *me = CH_ELECTRIC_0 + rangeRandom(4);
-
-        // if (Attribute[CharToType[GET(*(me + _1ROW))]] & (ATT_DISSOLVES | ATT_BLANK))
-        //     *(me + _1ROW) = CH_ELECTRIC_0 + rangeRandom(4);
-
-        // if (Attribute[CharToType[GET(*(me - _1ROW))]] & (ATT_DISSOLVES | ATT_BLANK))
-        //     *(me - _1ROW) = CH_ELECTRIC_0 + rangeRandom(4);
-
+    case TYPE_ELECTRIC:
         *me = CH_ELECTRIC_0 + ((*me + 1 - CH_ELECTRIC_0) & 3);
-    } break;
+        break;
 
     case TYPE_OUTBOX:
         FLASH(0x28, 10);
@@ -382,12 +348,7 @@ void processTypes() {
         processWater();
         break;
 
-        // case TYPE_LAVA:
-        //     processLava();
-        //     break;
-
     case TYPE_MELLON_HUSK:
-
         if (!exitMode)
             movePlayer(me);
         break;
@@ -402,9 +363,8 @@ void processTypes() {
 
     case TYPE_GRINDER:
     case TYPE_GRINDER_1:
-        if (!(getRandom32() & 7)) {
+        if (!(getRandom32() & 7))
             nDots(1, boardCol, boardRow, PT_TWO, 10, 3, 7, 100, 7);
-        }
 
         __attribute__((fallthrough));
 
@@ -414,41 +374,16 @@ void processTypes() {
         break;
 
     case TYPE_GEODOGE:
-
-        // if ((!(theCave->flags & CAVEDEF_STAR_STATIC)) && !rangeRandom(250)) {
-        //     *me = FLAG(CH_ROCK_PEBBLE_1);
-        //     // FLASH(0x42, 10);
-        //     //  nDotsBackwards(10, boardCol, boardRow, PT_TWO, 25, 2, 5, 300);
-        //     nDots(10, boardCol, boardRow, PT_TWO, 10, 3, 7, 100, 7);
-        // }
-
-        // // else if (!rangeRandom(3)) {
-
-        // //     static const int xy[] = {1, -1, _1ROW, -_1ROW};
-        // //     unsigned char *d = me + xy[getRandom32() & 3];
-        // //     if (GET(*d) == CH_DIRT)
-        // //         *d = rangeRandom(2) + CH_PEBBLE1;
-        // // }
-
-        // else
         processCharGeoDogeAndRock();
-
-        surroundingConglomerate(boardCol, boardRow);
         break;
 
     default:
+        return false;
         break;
     }
+
+    return true;
 }
-
-// void electric(unsigned char *p, unsigned char ch) {
-
-//     p -= _1ROW;
-//     while (CharToType[GET(*p)] != TYPE_INSULATOR) {
-//         *p = ch;
-//         p -= _1ROW;
-//     }
-// }
 
 
 void setInsulator(unsigned char *p, int row, int col) {
@@ -499,17 +434,8 @@ void setInsulatorPattern() {
     static int s = 0;
     s++;
 
-
-    for (int i = 0; i < _BOARD_COLS; i++) {
-
-        bool oc = sin_cos[(s + i * 20) & 31] < 128;
-
-        if (oc && !onOff[i]) {
-            // ADDAUDIO(SFX_ZAP);
-            // ADDAUDIO(SFX_ZAP2);
-        }
-        onOff[i] = oc;
-    }
+    for (int i = 0; i < _BOARD_COLS; i++)
+        onOff[i] = sin_cos[(s + i * 20) & 31] < 128;
 }
 
 
@@ -536,7 +462,7 @@ void processCreatures() {
 
     case CH_PEBBLE_ROCK:
         *me = FLAG(CH_GEODOGE);
-        surroundingConglomerate(boardCol, boardRow);
+        // surroundingConglomerate(boardCol, boardRow);
         break;
 
     case CH_PUSH_LEFT:
@@ -993,7 +919,7 @@ void processCharGeoDogeAndRock() {
             *me = FLAG(CH_ROCK_FALLING_TOP);
         }
 
-        surroundingConglomerate(boardCol, boardRow);
+        // surroundingConglomerate(boardCol, boardRow);
     }
 
     else if (Attribute[typeDown] & ATT_ROLL) {
@@ -1109,7 +1035,7 @@ void processFallingThings() {
 
         case CH_GEODOGE_FALLING: {
             *me = CH_GEODOGE;
-            surroundingConglomerate(boardCol, boardRow);
+            // surroundingConglomerate(boardCol, boardRow);
             break;
         }
 
@@ -1179,8 +1105,8 @@ void genericPush(int offsetX, int offsetY) {
                 }
             }
 
-            surroundingConglomerate(boardCol, boardRow);
-            surroundingConglomerate(boardCol + offsetX, boardRow + offsetY);
+            // surroundingConglomerate(boardCol, boardRow);
+            // surroundingConglomerate(boardCol + offsetX, boardRow + offsetY);
 
             //??
             if (!(attPushPos & ATT_PERMEABLE))
@@ -1223,11 +1149,11 @@ void chainReact_GeoDogeToDoge() {
             ADDAUDIO(SFX_UNCOVER);
             ongoing = true;
 
-            surroundingConglomerate(boardCol + xdir[i], boardRow + ydir[i]);
+            // surroundingConglomerate(boardCol + xdir[i], boardRow + ydir[i]);
         }
     }
 
-    surroundingConglomerate(boardCol, boardRow);
+    // surroundingConglomerate(boardCol, boardRow);
 
     if (!ongoing)
         killAudio(SFX_UNCOVER);
@@ -1287,7 +1213,7 @@ void doRoll() {
                     nDots(1, boardCol, boardRow, PT_TWO, 25, offset * 6 + off, 7 * gravity, 0, 1);
                     nDots(1, boardCol, boardRow, PT_TWO, 30, offset * 7 + off, 10 * gravity, 0, 1);
 
-                    surroundingConglomerate(boardCol, boardRow);
+                    // surroundingConglomerate(boardCol, boardRow);
                     return;
                 }
             }
@@ -1328,30 +1254,30 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 }
 
 
-void surroundingConglomerate(int col, int row) {
+// void surroundingConglomerate(int col, int row) {
+//     return;
+//     if (isVisible(col, row)) {
 
-    if (isVisible(col, row)) {
+//         //        if (rangeRandom(10))
+//         //          return;
 
-        //        if (rangeRandom(10))
-        //          return;
+//         unsigned char *pos = RAM + _BOARD + row * _1ROW + col;
+//         for (int i = 4; i < 5; i++) {
 
-        unsigned char *pos = RAM + _BOARD + row * _1ROW + col;
-        for (int i = 4; i < 5; i++) {
+//             unsigned char *offsetPos = pos + dirOffset[i];
+//             if (Attribute[CharToType[GET(*offsetPos)]] & ATT_GEODOGE) {
 
-            unsigned char *offsetPos = pos + dirOffset[i];
-            if (Attribute[CharToType[GET(*offsetPos)]] & ATT_GEODOGE) {
+//                 int cong = CH_GEODOGE;
 
-                int cong = CH_GEODOGE;
+//                 for (int j = 0; j < 4; j++)
+//                     if (Attribute[CharToType[GET(*(offsetPos + dirOffset[j]))]] & ATT_GEODOGE)
+//                         cong += 1 << j;
 
-                for (int j = 0; j < 4; j++)
-                    if (Attribute[CharToType[GET(*(offsetPos + dirOffset[j]))]] & ATT_GEODOGE)
-                        cong += 1 << j;
-
-                *offsetPos = cong;
-            }
-        }
-    }
-}
+//                 *offsetPos = cong;
+//             }
+//         }
+//     }
+// }
 
 
 // EOF

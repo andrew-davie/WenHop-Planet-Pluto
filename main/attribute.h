@@ -236,7 +236,7 @@ DEFINE_ENUM_WITH_BIT_VALUES(TypeAttributes,
     ATT(PHASE1),                // 20
     ATT(DISSOLVES),             // 21
     ATT(MELTS),                 // 22
-    ATT(GEODOGE),               // 23
+    ATT(GEODOGE),               // 23 must match POS_GEODOGE
     ATT(PAD),                   // 24
     ATT(CRUSHES),               // 25
     ATT(CORNER),                // 26  must match POS_CORNER
@@ -244,6 +244,8 @@ DEFINE_ENUM_WITH_BIT_VALUES(TypeAttributes,
 );
 
 #define POS_CORNER 26           /* must match ATT(CORNER) #*/
+#define POS_GEODOGE 23          /* must match ATT(GEOFOGE) */
+
 #define VALUE_BREAK_GEODE 25
 
 // EOF

@@ -110,8 +110,6 @@ extern int lives;
 extern unsigned int sparkleTimer;
 extern bool playerDead;
 extern int gameFrame;
-extern int gameTick;
-
 
 extern const int xInc[];
 extern const int yInc[];

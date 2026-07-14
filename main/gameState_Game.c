@@ -105,8 +105,6 @@ void initGameState_Game() {
 
     gameSpeed = SPEED_BASE;
     gameFrame = gameSpeed;    // force rollover
-    gameTick = 0;
-
 
 #if ENABLE_SHAKE
     setShake(0);
@@ -172,8 +170,8 @@ void VB_Game() {
     processCharAnimations();
     setPalette(_BUF_GAME_COLUBK);
 
-    // if (gameSchedule != SCHEDULE_UNPACK_CAVE)
-    //     drawScreen(1);
+    if (gameSchedule != SCHEDULE_UNPACK_CAVE)
+        drawScreen(1);
 
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
@@ -188,7 +186,6 @@ void VB_Game() {
 
         drawAttachedChar(attachment);
     }
-
 
     scheduledTasks();    // gets the MOST time
 }
@@ -210,12 +207,15 @@ void OS_Game() {
     updatePlayerAnimation();
     scroll();
 
+    int st = T1TC;
+
     if (gameSchedule != SCHEDULE_UNPACK_CAVE)
-        drawScreen();
+        drawScreen(0);
 
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;
 
+    actualScore = T1TC - st;
 
     scheduledTasks();    // gets the LEAST time because of drawScreen (~78K already used)
 }

@@ -25,15 +25,15 @@ const struct fmt {
     // clang-format off
     // Measured with Gopher over DETECT_FRAME_COUNT frames
 
-    // 70MHz ARM
-    { 70000000, 0xB26349, _TV_SYSTEM_NTSC,  },
-    { 70000000, 0xB33EF7, _TV_SYSTEM_SECAM, },
-    { 70000000, 0xB384BA, _TV_SYSTEM_PAL60, },
+    // // 70MHz ARM
+    // { 70000000, 0xB26349, _TV_SYSTEM_NTSC,  },
+    // { 70000000, 0xB33EF7, _TV_SYSTEM_SECAM, },
+    // { 70000000, 0xB384BA, _TV_SYSTEM_PAL60, },
 
     // 60MHz ARM
     { 60000000, 0x98E311, _TV_SYSTEM_NTSC,  },
-    { 60000000, 0x99B301, _TV_SYSTEM_SECAM, },
-    { 60000000, 0x9A0260, _TV_SYSTEM_PAL60, },
+    // { 60000000, 0x99B301, _TV_SYSTEM_SECAM, },
+    // { 60000000, 0x9A0260, _TV_SYSTEM_PAL60, },
 
     // clang-format on
 };
@@ -93,6 +93,8 @@ void VB_DetectConsole() {
         armCycles = ((armFrequency >> 8) * (0x10000 / 60)) >> 8;    // cycles/frame
         armCycles = (armCycles * (0x10000 / 262)) >> 16;            // cycles/scanline
         armCycles = (armCycles * (64 * 0x10000 / 76)) >> 16;        // cycles/INTIM
+
+        // ≈        armCycles -= 2000;    // tmp
 
         // and kludge
         // armCycles = (armCycles * 7) >> 3;

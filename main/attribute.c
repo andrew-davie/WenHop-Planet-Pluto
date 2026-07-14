@@ -202,7 +202,7 @@ const unsigned int Attribute[] = {
     _ | _ | _ | _ | _ |PH4|PIP| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL| _  , // 16 TYPE_PUSHER,
     _ | _ | _ | _ | _ |PH1|PIP| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 17 TYPE_PUSHER_VERT,
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 18 TYPE_WYRM,
-    _ |PAD|DGE|MLT| _ |PH2| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ |ROL|PUP , // 19 TYPE_GEODOGE,
+    _ |PAD|DGE|MLT| _ |PH1| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ | _ |ROL|PUP , // 19 TYPE_GEODOGE,
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ |XPD| _ |CRU| _ | _  , // 20 TYPE_GEODOGE_FALLING,
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ |RKF| _ | _ | _ | _ | _ | _ | _ |SPC|PER| _ | _ | _ | _ | _  , // 21 TYPE_LAVA,
    CNR|PAD| _ | _ |DIS|PH4| _ | _ | _ | _ | _ |RKF| _ | _ | _ | _ | _ | _ | _ | _ |PER|XPD| _ | _ | _ | _  , // 22 TYPE_PEBBLE_ROCK,

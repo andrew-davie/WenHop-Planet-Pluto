@@ -87,8 +87,6 @@ unsigned char swcha;
 
 int gameSpeed;
 int gameFrame;
-int gameTick;
-
 
 int boardRow;
 int boardCol;
@@ -371,7 +369,7 @@ void (*const verticalBlank[GS_MAX])() = {
 
 void runARM_VerticalBlank() {
 
-    availableIdleTime = RAM[_INTIM] * armCycles;
+    availableIdleTime = RAM[_INTIM] * armCycles - 7500;
 
     if (gameState == nextGameState)
         (*verticalBlank[gameState])();
@@ -415,7 +413,7 @@ int intim;
 void runARM_Overscan() {
 
 
-    availableIdleTime = RAM[_INTIM] * armCycles;    // 75000    // --> 64 /76 * 4452
+    availableIdleTime = RAM[_INTIM] * armCycles - 7500;
 
     if (gameState != nextGameState) {
 

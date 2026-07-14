@@ -77,9 +77,6 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
     myMemsetInt((unsigned int *)(RAM + _BUF_GAME_GRP0), 0, _BUFFER_SIZE * 2 / 4);
 
-    if (gameTick < 2)
-        return;    // coalesce initial geodoge
-
     static int root = 0;
     root++;
 
@@ -167,8 +164,13 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
             unsigned char *p0Colour = RAM + _BUF_GAME_COLUP0 + playerSpriteY;
             unsigned char *p0 = RAM + _BUF_GAME_GRP0 + playerSpriteY;
 
-            unsigned char *p1Colour = p0Colour + _SCANLINES;
-            unsigned char *p1 = p0 + _SCANLINES;
+            unsigned char *p1Colour = p0Colour + _SCANLINES + 2;
+            unsigned char *p1 = p0 + _SCANLINES + 2;
+
+            // p0++[destLine] = 0xFF;
+            // p0Colour++[destLine] = 0xF;
+            // p1++[destLine] = 0xFF;
+            // p1Colour++[destLine] = 0x44;
 
             for (int line = 0; line < (shapeHeight & 0x3f); line++) {
 
@@ -201,6 +203,20 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
                     }
                 }
 
+                int lum = (p0Colour[destLine] & 0xF) + luminance;
+                if (lum < 0)
+                    lum = 0;
+                if (lum > 15)
+                    lum = 15;
+                p0Colour[destLine] = (p0Colour[destLine] & 0xF0) + lum;
+                lum = (p1Colour[destLine] & 0xF) + luminance;
+                if (lum < 0)
+                    lum = 0;
+                if (lum > 15)
+                    lum = 15;
+                p1Colour[destLine] = (p1Colour[destLine] & 0xF0) + lum;
+
+
                 destLine += gravity;
             }
 
@@ -210,6 +226,9 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
             unsigned char *p0Colour = RAM + _BUF_GAME_COLUP0 + playerSpriteY + 1;
             unsigned char *p0 = RAM + _BUF_GAME_GRP0 + playerSpriteY;
+
+            // p0++[destLine] = 0xFF;
+            // p0Colour++[destLine] = 0xF;
 
             for (int line = 0; line < (shapeHeight & 0x3F); line++) {
 
@@ -231,6 +250,13 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
                         p0Colour[destLine] = ((p0Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);
                     }
                 }
+                int lum = (p0Colour[destLine] & 0xF) + luminance;
+                if (lum < 0)
+                    lum = 0;
+                if (lum > 15)
+                    lum = 15;
+                p0Colour[destLine] = (p0Colour[destLine] & 0xF0) + lum;
+
 
                 destLine += gravity;
             }

@@ -1,5 +1,7 @@
-#include "cavedata.h"
+#include "defines_dasm.h"
+
 #include "attribute.h"
+#include "cavedata.h"
 #include "colour.h"
 #include "decodeCaves.h"
 #include "decodecaves.h"
@@ -51,6 +53,8 @@
 
 const unsigned char caveUseWall[] = {
     // clang-format off
+
+    0,0,_BOARD_COLS,_BOARD_ROWS,
 
     20,                             // milling
     10, 15,                         // doge $
@@ -155,6 +159,8 @@ const unsigned char caveUseWall[] = {
 const unsigned char caveWyrms[] = {
     // clang-format off
 
+    0,0,_BOARD_COLS,_BOARD_ROWS,
+
     20,     // milling
     10, 15, // doge $
     0,          // weather
@@ -209,6 +215,8 @@ const unsigned char caveWyrms[] = {
 
 const unsigned char caveMace[] = {
     // clang-format off
+
+    0,0,_BOARD_COLS,_BOARD_ROWS,
 
     20,     // milling
     10, 15, // doge $
@@ -268,6 +276,7 @@ const unsigned char caveMace[] = {
 
 const unsigned char caveTest[] = {
     // clang-format off
+    0,0,_BOARD_COLS,_BOARD_ROWS,
 
     0,     // milling
     10, 15, // doge $
@@ -311,22 +320,24 @@ const unsigned char caveTest[] = {
 
 
 const unsigned char caveFast[] = {
-    // clang-format off
+    // clang-format of
 
-    20,     // milling
-    10, 15, // doge $
-    5,      //              ,          // rain
+    0, 0, _BOARD_COLS, _BOARD_ROWS,
+
+    20,        // milling
+    10, 15,    // doge $
+    5,         //              ,          // rain
 
 
-    10, 11, 50, 56, 8, // randomiser[level]
+    10, 11, 50, 56, 8,    // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
 
-    WEAPON_NONE,                    //0
-    WEAPON_NONE,                    //1
-    WEAPON_NONE,                    //2
-    WEAPON_NONE,                    //3
-    WEAPON_NONE,                    //4
+    WEAPON_NONE,    // 0
+    WEAPON_NONE,    // 1
+    WEAPON_NONE,    // 2
+    WEAPON_NONE,    // 3
+    WEAPON_NONE,    // 4
 
     0, STEEL, DIRT,
 
@@ -337,22 +348,20 @@ const unsigned char caveFast[] = {
     // CH_ROCK, 50, 0, 240, 0, 20,
 
 
-    CH_DOORCLOSED, 38, 16,
-    CH_MELLON_HUSK_BIRTH, 10, 15,
+    CH_DOORCLOSED, 38, 16, CH_MELLON_HUSK_BIRTH, 10, 15,
 
 
-    LINER(CH_BLANK, 0,15, 10, 2)
-    LINER(CH_BLANK, 10,15, 6, 0)
+    LINER(CH_BLANK, 0, 15, 10, 2) LINER(CH_BLANK, 10, 15, 6, 0)
 
 
-    DRAW_EOF,
+        DRAW_EOF,
 
     // EXTRAS
     // LEVEL 0
-    DRAW_EOF, // LEVEL 1
-    DRAW_EOF, // LEVEL 2
-    DRAW_EOF, // LEVEL 3
-    DRAW_EOF, // LEVEL 4
+    DRAW_EOF,    // LEVEL 1
+    DRAW_EOF,    // LEVEL 2
+    DRAW_EOF,    // LEVEL 3
+    DRAW_EOF,    // LEVEL 4
     DRAW_EOF,
 
     'M', 'E', 'R', 'C', 'U', 'R', 'Y', END_STRING
@@ -362,6 +371,7 @@ const unsigned char caveFast[] = {
 
 const unsigned char caveA[] = {
     // clang-format off
+    0,0,_BOARD_COLS,_BOARD_ROWS,
 
     80,     // milling
     10, 15, // doge $
@@ -633,6 +643,7 @@ const unsigned char caveA[] = {
 
 const unsigned char caveA2[] = {
     // clang-format off
+    0,0,_BOARD_COLS,_BOARD_ROWS,
 
     20,     // milling
     10, 15, // doge $
@@ -734,6 +745,7 @@ const unsigned char caveA2[] = {
 
 const unsigned char caveA5[] = {
     // clang-format off
+    0,0,_BOARD_COLS,_BOARD_ROWS,
 
     20,     // milling
     10, 15, // doge $
@@ -813,6 +825,7 @@ const unsigned char caveA5[] = {
 
 const unsigned char caveA3[] = {
     // clang-format off
+    0,0,_BOARD_COLS,_BOARD_ROWS,
 
     20,    // milling
     1, 15, // doge $
@@ -924,6 +937,7 @@ const unsigned char caveA3[] = {
 const unsigned char starsAndStripes[] = {
     // clang-format off
 
+    0,0,_BOARD_COLS,_BOARD_ROWS,
     20,                             // milling
     1, 15,                          // doge $
     0,                              // rain
@@ -1031,6 +1045,7 @@ const unsigned char starsAndStripes[] = {
 
 const unsigned char caveA4[] = {
     // clang-format off
+    8,0,_BOARD_COLS-10,_BOARD_ROWS,
 
     20,    // milling
     1, 15, // doge $
@@ -1060,7 +1075,8 @@ const unsigned char caveA4[] = {
     WEAPON_NONE,                    //3
     WEAPON_NONE,                    //4
 
-    CAVEDEF_LOCK_Y, CH_DIRT, CH_DIRT,
+    //CAVEDEF_LOCK_Y,
+     0, CH_DIRT, CH_DIRT,
 
     2,
     CH_GEODOGE, 100, 100, 100, 100, 100,
@@ -1158,12 +1174,13 @@ const struct caveHandler caveList[] = {
 
     // {caveA3, none},    //
     // {caveMace, none},
-    {caveUseWall, none},        //
-    {caveWyrms, empty},         //
+    // {caveA2, none},        //
+    {caveUseWall, none},    //
+    {caveWyrms, empty},     //
+
+    {caveA4, none},             //
     {starsAndStripes, spec},    //
 
-    {caveA2, none},    //
-    {caveA4, none},    //
     // {caveA, none},          //
 
 
