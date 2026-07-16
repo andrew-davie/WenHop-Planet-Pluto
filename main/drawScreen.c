@@ -293,7 +293,7 @@ void drawScreen() {    // --> cycles 62870 (@20230616)
 
         for (int half = 0; half < 2; half++) {
 
-            unsigned char leftMask = !half && theCave->flags & CAVEDEF_LOCK_X ? 0b11100000 : 0b11110000;
+            unsigned char leftMask = !half && theCave->flags & CAVEDEF_MASK_LEFT_PIXEL ? 0b11100000 : 0b11110000;
 
             grabCharacters();
 

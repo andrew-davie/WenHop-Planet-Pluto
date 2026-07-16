@@ -304,7 +304,8 @@ void drawPlanet(int half) {
     const unsigned char *xchar;
     const unsigned char *image[6];
 
-    int trixLine = 6;    // start globe y @
+
+    int trixLine = armFrequency == 70000000 ? 6 : 6 + 7;    // start globe y @
 
     unsigned char *pf0 = trixLine * 3 + RAM + _BUF_GLOBE_PF + (half ? 0 : (3 * _BUFFER_SIZE));
     unsigned char *pf1 = pf0 + _BUFFER_SIZE;
@@ -348,9 +349,11 @@ void drawPlanet(int half) {
 
     const unsigned char *basex = map + half + frac + 2;
 
+    int trim = 1;    // armFrequency == 70000000 ? 1 : 8;
+
 
     if (!half) {
-        for (; trixLine < (_SCANLINES / 3) - 1 && line85[equiv] >= 0;) {
+        for (; trixLine < (_SCANLINES / 3) - trim && line85[equiv] >= 0;) {
 
             xchar = basex + map[0] * (line85[equiv] >> 5);
 
@@ -422,7 +425,7 @@ void drawPlanet(int half) {
         }
 
     } else {
-        for (; trixLine < (_SCANLINES / 3) - 1 && line85[equiv] >= 0;) {
+        for (; trixLine < (_SCANLINES / 3) - trim && line85[equiv] >= 0;) {
 
             xchar = basex + map[0] * (line85[equiv] >> 5);
 

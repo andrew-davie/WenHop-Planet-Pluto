@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 extern bool onOff[_BOARD_COLS];
+extern bool lastOnOff[_BOARD_COLS];
 
 void setupBoardScanner();
 void processBoardSquares();

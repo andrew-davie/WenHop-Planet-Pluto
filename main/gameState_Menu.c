@@ -5,6 +5,7 @@
 #include "caveData.h"
 #include "colour.h"
 #include "draw.h"
+#include "drawGridPreview.h"
 #include "grid6.h"
 #include "main.h"
 #include "menuCharacterSet.h"
@@ -114,12 +115,12 @@ void initKernel_Menu() {
     myMemsetInt((unsigned int *)(RAM + _MENU_BUFFERS_START), 0, _MENU_BUFFERS_SIZE / 4);
 
 
-    drawString(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 172);
-    while (drawNextChar())
-        ;
-    drawString(FONT_COMPACT, 0xC6, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 184);
-    while (drawNextChar())
-        ;
+    // drawString(FONT_COMPACT, 0xF, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 172);
+    // while (drawNextChar())
+    //     ;
+    // drawString(FONT_COMPACT, 0xF, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 184);
+    // while (drawNextChar())
+    //     ;
 
 
     // draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
@@ -131,6 +132,8 @@ void initKernel_Menu() {
     menuLine = 0;
     base2 = 0;
     pushCount = 0;
+
+    initGridPreview(_SCANLINES + 50, PREVIEW_Y);
 
     //    chooseColourScheme();
 
@@ -207,9 +210,11 @@ void VB_Menu() {
     if (!drawNextChar()) {
     }
 
-    if (frame > 20)
+    drawGridPreview();
+
+    if (frame > 220)
         lumTarget = -15;
-    if (frame > 50)
+    if (frame > 250)
         setGameState(GS_GAME);    // GS_GLOBE);
 }
 
@@ -316,7 +321,7 @@ void OS_Menu() {
     // Draw ICC menu PF background
 
     interleaveChronoColour(&roller);
-    adjustLuminance(3);
+    adjustLuminance(1);
 
     setPFColours((unsigned char *)(RAM + _BUF_MENU_COLUPF));
 

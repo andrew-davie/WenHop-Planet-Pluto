@@ -606,7 +606,7 @@ void blitShape(int ch, int shift, int y, int offset) {
     while (modifier < 0)
         modifier += 3;
 
-    int r = 2;
+    // int r = 2;
     int bitsh = 19 - shift;
 
     const char nextRoller[] = {1, 2, 0, 1, 2, 0, 1, 2, 0};
@@ -655,10 +655,16 @@ void drawAttachedChar(int ch) {
     ch = GET(ch);
     int type = CharToType[ch];
 
+    // if (Animate[type])
+    //     ch = revectorChar[*Animate[type]];
+    // else
+    //     ch = revectorChar[ch];
+
     if (Animate[type])
-        ch = revectorChar[*Animate[type]];
-    else
-        ch = revectorChar[ch];
+        ch = *Animate[type];
+    // else
+    //     ch = revectorChar[ch];
+
 
     int ay = 0;
     int autoY = autoMoveY;
@@ -668,7 +674,7 @@ void drawAttachedChar(int ch) {
     }
 
     int offsetX = 0;
-    int offsetY = 0;
+    int offsetY = attachment == CH_DOGE_00 ? -12 : -24;
 
     if (attachmentOffset) {
 
@@ -683,6 +689,10 @@ void drawAttachedChar(int ch) {
 
         if ((attachmentOffset + 1)->x || (attachmentOffset + 1)->y)
             attachmentOffset++;
+
+        else
+            attachmentOffset = 0;
+        ;
     }
 
 

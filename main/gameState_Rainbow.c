@@ -39,7 +39,7 @@ void VB_Rainbow() {
 }
 
 void OS_Rainbow() {
-    adjustLuminance(3);
+    adjustLuminance(1);
 }
 
 // EOF

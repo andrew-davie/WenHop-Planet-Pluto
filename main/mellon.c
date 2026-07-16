@@ -29,6 +29,7 @@ int waitForNothing;
 bool handled;
 bool gearsActive;
 bool gearsWaitRelease;
+static int kdelay = 0;
 
 static unsigned char *meAtt;
 static bool drop = false;
@@ -158,12 +159,14 @@ void grabDoge() {
     // if (doges > 0)
     addScore(100);    // theCave->dogeValue);
 
-    if (!--doges) {
-        exitTrigger = true;
-        //        FLASH(0x08, 8);     //open door
-        ADDAUDIO(SFX_EXIT);
-    } else
-        ADDAUDIO(SFX_DOGE2);
+    --doges;
+
+    // if (!--doges) {
+    //     // exitTrigger = true;
+    //     //        FLASH(0x08, 8);     //open door
+    //     ADDAUDIO(SFX_EXIT);
+    // } else
+    //     ADDAUDIO(SFX_DOGE2);
 }
 
 int playerSlow = 0;
@@ -211,6 +214,9 @@ void moveHusk(int dir, unsigned char *me, unsigned char *meOffset) {
 
 
 const OFFSET sampleOffsetRight[] = {
+
+    {-5, -2 * 3}, {-5, -2 * 3}, {-5, -2 * 3}, {-5, -2 * 3}, {-5, -2 * 3},
+
 
     {-5, -2 * 3}, {-5, -4 * 3}, {-4, -6 * 3}, {-4, -6 * 3}, {-3, -7 * 3},
     {-2, -7 * 3}, {-1, -7 * 3}, {0, -8 * 3},  {0, 0},
@@ -310,11 +316,13 @@ bool checkHighPriorityMove(int dir) {
     if (usableSWCHA & joyBit)
         return false;
 
-    getRandom32();
+    //    getRandom32();
 
 
-    if (!waitRelease) {
+    if (!kdelay && !waitRelease) {
         if (!(inpt4 & 0x80)) {
+
+            //            FLASH(0x94, 4);
 
             meAtt = me + dirOffset[dir];
 
@@ -330,7 +338,7 @@ bool checkHighPriorityMove(int dir) {
                         attachment = CH_ROCK_FALLING;
 
                     if (dir == 1 || dir == 2)
-                        attachment |= 0x80;
+                        attachment |= FLAG_THISFRAME;
 
                     drop = true;
                     attachmentOffset = dropOffset[dir];
@@ -338,15 +346,21 @@ bool checkHighPriorityMove(int dir) {
                 }
             }
 
-            else {
+            else if (!attachment) {
 
                 unsigned char pickup = PickupCharacter[CharToType[GET(*meAtt)]];
                 if (pickup) {
 
+                    kdelay = 5;
+
+                    faceDirection = faceDirectionDef[dir];
+                    // startPlayerAnimation(ID_Pickup);
+
+
                     attachment = GET(pickup);
 
                     if (dir == 1 || dir == 2)
-                        attachment |= 0x80;
+                        attachment |= FLAG_THISFRAME;
 
                     attachmentOffset = pickupOffset[dir];
 
@@ -515,9 +529,10 @@ bool checkHighPriorityMove(int dir) {
                 ADDAUDIO(SFX_SPACE);
 
             else if (destType == TYPE_OUTBOX) {
+
                 *meOffset = CH_EXITBLANK;
                 ADDAUDIO(SFX_WHOOSH);
-                exitMode = 151;
+                exitMode = 40;
                 waitRelease = true;
             }
 
@@ -553,7 +568,6 @@ bool checkHighPriorityMove(int dir) {
 
                 moveHusk(dir, me, meOffset);
             }
-
 
             // Fix bar stuff
 
@@ -701,17 +715,6 @@ bool checkLowPriorityMove(int dir) {
                 addScore(VALUE_BREAK_GEODE);
                 *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
 
-                // surroundingConglomerate(playerX + xdir[dir], playerY + ydir[dir]);
-
-                // if (destType == TYPE_ROCK_BONUS) {
-
-                //     ADDAUDIO(SFX_DOGE2);
-
-                //     *meOffset = FLAG(CH_STAR);
-
-                // }
-
-                // else
                 if (destType == TYPE_ROCK) {
 
 
@@ -720,9 +723,9 @@ bool checkLowPriorityMove(int dir) {
                     nDots(10, playerX, playerY, PT_ONE, 30,
                           xOffset[dir] + CHAR_CENTER_X /*+ rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1)*/,
                           /*rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + */ yOffset[dir] + CHAR_CENTER_Y, 40, 2);
-                    nDots(10, playerX, playerY, PT_ONE, 15,
-                          xOffset[dir] + CHAR_CENTER_X + rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1),
-                          rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + yOffset[dir] + CHAR_CENTER_Y, 50, 3);
+                    // nDots(10, playerX, playerY, PT_ONE, 15,
+                    //       xOffset[dir] + CHAR_CENTER_X + rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1),
+                    //       rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + yOffset[dir] + CHAR_CENTER_Y, 50, 3);
                 } else {
                     ADDAUDIO(SFX_DOGE);
 
@@ -738,14 +741,9 @@ bool checkLowPriorityMove(int dir) {
             // fixSurroundingConglomerates(meOffset);
 
             waitForNothing = 1;
-            startPlayerAnimation(ID_Stand);
+            startPlayerAnimation(/*attachment ? ID_StandArmsUp :*/ ID_StandUp);
 
             pushCounter = 0;
-
-            // extern int dogeBlockCount;
-            // extern int cumulativeBlockCount;
-            // dogeBlockCount++;
-            // cumulativeBlockCount++;
 
             if (faceDirection > 0) {
                 me += 2;
@@ -770,16 +768,17 @@ void bubbles(int count, int dripX, int dripY, int age, int /*speed*/) {
     for (int i = 0; i < count; i++) {
         int idx = sphereDot(dripX, dripY, PT_BUBBLE, age, 1);
         if (idx >= 0) {
-            particle[idx].speed = 10;    //(-0x2800 - rangeRandom(0x2800)) >> 4;
-            // particle.speedX[idx] >>= 4;
-
+            particle[idx].speed = 10;
             particle[idx].dir = 128 + rangeRandom(64) - 32;
         }
     }
 }
 
+
 void movePlayer(unsigned char *me) {
 
+    if (kdelay)
+        --kdelay;
     handled = false;
 
 
@@ -820,14 +819,7 @@ void movePlayer(unsigned char *me) {
 
     if (usableSWCHA != lastUsableSWCHA) {
         waitForNothing = 0;
-        // tapDelay = 0;
     }
-
-    // if (waitForNothing) {
-    //     --waitForNothing;
-    //     usableSWCHA = 0xFF;
-    //     return;
-    // }
 
     if (autoMoveFrameCount)
         return;
@@ -841,9 +833,8 @@ void movePlayer(unsigned char *me) {
 
 
     for (int dir = 0; dir < 4; dir++)
-        if (checkHighPriorityMove(dir)) {
+        if (checkHighPriorityMove(dir))
             return;
-        }
 
     for (int dir = 0; dir < 4 && !handled; dir++)
         if (checkLowPriorityMove(dir))
@@ -853,14 +844,16 @@ void movePlayer(unsigned char *me) {
 
     if (!autoMoveFrameCount) {
 
+        // FLASH(0x42, 2);
+
         if (playerAnimationID == ID_WalkUp || playerAnimationID == ID_MineUp)
-            startPlayerAnimation(ID_StandUp);
+            startPlayerAnimation(/*attachment ? ID_StandArmsUp :*/ ID_StandUp);
 
         else if (playerAnimationID == ID_Walk || playerAnimationID == ID_Mine)
-            startPlayerAnimation(ID_StandLR);
+            startPlayerAnimation(/*attachment ? ID_StandArmsUp :*/ ID_StandLR);
 
         else if (playerAnimationID == ID_WalkDown || playerAnimationID == ID_MineDown)
-            startPlayerAnimation(ID_Stand);
+            startPlayerAnimation(/*attachment ? ID_StandArmsUp :*/ ID_Stand);
     }
 
     // after all movement checked, anything falling on player?

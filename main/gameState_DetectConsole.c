@@ -97,10 +97,11 @@ void VB_DetectConsole() {
         // and kludge
         // armCycles = (armCycles * 7) >> 3;
 
-        setGameState(GS_GAME);
-        //  setGameState(GS_COPYRIGHT);
+        //        setGameState(GS_GLOBE);    // GS_GAME);
+        // setGameState(GS_COPYRIGHT);
         // setGameState(GS_RASTER_BLEED);
         // setGameState(GS_SKULL);
+        setGameState(GS_MENU);
     }
     }
 

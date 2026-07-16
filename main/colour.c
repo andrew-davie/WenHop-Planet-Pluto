@@ -70,7 +70,7 @@ unsigned char adjustBrightness(unsigned char colour) {
         lum = 14;
     }
 
-    return (colour & 0xF0) | lum;
+    return luminance == -15 ? 0 : (colour & 0xF0) | lum;
 }
 
 

@@ -146,23 +146,10 @@ void VB_Game() {
 
 #if ENABLE_SHAKE
 
-    // if (!rangeRandom(100)) {
-    //     FLASH(0x26, 3);
-    //     setShake(20);
-    // }
-
     if (shakeTime) {
         shakeTime--;
-
-        int richter = shakeTime >> 3 << 1;
-
-        if (richter < 2)
-            richter = 2;
-        if (richter > 3)
-            richter = 3;
-
-        shakeX = (rangeRandom(richter + 1) - (richter >> 1)) << 16;
-        shakeY = (rangeRandom(richter + 1) - (richter >> 1)) << 16;
+        shakeX = (rangeRandom(5) - 2) << 16;
+        shakeY = (rangeRandom(5) - 2) << 16;
     }
 
     else
@@ -193,7 +180,7 @@ void VB_Game() {
     }
 
     interleaveChronoColour(&roller);
-    adjustLuminance(2);
+    adjustLuminance(1);
 
     scheduledTasks();    // gets the MOST time
 }
@@ -205,13 +192,8 @@ void OS_Game() {
 
     (*caveList[cave].handler)();
 
-    setScoreCycle(SCORELINE_SCORE);    // tmp
-
-
-    if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
+    if (gameSchedule != SCHEDULE_UNPACK_CAVE)
         drawScreen();
-        // drawScreen(1);
-    }
 
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;

@@ -86,6 +86,7 @@ _TV_SYSTEM_PAL             = 1
 _TV_SYSTEM_SECAM           = 2
 _TV_SYSTEM_PAL60           = 3
 
+SAVEKEY_SIZE = ((100+7)/8)
 
     include "_zeroPage.asm"
     include "_displayData.asm"

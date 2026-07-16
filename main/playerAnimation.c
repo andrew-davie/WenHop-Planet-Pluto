@@ -29,6 +29,12 @@ const signed char AnimationStandUp[] = {
     FRAME_STAND, 255,
 };
 
+const signed char AnimationStandArmsUp[] = {
+
+    FRAME_ARMS_IN_AIR, 255,
+};
+
+
 const signed char AnimationStandLR[] = {
     //    FRAME_WALK3, ,
     FRAME_STAND, 255,
@@ -99,6 +105,14 @@ const signed char AnimationLocked[] = {
     FRAME_HUNCH, 12,
     ACTION_STOP,
 };
+
+const signed char AnimationPickup[] = {
+    FRAME_PICKUP, 6,
+    FRAME_PICKUP2, 6,
+    FRAME_STAND, 10,
+    ACTION_STOP,
+};
+
 
 // const signed char AnimationEndPush2[] = {
 // //    ACTION_POSITION, 4,0,
@@ -415,24 +429,29 @@ const signed char *const AnimationVector[] = {
 
     // see (player.h) AnimationIdent
 
-    AnimationDefault,     // 00 ID_Stand
-    AnimationStandUp,     // 01 ID_StandUp
-    AnimationStandLR,     // 02 ID_StandLR
-    AnimationMine,        // 03 ID_Mine
-    AnimationTurn,        // 04 ID_Turn
-    AnimationDie,         // 05 ID_Die
-    AnimationWalk,        // 06 ID_Walk
-    AnimationSkeleton,    // 07 ID_Skeleton
-    AnimationLocked,      // 08 ID_Locked
-    AnimationWalkUp,      // 09 ID_WalkUp
-    AnimationWalkDown,    // 10 ID_WalkDown
-    AnimationMineUp,      // 11 ID_MineUp
-    AnimationMineDown,    // 12 ID_MineDown
-    AnimationTapUp,       // 13 ID_TapUp
-    AnimationTapDown,     // 14 ID_TapDown
-    AnimationTapPush,     // 15 ID_TapPush
-    AnimationXray,        // 16 ID_Xray
+    AnimationDefault,        // 00 ID_Stand
+    AnimationStandUp,        // 01 ID_StandUp
+    AnimationStandLR,        // 02 ID_StandLR
+    AnimationMine,           // 03 ID_Mine
+    AnimationTurn,           // 04 ID_Turn
+    AnimationDie,            // 05 ID_Die
+    AnimationWalk,           // 06 ID_Walk
+    AnimationSkeleton,       // 07 ID_Skeleton
+    AnimationLocked,         // 08 ID_Locked
+    AnimationWalkUp,         // 09 ID_WalkUp
+    AnimationWalkDown,       // 10 ID_WalkDown
+    AnimationMineUp,         // 11 ID_MineUp
+    AnimationMineDown,       // 12 ID_MineDown
+    AnimationTapUp,          // 13 ID_TapUp
+    AnimationTapDown,        // 14 ID_TapDown
+    AnimationTapPush,        // 15 ID_TapPush
+    AnimationXray,           // 16 ID_Xray
+    AnimationPickup,         // 17 ID_Pickup
+    AnimationStandArmsUp,    // 18 ID_StandArmsUp
 };
+
+_Static_assert(sizeof(AnimationVector) / sizeof(AnimationVector[0]) == ID_MAX, "AnimationVector table wrong size");
+
 
 enum AnimationIdent playerAnimationID = ID_Stand;
 const signed char *playerAnimation = AnimationDefault;

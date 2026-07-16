@@ -66,7 +66,7 @@ int time;
 int lavaSurfaceTrixel;
 bool showWater;
 bool showLava;
-bool exitTrigger;
+// bool exitTrigger;
 
 int cave;
 bool caveCompleted;

@@ -8,9 +8,10 @@
 #include "grid6.h"
 #include "kernels.h"
 #include "main.h"
+#include "sound.h"
 
 
-#define DURATION_COUCH 250
+#define DURATION_COUCH 400
 
 
 // Re-using COPYRIGHT buffers, but alias just for readability
@@ -41,54 +42,60 @@ void initGameState_CouchCompliant() {
     frame = 0;
 }
 
-
-void VB_CouchCompliant() {
-
-    initDataStreams_Copyright();    // re-use Copyright kernel
-
-
-    if (frame < DURATION_COUCH) {
-
 #define COUCH_BASE 50
+#define COUCH_SHADOW_WIDTH 40
+#define COUCH_TEXT_OFFSET 30
 
 #define COLOUR_SHADOW 0x60
 #define COLOUR_COUCH 0x50
 #define COLOUR_TEXT 0x90
 
-        if (colx < 40)
+#define SHADOW_FADE_START_FRAME 50
+#define TEXT_REVEAL_FRAME 80
+
+#define LUM_TARGET_EXIT -15
+
+void VB_CouchCompliant() {
+    initDataStreams_Copyright();    // re-use Copyright kernel
+
+    if (frame < DURATION_COUCH) {
+        if (luminance == lumTarget && (frame & 1) && (colx < COUCH_SHADOW_WIDTH))
             colx++;
 
-        int clr = colx >> 2;
+        unsigned char *colours = (unsigned char *)(RAM + _BUF_CC_COLUP0);
+        unsigned char *shadow_px = &colours[COUCH_BASE + colx - 1];
+        *shadow_px = (*shadow_px & 0xF) | convertColour(COLOUR_SHADOW);
+    }
 
-        unsigned char *p = (unsigned char *)(RAM + _BUF_CC_COLUP0);
-        p[COUCH_BASE + colx - 1] = (p[COUCH_BASE + colx - 1] & 0xF) | convertColour(COLOUR_SHADOW);
+    int couch_colour = (colx >> 2) | COLOUR_COUCH;
+    draw6Bitmap(_BUF_CC_GRP, _BUF_CC_COLUP0, gfx_grid_couch_compliant_gif, gfx_grid_couch_compliant_gif_HEIGHT,
+                COUCH_BASE + 1 + colx, couch_colour);
 
-        draw6Bitmap(_BUF_CC_GRP, _BUF_CC_COLUP0, gfx_grid_couch_compliant_gif, gfx_grid_couch_compliant_gif_HEIGHT,
-                    COUCH_BASE + 1 + colx, clr | COLOUR_COUCH);
+    if (frame > TEXT_REVEAL_FRAME) {
+        int text_colour = convertColour((COLOUR_TEXT | ((frame >> 3) & 7)) + 4);
+        draw6Bitmap(_BUF_CC_GRP, _BUF_CC_COLUP0, gfx_grid_compliant_gif, gfx_grid_compliant_gif_HEIGHT,
+                    COUCH_BASE + COUCH_TEXT_OFFSET + colx, text_colour);
+    }
 
-        if (frame > 80)
-            draw6Bitmap(_BUF_CC_GRP, _BUF_CC_COLUP0, gfx_grid_compliant_gif, gfx_grid_compliant_gif_HEIGHT,
-                        COUCH_BASE + 30 + colx, convertColour((COLOUR_TEXT | ((frame >> 2) & 7)) + 4));
-
-
-        // fade out shadow
-        if (frame > 50 && !(frame & 3)) {
-            unsigned char *c = RAM + _BUF_CC_COLUP0;
-            for (int i = COUCH_BASE; i < COUCH_BASE + 40; i++) {
-                if ((--c[i] & 0xF) == 0xF)
-                    c[i] = 0;
-            }
+    // fade out shadow
+    if (frame > SHADOW_FADE_START_FRAME && !(frame & 7)) {
+        unsigned char *colours = RAM + _BUF_CC_COLUP0;
+        for (int i = COUCH_BASE; i < COUCH_BASE + COUCH_SHADOW_WIDTH; i++) {
+            if ((--colours[i] & 0xF) == 0xF)
+                colours[i] = 0;
         }
     }
 
-    else
-        //        setGameState(GS_RAINBOW);
-        //    setGameState(GS_MENU);
-        setGameState(GS_RASTER_BLEED);
+    if (frame >= DURATION_COUCH) {
+        lumTarget = LUM_TARGET_EXIT;
+        if (luminance == lumTarget)
+            setGameState(GS_MENU);
+    }
 }
 
+
 void OS_CouchCompliant() {
-    adjustLuminance(3);
+    adjustLuminance(1);
 }
 
 // EOF

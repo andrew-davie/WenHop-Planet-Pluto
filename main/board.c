@@ -116,12 +116,7 @@ void initBoard() {
 void setupBoardScanner() {
 
     // After board scan complete, throttles until we're at correct FPS
-
-    // int st = T1TC;
-
     if (gameFrame >= gameSpeed) {    // && !autoMoveFrameCount) {
-
-        //        doges = gameFrame;
 
         waterDir++;
 
@@ -140,12 +135,7 @@ void setupBoardScanner() {
             startCharAnimation(TYPE_STAR, AnimateStar);
         }
 
-        // if (!totalDogePossible)
-        //     FLASH(0xC2, 10);
-
-
         ++selectorCounter;
-        //        activated = isActive[++selectorCounter & 3];
 
         if (showLava) {
 
@@ -169,12 +159,8 @@ void setupBoardScanner() {
 
                 lavaSurfaceTrixel -= sinus[(waves >> 0) & 15];
 
-                if (((sinus[(waves >> 0) & 15] & 3) != 0) || (gameFrame & 31) == 0) {
+                if (((sinus[(waves >> 0) & 15] & 3) != 0) || (gameFrame & 31) == 0)
                     ++waves;
-
-                    //                  if (!(frame & 65535))
-                    //                        lavaSurfaceTrixel--;
-                }
 
                 lavaSurfaceTrixel += sinus[(waves >> 0) & 15];
             }
@@ -206,24 +192,21 @@ void setupBoardScanner() {
         setSchedule(SCHEDULE_PROCESS_BOARD);
 
 
-        // processBoardSquares();
+        processBoardSquares();
     }
-
-    // if (T1TC - st > actualScore)
-    //     actualScore = T1TC - st;
 }
 
 
 void processBoardSquares() {
 
 
-    while (T1TC < availableIdleTime - 5000) {
+    while (T1TC < availableIdleTime - 7500) {
 
         me = RAM + _BOARD + boardRow * _1ROW + boardCol;
 
         creature = *me;
 
-        if (!(creature & FLAG_THISFRAME)) {
+        if (creature < FLAG_THISFRAME) {
 
             type = CharToType[creature];
 
@@ -351,6 +334,17 @@ bool processTypes() {
     case TYPE_MELLON_HUSK:
         if (!exitMode)
             movePlayer(me);
+
+        else {
+
+            exitMode--;
+            if (exitMode < 20) {
+                lumTarget = -15;
+                if (lumTarget == luminance)
+                    setGameState(GS_MENU);
+            }
+        }
+
         break;
 
     case TYPE_WATERFLOW_0:
@@ -388,14 +382,22 @@ bool processTypes() {
 
 void setInsulator(unsigned char *p, int row, int col) {
 
-    int dir = _1ROW;
-    p += dir;
+    int visibleLeft = scrollX >> 16;
+    int colTrix = col * CHAR_TRIX_X;
+
+    if (colTrix <= visibleLeft - CHAR_TRIX_X || colTrix >= visibleLeft + SCREEN_TRIX_X) {
+        return;
+    }
+
+    p += _1ROW;
 
     if (!onOff[col]) {
-        while (++row < _BOARD_ROWS && CharToType[GET(*p)] != TYPE_INSULATOR) {
-            if (CharToType[GET(*p)] == TYPE_ELECTRIC)
-                *p = FLAG(CH_BLANK);
-            p += dir;
+        if (lastOnOff[col]) {
+            while (++row < _BOARD_ROWS && CharToType[GET(*p)] != TYPE_INSULATOR) {
+                if (CharToType[GET(*p)] == TYPE_ELECTRIC)
+                    *p = FLAG(CH_BLANK);
+                p += _1ROW;
+            }
         }
     }
 
@@ -405,37 +407,41 @@ void setInsulator(unsigned char *p, int row, int col) {
 
             int type2 = CharToType[GET(*p)];
             unsigned int att = Attribute[type2];
-            if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES | ATT_BLANK)) {
 
-                // if (att & ATT_EXPLODABLE && !(att & ATT_BLANK))
-                //     FLASH(0x28, 10);
 
+            if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES)) {
                 *p = FLAG(CH_ELECTRIC_0 + rangeRandom(4));
-                nDots(6, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
-                break;
+                nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                return;
             }
+
+            if (att & ATT_BLANK)
+                *p = FLAG(CH_ELECTRIC_0 + rangeRandom(4));
+
 
             else if (type2 == TYPE_ROCK_BONUS) {
 
                 *p = FLAG(CH_STAR);
-                nDots(6, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
-                break;
+                nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                return;
             }
-
-            p += dir;
+            p += _1ROW;
         }
     }
 }
 
-bool onOff[_BOARD_COLS] = {true};
+bool onOff[_BOARD_COLS] = {false};
+bool lastOnOff[_BOARD_COLS] = {false};
 
 void setInsulatorPattern() {
 
     static int s = 0;
     s++;
 
-    for (int i = 0; i < _BOARD_COLS; i++)
+    for (int i = 0; i < _BOARD_COLS; i++) {
+        lastOnOff[i] = onOff[i];
         onOff[i] = sin_cos[(s + i * 20) & 31] < 128;
+    }
 }
 
 
@@ -688,10 +694,13 @@ void restartBoardScan() {
             waitRelease = false;
 
         enum ObjectType type = CharToType[what];
-        playerDead = (type != TYPE_MELLON_HUSK && type != TYPE_MELLON_HUSK_PRE && !exitMode);
+        playerDead = (type != TYPE_MELLON_HUSK && type != TYPE_MELLON_HUSK_PRE && type != TYPE_OUTBOX && !exitMode);
 
 
         if (oldDead != playerDead) {
+
+            shakeTime = 40;
+            FLASH(0x34, 20);
 
             attachment = 0;
 
@@ -711,11 +720,18 @@ void restartBoardScan() {
             sound_max_volume = VOLUME_NONPLAYING;
         }
 
+
+        if (playerDead && !shakeTime && !(inpt4 & 0x80)) {
+            // cave--;
+            setGameState(GS_MENU);
+        }
+
+
         if (explodeCount > 0) {
 
             explodeRadius++;
 
-            for (int i = 0; i < PARTICLE_COUNT / 2; i++)
+            for (int i = 0; i < 5; i++)
                 nDots(1, playerX, playerY, PT_TWO, rangeRandom(20),
                       rangeRandom(explodeRadius) - (explodeRadius >> 1) + CHAR_CENTER_X,
                       rangeRandom(explodeRadius * 2) - explodeRadius + CHAR_CENTER_Y, rangeRandom(10),
@@ -820,7 +836,7 @@ void processWaterFlow() {
 
     // Lag the interruption of water flowing downwards
     unsigned char above = *(me - _1ROW);
-    if (!(above & FLAG_THISFRAME) && !(Attribute[CharToType[GET(above)]] & ATT_WATERFLOW)) {
+    if (above < FLAG_THISFRAME && !(Attribute[CharToType[GET(above)]] & ATT_WATERFLOW)) {
         *me = FLAG(CH_BLANK);
         return;
     }
@@ -866,8 +882,7 @@ void processCharBeltAndGrinder() {
     unsigned char *up = me - _1ROW;
     unsigned char *up2 = me - _1ROW + conveyorDirection;
 
-    if (ATTRIBUTE_BIT(*up, ATT_CONVEYOR) && (ATTRIBUTE_BIT(*up2, ATT_BLANK | ATT_DISSOLVES)) &&
-        !(*up & FLAG_THISFRAME)) {
+    if (ATTRIBUTE_BIT(*up, ATT_CONVEYOR) && (ATTRIBUTE_BIT(*up2, ATT_BLANK | ATT_DISSOLVES)) && *up < FLAG_THISFRAME) {
         *up2 = FLAG(*up);
         *up = CH_DUST_0;
     }
@@ -1079,7 +1094,7 @@ void genericPush(int offsetX, int offsetY) {
 
     const unsigned int attPushPos = Attribute[CharToType[GET(*pushPos)]];
 
-    if (!(GET(*pushPos) & FLAG_THISFRAME)) {
+    if (GET(*pushPos) < FLAG_THISFRAME) {
         if ((attPushPos & ATT_PERMEABLE) || ((attPushPos & ATT_PUSH) && (attPushPosFurther & ATT_PERMEABLE))) {
 
             // Note we may have a lagging flag clear until next frame but who cares
@@ -1186,7 +1201,7 @@ void doRoll() {
     for (int offset = -1; offset < 2; offset += 2) {
 
         unsigned char *side = me + offset;
-        if (!(*side & FLAG_THISFRAME)) {
+        if (*side < FLAG_THISFRAME) {
 
             enum ObjectType sideType = CharToType[GET(*side)];
             if (Attribute[sideType] & ATT_BLANK) {

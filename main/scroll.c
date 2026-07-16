@@ -99,11 +99,15 @@ void scroll() {
     scrollY += scrollSpeedY;
 
 
-    int bounds_l = ((theCave->bounds_l) * CHAR_TRIX_X) << 16;
-    int bounds_r = ((theCave->bounds_r - 8) * CHAR_TRIX_X) << 16;
-    int bounds_t = ((theCave->bounds_t) * CHAR_TRIX_Y) << 16;
-    int bounds_b = ((theCave->bounds_b) * CHAR_TRIX_Y) << 16;
+    // int bounds_l = ((theCave->bounds_l) * CHAR_TRIX_X) << 16;
+    // int bounds_r = ((theCave->bounds_r) * CHAR_TRIX_X - SCREEN_TRIX_X) << 16;
+    // int bounds_t = ((theCave->bounds_t) * CHAR_TRIX_Y) << 16;
+    // int bounds_b = ((theCave->bounds_b) * CHAR_TRIX_Y - SCREEN_TRIX_Y) << 16;
 
+    int bounds_l = (theCave->bounds_l) << 16;
+    int bounds_r = (theCave->bounds_r) << 16;
+    int bounds_t = (theCave->bounds_t) << 16;
+    int bounds_b = (theCave->bounds_b) << 16;
 
     if (scrollX > bounds_r) {
         scrollX = bounds_r;
@@ -120,21 +124,21 @@ void scroll() {
         scrollSpeedY = 0;
     }
 
-    else if (scrollY < bounds_t) {
+    if (scrollY < bounds_t) {
         scrollY = bounds_t;
         scrollSpeedY = 0;
     }
 
 
-    if (theCave->flags & CAVEDEF_LOCK_X) {
-        scrollX = 0x70000;
-        scrollSpeedX = 0;
-    }
+    // if (theCave->flags & CAVEDEF_LOCK_X) {
+    //     scrollX = 0x70000;
+    //     scrollSpeedX = 0;
+    // }
 
-    if (theCave->flags & CAVEDEF_LOCK_Y) {
-        scrollY = 0x110000;
-        scrollSpeedY = 0;
-    }
+    // if (theCave->flags & CAVEDEF_LOCK_Y) {
+    //     scrollY = 0x110000;
+    //     scrollSpeedY = 0;
+    // }
 }
 
 

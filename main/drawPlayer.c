@@ -27,9 +27,29 @@
 
 static int playerSpriteY;
 
-unsigned char dynamicPlayerColours[16];
 unsigned char playerBaseColour[16];
 unsigned char postProcessPlayerColours[16];
+
+static const unsigned char playerColour[] = {
+
+    0x28,    // 00 HAIR
+    0x34,    // 01 SKIN
+    0x06,    // 02 TOP1
+    0x06,    // 03 TOP2
+    0x44,    // 04 BOOT
+    0x44,    // 05 PANT
+    0x58,    // 06 BELT
+    0x08,    // 07 SOLE
+    0x08,    // 08 BONE
+    0x2C,    // 09 HMT0
+    0x28,    // 10 HMT1
+    0x26,    // 11 HMT2
+    0x22,    // 12 HMT3
+    0x4A,    // 13 BDY0
+    0x46,    // 14 BDY1
+    0x44,    // 15 BDY2
+};
+
 
 void initSprites() {
 
@@ -37,32 +57,12 @@ void initSprites() {
 
     int rcol = getRandom32() & 0xF0;
 
-    static const unsigned char playerColour[] = {
-
-        0x28,    // 00 HAIR
-        0x34,    // 01 SKIN
-        0x06,    // 02 TOP1
-        0x06,    // 03 TOP2
-        0x44,    // 04 BOOT
-        0x44,    // 05 PANT
-        0x58,    // 06 BELT
-        0x08,    // 07 SOLE
-        0x08,    // 08 BONE
-        0x2C,    // 09 HMT0
-        0x28,    // 10 HMT1
-        0x26,    // 11 HMT2
-        0x22,    // 12 HMT3
-        0x4A,    // 13 BDY0
-        0x46,    // 14 BDY1
-        0x44,    // 15 BDY2
-    };
-
     int oldlum = luminance;
     luminance = 0;
 
     for (int i = 0; i < 16; i++) {
-        playerBaseColour[i] = dynamicPlayerColours[i] = convertColour(playerColour[i]) + rcol;
-        postProcessPlayerColours[i] = dynamicPlayerColours[i] & 0xF0;
+        playerBaseColour[i] = playerColour[i] + rcol;
+        // postProcessPlayerColours[i] = playerBaseColour[i];
     }
 
     luminance = oldlum;
@@ -76,6 +76,7 @@ const unsigned char cx[][4] = {
 void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
     myMemsetInt((unsigned int *)(RAM + _BUF_GAME_GRP0), 0, _BUFFER_SIZE * 2 / 4);
+
 
     static int root = 0;
     root++;
@@ -94,7 +95,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
     else {
         rooted = cx[0][(root >> 3) & 3];
         for (int i = 0; i < 16; i++)
-            postProcessPlayerColours[i] = playerBaseColour[i] & 0xF0;
+            postProcessPlayerColours[i] = playerBaseColour[i];
     }
 
 #if ENABLE_SHAKE
@@ -194,8 +195,8 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
                 else {
 
-                    p0Colour[destLine] = (dynamicPlayerColours[c1] & 0xF) ^ postProcessPlayerColours[c1];
-                    p1Colour[destLine] = (dynamicPlayerColours[c2] & 0xF) ^ postProcessPlayerColours[c2];
+                    p0Colour[destLine] = convertColour(postProcessPlayerColours[c1]);
+                    p1Colour[destLine] = convertColour(postProcessPlayerColours[c2]);
 
                     if (playerSpriteY++ >= lavaLine) {
                         p0Colour[destLine] = ((p0Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);
@@ -244,7 +245,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
                 else {
 
-                    p0Colour[destLine] = (dynamicPlayerColours[c1] & 0xF) ^ postProcessPlayerColours[c1];
+                    p0Colour[destLine] = convertColour(postProcessPlayerColours[c1]);
 
                     if (playerSpriteY++ >= lavaLine) {
                         p0Colour[destLine] = ((p0Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);

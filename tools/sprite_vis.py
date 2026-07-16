@@ -17,6 +17,23 @@ YELLOW = '🟨'
 RED    = '🟢'
 BROWN  = '❌'
 
+# Colour code -> emoji square, keyed by the 4-char suffix passed to ONE()/TWO()
+# (see the colour enum: NONE, BONE, HMT0..3, BDY0..2).
+COLOR_MAP = {
+    'NONE': BLACK,
+    'BONE': '⬜',
+    'HMT0': '🟥',
+    'HMT1': '🟧',
+    'HMT2': YELLOW,
+    'HMT3': '🟩',
+    'BDY0': '🟦',
+    'BDY1': '🟪',
+    'BDY2': '🟫',
+}
+DEFAULT_ON_COLOR = YELLOW  # fallback for unrecognised/missing colour codes
+
+COLOR_ARG_RE = re.compile(r'^[X_]+$')
+
 SP_LINE_RE = re.compile(
     r'^(?P<indent>\s*)'
     r'(?P<call>(?:ONE|TWO)\s*\(\s*[^)]*\))'
@@ -27,7 +44,7 @@ SP_LINE_RE = re.compile(
 )
 
 # Generated padding rows and border rows (stripped on re-run for idempotency)
-PADDING_ROW_RE = re.compile(r'^\s*//\s+\|[🟫🟩◼️🔴]+\|')
+PADDING_ROW_RE = re.compile(r'^\s*//\s+\|[' + RED + BROWN + r']+\|')
 BORDER_ROW_RE  = re.compile(r'^\s*//\s+\+-+\+')
 
 PATTERN_RE     = re.compile(r'[X_]{2,}')
@@ -45,7 +62,8 @@ COMMENT_COL = 48   # column where '// NN' starts on sprite lines
 def render_canvas_row(sprite_width: int,
                       canvas_col_start: int, canvas_width: int,
                       cx: int, is_centre_row: bool,
-                      pixel_data: Optional[list]) -> str:
+                      pixel_data: Optional[list],
+                      col_colors: Optional[list] = None) -> str:
     result = []
     for col in range(canvas_col_start, canvas_col_start + canvas_width):
         in_sprite_h = (0 <= col < sprite_width)
@@ -53,10 +71,31 @@ def render_canvas_row(sprite_width: int,
         if is_centre_row and is_cx:
             result.append(RED)
         elif pixel_data is not None and in_sprite_h:
-            result.append(YELLOW if pixel_data[col] == 'X' else BLACK)
+            if pixel_data[col] == 'X':
+                on_color = col_colors[col] if col_colors else DEFAULT_ON_COLOR
+                result.append(on_color)
+            else:
+                result.append(BLACK)
         else:
             result.append(BROWN)
     return ''.join(result)
+
+
+def extract_col_colors(inner_text: str, sprite_width: int) -> list:
+    """Work out the emoji colour for each column of an ONE()/TWO() sprite row,
+    based on the trailing colour-code argument(s) (e.g. HMT0, BDY2, NONE)."""
+    args       = [a.strip() for a in inner_text.split(',')]
+    color_args = [a for a in args if a and not COLOR_ARG_RE.match(a)]
+    emojis     = [COLOR_MAP.get(code, DEFAULT_ON_COLOR) for code in color_args]
+
+    if not emojis:
+        return [DEFAULT_ON_COLOR] * sprite_width
+
+    if sprite_width == 16 and len(emojis) >= 2:
+        half = sprite_width // 2
+        return [emojis[0]] * half + [emojis[1]] * half
+
+    return [emojis[0]] * sprite_width
 
 
 def build_canvas_params(n_rows: int, sprite_width: int, cx: int, cy: int):
@@ -100,8 +139,10 @@ def format_sprite_line(raw_line: str, cx: int, is_centre_row: bool, row_idx: int
     flat = list(''.join(patterns))
     flat = (flat + ['_'] * sprite_width)[:sprite_width]
 
+    col_colors = extract_col_colors(inner.group(1), sprite_width)
+
     visual = render_canvas_row(sprite_width, canvas_col_start, canvas_width,
-                               cx, is_centre_row, flat)
+                               cx, is_centre_row, flat, col_colors)
 
     comment = f'// {row_idx:02d}   |{visual}|'
     base    = f'{indent}{call}{tail}'

@@ -16,6 +16,16 @@ _SK_ID              ds 1
 _SK_ENABLE_ICC      ds 1
 _SK_ODOMETER        ds 2           ; how many games played!
 
+
+_SK_PER             ds SAVEKEY_SIZE
+_SK_UNL             ds SAVEKEY_SIZE
+_SK_SLV             ds SAVEKEY_SIZE
+
+_SK_LAST            ds 1
+_SK_USED_SOLVES     ds 1
+_SK_SEEN_TROPHY     ds 1
+_SK_TOTAL_SOLVES    ds 1
+
 _SK_RESET           ds 1            ; NOT saved; just a toggle
 
     ;---------------------------------------------

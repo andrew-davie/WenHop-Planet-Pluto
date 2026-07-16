@@ -1,218 +1,174 @@
 #!/usr/bin/env python3
-
 """
-cset.py - Convert image files to C character set source/header files.
+Build a deduplicated Atari 2600 character set from one or more images.
 
-Usage:
-    python3 cset.py --width W --depth D image1.png [image2.jpg ...]
-
-    --width  W   Character cell width in pixels (1-8; packed into one byte per row)
-    --depth  D   Character cell height in pixels (one byte per row, D rows per char)
-
-Images may be JPG GIF PNG 
-
-The image is divided into WxD pixel cells, left-to-right then top-to-bottom.
-Each cell becomes D bytes. Within each byte, the leftmost pixel is the MSB (bit 7).
-If W < 8 the remaining low bits in each byte are 0.
-
-Output per input file:
-    <basename>.c   - character table
-    <basename>.h   - #defines for each character index + extern declaration
+Each image is sliced into WIDTH x DEPTH pixel blocks ("characters"). Identical
+blocks are deduplicated into a shared charset; every image also gets a grid
+mapping its blocks to character IDs. Each character's rows are packed into
+three bit planes (R/G/B) suitable for the TIA. Output is a matching .c/.h pair.
 """
+
+#from __future__ import annotations
 
 import argparse
-import os
-import sys
+import glob
+from dataclasses import dataclass, field
 from pathlib import Path
 
-try:
-    from PIL import Image
-except ImportError:
-    print("Pillow is required: pip install Pillow", file=sys.stderr)
-    sys.exit(1)
+from PIL import Image
+
+BIT_PLANES = 3  # rows are packed into R, G and B planes
+
+# Coloured-block emoji for each combination of a pixel's R/G/B plane bits,
+# indexed by (r | g << 1 | b << 2).
+PIXEL_EMOJI = ["⬛", "🟥", "🟩", "🟨", "🟦", "🟪", "🟧", "⬜"]
 
 
-def make_c_identifier(name: str) -> str:
-    """Convert an arbitrary string to a valid C identifier."""
-    result = []
-    for ch in name:
-        result.append(ch if (ch.isalnum() or ch == "_") else "_")
-    if result and result[0].isdigit():
-        result.insert(0, "_")
-    return "".join(result)
+@dataclass
+class CharSet:
+    """Deduplicated pixel blocks, plus each source image's block grid."""
+
+    width: int
+    depth: int
+    ids: dict[tuple, int] = field(default_factory=dict)
+    grids: dict[str, list[list[int]]] = field(default_factory=dict)
+
+    def __len__(self) -> int:
+        return len(self.ids)
+
+    def by_id(self):
+        """Characters in assignment order, as (pixels, id) pairs."""
+        return sorted(self.ids.items(), key=lambda kv: kv[1])
+
+    def add_image(self, filename: str) -> None:
+        """Slice an image into blocks, deduplicating into the shared charset."""
+        img = Image.open(filename)
+        w, h = img.size
+
+        grid = []
+        for y in range(0, h, self.depth):
+            row = []
+            for x in range(0, w, self.width):
+                block = img.crop((x, y, x + self.width, y + self.depth))
+                pixels = tuple(block.getdata())
+                if pixels not in self.ids:
+                    self.ids[pixels] = len(self.ids)
+                row.append(self.ids[pixels])
+            grid.append(row)
+
+        self.grids[filename] = grid
 
 
-def image_to_charset(image_path: Path, char_width: int, char_depth: int):
-    """
-    Load image and split into characters.
-
-    Returns:
-        chars      - list of characters; each character is a list of `char_depth`
-                     ints (one byte per row, MSB = leftmost pixel, unused low bits = 0)
-        num_chars  - total number of characters
-        cols       - number of character columns
-        rows       - number of character rows
-    """
-    img = Image.open(image_path).convert("1")  # 1-bit: pixel is 0 or 255
-    img_w, img_h = img.size
-
-    if img_w % char_width != 0:
-        print(
-            f"  Warning: image width {img_w}px is not a multiple of char width "
-            f"{char_width}px — trailing pixels ignored.",
-            file=sys.stderr,
-        )
-    if img_h % char_depth != 0:
-        print(
-            f"  Warning: image height {img_h}px is not a multiple of char depth "
-            f"{char_depth}px — trailing rows ignored.",
-            file=sys.stderr,
-        )
-
-    cols = img_w // char_width
-    rows = img_h // char_depth
-
-    if cols == 0 or rows == 0:
-        raise ValueError(
-            f"Image {img_w}x{img_h} is too small for a {char_width}x{char_depth} character cell."
-        )
-
-    pixels = img.load()
-    chars = []
-
-    for row in range(rows):
-        for col in range(cols):
-            char_bytes = []
-            for dy in range(char_depth):
-                byte = 0
-                for dx in range(char_width):
-                    px = col * char_width + dx
-                    py = row * char_depth + dy
-                    # PIL mode "1" returns 0 or 255
-                    bit = 1 if pixels[px, py] else 0
-                    # MSB = leftmost pixel; dx=0 → bit 7, dx=1 → bit 6, etc.
-                    bit_pos = 7 - dx
-                    byte |= bit << bit_pos
-                char_bytes.append(byte)
-            chars.append(char_bytes)
-
-    return chars, len(chars), cols, rows
+def pack_bits(values: list[int], bit_index: int) -> int:
+    """Pack one bit from each value into a single integer, first value highest."""
+    result = 0
+    for i, value in enumerate(values):
+        bit = (value >> bit_index) & 1
+        result |= bit << (len(values) - 1 - i)
+    return result
 
 
-def write_c_file(c_path: Path, h_stem: str, prefix: str, chars, char_depth: int):
-    table_name = f"{prefix}_charset"
+def character_rows(pixels: tuple, width: int, depth: int) -> list[tuple[list[str], str]]:
+    """A character's rows: packed R/G/B fields, paired with an emoji preview of the row."""
+    rows = []
+    for y in range(depth):
+        line = list(pixels[y * width:(y + 1) * width])
+        fields = [f"0b{pack_bits(line, plane):0{width}b}" for plane in range(BIT_PLANES)]
+        preview = "".join(PIXEL_EMOJI[value & 0b111] for value in line)
+        rows.append((fields, preview))
+    return rows
+
+
+def map_varname(filename: str) -> str:
+    """C identifier for a source image's block-grid array."""
+    return filename.replace(".", "_").replace("/", "_") + "_map"
+
+
+def write_header(path: Path, name: str, charset: CharSet) -> None:
     lines = [
-        "/* Auto-generated by img2charset.py - do not edit */",
-        f'#include "{h_stem}.h"',
-        "",
-        f"/* {len(chars)} characters, {char_depth} byte(s) per character */",
-        f"const unsigned char {table_name}[{len(chars)}][{char_depth}] = {{",
+        "#pragma once\n",
+        f"#define CARS_CHAR_WIDTH {charset.width}",
+        f"#define CARS_CHAR_HEIGHT {charset.depth}\n",
+        "typedef struct {",
+        "    unsigned char data[CARS_CHAR_HEIGHT * 3]; // RGB",
+        "} character;\n",
+        f"extern const character {name}[{len(charset)}];\n",
     ]
 
-    for i, char_bytes in enumerate(chars):
-        hex_vals = ", ".join(f"0x{b:02X}" for b in char_bytes)
-        comma = "," if i < len(chars) - 1 else " "
-        lines.append(f"    {{ {hex_vals} }}{comma} /* {prefix}_{i} */")
+    for filename, grid in charset.grids.items():
+        varname = map_varname(filename)
+        lines.append(f"extern const unsigned char {varname}[{len(grid)}][{len(grid[0])}];")
+    if charset.grids:
+        lines.append("")
 
-    lines += ["};", ""]
-    c_path.write_text("\n".join(lines))
-
-
-def write_h_file(h_path: Path, prefix: str, num_chars: int, char_width: int, char_depth: int):
-    table_name = f"{prefix}_charset"
-    guard = f"{prefix.upper()}_H"
-
-    lines = [
-        "/* Auto-generated by img2charset.py - do not edit */",
-        f"#ifndef {guard}",
-        f"#define {guard}",
-        "",
-        "/* Character cell dimensions */",
-        f"#define {prefix.upper()}_CHAR_WIDTH   {char_width}",
-        f"#define {prefix.upper()}_CHAR_DEPTH   {char_depth}",
-        f"#define {prefix.upper()}_NUM_CHARS    {num_chars}",
-        "",
-        "/* Per-character index equates */",
-    ]
-
-    for i in range(num_chars):
-        lines.append(f"#define {prefix}_{i}  {i}")
-
-    lines += [
-        "",
-        "/* Table declaration */",
-        f"extern const unsigned char {table_name}[{num_chars}][{char_depth}];",
-        "",
-        f"#endif /* {guard} */",
-        "",
-    ]
-    h_path.write_text("\n".join(lines))
+    lines.append("//EOF")
+    path.write_text("\n".join(lines) + "\n")
 
 
-def process_file(image_path: Path, char_width: int, char_depth: int, output_dir: Path):
-    stem = image_path.stem
-    prefix = make_c_identifier(stem)
+def write_source(path: Path, include_stem: str, name: str, charset: CharSet) -> None:
+    lines = [f'#include "{include_stem}.h"', ""]
 
-    print(f"Processing: {image_path}")
+    lines.append(f"const character {name}[{len(charset)}] = {{")
+    for pixels, idx in charset.by_id():
+        rows = character_rows(pixels, charset.width, charset.depth)
+        row_prefixes = ["        " + ", ".join(fields) + ", " for fields, _ in rows]
+        comment_col = len(row_prefixes[0])
 
-    chars, num_chars, cols, rows = image_to_charset(image_path, char_width, char_depth)
-    print(f"  Grid: {cols} cols x {rows} rows = {num_chars} characters "
-          f"({char_width}px wide x {char_depth}px deep, {char_depth} byte(s) each)")
+        lines.append("    { {".ljust(comment_col) + f"//     {idx}")
+        for line_no, (prefix, (_, preview)) in enumerate(zip(row_prefixes, rows)):
+            lines.append(prefix + f"// {line_no:2d}  {preview}")
+        lines.append("    } },")
+    lines.append("};")
+    lines.append("")
 
-    c_path = output_dir / f"{stem}.c"
-    h_path = output_dir / f"{stem}.h"
+    for filename, grid in charset.grids.items():
+        varname = map_varname(filename)
+        lines.append(
+            f"__attribute__((used)) const unsigned char "
+            f"{varname}[{len(grid)}][{len(grid[0])}] = {{"
+        )
+        for row in grid:
+            lines.append("    { " + ", ".join(str(n) for n in row) + " },")
+        lines.append("};")
+        lines.append("")
 
-    write_c_file(c_path, stem, prefix, chars, char_depth)
-    write_h_file(h_path, prefix, num_chars, char_width, char_depth)
-
-    print(f"  Wrote: {c_path.name}, {h_path.name}")
+    lines.append("//EOF")
+    path.write_text("\n".join(lines) + "\n")
 
 
-def main():
+def resolve_files(patterns: list[str]) -> list[str]:
+    """Expand glob patterns, warning about any that match nothing."""
+    files = []
+    for pattern in patterns:
+        matched = glob.glob(pattern)
+        if not matched:
+            print(f"Warning: pattern '{pattern}' did not match any files")
+        files.extend(matched)
+    return files
+
+
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Convert image files to C character set source/header files.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__,
+        description="Build a deduplicated Atari 2600 character set from one or more images."
     )
-    parser.add_argument(
-        "--width", type=int, required=True,
-        help="Character cell width in pixels (1-8).",
-    )
-    parser.add_argument(
-        "--depth", type=int, required=True,
-        help="Character cell height in pixels (one byte per row).",
-    )
-    parser.add_argument(
-        "--output-dir", type=Path, default=Path("."),
-        help="Directory for output files (default: current directory).",
-    )
-    parser.add_argument(
-        "images", nargs="+", type=Path,
-        help="One or more image files to convert.",
-    )
+    parser.add_argument("-w", "--width", type=int, required=True, help="Character width in pixels")
+    parser.add_argument("-d", "--depth", type=int, required=True, help="Character height in pixels")
+    parser.add_argument("-o", "--output", required=True, help="Output filename (without extension)")
+    parser.add_argument("-n", "--name", required=True, help="C array/struct variable name")
+    parser.add_argument("files", nargs="+", help="Input filenames or glob patterns")
+    return parser.parse_args()
 
-    args = parser.parse_args()
 
-    if not (1 <= args.width <= 8):
-        parser.error("--width must be between 1 and 8 (packed into one byte per row).")
-    if args.depth < 1:
-        parser.error("--depth must be >= 1.")
+def main() -> None:
+    args = parse_args()
 
-    args.output_dir.mkdir(parents=True, exist_ok=True)
+    charset = CharSet(args.width, args.depth)
+    for filename in resolve_files(args.files):
+        charset.add_image(filename)
 
-    errors = 0
-    for image_path in args.images:
-        if not image_path.exists():
-            print(f"Error: not found: {image_path}", file=sys.stderr)
-            errors += 1
-            continue
-        try:
-            process_file(image_path, args.width, args.depth, args.output_dir)
-        except Exception as exc:
-            print(f"Error processing {image_path}: {exc}", file=sys.stderr)
-            errors += 1
-
-    sys.exit(1 if errors else 0)
+    write_header(Path(f"{args.output}.h"), args.name, charset)
+    write_source(Path(f"{args.output}.c"), args.output, args.name, charset)
+    print(f"C and H output written to {args.output}")
 
 
 if __name__ == "__main__":

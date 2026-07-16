@@ -5,6 +5,7 @@
 
 #include "cdfjplus.h"
 
+#include "T1TC.h"
 #include "attribute.h"
 #include "characterset.h"
 #include "colour.h"
@@ -15,13 +16,14 @@
 #include "particle.h"
 #include "playerAnimation.h"
 #include "random.h"
+#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 
 unsigned int weaponLength = 0;
 
-void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
-                    unsigned char colour, unsigned char dmask);
+// void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
+//                     unsigned char colour, unsigned char dmask);
 
 #define TOOL_MAX 60
 
@@ -121,7 +123,7 @@ void modifyCharAtTip(int x, int y) {
             }
         }
 
-        if (*b & FLAG_THISFRAME)
+        if (*b >= FLAG_THISFRAME)
             nDotsAtTrixel(5, (x >> 8) + CHAR_CENTER_Y, (y >> 8) + CHAR_CENTER_Y, 30, PT_SPIRAL, 50, colour);
     }
 }
@@ -425,10 +427,9 @@ void initParticles() {
 
 void drawParticles() {
 
-    for (int i = 0; i < PARTICLE_COUNT; i++) {
+    TIMED(DRAWPARTICLE, 0x4B8);    // 14/7/2026
 
-        // if (T1TC > availableIdleTime - 500)
-        //     return;
+    for (int i = 0; i < PARTICLE_COUNT && TIME_OK(DRAWPARTICLE); i++) {
 
         if (particle[i].age) {
 
@@ -491,6 +492,7 @@ void drawParticles() {
 
 int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char colour) {
 
+
     int whichDrop = -1;
 
     int col = dotX - ((scrollX) >> 16);
@@ -546,28 +548,29 @@ void nDots(int count, int dripX, int dripY, int type, unsigned char age, int off
                 particle[idx].distance = rangeRandom(200) + 50;
                 particle[idx].dir = getRandom32();
             }
-        }
+        } else
+            break;
     }
 }
 
-void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY,
-                    int /*speed*/) {
+// void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY,
+//                     int /*speed*/) {
 
-    if (gravity < 0)
-        offsetY = CHAR_TRIX_Y - offsetY;
+//     if (gravity < 0)
+//         offsetY = CHAR_TRIX_Y - offsetY;
 
-    for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, 3);
-        if (idx >= 0) {
-            // TODO  vector
-            particle[idx].x += particle[idx].age * particle[idx].speed;
-            particle[idx].y += particle[idx].age * particle[idx].speed;
+//     for (int i = 0; i < count; i++) {
+//         int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, 3);
+//         if (idx >= 0) {
+//             // TODO  vector
+//             particle[idx].x += particle[idx].age * particle[idx].speed;
+//             particle[idx].y += particle[idx].age * particle[idx].speed;
 
-            // particle.speedX[idx] = -particle.speedX[idx];
-            // particle.speedY[idx] = -particle.speedY[idx];
-        }
-    }
-}
+//             // particle.speedX[idx] = -particle.speedX[idx];
+//             // particle.speedY[idx] = -particle.speedY[idx];
+//         }
+//     }
+// }
 
 void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
                    unsigned char colour) {
@@ -579,22 +582,23 @@ void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum Part
     }
 }
 
-#define SPREAD 96
+// #define SPREAD 96
 
-void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
-                    unsigned char colour, unsigned char dmask) {
+// void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
+//                     unsigned char colour, unsigned char dmask) {
+//     TIMER_ON
+//     for (int i = 0; i < count; i++) {
+//         int idx = sphereDot(dripX, dripY, type, age, colour);
+//         if (idx >= 0) {
+//             particle[idx].speed = rangeRandom(speed);
 
-    for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX, dripY, type, age, colour);
-        if (idx >= 0) {
-            particle[idx].speed = rangeRandom(speed);
 
-
-            int doff = rangeRandom(SPREAD) - (SPREAD >> 1);
-            particle[idx].dir = (unsigned char)(128 + dmask + doff);
-        }
-    }
-}
+//             int doff = rangeRandom(SPREAD) - (SPREAD >> 1);
+//             particle[idx].dir = (unsigned char)(128 + dmask + doff);
+//         }
+//     }
+//     TIMER_OFF
+// }
 
 
 //-------------rain

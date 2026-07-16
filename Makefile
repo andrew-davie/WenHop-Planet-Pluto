@@ -72,9 +72,11 @@ SRCS = \
  cdfjplus.c \
  characterset.c \
  colour.c \
+ cset.c \
  custom.c \
  decodeCaves.c \
  draw.c \
+ drawGridPreview.c \
  drawPlanet.c \
  drawPlayer.c \
  drawScreen.c \
@@ -342,10 +344,10 @@ $(TOOLS_BIN)/$(WAV2RAW): $(TOOLS_SRC)/$(WAV2RAW).c
 ###############################################################################
 # Graphics
 
-gfx: GRID6 IMG SKULL
+gfx: GRID6 IMG SKULL CHARSET
 
 GRID6: gfx/grid/*.gif
-	(cd gfx/grid & python3 tools/1bpp.py -o grid6 gfx/grid/*.gif)
+	(python3 tools/1bpp.py -o grid6 gfx/grid/*.gif)
 	mv grid6.* main
 
 .PHONY: IMG
@@ -355,6 +357,12 @@ IMG:
 .PHONY: SKULL
 SKULL: main/skull/gfx/iCC_skull.gif
 	$(MAKE) -C main/skull/gfx
+
+
+CHARSET: gfx/cars/*.gif
+	(python3 tools/cset.py -o cset --name charset --width 5 --depth 11 gfx/cars/blank.gif gfx/cars/numbers.gif gfx/cars/blip.gif )
+	mv cset.* main
+
 
 ###############################################################################
 # Cleaning

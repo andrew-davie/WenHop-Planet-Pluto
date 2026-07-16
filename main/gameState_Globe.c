@@ -6,6 +6,7 @@
 #include "draw.h"
 #include "drawPlanet.h"
 #include "drawplanet.h"
+#include "joystick.h"
 #include "main.h"
 #include "planet.h"
 #include "random.h"
@@ -320,7 +321,8 @@ void VB_Globe() {
 
     sound_max_volume = approach(sound_max_volume, nsv, 1);
 
-    if (finished)
+    getJoystick();
+    if (!(inpt4 & 0x80) || finished)
         setGameState(GS_GAME);
 }
 
@@ -331,7 +333,7 @@ void OS_Globe() {
 
 
     interleaveChronoColour(&roller);
-    adjustLuminance(3);
+    adjustLuminance(1);
 
     drawPlanet(0);
 

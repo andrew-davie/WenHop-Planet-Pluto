@@ -54,7 +54,9 @@
 const unsigned char caveUseWall[] = {
     // clang-format off
 
-    0,0,_BOARD_COLS,_BOARD_ROWS,
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    3,17,
+    BOARD_TRIX_X-SCREEN_TRIX_X-3,17,
 
     20,                             // milling
     10, 15,                         // doge $
@@ -70,7 +72,8 @@ const unsigned char caveUseWall[] = {
     WEAPON_MACE,                    // 3
     WEAPON_MACE,                    // 4
 
-    CAVEDEF_LOCK_Y,CH_STEELWALL, CH_BLANK,           // flags, border, fill
+//    CAVEDEF_LOCK_Y,
+    0, CH_STEELWALL, CH_BLANK,           // flags, border, fill
 
     // Random objects
 
@@ -159,7 +162,9 @@ const unsigned char caveUseWall[] = {
 const unsigned char caveWyrms[] = {
     // clang-format off
 
-    0,0,_BOARD_COLS,_BOARD_ROWS,
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    7,17,7,17,
+
 
     20,     // milling
     10, 15, // doge $
@@ -176,7 +181,8 @@ const unsigned char caveWyrms[] = {
     WEAPON_MACE,                    //3
     WEAPON_MACE,                    //4
 
-    CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y|CAVEDEF_START_WITH_WEAPON, CH_BLANK, CH_BRICKWALL,
+    //CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y|
+    CAVEDEF_BONUS|CAVEDEF_START_WITH_WEAPON, CH_BLANK, CH_BRICKWALL,
 
     0,
 
@@ -216,7 +222,8 @@ const unsigned char caveWyrms[] = {
 const unsigned char caveMace[] = {
     // clang-format off
 
-    0,0,_BOARD_COLS,_BOARD_ROWS,
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,
 
     20,     // milling
     10, 15, // doge $
@@ -276,8 +283,10 @@ const unsigned char caveMace[] = {
 
 const unsigned char caveTest[] = {
     // clang-format off
-    0,0,_BOARD_COLS,_BOARD_ROWS,
 
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,
+    
     0,     // milling
     10, 15, // doge $
     0,      //              ,          // rain
@@ -322,7 +331,8 @@ const unsigned char caveTest[] = {
 const unsigned char caveFast[] = {
     // clang-format of
 
-    0, 0, _BOARD_COLS, _BOARD_ROWS,
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    0, 0, BOARD_TRIX_X, BOARD_TRIX_Y,
 
     20,        // milling
     10, 15,    // doge $
@@ -371,7 +381,9 @@ const unsigned char caveFast[] = {
 
 const unsigned char caveA[] = {
     // clang-format off
-    0,0,_BOARD_COLS,_BOARD_ROWS,
+
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,
 
     80,     // milling
     10, 15, // doge $
@@ -643,7 +655,9 @@ const unsigned char caveA[] = {
 
 const unsigned char caveA2[] = {
     // clang-format off
-    0,0,_BOARD_COLS,_BOARD_ROWS,
+
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,
 
     20,     // milling
     10, 15, // doge $
@@ -745,7 +759,9 @@ const unsigned char caveA2[] = {
 
 const unsigned char caveA5[] = {
     // clang-format off
-    0,0,_BOARD_COLS,_BOARD_ROWS,
+
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,
 
     20,     // milling
     10, 15, // doge $
@@ -825,7 +841,9 @@ const unsigned char caveA5[] = {
 
 const unsigned char caveA3[] = {
     // clang-format off
-    0,0,_BOARD_COLS,_BOARD_ROWS,
+
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,
 
     20,    // milling
     1, 15, // doge $
@@ -937,7 +955,9 @@ const unsigned char caveA3[] = {
 const unsigned char starsAndStripes[] = {
     // clang-format off
 
-    0,0,_BOARD_COLS,_BOARD_ROWS,
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    7,17,7,17,
+
     20,                             // milling
     1, 15,                          // doge $
     0,                              // rain
@@ -1045,7 +1065,9 @@ const unsigned char starsAndStripes[] = {
 
 const unsigned char caveA4[] = {
     // clang-format off
-    8,0,_BOARD_COLS-10,_BOARD_ROWS,
+
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    43,17,BOARD_TRIX_X-SCREEN_TRIX_X-53,17,
 
     20,    // milling
     1, 15, // doge $
@@ -1175,11 +1197,11 @@ const struct caveHandler caveList[] = {
     // {caveA3, none},    //
     // {caveMace, none},
     // {caveA2, none},        //
-    {caveUseWall, none},    //
-    {caveWyrms, empty},     //
-
+    {caveUseWall, none},        //
     {caveA4, none},             //
+    {caveWyrms, empty},         //
     {starsAndStripes, spec},    //
+
 
     // {caveA, none},          //
 

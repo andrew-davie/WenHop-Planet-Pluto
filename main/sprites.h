@@ -79,6 +79,8 @@ enum FRAME {
     FRAME_DIE_2,          // 53
     FRAME_DIE_3,          // 54
     FRAME_DIE_4,          // 55
+    FRAME_PICKUP,         // 56
+    FRAME_PICKUP2,        // 56
 
     FRAME_MAX,
 

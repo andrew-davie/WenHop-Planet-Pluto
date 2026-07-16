@@ -6,6 +6,7 @@
 
 
 #define _WENHOP_SK_ID _SK_GAME_ID
+#define GROUPING 10
 
 #define NEW_LINE 0xFF
 #define END_STRING NEW_LINE, NEW_LINE
@@ -78,7 +79,7 @@ extern int time;
 extern int lavaSurfaceTrixel;
 extern bool showWater;
 extern bool showLava;
-extern bool exitTrigger;
+// extern bool exitTrigger;
 
 extern int cave;
 extern bool caveCompleted;
