@@ -7,6 +7,8 @@
 #include "draw.h"
 #include "drawGridPreview.h"
 #include "grid6.h"
+#include "joystick.h"
+#include "life.h"
 #include "main.h"
 #include "menuCharacterSet.h"
 #include "random.h"
@@ -212,10 +214,16 @@ void VB_Menu() {
 
     drawGridPreview();
 
-    if (frame > 220)
-        lumTarget = -15;
-    if (frame > 250)
+    getJoystick();
+
+    if (!(inpt4 & 0x80))
         setGameState(GS_GAME);    // GS_GLOBE);
+
+    // if (frame > 220)
+
+    //     lumTarget = -15;
+    // if (frame > 250)
+    //     setGameState(GS_GAME);    // GS_GLOBE);
 }
 
 
@@ -277,6 +285,9 @@ __attribute__((nonstring)) const char Level[][6] = {
 
 void OS_Menu() {
 
+
+    if (!(frame & 1))
+        life();
 
     //    myMemset((unsigned char *)(RAM + _BUF_MENU_PF), 0, _SCANLINES);
 

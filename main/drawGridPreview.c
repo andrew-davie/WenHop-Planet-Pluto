@@ -5,9 +5,11 @@
 #include "colour.h"
 #include "cset.h"
 #include "drawGridPreview.h"
+#include "life.h"
 #include "main.h"
 #include "random.h"
 #include "savekey.h"
+
 
 #define PREVIEW_BOTTOM_OFFSET 0
 #define PREVIEW_SLIDE_SPEED 5
@@ -20,6 +22,7 @@ int previewTarget;    // = PREVIEW_Y;
 
 
 unsigned char wcol[100];
+unsigned char neighbours[100];
 
 void initGridPreview(int startLine, int endLine) {
 
@@ -30,15 +33,18 @@ void initGridPreview(int startLine, int endLine) {
         setUnlockStatus(rangeRandom(100));
 
 
-    for (int i = 0; i < 100; i++)
-        wcol[i] = 4;
+    // for (int i = 0; i < 100; i++)
+    //     wcol[i] = 4;
 
-    for (int i = 0; i < 30; i++) {
-        int base = rangeRandom(91);
-        for (int j = 0; j < rangeRandom(10); j++)
-            wcol[base + j] = rangeRandom(7) + 1;
-    }
+    // for (int i = 0; i < 30; i++) {
+    //     int base = rangeRandom(91);
+    //     for (int j = 0; j < rangeRandom(10); j++)
+    //         wcol[base + j] = rangeRandom(7) + 1;
+    // }
+
+    initLife();
 }
+
 
 void drawGridPreview() {
 
@@ -48,7 +54,7 @@ void drawGridPreview() {
         previewStart += (previewStart < previewTarget) - (previewStart > previewTarget);
 
 #define PREVIEW_BORDER 6
-#define PREVIEW_HEIGHT ((11 * 10) + 3)
+#define PREVIEW_HEIGHT ((11 * 9) + 3)
 
     unsigned char *pL = RAM + _BUF_MENU_PF + _BUFFER_SIZE + previewStart;
     unsigned char *pM = pL + _BUFFER_SIZE;
@@ -299,7 +305,7 @@ void drawGridPreview() {
             unsigned char *p2 = charset[gfx_cars_blip_gif_map[1][bs]].data;
             unsigned char *z = charset[gfx_cars_blip_gif_map[1][0]].data;
 
-            for (int chLine = 0; chLine < 31 - 3; chLine += 3) {
+            for (int chLine = 0; chLine < 31 - 6; chLine += 3) {
                 if (++scanline >= base)
                     continue;
 
