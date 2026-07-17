@@ -4,9 +4,11 @@
 
 #include "colour.h"
 #include "draw.h"
+#include "drawGridPreview.h"
 #include "drawPlanet.h"
 #include "drawplanet.h"
 #include "joystick.h"
+#include "life.h"
 #include "main.h"
 #include "planet.h"
 #include "random.h"
@@ -302,6 +304,8 @@ void initGameState_Globe() {
         seen[i] = false;
 
     finished = false;
+
+    initLife();
 }
 
 
@@ -313,6 +317,9 @@ void VB_Globe() {
 
     drawPlanet(5);
     drawStars();
+
+
+    //    life(1);
 
     static int nsv = VOLUME_PLAYING;
 
@@ -336,6 +343,7 @@ void OS_Globe() {
     adjustLuminance(1);
 
     drawPlanet(0);
+    //    drawGridPreview();
 
     if (!drawNextChar() && --wait < 0) {
 

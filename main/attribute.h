@@ -58,6 +58,7 @@ enum ObjectType {
     TYPE_STAR_FALLING,             // 45
     TYPE_STAR_EXPLODE,             // 46
     TYPE_ROCK_BONUS,               // 47
+    TYPE_MOUNT,                    // 48
 
     TYPE_MAX
 };
@@ -91,111 +92,110 @@ enum ChName {
     CH_LAVA_MEDIUM,               // 017
     CH_LAVA_LARGE,                // 018
     CH_MELLON_HUSK,               // 019
-    CH_DOGE_01,                   // 020
-    CH_DOGE_02,                   // 021
-    CH_DOGE_03,                   // 022
-    CH_DOGE_04,                   // 023
-    CH_DOGE_05,                   // 024
-    CH_DOGE_STATIC,               // 025 (CAN SWITCH ANIMATIONS ON THIS!)
-    CH_PEBBLE_ROCK,               // 026
-    CH_ROCK_PEBBLE,               // 027
-    CH_ROCK_PEBBLE_1,             // 028
-    CH_DUST_0,                    // 029
-    CH_DUST_1,                    // 030
-    CH_DUST_2,                    // 031
-    CH_GEODOGE,                   // 032
-    CH_CONGLOMERATE_1,            // 033
-    CH_CONGLOMERATE_2,            // 034
-    CH_CONGLOMERATE_3,            // 035
-    CH_CONGLOMERATE_4,            // 036
-    CH_CONGLOMERATE_5,            // 037
-    CH_CONGLOMERATE_6,            // 038
-    CH_CONGLOMERATE_7,            // 039
-    CH_CONGLOMERATE_8,            // 040
-    CH_CONGLOMERATE_9,            // 041
-    CH_CONGLOMERATE_10,           // 042
-    CH_CONGLOMERATE_11,           // 043
-    CH_CONGLOMERATE_12,           // 044
-    CH_CONGLOMERATE_13,           // 045
-    CH_CONGLOMERATE_14,           // 046
-    CH_CONGLOMERATE_15,           // 047
-    CH_DUST_ROCK_0,               // 048
-    CH_DUST_ROCK_1,               // 049
-    CH_DUST_ROCK_2,               // 050
-    CH_CONVERT_GEODE_TO_DOGE,     // 051
-    CH_HORIZONTAL_BAR,            // 052
-    CH_PUSH_LEFT,                 // 053       reverse must be +1
-    CH_PUSH_LEFT_REVERSE,         // 054
-    CH_PUSH_RIGHT,                // 055
-    CH_PUSH_RIGHT_REVERSE,        // 056
-    CH_VERTICAL_BAR,              // 057
-    CH_PUSH_UP,                   // 058
-    CH_PUSH_UP_REVERSE,           // 059
-    CH_PUSH_DOWN,                 // 060
-    CH_PUSH_DOWN_REVERSE,         // 061
-    CH_WYRM_BODY,                 // 062
-    CH_WYRM_VERT_BODY,            // 063
-    CH_WYRM_CORNER_LD,            // 064
-    CH_WYRM_CORNER_RD,            // 065
-    CH_WYRM_CORNER_LU,            // 066
-    CH_WYRM_CORNER_RU,            // 067
-    CH_WYRM_HEAD_U,               // 068
-    CH_WYRM_HEAD_R,               // 069
-    CH_WYRM_HEAD_D,               // 070
-    CH_WYRM_HEAD_L,               // 071
-    CH_GEODOGE_FALLING,           // 072
-    CH_FLIP_GRAVITY_0,            // 073
-    CH_FLIP_GRAVITY_1,            // 074
-    CH_FLIP_GRAVITY_2,            // 075
-    CH_BLOCK,                     // 076
-    CH_GRINDER_0,                 // 077
-    CH_GRINDER_1,                 // 078
-    CH_HUB,                       // 079
-    CH_WATER,                     // 080
-    CH_WATERFLOW_0,               // 081 must be grouped
-    CH_WATERFLOW_1,               // 082 .
-    CH_WATERFLOW_2,               // 083 .
-    CH_WATERFLOW_3,               // 084 .
-    CH_WATERFLOW_4,               // 085 /
-    CH_TAP_0,                     // 086
-    CH_HUB_1,                     // 087
-    CH_OUTLET,                    // 088
-    CH_TAP_1,                     // 089
-    CH_BELT_0,                    // 090
-    CH_BELT_1,                    // 091
-    CH_PUSH_DOWN2,                // 092
-    CH_GEODOGE_CONVERT,           // 093
-    CH_CONVERT_PIPE,              // 094
-    CH_WYRM_TAIL_U,               // 095
-    CH_WYRM_TAIL_R,               // 096
-    CH_WYRM_TAIL_D,               // 097
-    CH_WYRM_TAIL_L,               // 098
-    CH_DOGE_FALLING_TOP,          // 099
-    CH_DOGE_FALLING_BOTTOM,       // 100
-    CH_ROCK_FALLING_TOP,          // 101
-    CH_ROCK_FALLING_BOTTOM,       // 102
-    CH_GEODOGE_FALLING_TOP,       // 103
-    CH_GEODOGE_FALLING_BOTTOM,    // 104
-    CH_DOGE_FALLING_TOP2,         // 105
-    CH_DOGE_FALLING_BOTTOM2,      // 106
-    CH_DOGE_SIDE_1,               // 107
-    CH_DOGE_SIDE_3,               // 108
-    CH_DOGE_SIDE_2,               // 109
-    CH_DOGE_SIDE_4,               // 110
-    CH_ELECTRIC_0,                // 111
-    CH_ELECTRIC_1,                // 112
-    CH_ELECTRIC_2,                // 113
-    CH_ELECTRIC_3,                // 114
-    CH_BROKEN_DIRT,               // 115
-    CH_INSULATOR_TOP,             // 116
-    CH_INSULATOR_BOTTOM,          // 117
-    CH_STAR,                      // 118
-    CH_STAR_FALLING_TOP,          // 119
-    CH_STAR_FALLING_BOTTOM,       // 120
-    CH_ROCK_BONUS,                // 121
-    CH_STAR_EXPLODE,              // 122
+    CH_DOGE_STATIC,               // 020 (CAN SWITCH ANIMATIONS ON THIS!)
+    CH_PEBBLE_ROCK,               // 021
+    CH_ROCK_PEBBLE,               // 022
+    CH_ROCK_PEBBLE_1,             // 023
+    CH_DUST_0,                    // 024
+    CH_DUST_1,                    // 025
+    CH_DUST_2,                    // 026
+    CH_GEODOGE,                   // 027
+    CH_DUST_ROCK_0,               // 028
+    CH_DUST_ROCK_1,               // 029
+    CH_DUST_ROCK_2,               // 030
+    CH_CONVERT_GEODE_TO_DOGE,     // 031
+    CH_HORIZONTAL_BAR,            // 032
+    CH_PUSH_LEFT,                 // 033       reverse must be +1
+    CH_PUSH_LEFT_REVERSE,         // 034
+    CH_PUSH_RIGHT,                // 035
+    CH_PUSH_RIGHT_REVERSE,        // 036
+    CH_VERTICAL_BAR,              // 037
+    CH_PUSH_UP,                   // 038
+    CH_PUSH_UP_REVERSE,           // 039
+    CH_PUSH_DOWN,                 // 040
+    CH_PUSH_DOWN_REVERSE,         // 041
+    CH_WYRM_BODY,                 // 042
+    CH_WYRM_VERT_BODY,            // 043
+    CH_WYRM_CORNER_LD,            // 044
+    CH_WYRM_CORNER_RD,            // 045
+    CH_WYRM_CORNER_LU,            // 046
+    CH_WYRM_CORNER_RU,            // 047
+    CH_WYRM_HEAD_U,               // 048
+    CH_WYRM_HEAD_R,               // 049
+    CH_WYRM_HEAD_D,               // 050
+    CH_WYRM_HEAD_L,               // 051
+    CH_GEODOGE_FALLING,           // 052
+    CH_FLIP_GRAVITY_0,            // 053
+    CH_FLIP_GRAVITY_1,            // 054
+    CH_FLIP_GRAVITY_2,            // 055
+    CH_BLOCK,                     // 056
+    CH_GRINDER_0,                 // 057
+    CH_GRINDER_1,                 // 058
+    CH_HUB,                       // 059
+    CH_WATER,                     // 060
+    CH_WATERFLOW_0,               // 061 must be grouped
+    CH_WATERFLOW_1,               // 062 .
+    CH_WATERFLOW_2,               // 063 .
+    CH_WATERFLOW_3,               // 064 .
+    CH_WATERFLOW_4,               // 065 /
+    CH_HUB_1,                     // 066
+    CH_OUTLET,                    // 067
+    CH_BELT_0,                    // 068
+    CH_BELT_1,                    // 069
+    CH_PUSH_DOWN2,                // 070
+    CH_GEODOGE_CONVERT,           // 071
+    CH_CONVERT_PIPE,              // 072
+    CH_WYRM_TAIL_U,               // 073
+    CH_WYRM_TAIL_R,               // 074
+    CH_WYRM_TAIL_D,               // 075
+    CH_WYRM_TAIL_L,               // 076
+    CH_DOGE_FALLING_TOP,          // 077
+    CH_DOGE_FALLING_BOTTOM,       // 078
+    CH_ROCK_FALLING_TOP,          // 079
+    CH_ROCK_FALLING_BOTTOM,       // 080
+    CH_GEODOGE_FALLING_TOP,       // 081
+    CH_GEODOGE_FALLING_BOTTOM,    // 082
+    CH_DOGE_FALLING_TOP2,         // 083
+    CH_DOGE_FALLING_BOTTOM2,      // 084
+    CH_DOGE_SIDE_1,               // 085
+    CH_DOGE_SIDE_3,               // 086
+    CH_DOGE_SIDE_2,               // 087
+    CH_DOGE_SIDE_4,               // 088
+    CH_ELECTRIC_0,                // 089
+    CH_ELECTRIC_1,                // 090
+    CH_ELECTRIC_2,                // 091
+    CH_ELECTRIC_3,                // 092
+    CH_BROKEN_DIRT,               // 093
+    CH_INSULATOR_TOP,             // 094
+    CH_INSULATOR_BOTTOM,          // 095
+    CH_STAR,                      // 096
+    CH_STAR_FALLING_TOP,          // 097
+    CH_STAR_FALLING_BOTTOM,       // 098
+    CH_ROCK_BONUS,                // 099
+    CH_STAR_EXPLODE,              // 100
+    CH_INSULATOR_L,               // 101
+    CH_INSULATOR_R,               // 102
+    CH_ELECTRIC_H0,               // 103
+    CH_ELECTRIC_H1,               // 104
+    CH_ELECTRIC_H2,               // 105
+    CH_ELECTRIC_H3,               // 106
+    CH_CROSSED_STREAMS,           // 107
+    CH_MOUNT_U,                   // 108
+    CH_MOUNT_D,                   // 109
+    CH_MOUNT_L,                   // 110
+    CH_MOUNT_R,                   // 111
 
-    // 127 is limit
+    // 127 is limit of board-resident character numbers
+
+    // 128 onward are virtual characters from animations
+    // these can't go on board but can be displayed
+
+    CH_DOGE_01 = 128,    // 128
+    CH_DOGE_02,          // 129
+    CH_DOGE_03,          // 130
+    CH_DOGE_04,          // 131
+    CH_DOGE_05,          // 132
+
 
     CH_MAX
 };

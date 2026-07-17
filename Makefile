@@ -145,7 +145,8 @@ SRCS = \
  ../tools/zph.c \
  ../tools/parrot.c \
  ../tools/pirate.c \
-
+ \
+ charset.c \
 
 
 OBJS = $(SRCS:.c=.o)
@@ -345,7 +346,7 @@ $(TOOLS_BIN)/$(WAV2RAW): $(TOOLS_SRC)/$(WAV2RAW).c
 ###############################################################################
 # Graphics
 
-gfx: GRID6 IMG SKULL CHARSET
+gfx: GRID6 IMG SKULL CHARSET AUTO_CSET
 
 GRID6: gfx/grid/*.gif
 	(python3 tools/1bpp.py -o grid6 gfx/grid/*.gif)
@@ -359,6 +360,10 @@ IMG:
 SKULL: main/skull/gfx/iCC_skull.gif
 	$(MAKE) -C main/skull/gfx
 
+AUTO_CSET: gfx/characterset.png
+	(python3 tools/cset.py -o charset --name charset_auto --width 5 --depth 10 gfx/characterset.png)
+	mv charset.c main
+	mv charset.h main
 
 CHARSET: gfx/cars/*.gif
 	(python3 tools/cset.py -o cset --name charset --width 5 --depth 11 gfx/cars/blank.gif gfx/cars/numbers.gif gfx/cars/blip.gif )

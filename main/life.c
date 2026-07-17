@@ -59,49 +59,75 @@ void initLife() {
 }
 
 
-void life() {
+static void computeRow(int y) {
 
-    for (int y = 0; y < LIFE_SIZE; y++) {
-        for (int x = 0; x < LIFE_SIZE; x++) {
+    for (int x = 0; x < LIFE_SIZE; x++) {
 
-            int aliveCount = 0;
-            unsigned char votes[8] = {0};
+        int aliveCount = 0;
+        unsigned char votes[8] = {0};
 
-            for (int dy = -1; dy <= 1; dy++) {
+        for (int dy = -1; dy <= 1; dy++) {
 
-                int ny = y + dy;
-                if (ny < 0 || ny >= LIFE_SIZE)
-                    continue;    // no wrap top/bottom
+            int ny = y + dy;
+            if (ny < 0 || ny >= LIFE_SIZE)
+                continue;    // no wrap top/bottom
 
-                for (int dx = -1; dx <= 1; dx++) {
+            for (int dx = -1; dx <= 1; dx++) {
 
-                    if (dx == 0 && dy == 0)
-                        continue;
+                if (dx == 0 && dy == 0)
+                    continue;
 
-                    unsigned char neighbour = wcol[ny * LIFE_SIZE + wrapX(x + dx)];
-                    if (neighbour) {
-                        aliveCount++;
-                        votes[neighbour]++;
-                    }
+                unsigned char neighbour = wcol[ny * LIFE_SIZE + wrapX(x + dx)];
+                if (neighbour) {
+                    aliveCount++;
+                    votes[neighbour]++;
                 }
             }
-
-            unsigned char cell = wcol[y * LIFE_SIZE + x];
-
-            if (cell)
-                nextwcol[y * LIFE_SIZE + x] = (aliveCount == 2 || aliveCount == 3) ? cell : 0;
-            else
-                nextwcol[y * LIFE_SIZE + x] = (aliveCount == 3) ? birthColour(votes) : 0;
         }
+
+        unsigned char cell = wcol[y * LIFE_SIZE + x];
+
+        if (cell)
+            nextwcol[y * LIFE_SIZE + x] = (aliveCount == 2 || aliveCount == 3) ? cell : 0;
+        else
+            nextwcol[y * LIFE_SIZE + x] = (aliveCount == 3) ? birthColour(votes) : 0;
     }
+}
 
-    for (int i = 0; i < LIFE_CELLS; i++)
-        wcol[i] = nextwcol[i];
+// Computes up to 'rows' rows of the next generation, resuming from wherever
+// the previous call left off. All rows read the untouched wcol (the current
+// generation) and write into nextwcol, so a generation can be safely spread
+// across many calls. Once the last row is done, nextwcol is committed back
+// into wcol and (every RESEED_INTERVAL generations) a fresh R-pentomino is
+// dropped in.
+void life(int rows) {
 
-    static int generation = 0;
-    if (++generation >= RESEED_INTERVAL) {
-        generation = 0;
-        sprinkleRPentomino();
+    static int nextRow = 0;
+
+    if (rows < 1)
+        rows = 1;
+
+    int rowsRemaining = LIFE_SIZE - nextRow;
+    if (rows > rowsRemaining)
+        rows = rowsRemaining;
+
+    for (int r = 0; r < rows; r++)
+        computeRow(nextRow + r);
+
+    nextRow += rows;
+
+    if (nextRow >= LIFE_SIZE) {
+
+        nextRow = 0;
+
+        for (int i = 0; i < LIFE_CELLS; i++)
+            wcol[i] = nextwcol[i];
+
+        static int generation = 0;
+        if (++generation >= RESEED_INTERVAL) {
+            generation = 0;
+            sprinkleRPentomino();
+        }
     }
 }
 

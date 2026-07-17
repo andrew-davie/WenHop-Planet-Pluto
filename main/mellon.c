@@ -387,28 +387,28 @@ bool checkHighPriorityMove(int dir) {
         //        bool grabbed = false;
         int type = CharToType[GET(*meOffset)];
 
-        if (tapDelay)
-            tapDelay--;
+        // if (tapDelay)
+        //     tapDelay--;
 
-        // turn on/off a tap
-        if (!tapDelay && type == TYPE_TAP) {
-            *meOffset = *meOffset ^ (CH_TAP_1 ^ CH_TAP_0);
-            if (*meOffset == CH_TAP_1) {
-                // showWater = true;
-                // showLava = false;
-                if (21 * CHAR_TRIX_Y < lavaSurfaceTrixel)
-                    lavaSurfaceTrixel = 21 * CHAR_TRIX_Y;
-            }
+        // // turn on/off a tap
+        // if (!tapDelay && type == TYPE_TAP) {
+        //     *meOffset = *meOffset ^ (CH_TAP_1 ^ CH_TAP_0);
+        //     if (*meOffset == CH_TAP_1) {
+        //         // showWater = true;
+        //         // showLava = false;
+        //         if (21 * CHAR_TRIX_Y < lavaSurfaceTrixel)
+        //             lavaSurfaceTrixel = 21 * CHAR_TRIX_Y;
+        //     }
 
-            *(meOffset + _1ROW) = (GET(*(meOffset + _1ROW)) == CH_HUB) ? CH_HUB_1 : CH_HUB;
+        //     *(meOffset + _1ROW) = (GET(*(meOffset + _1ROW)) == CH_HUB) ? CH_HUB_1 : CH_HUB;
 
-            startPlayerAnimation(tapAnimation[dir]);
-            tapDelay = 10;
+        //     startPlayerAnimation(tapAnimation[dir]);
+        //     tapDelay = 10;
 
-            waitForNothing = 6;
-            //            startPlayerAnimation(ID_Stand);
-            handled = true;
-        }
+        //     waitForNothing = 6;
+        //     //            startPlayerAnimation(ID_Stand);
+        //     handled = true;
+        // }
 
         // else if (type == TYPE_WEAPON) {
 
@@ -419,7 +419,7 @@ bool checkHighPriorityMove(int dir) {
         //     return handled = true;
         // }
 
-        else if (type == TYPE_GRINDER || type == TYPE_GRINDER_1) {
+        if (type == TYPE_GRINDER || type == TYPE_GRINDER_1) {
             ADDAUDIO(SFX_EXPLODE_QUIET);
 
 
@@ -444,7 +444,6 @@ bool checkHighPriorityMove(int dir) {
             if (!gearsActive)
                 setShake(5);
 #endif
-
         }
 
 

@@ -7,6 +7,6 @@ void drawIconScreen(int startRow, int endRow);
 void initCharVector();
 bool drawBit(int x, int y, unsigned char colour);
 
-extern unsigned char revectorChar[128];
+extern unsigned char revectorChar[256];
 
 // EOF

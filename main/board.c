@@ -51,7 +51,7 @@ void processWater();
 // void processLava();
 void processWaterFlow();
 void processCharBeltAndGrinder();
-void processOutlet();
+// void processOutlet();
 void processFallingThings();
 void processCharGeoDogeAndRock();
 
@@ -310,9 +310,6 @@ bool processTypes() {
         break;
     }
 
-    case TYPE_ELECTRIC:
-        *me = CH_ELECTRIC_0 + ((*me + 1 - CH_ELECTRIC_0) & 3);
-        break;
 
     case TYPE_OUTBOX:
         FLASH(0x28, 10);
@@ -405,6 +402,7 @@ void setInsulator(unsigned char *p, int row, int col) {
 
         while (++row < _BOARD_ROWS && CharToType[GET(*p)] != TYPE_INSULATOR) {
 
+            int ch = GET(*p);
             int type2 = CharToType[GET(*p)];
             unsigned int att = Attribute[type2];
 
@@ -415,8 +413,16 @@ void setInsulator(unsigned char *p, int row, int col) {
                 return;
             }
 
-            if (att & ATT_BLANK)
-                *p = FLAG(CH_ELECTRIC_0 + rangeRandom(4));
+            if (att & ATT_BLANK) {
+
+                if (ch >= CH_ELECTRIC_H0 && ch <= CH_ELECTRIC_H3) {
+                    *p = FLAG(CH_CROSSED_STREAMS);
+                    nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
+                }
+
+                else
+                    *p = FLAG(CH_ELECTRIC_0 + rangeRandom(4));
+            }
 
 
             else if (type2 == TYPE_ROCK_BONUS) {
@@ -429,6 +435,67 @@ void setInsulator(unsigned char *p, int row, int col) {
         }
     }
 }
+
+
+void setInsulatorHoriz(unsigned char *p, int row, int col) {
+
+    // int visibleLeft = scrollX >> 16;
+    // int colTrix = col * CHAR_TRIX_X;
+
+    // if (colTrix <= visibleLeft - CHAR_TRIX_X || colTrix >= visibleLeft + SCREEN_TRIX_X) {
+    //     return;
+    // }
+
+    p++;
+
+    // if (!onOff[col]) {
+    //     if (lastOnOff[col]) {
+    //         while (++row < _BOARD_ROWS && CharToType[GET(*p)] != TYPE_INSULATOR) {
+    //             if (CharToType[GET(*p)] == TYPE_ELECTRIC)
+    //                 *p = FLAG(CH_BLANK);
+    //             p += _1ROW;
+    //         }
+    //     }
+    // }
+
+    // else {
+
+    while (++col < _BOARD_COLS && CharToType[GET(*p)] != TYPE_INSULATOR) {
+
+        int ch = GET(*p);
+        int type2 = CharToType[GET(*p)];
+        unsigned int att = Attribute[type2];
+
+
+        if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES)) {
+            *p = FLAG(CH_ELECTRIC_H0 + rangeRandom(3));
+            nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+            return;
+        }
+
+        if (att & ATT_BLANK) {
+
+            if (ch >= CH_ELECTRIC_0 && ch <= CH_ELECTRIC_3) {
+                *p = FLAG(CH_CROSSED_STREAMS);
+                nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
+            }
+
+            else
+                *p = FLAG(CH_ELECTRIC_H0 + rangeRandom(4));
+        }
+
+
+        else if (type2 == TYPE_ROCK_BONUS) {
+
+            *p = FLAG(CH_STAR);
+            nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+            return;
+        }
+        p++;
+    }
+    // }
+}
+
 
 bool onOff[_BOARD_COLS] = {false};
 bool lastOnOff[_BOARD_COLS] = {false};
@@ -444,18 +511,44 @@ void setInsulatorPattern() {
     }
 }
 
+int pickDifferent(int current) {
+    int r = rangeRandom(4);
+    // if (r >= current)
+    //     r++;
+    return r;
+}
 
 void processCreatures() {
 
     switch (creature) {
 
+    case CH_ELECTRIC_0:
+    case CH_ELECTRIC_1:
+    case CH_ELECTRIC_2:
+    case CH_ELECTRIC_3: {
+        *me = pickDifferent(*me - CH_ELECTRIC_0) + CH_ELECTRIC_0;
+        break;
+    }
+
+    case CH_ELECTRIC_H0:
+    case CH_ELECTRIC_H1:
+    case CH_ELECTRIC_H2:
+    case CH_ELECTRIC_H3: {
+        *me = pickDifferent(*me - CH_ELECTRIC_H0) + CH_ELECTRIC_H0;
+        break;
+    }
+
+
     case CH_INSULATOR_TOP:
         setInsulator(me, boardRow, boardCol);
         break;
 
-    case CH_OUTLET:
-        processOutlet();
+    case CH_INSULATOR_L:
+        setInsulatorHoriz(me, boardRow, boardCol);
         break;
+        // case CH_OUTLET:
+        //     processOutlet();
+        //     break;
 
     case CH_ROCK_PEBBLE_1:
         *me = FLAG(CH_ROCK_PEBBLE);
@@ -888,30 +981,30 @@ void processCharBeltAndGrinder() {
     }
 }
 
-void processOutlet() {
+// void processOutlet() {
 
-    if ((boardRow + 2) * CHAR_TRIX_Y <= lavaSurfaceTrixel) {
+//     if ((boardRow + 2) * CHAR_TRIX_Y <= lavaSurfaceTrixel) {
 
-        if (GET(*(me - _1ROW * 2)) == CH_TAP_0) {
+//         if (GET(*(me - _1ROW * 2)) == CH_TAP_0) {
 
-            enum ChName under = GET(*(me + _1ROW));
+//             enum ChName under = GET(*(me + _1ROW));
 
-            if (!(Attribute[CharToType[under]] & ATT_WATERFLOW)) {
+//             if (!(Attribute[CharToType[under]] & ATT_WATERFLOW)) {
 
-                if (Attribute[CharToType[under]] & ATT_PERMEABLE)
-                    *(me + _1ROW) = CH_WATERFLOW_0 + (getRandom32() & 3);
+//                 if (Attribute[CharToType[under]] & ATT_PERMEABLE)
+//                     *(me + _1ROW) = CH_WATERFLOW_0 + (getRandom32() & 3);
 
-                else
-                    nDots(1, boardCol, boardRow, PT_TWO, 30, rangeRandom(3) + 2, 10, 0x80, 7);
-            }
-        }
+//                 else
+//                     nDots(1, boardCol, boardRow, PT_TWO, 30, rangeRandom(3) + 2, 10, 0x80, 7);
+//             }
+//         }
 
-        else if (GET(*(me - _1ROW * 2)) == CH_TAP_1) {
-            if (Attribute[CharToType[GET(*(me + _1ROW))]] & ATT_BLANK)
-                *(me + _1ROW) = CH_BLANK;
-        }
-    }
-}
+//         else if (GET(*(me - _1ROW * 2)) == CH_TAP_1) {
+//             if (Attribute[CharToType[GET(*(me + _1ROW))]] & ATT_BLANK)
+//                 *(me + _1ROW) = CH_BLANK;
+//         }
+//     }
+// }
 
 void processCharGeoDogeAndRock() {
 

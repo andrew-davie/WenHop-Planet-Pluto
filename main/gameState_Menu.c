@@ -286,8 +286,7 @@ __attribute__((nonstring)) const char Level[][6] = {
 void OS_Menu() {
 
 
-    if (!(frame & 1))
-        life();
+    life(3);
 
     //    myMemset((unsigned char *)(RAM + _BUF_MENU_PF), 0, _SCANLINES);
 

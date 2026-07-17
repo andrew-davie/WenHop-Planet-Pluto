@@ -5,13 +5,22 @@ Build a deduplicated Atari 2600 character set from one or more images.
 Each image is sliced into WIDTH x DEPTH pixel blocks ("characters"). Identical
 blocks are deduplicated into a shared charset; every image also gets a grid
 mapping its blocks to character IDs. Each character's rows are packed into
-three bit planes (R/G/B) suitable for the TIA. Output is a matching .c/.h pair.
+three bit planes (R/G/B) suitable for the TIA. Output is a matching .c/.h pair:
+
+  - The .c file's per-character comment lists every (x, y) source grid
+    position that character came from, e.g. `//     20  (3,2), (7,4)`.
+  - The .h file gets a `#define CHAR_MAP_<x>_<y> <id>` for every source grid
+    cell, giving each occupied grid position a compile-time name for the
+    character ID it became. Character 0 is always reserved for blank (by
+    convention, not by inspecting pixels), so cells that dedupe to id 0 are
+    skipped -- no CHAR_MAP define and no position list in the .c comment.
 """
 
 #from __future__ import annotations
 
 import argparse
 import glob
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -20,8 +29,15 @@ from PIL import Image
 BIT_PLANES = 3  # rows are packed into R, G and B planes
 
 # Coloured-block emoji for each combination of a pixel's R/G/B plane bits,
-# indexed by (r | g << 1 | b << 2).
-PIXEL_EMOJI = ["⬛", "🟥", "🟩", "🟨", "🟦", "🟪", "🟧", "⬜"]
+# indexed by (r | g << 1 | b << 2). One-to-one assignment (no repeats)
+# against the current gfx/characterset.png palette colours, with index 4
+# pinned to brown (its natural match) and everything else re-solved around
+# that to minimize total RGB Euclidean distance. 🟥 red goes unused -- once
+# brown is reserved for index 4, nothing else in the palette is close to
+# red. This is a slightly worse global fit than letting the optimizer pick
+# index 4 freely (it bumped index 1 to brown instead), but keeps brown where
+# you'd expect it for a brown-ish colour.
+PIXEL_EMOJI = ["⬛", "🟩", "🟦", "🟨", "🟫", "🟧", "🟪", "⬜"]
 
 
 @dataclass
@@ -57,6 +73,23 @@ class CharSet:
             grid.append(row)
 
         self.grids[filename] = grid
+
+    def occurrences(self) -> dict[int, list[tuple[str, int, int]]]:
+        """id -> ordered list of (filename, x, y) source grid positions."""
+        occ: dict[int, list[tuple[str, int, int]]] = {}
+        for filename, grid in self.grids.items():
+            for y, row in enumerate(grid):
+                for x, idx in enumerate(row):
+                    occ.setdefault(idx, []).append((filename, x, y))
+        return occ
+
+
+BLANK_ID = 0  # character 0 is always reserved for blank, by convention
+
+
+def sanitize_ident(text: str) -> str:
+    """Turn arbitrary text into a valid fragment of a C identifier."""
+    return re.sub(r"\W", "_", text)
 
 
 def pack_bits(values: list[int], bit_index: int) -> int:
@@ -101,6 +134,25 @@ def write_header(path: Path, name: str, charset: CharSet) -> None:
     if charset.grids:
         lines.append("")
 
+    # One #define per non-blank source grid cell, naming the character ID it
+    # became. Character 0 is always reserved for blank, so other cells that
+    # deduplicated to id 0 are skipped as pointless repeats -- except (0,0)
+    # itself, which always gets its define since it's the canonical blank
+    # reference for that image.
+    multi_file = len(charset.grids) > 1
+    define_lines = []
+    for filename, grid in charset.grids.items():
+        stem = sanitize_ident(Path(filename).stem)
+        for y, row in enumerate(grid):
+            for x, idx in enumerate(row):
+                if idx == BLANK_ID and (x, y) != (0, 0):
+                    continue
+                macro = f"CHAR_MAP_{stem}_{x}_{y}" if multi_file else f"CHAR_MAP_{x}_{y}"
+                define_lines.append(f"#define {macro} {idx}")
+    if define_lines:
+        lines.extend(define_lines)
+        lines.append("")
+
     lines.append("//EOF")
     path.write_text("\n".join(lines) + "\n")
 
@@ -108,13 +160,27 @@ def write_header(path: Path, name: str, charset: CharSet) -> None:
 def write_source(path: Path, include_stem: str, name: str, charset: CharSet) -> None:
     lines = [f'#include "{include_stem}.h"', ""]
 
+    occurrences = charset.occurrences()
+    multi_file = len(charset.grids) > 1
+
     lines.append(f"const character {name}[{len(charset)}] = {{")
     for pixels, idx in charset.by_id():
         rows = character_rows(pixels, charset.width, charset.depth)
         row_prefixes = ["        " + ", ".join(fields) + ", " for fields, _ in rows]
         comment_col = len(row_prefixes[0])
 
-        lines.append("    { {".ljust(comment_col) + f"//     {idx}")
+        # Character 0 (blank) tends to occur everywhere, so its position
+        # list is just noise -- skip it, same as it skips a CHAR_MAP define.
+        positions = [] if idx == BLANK_ID else occurrences.get(idx, [])
+        if multi_file:
+            pos_text = ", ".join(f"{fn}:({x},{y})" for fn, x, y in positions)
+        else:
+            pos_text = ", ".join(f"({x},{y})" for _, x, y in positions)
+        header_comment = f"//     {idx}"
+        if pos_text:
+            header_comment += f"  {pos_text}"
+
+        lines.append("    { {".ljust(comment_col) + header_comment)
         for line_no, (prefix, (_, preview)) in enumerate(zip(row_prefixes, rows)):
             lines.append(prefix + f"// {line_no:2d}  {preview}")
         lines.append("    } },")
@@ -168,7 +234,7 @@ def main() -> None:
 
     write_header(Path(f"{args.output}.h"), args.name, charset)
     write_source(Path(f"{args.output}.c"), args.output, args.name, charset)
-    print(f"C and H output written to {args.output}")
+    print(f"C and H output written to {args.output} ({len(charset)} unique characters)")
 
 
 if __name__ == "__main__":

@@ -293,10 +293,10 @@ void drawGridPreview() {
                     s = wcol[lvl];
 
                     // int blink = 0;
-                    if (y + i == cave && (frame & 8))
-                        s ^= complete ? 1 : 7;
+                    // if (y + i == cave && (frame & 8))
+                    //     s ^= complete ? 1 : 7;
 
-                    img[i] = charset[gfx_cars_blip_gif_map[0][s]].data;
+                    img[i] = charset[gfx_cars_blip_gif_map[2][s]].data;
                 }
                 lvl--;
             }

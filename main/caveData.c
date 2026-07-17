@@ -82,7 +82,15 @@ const unsigned char caveUseWall[] = {
     CH_GEODOGE, 80,40,40,40,40,
     CH_ROCK, 50,40,40,40,40,
 
+
+
+    CH_INSULATOR_L, 4,4,
+    CH_INSULATOR_R, 8,4,
     // Start of cave draw
+    CH_MOUNT_R, 3,4,
+
+    CH_MOUNT_L, 3,5,
+    CH_INSULATOR_TOP, 3,6,
 
 
     CH_ROCK_BONUS, 7,3,
@@ -133,6 +141,9 @@ const unsigned char caveUseWall[] = {
     CH_MELLON_HUSK_BIRTH, 2, 3,
 
     CH_WYRM_HEAD_U, 38, 2,
+
+    CH_INSULATOR_L, 9,5,
+    CH_INSULATOR_R, 30,5,
 
     DRAW_EOF,
 
@@ -261,7 +272,7 @@ const unsigned char caveMace[] = {
 
     //DRAW_LINE,CH_WATERFLOW_0,1,1,38,2,
     
-    DRAW_LINE,CH_TAP_0,1,1,2,10,
+    // DRAW_LINE,CH_TAP_0,1,1,2,10,
     DRAW_LINE,CH_HUB,1,2,2,10,
     DRAW_LINE,CH_OUTLET,1,3,2,10,
     CH_INSULATOR_TOP,12,1,
@@ -429,7 +440,7 @@ const unsigned char caveA[] = {
 
     CH_HORIZONTAL_BAR, 0,3,
     CH_HORIZONTAL_BAR, 1,3,
-    CH_TAP_0, 2,2,
+    // CH_TAP_0, 2,2,
     CH_HUB, 2,3,
     CH_OUTLET, 2,4,
 

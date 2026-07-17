@@ -47,76 +47,8 @@ const unsigned char AnimateStarExplode[] = {
 
 const unsigned char AnimateRockBonus[] = {
 
-    CH_ROCK,30,
-
-
-    CH_STAR,1,
-    CH_ROCK,1,
-    CH_STAR,1,
-    CH_ROCK,1,
-    CH_STAR,1,
-    CH_ROCK,1,
-    CH_STAR,1,
-    CH_ROCK,1,
-    CH_STAR,1,
-    CH_ROCK,1,
-    CH_STAR,1,
-    CH_ROCK,1,
-    CH_STAR,1,
-    CH_ROCK,1,
-    CH_STAR,1,
-    CH_ROCK,1,
-    CH_STAR,1,
-    CH_ROCK,1,
-    CH_DOGE_04, 1,
-    CH_ROCK,1,
-    CH_DOGE_04, 1,
-    CH_ROCK,1,
-    CH_DOGE_04, 1,
-    CH_ROCK,1,
-    CH_DOGE_04, 1,
-    CH_ROCK,1,
-    CH_DOGE_04, 1,
-    CH_ROCK,1,
-    CH_DOGE_04, 1,
-    CH_ROCK,1,
-    CH_BLANK,1,
-    CH_ROCK,1,
-    CH_BLANK,1,
-    CH_ROCK,1,
-    CH_BLANK,1,
-    CH_ROCK,1,
-
+    CH_ROCK_BONUS,0,
     ANIM_LOOP,
-
-//    CH_STAR, 21,
-    // CH_ROCK, 9,
-    // CH_STAR, 9,
-    // CH_ROCK, 9,
-    // CH_STAR, 9,
-    // CH_ROCK, 9,
-  //  ANIM_LOOP,
-
-    // CH_ROCK,12,
-
-    // CH_STAR, 1,
-    // CH_ROCK, 2,
-    // CH_STAR, 1,
-    // CH_ROCK, 2,
-    // CH_STAR, 1,
-    // CH_ROCK, 12,
-    // CH_STAR, 1,
-    // CH_ROCK, 2,
-    // CH_STAR, 1,
-    // CH_ROCK, 2,
-    // CH_STAR, 1,
-    // CH_ROCK, 12,
-    // CH_STAR, 1,
-    // CH_ROCK, 2,
-    // CH_STAR, 1,
-    // CH_ROCK, 2,
-    // CH_STAR, 1,
-    // ANIM_LOOP,
 };
 
 
@@ -342,6 +274,7 @@ const unsigned char *const AnimateBase[] = {
     0,                     // 45 TYPE_STAR_FALLING
     AnimateStarExplode,    // 46 TYPE_STAR_EXPLODE
     AnimateRockBonus,      // 47 TYPE_ROCK_BONUS
+    0,                     // 48 TYPE_MOUNT
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
@@ -396,6 +329,7 @@ const unsigned char PickupCharacter[] = {
     0,                // 45 TYPE_STAR_FALLING
     0,                // 46 TYPE_STAR_EXPLODE
     CH_ROCK_BONUS,    // 47 TYPE_ROCK_BONUS
+    0,                // 48 TYPE_MOUNT
 
 };
 
