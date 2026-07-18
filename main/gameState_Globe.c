@@ -487,18 +487,6 @@ void OS_Globe() {
             else
                 infoPhase = INFO_FADE_DOWN;
 
-            // if (luminance == lumTarget) {
-
-            //     myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_PF), 0, 6 * _BUFFER_SIZE / 4);
-            //     //                lumTarget = 0;
-            //     infoPhase = INFO_FADEUP;
-            //     planet = nextPlanet();
-
-            // }
-
-            // else
-            //     finished = true;
-
             break;
         }
     }

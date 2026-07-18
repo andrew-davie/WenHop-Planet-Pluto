@@ -71,13 +71,6 @@ const unsigned char mineAnimation[] = {
     ID_Mine,
 };
 
-const unsigned char tapAnimation[] = {
-    ID_TapUp,
-    ID_TapPush,
-    ID_TapDown,
-    ID_TapPush,
-};
-
 const unsigned char WalkAnimation[] = {
     ID_WalkUp,      // U
     ID_Walk,        // R
@@ -100,77 +93,18 @@ void initPlayer() {
     attachmentOffset = 0;
 
     startPlayerAnimation(ID_Stand);    // tmp
-    // startPlayerAnimation(ID_Stand);
 }
-
-// void chooseIdleAnimation() {
-//  return;
-
-// #if ENABLE_IDLE_ANIMATION
-// #define ANIM_COUNT (sizeof(animID)/2)
-
-//     static const char animID[] = {
-//         // ID_Blink,       200,
-// //        ID_WipeHair,    120,
-// //        ID_Impatient,   112,
-//         ID_Turn,        117,
-// //        ID_Look,        130,
-//         // ID_Shades,      125,
-//         // ID_ArmsCrossed, 113,
-//     };
-
-//     // suicide skeleton
-// //     if (selectResetDelay > DEAD_RESTART_COUCH * 3 / 5) {
-// //         if (playerAnimationID != ID_Skeleton2) {
-// //             startPlayerAnimation(ID_Skeleton2);
-// // //            ADDAUDIO(SFX_DRIP);
-// //             SAY(__WORD_GOODBYE);
-// //         }
-// //     }
-
-// //    else
-//      {
-
-//         // choose an idle animation
-//         if ((inpt4 & 0x80) && usableSWCHA == 0xFF) {
-
-//             if (playerAnimationID == ID_Skeleton2)
-//                 startPlayerAnimation(ID_Stand);             // abort from
-//                 suicide
-
-//             else if (playerAnimationID == ID_Stand) {
-
-//                 if (getRandom32() < 0x700000) {
-//                     int idle = rangeRandom(ANIM_COUNT) << 1;
-//                     if ((rndX & 0xFFF) < animID[idle + 1])
-//                         startPlayerAnimation(animID[idle]);
-//                 }
-//             }
-//         }
-//     }
-
-// #endif
-// }
 
 void grabDoge() {
 
     totalDogePossible--;
 
-    // if (doges > 0)
     addScore(100);    // theCave->dogeValue);
 
     --doges;
-
-    // if (!--doges) {
-    //     // exitTrigger = true;
-    //     //        FLASH(0x08, 8);     //open door
-    //     ADDAUDIO(SFX_EXIT);
-    // } else
-    //     ADDAUDIO(SFX_DOGE2);
 }
 
 int playerSlow = 0;
-int tapDelay = 0;
 
 
 void moveHusk(int dir, unsigned char *me, unsigned char *meOffset) {
@@ -316,13 +250,8 @@ bool checkHighPriorityMove(int dir) {
     if (usableSWCHA & joyBit)
         return false;
 
-    //    getRandom32();
-
-
     if (!kdelay && !waitRelease) {
         if (!(inpt4 & 0x80)) {
-
-            //            FLASH(0x94, 4);
 
             meAtt = me + dirOffset[dir];
 
@@ -354,8 +283,6 @@ bool checkHighPriorityMove(int dir) {
                     kdelay = 5;
 
                     faceDirection = faceDirectionDef[dir];
-                    // startPlayerAnimation(ID_Pickup);
-
 
                     attachment = GET(pickup);
 
@@ -383,41 +310,7 @@ bool checkHighPriorityMove(int dir) {
 
     {    // no fire button
 
-
-        //        bool grabbed = false;
         int type = CharToType[GET(*meOffset)];
-
-        // if (tapDelay)
-        //     tapDelay--;
-
-        // // turn on/off a tap
-        // if (!tapDelay && type == TYPE_TAP) {
-        //     *meOffset = *meOffset ^ (CH_TAP_1 ^ CH_TAP_0);
-        //     if (*meOffset == CH_TAP_1) {
-        //         // showWater = true;
-        //         // showLava = false;
-        //         if (21 * CHAR_TRIX_Y < lavaSurfaceTrixel)
-        //             lavaSurfaceTrixel = 21 * CHAR_TRIX_Y;
-        //     }
-
-        //     *(meOffset + _1ROW) = (GET(*(meOffset + _1ROW)) == CH_HUB) ? CH_HUB_1 : CH_HUB;
-
-        //     startPlayerAnimation(tapAnimation[dir]);
-        //     tapDelay = 10;
-
-        //     waitForNothing = 6;
-        //     //            startPlayerAnimation(ID_Stand);
-        //     handled = true;
-        // }
-
-        // else if (type == TYPE_WEAPON) {
-
-        //     *meOffset = FLAG(CH_MELLON_HUSK);
-        //     *me = FLAG(CH_BLANK);
-        //     extern int weapon;
-        //     weapon = theCave->weapon[level];
-        //     return handled = true;
-        // }
 
         if (type == TYPE_GRINDER || type == TYPE_GRINDER_1) {
             ADDAUDIO(SFX_EXPLODE_QUIET);
@@ -449,17 +342,12 @@ bool checkHighPriorityMove(int dir) {
 
         else if (type == TYPE_ELECTRIC) {
 
-
-            // startPlayerAnimation(ID_Turn);
-
-            //            if (!zapDelay || !rangeRandom(4))
             FLASH(0x28, 13);
 
             pulsePlayerColour = 100;
 
             if (!zapDelay || (!rangeRandom(30))) {
                 zapDelay = 50;
-                // ADDAUDIO(SFX_ZAP2);
             }
 
             if (rangeRandom(20)) {
@@ -481,13 +369,10 @@ bool checkHighPriorityMove(int dir) {
 
         else if (destType == TYPE_STAR) {
 
-            // if (!totalDogePossible) {
-
             ADDAUDIO(SFX_ZAP2);
             ADDAUDIO(SFX_WHOOSH);
             weapon = theCave->weapon[level];
             nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
-            // FLASH(0x2A, 4);
 
             playerX += xdir[dir];
             playerY += ydir[dir];
@@ -508,19 +393,10 @@ bool checkHighPriorityMove(int dir) {
             }
 
             handled = true;
-            // }
-
-            // else {
-            //     FLASH(0x40, 10);
-            //     ADDAUDIO(SFX_ROCK);
-            // }
         }
 
 
         else if (Attribute[destType] & (ATT_BLANK | ATT_PERMEABLE | ATT_GRAB | ATT_EXIT)) {
-
-            // startCharAnimation(TYPE_MELLON_HUSK,
-            // AnimateBase[TYPE_MELLON_HUSK]);
 
             pushCounter = 0;
 
@@ -541,19 +417,10 @@ bool checkHighPriorityMove(int dir) {
 #if ENABLE_SHAKE
                 setShake(20);
 #endif
-                // ADDAUDIO(SFX_SCORE);
             }
 
-            // else if (destType == TYPE_EASTEREGG) {
-            //     FLASH(0x8, 10);
-            //     time += 50 << 8;
-            //     lockDisplay = false;
-            // }
-
             if (Attribute[destType] & ATT_GRAB) {
-                grabDoge(/* meOffset */);
-                //     grabbed = true;
-                // if (grabbed)
+                grabDoge();
                 nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
             }
 
@@ -608,28 +475,15 @@ bool checkHighPriorityMove(int dir) {
 
                     *me = udlrChar[udlr];
 
-                    // if (*me == CH_HUB_1 && Attribute[CharToType[GET(*(me - _BOARD_COLS))]] &
-                    // ATT_BLANK)
-                    //     *(me - _BOARD_COLS) = CH_TAP_0;
-
                     showTool = true;
                 }
             }
 
-            // else
-            //     // *me = FLAG(CH_DUST_ROCK_0);
-            //     *me = FLAG(CH_BLANK);
-
             playerSlow = 0;
             if (!autoMoveFrameCount && ((Attribute[destType] & (ATT_DIRT | ATT_WATERFLOW)) || destType == TYPE_LAVA)) {
 
-                // playerSlow = 1;    // tmp ((Attribute[destType] & ATT_WATERFLOW)) ? 2 : 1;
-
                 ADDAUDIO(SFX_DIRT);
-                // dirtFlag = true;
                 startCharAnimation(TYPE_MELLON_HUSK, AnimateBase[TYPE_MELLON_HUSK]);
-
-                //                nDots(6, playerX, playerY, PT_ONE, 25, 2, 5, 50);
             }
 
             int dir2 = (gravity < 0) ? dir ^ 2 : dir;
@@ -665,24 +519,12 @@ bool checkLowPriorityMove(int dir) {
         return false;
     }
 
-    // int offX = playerX + xdir[dir];
-    // int offY = playerY + ydir[dir];
-
-
     int offset = dirOffset[dir];
     unsigned char *meOffset = me + offset;
     enum ObjectType destType = CharToType[GET(*meOffset)];
 
 #if 1    // disable push
-    if (/*faceDirectionDef[dir] && */ (!(theCave->flags & CAVEDEF_STAR_STATIC)) &&
-        (Attribute[destType] & (ATT_MINE | ATT_PIPE))) {
-
-        // FLASH(0x94, 4);
-
-        // if (!pushCounter)
-        //     if (destType == TYPE_ROCK_BONUS)
-        //         startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
-
+    if ((!(theCave->flags & CAVEDEF_STAR_STATIC)) && (Attribute[destType] & (ATT_MINE | ATT_PIPE))) {
 
         if (++pushCounter > 1) {
 
@@ -699,8 +541,6 @@ bool checkLowPriorityMove(int dir) {
 
         } else {
             ADDAUDIO(SFX_SPACE);
-            //            startPlayerAnimation(ID_Locked);          // works
-            //            nicely as start of push
         }
 
         if (pushCounter > 8) {
@@ -719,12 +559,8 @@ bool checkLowPriorityMove(int dir) {
 
                     ADDAUDIO(SFX_ROCK);
 
-                    nDots(10, playerX, playerY, PT_ONE, 30,
-                          xOffset[dir] + CHAR_CENTER_X /*+ rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1)*/,
-                          /*rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + */ yOffset[dir] + CHAR_CENTER_Y, 40, 2);
-                    // nDots(10, playerX, playerY, PT_ONE, 15,
-                    //       xOffset[dir] + CHAR_CENTER_X + rangeRandom(CHAR_TRIX_X) - (CHAR_TRIX_X >> 1),
-                    //       rangeRandom(CHAR_TRIX_Y) - (CHAR_TRIX_Y >> 1) + yOffset[dir] + CHAR_CENTER_Y, 50, 3);
+                    nDots(10, playerX, playerY, PT_ONE, 30, xOffset[dir] + CHAR_CENTER_X,
+                          yOffset[dir] + CHAR_CENTER_Y, 40, 2);
                 } else {
                     ADDAUDIO(SFX_DOGE);
 
@@ -737,10 +573,8 @@ bool checkLowPriorityMove(int dir) {
                 *meOffset = FLAG(CH_CONVERT_PIPE);
             }
 
-            // fixSurroundingConglomerates(meOffset);
-
             waitForNothing = 1;
-            startPlayerAnimation(/*attachment ? ID_StandArmsUp :*/ ID_StandUp);
+            startPlayerAnimation(ID_StandUp);
 
             pushCounter = 0;
 
@@ -748,8 +582,6 @@ bool checkLowPriorityMove(int dir) {
                 me += 2;
                 boardCol += 2;    // SKIP processing it!
             }
-
-            //            ADDAUDIO(SFX_PUSH);
         }
 
         handled = true;
@@ -807,12 +639,8 @@ void movePlayer(unsigned char *me) {
             int x = (playerX * 5) + 3;
             int y = (playerY * CHAR_TRIX_Y) + 4;
             bubbles(1, x - 1, y - 2, 400, 0x1000);
-            // ADDAUDIO(SFX_BUBBLER);
         }
     }
-
-    // else
-    //     killAudio(SFX_BUBBLER);
 
     static unsigned char lastUsableSWCHA = 0;
 
@@ -843,32 +671,26 @@ void movePlayer(unsigned char *me) {
 
     if (!autoMoveFrameCount) {
 
-        // FLASH(0x42, 2);
-
         if (playerAnimationID == ID_WalkUp || playerAnimationID == ID_MineUp)
-            startPlayerAnimation(/*attachment ? ID_StandArmsUp :*/ ID_StandUp);
+            startPlayerAnimation(ID_StandUp);
 
         else if (playerAnimationID == ID_Walk || playerAnimationID == ID_Mine)
-            startPlayerAnimation(/*attachment ? ID_StandArmsUp :*/ ID_StandLR);
+            startPlayerAnimation(ID_StandLR);
 
         else if (playerAnimationID == ID_WalkDown || playerAnimationID == ID_MineDown)
-            startPlayerAnimation(/*attachment ? ID_StandArmsUp :*/ ID_Stand);
+            startPlayerAnimation(ID_Stand);
     }
 
     // after all movement checked, anything falling on player?
     // potential bug - if you're pushing and something falls on you
 
     if (Attribute[CharToType[*(me - _1ROW * gravity)]] & ATT_CRUSHES) {
-        //        SAY(__WORD_WATCHOUT);
         startPlayerAnimation(ID_Die);
         return;
     }
 
     pushCounter = 0;
     idleTimer++;
-
-    // if (!autoMoveFrameCount)
-    //     chooseIdleAnimation();
 }
 
 // EOF

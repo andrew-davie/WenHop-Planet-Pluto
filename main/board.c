@@ -430,11 +430,6 @@ void setInsulator(unsigned char *p, int row, int col) {
 
                 else {
 
-                    // if (*p > CH_ELECTRIC_0 && &p <= CH_ELECTRIC_2)
-                    //     (*p)++;
-
-                    // else
-
                     if (type2 != TYPE_ELECTRIC)
                         *p = CH_ELECTRIC_0;    // + (!rangeRandom(230) ? 1 : 0);
                 }
@@ -455,38 +450,13 @@ void setInsulator(unsigned char *p, int row, int col) {
 
 void setInsulatorHoriz(unsigned char *p, int row, int col) {
 
-    // int visibleLeft = scrollX >> 16;
-    // int colTrix = col * CHAR_TRIX_X;
-
-    // if (colTrix <= visibleLeft - CHAR_TRIX_X || colTrix >= visibleLeft + SCREEN_TRIX_X) {
-    //     return;
-    // }
-
     p++;
-
-    // if (!onOff[col]) {
-    //     if (lastOnOff[col]) {
-    //         while (++row < _BOARD_ROWS && CharToType[GET(*p)] != TYPE_INSULATOR) {
-    //             if (CharToType[GET(*p)] == TYPE_ELECTRIC)
-    //                 *p = FLAG(CH_BLANK);
-    //             p += _1ROW;
-    //         }
-    //     }
-    // }
-
-    // else {
 
     while (++col < _BOARD_COLS && CharToType[GET(*p)] != TYPE_INSULATOR) {
 
         int ch = GET(*p);
         int type2 = CharToType[GET(*p)];
         unsigned int att = Attribute[type2];
-
-
-        static const enum ChName insSh[] = {
-            CH_BLANK, CH_ELECTRIC_H0, CH_ELECTRIC_H1, CH_ELECTRIC_H2, CH_ELECTRIC_H3,
-        };
-
 
         if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES)) {
 
@@ -535,8 +505,6 @@ void setInsulatorPattern() {
 }
 
 int pickDifferent(int current) {
-    //    int r = rangeRandom(4);
-    // if (r >= current)
 
     if (!rangeRandom(10))
         return 0;
@@ -577,13 +545,9 @@ void processCreatures() {
     case CH_INSULATOR_L:
         setInsulatorHoriz(me, boardRow, boardCol);
         break;
-        // case CH_OUTLET:
-        //     processOutlet();
-        //     break;
 
     case CH_ROCK_PEBBLE_1:
         *me = FLAG(CH_ROCK_PEBBLE);
-        // shakeTime += 5;
         break;
 
     case CH_ROCK_PEBBLE:
@@ -592,7 +556,6 @@ void processCreatures() {
 
     case CH_PEBBLE_ROCK:
         *me = FLAG(CH_GEODOGE);
-        // surroundingConglomerate(boardCol, boardRow);
         break;
 
     case CH_PUSH_LEFT:
@@ -776,9 +739,6 @@ void restartBoardScan() {
 
     if (!autoMoveFrameCount) {    // delay until fully in new square
 
-
-        //                    chooseIdleAnimation();
-
         bool oldDead = playerDead;
 
         unsigned char *man = RAM + _BOARD + playerY * _1ROW + playerX;
@@ -811,14 +771,12 @@ void restartBoardScan() {
             startPlayerAnimation(ID_Die);
             waitRelease = true;
             lives--;
-            // lockDisplay = false;
 
             sound_max_volume = VOLUME_NONPLAYING;
         }
 
 
         if (playerDead && !shakeTime && !(inpt4 & 0x80)) {
-            // cave--;
             setGameState(GS_MENU);
         }
 
@@ -944,14 +902,8 @@ void processCharGeoDogeAndRock() {
 
     unsigned char *next = me + _1ROW * gravity;
     enum ObjectType typeDown = CharToType[GET(*next)];
-    // int typeofMe = CharToType[GET(*me)];
 
     if (Attribute[typeDown] & ATT_BLANK) {
-
-        // if (*me == CH_ROCK_BONUS) {
-        //     *me = FLAG(CH_STAR);
-        //     return;
-        // }
 
         if (ATTRIBUTE_BIT(*me, ATT_GEODOGE)) {
             *next = FLAG(CH_GEODOGE_FALLING_BOTTOM);
@@ -960,22 +912,6 @@ void processCharGeoDogeAndRock() {
             *next = FLAG(CH_ROCK_FALLING_BOTTOM);
             *me = FLAG(CH_ROCK_FALLING_TOP);
         }
-
-        // surroundingConglomerate(boardCol, boardRow);
-    }
-
-    else if (Attribute[typeDown] & ATT_ROLL) {
-
-        // TODO: allow rock to roll in earthquake or on gear
-
-        //     if (shakeTime && !rangeRandom(20)) {
-        //         if (ATTRIBUTE_BIT(*me, ATT_GEODOGE))
-        //             doRoll(me, CH_GEODOGE_FALLING);
-        //         else {
-
-        //             doRoll(me, CH_ROCK_FALLING);
-        //         }
-        // }
     }
 }
 
@@ -1012,15 +948,6 @@ void processFallingThings() {
 
             int sfx = 0;
 
-            // if (!(attNextNext & ATT_NOROCKNOISE)) {
-
-            //     if (creature == CH_ROCK_FALLING)
-            //         sfx = attNextNext & ATT_HARD ? SFX_ROCK :
-            //         SFX_ROCK2;
-            //     else
-            //         sfx = SFX_DOGE;
-            // }
-
             if (attNextNext & ATT_HARD) {
                 if (creature == CH_ROCK_FALLING || creature == CH_GEODOGE_FALLING) {
 
@@ -1037,8 +964,6 @@ void processFallingThings() {
                         nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
                     }
                 }
-                // else
-                //     sfx = SFX_DOGE;
             }
 
             if (sfx)
@@ -1058,8 +983,6 @@ void processFallingThings() {
         else {
             explode(next, FLAG(CH_DUST_0));
             initParticles();
-            //            nDots(PARTICLE_COUNT, boardCol, boardRow + 1, PT_TWO, 100, CHAR_CENTER_X, CHAR_CENTER_Y,
-            //            50, 7);
         }
     } else {
 
@@ -1077,7 +1000,6 @@ void processFallingThings() {
 
         case CH_GEODOGE_FALLING: {
             *me = CH_GEODOGE;
-            // surroundingConglomerate(boardCol, boardRow);
             break;
         }
 
@@ -1147,9 +1069,6 @@ void genericPush(int offsetX, int offsetY) {
                 }
             }
 
-            // surroundingConglomerate(boardCol, boardRow);
-            // surroundingConglomerate(boardCol + offsetX, boardRow + offsetY);
-
             //??
             if (!(attPushPos & ATT_PERMEABLE))
                 nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 150, 3, 4, 0x100, 7);
@@ -1190,12 +1109,8 @@ void chainReact_GeoDogeToDoge() {
             *newDogeCandidate = CH_CONVERT_GEODE_TO_DOGE | thisFrame[i];
             ADDAUDIO(SFX_UNCOVER);
             ongoing = true;
-
-            // surroundingConglomerate(boardCol + xdir[i], boardRow + ydir[i]);
         }
     }
-
-    // surroundingConglomerate(boardCol, boardRow);
 
     if (!ongoing)
         killAudio(SFX_UNCOVER);
@@ -1255,7 +1170,6 @@ void doRoll() {
                     nDots(1, boardCol, boardRow, PT_TWO, 25, offset * 6 + off, 7 * gravity, 0, 1);
                     nDots(1, boardCol, boardRow, PT_TWO, 30, offset * 7 + off, 10 * gravity, 0, 1);
 
-                    // surroundingConglomerate(boardCol, boardRow);
                     return;
                 }
             }

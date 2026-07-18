@@ -88,12 +88,9 @@ void processWyrms() {
         enum ObjectType whatsThere = CharToType[GET(*newHead)];
         bool moveable = Attribute[whatsThere] & mask;
 
-        if (!moveable) {    // || !(getRandom32() & 3)) {
+        if (!moveable) {
 
             wyrm->dir = (wyrm->dir + 1) & 3;
-            //            int rdir = wyrm->dir + 1) & 3; getRandom32() & 3;
-
-            //            for (int dir = 0; dir < 4; dir++) {
 
             candidateX = x + xdir[wyrm->dir];
             candidateY = y + ydir[wyrm->dir];
@@ -101,12 +98,7 @@ void processWyrms() {
             newHead = RAM + _BOARD + candidateY * _1ROW + candidateX;
             whatsThere = CharToType[GET(*newHead)];
             if (Attribute[whatsThere] & mask) {
-                //                    wyrm->dir = rdir;
                 moveable = true;
-                //                  break;
-                //            }
-
-                //                rdir = (rdir + 1) & 3;
             }
         }
 

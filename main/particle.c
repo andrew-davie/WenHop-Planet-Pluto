@@ -22,9 +22,6 @@
 
 unsigned int weaponLength = 0;
 
-// void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
-//                     unsigned char colour, unsigned char dmask);
-
 #define TOOL_MAX 60
 
 struct TOOL {
@@ -98,7 +95,6 @@ void modifyCharAtTip(int x, int y) {
         else if (type == TYPE_GEODOGE) {
             *b = CH_DOGE_00 | FLAG_THISFRAME;
             colour = 3;
-            // surroundingConglomerate(xchar, ychar);
         }
 
         else if (type == TYPE_DIRT) {
@@ -128,15 +124,13 @@ void modifyCharAtTip(int x, int y) {
     }
 }
 
-// bool ropeEnabled = false;
 const int PIXEL_ASPECT = 110;
 
 unsigned char turn_toward(unsigned char current, unsigned char target, unsigned char speed) {
     if (current == target)
         return target;    // fix: early exit
     signed char diff = (signed char)(target - current);
-    // speed must be <= 127; caller's responsibility or clamp here:
-    // speed = (speed > 127) ? 127 : speed;
+    // speed must be <= 127; caller's responsibility or clamp here
     signed char s = (signed char)speed;    // safe only if speed <= 127
     if (diff > 0)
         return (diff <= s) ? target : (unsigned char)(current + s);
@@ -147,14 +141,10 @@ unsigned char turn_toward(unsigned char current, unsigned char target, unsigned 
 
 void drawMace() {
 
-    // if (T1TC > availableIdleTime - 5000)
-    //     return;
-
     if (playerDead || !(weapon & WEAPON_MACE))
         return;
 
     if ((inpt4 & 0x80) && !weaponLength) {
-        //        weaponLength = 0;
         return;
     }
 
@@ -233,7 +223,6 @@ void drawMace() {
 
 
     } else {
-        // FLASH(0x28, 2);
         if (tool[0].dir == wantedDirection)
             wantedDirection = getRandom32();
         tool[0].dir = turn_toward(tool[0].dir, wantedDirection, 4);
@@ -273,10 +262,6 @@ unsigned char *getBoardAddress(int x, int y) {
 }
 
 void drawGun() {
-
-    // if (T1TC > availableIdleTime - 3000)
-    //     return;
-
 
     for (int i = 0; i < TOOL_MAX; i++)
         if (tool[i].age && tool[i].age--) {
@@ -458,8 +443,6 @@ void drawParticles() {
 
             case PT_BUBBLE: {
 
-                // FLASH(0xD2, 4);
-
                 if (y < lavaSurfaceTrixel) {
                     particle[i].age = 0;
                     continue;
@@ -508,14 +491,6 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
             whichDrop = popParticle();
             if (whichDrop >= 0) {
 
-                // int oldest = 0;
-                // while (++whichDrop < PARTICLE_COUNT && particle[whichDrop].age)
-                //     if (particle[whichDrop].age < particle[oldest].age)
-                //         oldest = whichDrop;
-
-                // if (whichDrop == PARTICLE_COUNT)
-                //     whichDrop = oldest;
-
                 particle[whichDrop].type = type;
                 particle[whichDrop].x = dotX << 8;
 
@@ -553,25 +528,6 @@ void nDots(int count, int dripX, int dripY, int type, unsigned char age, int off
     }
 }
 
-// void nDotsBackwards(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY,
-//                     int /*speed*/) {
-
-//     if (gravity < 0)
-//         offsetY = CHAR_TRIX_Y - offsetY;
-
-//     for (int i = 0; i < count; i++) {
-//         int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, 3);
-//         if (idx >= 0) {
-//             // TODO  vector
-//             particle[idx].x += particle[idx].age * particle[idx].speed;
-//             particle[idx].y += particle[idx].age * particle[idx].speed;
-
-//             // particle.speedX[idx] = -particle.speedX[idx];
-//             // particle.speedY[idx] = -particle.speedY[idx];
-//         }
-//     }
-// }
-
 void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
                    unsigned char colour) {
 
@@ -581,194 +537,5 @@ void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum Part
             particle[idx].speed = speed;
     }
 }
-
-// #define SPREAD 96
-
-// void nDotsAtTrixel2(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
-//                     unsigned char colour, unsigned char dmask) {
-//     TIMER_ON
-//     for (int i = 0; i < count; i++) {
-//         int idx = sphereDot(dripX, dripY, type, age, colour);
-//         if (idx >= 0) {
-//             particle[idx].speed = rangeRandom(speed);
-
-
-//             int doff = rangeRandom(SPREAD) - (SPREAD >> 1);
-//             particle[idx].dir = (unsigned char)(128 + dmask + doff);
-//         }
-//     }
-//     TIMER_OFF
-// }
-
-
-//-------------rain
-#if 0
-
-void makeRain() {
-
-    for (int drop = 0; drop < RAINHAILSHINE; drop++)
-        if (rainX[drop] == UNUSED) {
-
-            // carefully calculated to not overflow board bounds!
-
-            int dripX = (scrollX[displayMode] >> (SHIFT_SCROLLX + 2)) + rangeRandom(10);
-            int dripY = (((scrollY[displayMode] >> SHIFT_SCROLLY) * (0x300 / CHAR_HEIGHT)) >> 8) + rangeRandom(8);
-
-            unsigned char *dripPos = ADDRESS_OF(dripY) + dripX;
-            if ((Attribute[CharToType[GET(*dripPos)]] & ATT_BLANK) &&
-                (Attribute[CharToType[GET(*(dripPos - _1ROW))]] & ATT_DRIP)) {
-
-                rainX[drop] = (dripX << 2) + rangeRandom(4);
-                rainY[drop] = (dripY * (CHAR_HEIGHT / 3)) << 16;    // embed in upper char
-                rainSpeed[drop] = RAIN_FORMING_DRIP;
-            }
-        }
-}
-
-
-void rain() {
-
-    for (int i = 0; i < RAINHAILSHINE; i++) {
-        if (rainX[i] != 255) {
-
-            rainSpeed[i] += RAIN_ACCEL;
-
-            if (rainSpeed[i] > 0)
-                rainY[i] += rainSpeed[i];
-
-            int t = (rainY[i] >> 16);
-            int row = 0;
-            while (t >= CHAR_HEIGHT / 3) {
-                t -= CHAR_HEIGHT / 3;
-                row++;
-            }
-
-            if (row >= __BOARD_DEPTH) {
-                FLASH(0xD8, 30);
-                rainX[i] = 255;
-                continue;
-            }
-
-            // int row = ((rainY[i] >> (16)) * (0x10000 / ((CHAR_HEIGHT / 3)) + 1)) >>
-            //           16; // trick! adjusted / 7 + a bit
-
-            // #else
-            int row = ((rainY[i] >> (16)) * 0x2493) >> 16;    // trick! adjusted / 7 + a bit
-                                                              // #endif
-
-            // #if ENABLE_DRIBBLE
-            int pix = (rainY[i] >> 16) - row * (CHAR_HEIGHT / 3);
-            // #endif
-
-            if (pix >= CHAR_HEIGHT / 3) {
-                FLASH(0xF8, 30);
-                rainX[i] = 255;
-                continue;
-            }
-            unsigned char *cell = ADDRESS_OF(row) + (rainX[i] >> 2);
-            unsigned char img = GET(*cell);
-            int type = CharToType[img];
-
-            if (type == TYPE_ROCKFORD) {
-                if (playerAnimationID == ID_Stand) {
-                    if ((rainX[i] + 1) & 2) {
-                        startPlayerAnimation(ID_Drip);
-                        rainX[i] = UNUSED;
-                        continue;
-                    } else
-                        startPlayerAnimation(ID_Talk2);
-                }
-            }
-
-            if (!(Attribute[type] & ATT_ROCKFORDYBLANK)) {
-
-#if ENABLE_DRIBBLE
-
-                // if (Animate[type])
-                //     img = *Animate[type];
-                const unsigned char *shape = charSet[img] + pix * 3;
-
-                if (type == TYPE_DIAMOND_WITHOUT_DIRT)
-                    shape = EXTERNAL(__CHAR_DIAMOND_FALLING) + pix * 3;
-
-                unsigned char iccPix = *shape | *(shape + 1) | *(shape + 2);
-
-                if (rainSpeed[i] >= 0 && iccPix & (1 << (3 - (rainX[i] & 3)))) {
-
-                    if (type >= TYPE_DIAMOND_WITHOUT_DIRT && type <= TYPE_DIAMONDX_PULSE_4) {
-                        rainX[i]--;
-                        rainY[i] -= rainSpeed[i];
-                        rainSpeed[i] = (rainSpeed[i] * 1) >> 2;
-                        break;
-                    }
-
-                    else if (type == TYPE_BOULDER) {
-
-                        //                        rainY[i] -= rainSpeed[i];
-                        rainSpeed[i] >>= 1;
-
-                        if (pix >= 3) {
-                            rainX[i] = UNUSED;
-                            ADDAUDIO(SFX_DRIP2);
-                            break;
-                        }
-
-                        //                        rainY[i] -= rainSpeed[i];
-
-                        int diff = rainX[i] & 3;
-
-                        if (diff < 2)
-                            rainX[i]--;
-                        else
-                            rainX[i]++;
-
-                        // rainSpeed[i] >>= 1;
-                        //                          rainY[i] -= 0x1000;
-                        //   rainSpeed[i] = 0x10000;
-                        // break;
-                        //                         continue;
-                    }
-
-                    else if (rainSpeed[i] > 0) {
-                        rainSpeed[i] = RAIN_RESET_AFTER_IMPACT;
-                        ADDAUDIO(SFX_DRIP2);
-                    }
-
-                    else if (rainSpeed[i] > RAIN_DEAD) {
-                        rainX[i] = UNUSED;
-                        continue;
-                    }
-                }
-#else
-
-                if (rainSpeed[i] > 0) {
-                    rainSpeed[i] = RAIN_RESET_AFTER_IMPACT;
-                    ADDAUDIO(SFX_DRIP2);
-                }
-
-                else if (rainSpeed[i] > RAIN_DEAD) {
-                    rainX[i] = UNUSED;
-                    continue;
-                }
-
-#endif
-            }
-
-            // rainSpeed[i] += RAIN_ACCEL;
-
-            // if (rainSpeed[i] > 0)
-            //     rainY[i] += rainSpeed[i];
-
-            if ((rainSpeed[i] & 0x2000) || rainSpeed[i] > 0) {
-                if (!drawBit(rainX[i], rainY[i] >> 16))
-                    rainX[i] = UNUSED;
-            }
-        }
-    }
-}
-
-
-#endif
-
 
 // EOF

@@ -14,7 +14,6 @@
 unsigned char bgPalette[_BOARD_ROWS];
 unsigned char fgPalette[2];
 
-// static int lastBgCol;
 static int lastPfCharLine;
 static int lastBgCharLine;
 int currentPalette;
@@ -23,7 +22,6 @@ int lumTarget = 0;
 
 int flashTime = 1;
 
-// static int lastBgCol;
 int openSlot;
 int roller;
 
@@ -144,30 +142,6 @@ void adjustLuminance(int speed) {
 }
 
 
-#define BG_LINES_RCP (0x10000 / (_BOARD_ROWS - 1))
-
-// void build_bg_gradient(unsigned char start_col, unsigned char end_col) {
-
-//     int start_hue = (start_col >> 4) & 0xF;
-//     int start_lum = start_col & 0x7;
-//     int end_hue   = (end_col >> 4) & 0xF;
-//     int end_lum   = end_col & 0x7;
-
-//     int hue_fp   = (int)start_hue << 16;
-//     int lum_fp   = (int)start_lum << 16;
-//     int hue_step = (int)(end_hue - start_hue) * BG_LINES_RCP;
-//     int lum_step = (int)(end_lum - start_lum) * BG_LINES_RCP;
-
-//     for (int i = 0; i < _BOARD_ROWS; i++) {
-//         int hue = (hue_fp >> 16) & 0xF;
-//         int lum = (lum_fp >> 16) & 0x7;
-//         bgPalette[i] = (unsigned char)((hue << 4) | lum);
-//         hue_fp += hue_step;
-//         lum_fp += lum_step;
-//     }
-// }
-
-
 #define FRANGE (0x100 / (_BOARD_ROWS - 1))
 void setBackgroundPalette(unsigned char *cx) {
 
@@ -184,26 +158,6 @@ void setBackgroundPalette(unsigned char *cx) {
 
     else {
 
-
-#if 0
-        // int start_hue = (c[2] >> 4) & 0xF;
-        // int start_lum = c[2] & 0x7;
-        // int end_hue = (c[3] >> 4) & 0xF;
-        // int end_lum = c[3] & 0x7;
-
-        // int hue_fp = (int)start_hue << 16;
-        // int lum_fp = (int)start_lum << 16;
-        // int hue_step = (int)(end_hue - start_hue) * BG_LINES_RCP;
-        // int lum_step = (int)(end_lum - start_lum) * BG_LINES_RCP;
-
-        // for (int i = 0; i < _BOARD_ROWS; i++) {
-        //     int hue = (hue_fp >> 16) & 0xF;
-        //     int lum = (lum_fp >> 16) & 0x7;
-        //     bgPalette[i] = (unsigned char)((hue << 4) | lum);
-        //     hue_fp += hue_step;
-        //     lum_fp += lum_step;
-        // }
-#else
         int c1 = c[2] & 0xF0;
         int c2 = c[3] & 0xF0;
         int i1 = c[2] & 0xF;
@@ -222,7 +176,6 @@ void setBackgroundPalette(unsigned char *cx) {
             i1 += iStep;
             c1 += cStep;
         }
-#endif
     }
 
     fgPalette[0] = convertColour(c[0]);
@@ -233,7 +186,6 @@ void setBackgroundPalette(unsigned char *cx) {
 void setPalette(int buf) {
 
     unsigned char bgCol = colubk;
-    // rangeRandom(15) + 0x20;    // convertColour(0x28);    // colubk;    // tmp flashTime ? ARENA_COLOUR : 0;
     const int shift = 16;
 
     int i = 0;
@@ -324,14 +276,6 @@ void setPalette(int buf) {
 
 
 const unsigned char colourPool[][4] = {
-
-#if 0
-
-//    {0x06, 0x38, 0xA4, 0xA6},    //
-
-
-#else
-
 
     // 0
     {0x04, 0x08, 0x0A, 0x0A},    //
@@ -428,8 +372,6 @@ const unsigned char colourPool[][4] = {
 
     // E
     {0xEA, 0x46, 0x96, 0x96},    //
-
-#endif
 
     // F
 };

@@ -16,11 +16,6 @@ void initRandom() {
 
     prng_a ^= RAM[_SK_ODOMETER];
     prng_b ^= RAM[_SK_ODOMETER + 1];
-
-    // for (int i = 0; i < SAVEKEY_SIZE; i++) {
-    // 	prng_a ^= saveKeySolved[i] ^ saveKeyPerfect[i];
-    // 	prng_b ^= saveKeyUnlocked[i];
-    // }
 }
 
 unsigned int getRandom32() {

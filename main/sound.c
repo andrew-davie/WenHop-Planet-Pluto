@@ -16,10 +16,6 @@
 void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument);
 void processMusic();
 
-// const unsigned char trackSimple[];
-// static const unsigned char trackSimple2[];
-
-// const unsigned char trackGridLockMelodyIntro2[];
 const unsigned char trackGridLockBase2[];
 const unsigned char trackGridLockMelodyIntro[];
 const unsigned char trackGridLockBase[];
@@ -209,21 +205,6 @@ const unsigned char sampleWhoosh[] = {
     19, 6,  5, 15, 16, 7,  6, 15, 13, 7,  10, 15, 10, 4,  2, 15, 7,  2,  2, CMD_STOP,
 };
 
-// const unsigned char sampleSpin[] = {
-//     15, 31, 1, 1,
-//     15, 31, 2, 2,
-//     15, 28, 3, 3,
-//     15, 25, 4, 5,
-//     15, 22, 5, 6,
-//     15, 19, 6, 6,
-//     15, 16, 5, 6,
-//     15, 13, 4, 5,
-//     15, 10, 3, 3,
-//     15, 7,  2, 2,
-//     15, 7,  2, 1,
-//     CMD_STOP,
-// };
-
 const unsigned char sample10987654321[] = {
 
     4, 10, 1, 1, 4, 10, 3, 1, 4, 10, 5, 1, 4, 10, 6, 1, 4, 10, 5, 15, 4, 10, 3, 3, 4, 10, 2, 3, 4, 10, 1, 3, CMD_STOP,
@@ -253,19 +234,6 @@ const unsigned char sampleExit[] = {
     12, 16, 1, 1, 12, 16, 4, 1, 12, 16, 10, 1, 12, 16, 8, 4, 12, 16, 6, 1, 12, 16, 4, 1, 12, 16, 2, 1, CMD_STOP,
 };
 
-// const unsigned char sampleBirth[] = {
-
-// //    8,4,1,1,
-// //    8,4,4,1,
-// //    8,4,8,1,
-//     8,4,14,8,
-//     8,4,10,4,
-//     8,4,8,4,
-//     8,4,6,4,
-//     8,4,4,4,
-//     8,4,2,4,
-//     CMD_STOP,
-// };
 
 const struct AudioTable AudioSamples[] = {
 
@@ -345,9 +313,6 @@ void initAudio(bool killTracks) {
 }
 
 void startMusic() {
-
-    // loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
-    // loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
 }
 
 void killAudio(enum AudioID id) {
@@ -433,7 +398,6 @@ void processSoundEffects() {
             else {
 
                 if (cmd == CMD_LOOP) {
-                    // FLASH(0x94, 4);
                     sfxx->index = 0;
                 }
 
@@ -464,16 +428,10 @@ void processSoundEffects() {
             audV = (AudioSamples[best->id].sample[(best->index) + 2] * ((int)best->attenuation + 1)) >> 8;
 
             switch (best->id) {
-            // case SFX_MAGIC2:
             case SFX_MAGIC:
                 audF = getRandom32() & 0xF;
                 audV = 2;
                 break;
-
-                // case SFX_X: {
-                // 	audF = getRandom32() & 0xF;
-                // 	break;
-                // }
             }
         }
 
@@ -483,10 +441,6 @@ void processSoundEffects() {
             RAM[_BUF_AUDC + channel] = audC;
             RAM[_BUF_AUDF + channel] = audF;
             RAM[_BUF_AUDV + channel] = audV;
-
-            // sound_volume -= 5;
-            // if (sound_volume < 0)
-            // 	sound_volume = 0;
         }
 #endif
     }
@@ -648,35 +602,13 @@ void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int
     music[best].baseSpeed = dur;
 }
 
-// // clang-format on
-
 const int multiplier[] = {0, 0x100, 0x200, 0x400};
 const unsigned char RENOTE[] = {1, 4, 6, 12};
 
 
-// int approach(int current, int target, int speed) {
-//     int diff = target - current;
-//     if (diff > speed)
-//         return current + speed;
-//     if (diff < -speed)
-//         return current - speed;
-//     return target;
-// }
-
-
 void processMusic() {
 
-
     sound_volume = approach(sound_volume, sound_max_volume, 2);
-
-    // if (sound_volume < sound_max_volume)
-    //     sound_volume += 2;
-
-    // else {
-    //     sound_volume -= 3;
-    //     if (sound_volume < 0)
-    //         sound_volume = 0;
-    // }
 
     for (int i = 0; i < MUSIC_MAX; i++) {
 
@@ -746,9 +678,6 @@ void processMusic() {
 
             RAM[_BUF_AUDV + channel] = volume[channel] =
                 (instrument[best->instrument][envelope_ptr] * sound_volume * best->volume) >> (4 + 10 + 8);
-
-            // if (note == 0xFF)
-            //     RAM[_BUF_AUDV + channel] = 0;
 
             RAM[_BUF_AUDF + channel] = note;
             RAM[_BUF_AUDC + channel] = RENOTE[note >> 6];

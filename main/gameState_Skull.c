@@ -383,9 +383,6 @@ void initKernel_Skull() {
     sound_max_volume = VOLUME_MAX;
 
     myMemsetInt((unsigned int *)(RAM + _SKULL_BUFFERS_START), 0, _SKULL_BUFFERS_SIZE / 4);
-
-    // draw6Bitmap(_BUF_SKULL_GRP, _B
-    //             gfx_grid_suchislife_gif, gfx_grid_suchislife_gif_HEIGHT, 175, 0xF4);
 }
 
 
@@ -409,12 +406,6 @@ void drawPFSkull(int buffer, const unsigned char image[66][4][3]) {
 
 
 void initGameState_Skull() {
-
-    // sound_volume = VOLUME_NONPLAYING;
-    // loadTrack(20, trackChamp1, CHAMP_VOL + 80, 0x54, 0);
-    // loadTrack(10, trackChamp2, CHAMP_VOL, 0x54, 1);
-
-    // myMemsetInt((unsigned int *)(RAM + _BUF_SKULL_PF), 0, _BUFFER_SIZE * 10 / 4);
 
     luminance = -15;
     lumTarget = 0;
@@ -543,7 +534,6 @@ void drawICCSkull() {
 
 
         const unsigned char skullPalette[] = {0xFA, 0xF6, 0xF8};    // green eyes!
-        // unsigned char skullPalette[] = {0xF6, 0xF6, 0xF6};
         drawPalette(skullPalette);
 
         if (rndm)
@@ -553,9 +543,6 @@ void drawICCSkull() {
             skully = 6 + rangeRandom(3) * 3;
             rndm += 1000;
         }
-
-        // if (!rangeRandom(rndm >> 8))
-        //     return;
 
         int bone1y = sinoid[(++sinPhase >> 3) & 15] * 3;
 
@@ -655,12 +642,8 @@ void VB_Skull() {
     drawICCSkull();
     getJoystick();
 
-    // if (luminance == lumTarget)
-    //     drawNextChar();
-
-    if (!(inpt4 & 0x80))    // > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
+    if (!(inpt4 & 0x80))
         setGameState(GS_GAME);
-    // setGameState(GS_COPYRIGHT);
 }
 
 
@@ -674,19 +657,6 @@ void OS_Skull() {
 
 
     static int skullBGFlash = 0;
-
-    // if (luminance == lumTarget) {
-
-    //     if (!skullBGFlash || !rangeRandom(100)) {
-    //         int intens = rangeRandom(5) + 4;
-    //         skullBGFlash = 0x20 + intens;
-    //         if (intens >= 6)
-    //             blink = 0;
-    //     }
-
-    //     if (!(frame & 7) && skullBGFlash != 0x20)
-    //         skullBGFlash--;
-    // }
 
     unsigned char *p = (unsigned char *)(RAM + _BUF_SKULL_COLUBK);
     *p = skullBGFlash;

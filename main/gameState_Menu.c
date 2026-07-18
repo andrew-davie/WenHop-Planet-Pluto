@@ -17,16 +17,6 @@
 
 int base2;
 int flashTime2;
-// int cave;
-// int level;
-int tempName;
-
-enum MENU_OPTION {
-
-    MENU_OPTION_CAVE,
-    MENU_OPTION_LEVEL,
-};
-
 
 __attribute__((nonstring)) const char showCaveName[][6] = {
     {";;MARS"},    //
@@ -93,45 +83,13 @@ void initKernel_Menu() {
 
     colubk = 0;
 
-    tempName = rangeRandom(sizeof(showCaveName) / sizeof(showCaveName[0]));
-
-    // ARENA_COLOUR = 0;
-
-    // if (rageQuit) {
-    //     rageQuit = false;
-    //     SAY(__WORD_RAGEQUIT);
-    //     FLASH(0x48, 8);
-    // }
-
-
-    //    bufferedSWCHA = 0xFF;
-    //    waitRelease = true;
     sound_max_volume = VOLUME_MAX;
 
     myMemsetInt((unsigned int *)(RAM + _MENU_BUFFERS_START), 0, _MENU_BUFFERS_SIZE / 4);
 
-
-    // drawString(FONT_COMPACT, 0xF, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=()2026", 172);
-    // while (drawNextChar())
-    //     ;
-    // drawString(FONT_COMPACT, 0xF, 0, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=Andrew Davie", 184);
-    // while (drawNextChar())
-    //     ;
-
-
-    // draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
-    //             gfx_grid_menu_planet_gif, gfx_grid_menu_planet_gif_HEIGHT, 94 + 30, 6);
-
-    // draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
-    //             gfx_grid_menu_bravado_gif, gfx_grid_menu_bravado_gif_HEIGHT, 120 + 30, 6);
-
     base2 = 0;
 
     initGridPreview(_SCANLINES + 50, PREVIEW_Y);
-
-    //    chooseColourScheme();
-
-    //    mustWatchDelay = MUSTWATCH_MENU;
 }
 
 void drawPF(int buffer, const unsigned char image[66][4][3]) {
@@ -174,12 +132,6 @@ void VB_Menu() {
 
     if (!(inpt4 & 0x80))
         setGameState(GS_GAME);    // GS_GLOBE);
-
-    // if (frame > 220)
-
-    //     lumTarget = -15;
-    // if (frame > 250)
-    //     setGameState(GS_GAME);    // GS_GLOBE);
 }
 
 
@@ -206,47 +158,10 @@ void OS_Menu() {
 
     life(3);
 
-    //    myMemset((unsigned char *)(RAM + _BUF_MENU_PF), 0, _SCANLINES);
-
     base2++;
-
-    static enum MENU_OPTION sline = 0;
-    sline++;
-    if (sline >= 2)    //(int)(sizeof(smallWord) / sizeof(smallWord[0])))
-        sline = 0;
 
     if (flashTime2)
         --flashTime2;
-
-    // const char *dLine = 0;
-
-    switch (sline) {
-
-    case MENU_OPTION_CAVE:
-        //        dLine = showCave[cave];
-
-        // dLine = showCaveName[tempName];
-
-        break;
-
-    case MENU_OPTION_LEVEL:
-        //        dLine = Level[level];
-        break;
-
-        // case MENU_OPTION_TVSYSTEM:
-        //     dLine = TV[menuLineTVType];
-        //     break;
-    }
-
-    //    drawSmallString(y, smallWord[sline]);
-
-    // int colour = sline == menuLine ? (flashTime2 & 4) ? 0x0A : ((base2 << 2) & 0xF0) | 0x16 : 0x26;
-
-    // drawString(0, y + 8 + 30, dLine, colour);
-
-
-    //--------------------------------------------------------------------------
-    // Draw ICC menu PF background
 
     interleaveChronoColour(&roller);
     adjustLuminance(1);
@@ -254,35 +169,6 @@ void OS_Menu() {
     setPFColours((unsigned char *)(RAM + _BUF_MENU_COLUPF));
 
     drawPF(_BUF_MENU_PF, gfx_image_WenHop_png);
-
-    //--------------------------------------------------------------------------
-
-    // draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
-    //             gfx_grid_menu_planetx_gif, gfx_grid_menu_planetx_gif_HEIGHT, 62, 0x96);
-
-
-    // static const char *registered = ":";
-    // static int landing2 = (-5) * 256;
-    // int landing = landing2 >> 8;
-
-    // static int accel = 190;
-    // if (accel)
-    //     accel -= 1;
-
-    // int landing3 = landing + 8;
-
-    // if (!rangeRandom(2) && accel)
-    //     drawString(5, landing + 8, "<", 0x4C);    //(R)
-    // else
-    //     drawString(5, landing3, ";", 0x4C);    //(R)
-
-    // drawString(5, landing, registered, 0x06);    //(R)
-
-    // // drawString(5, landing + 11, ";", 0x9C);   //(R)
-
-    // //    if (landing2 > -10 << 8)
-    // landing2 += accel;
-    // // drawString(5, 62, ":", 0x22); //(R)
 }
 
 

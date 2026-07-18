@@ -1,13 +1,5 @@
 #pragma once
 
-// #define SCREEN_BYTES_PER_ROW 6
-
-// typedef struct {
-//     unsigned char colour;
-//     unsigned char bits[SCREEN_BYTES_PER_ROW];
-// } ScanLine;
-
-
 #include "../tools/buzz.h"
 #include "../tools/dh.h"
 #include "../tools/donald.h"

@@ -48,15 +48,9 @@ void draw6Bitmap(unsigned int grpOffset, unsigned int colup0Offset,    //
 
 
     for (int line = 0; line < height; line++) {
-        // if (y++ >= 0) {
         q[line] = colour;
         for (int c = 0; c < 6; c++)
             p[c * _BUFFER_SIZE + line] = *bm++;
-        // }
-
-        // else {
-        //     bm += 6;
-        // }
     }
 }
 
@@ -441,114 +435,6 @@ bool drawNextChar() {
 }
 
 
-// const unsigned char _CHAR_WYRM_2[CHAR_Y] = {
-
-//     0b01111, 0b00000, 0b01111,  // 00 |◼️🟪🟪🟪🟪|
-//     0b01111, 0b00000, 0b01111,  // 01 |◼️🟪🟪🟪🟪|
-//     0b01111, 0b00000, 0b01111,  // 02 |◼️🟪🟪🟪🟪|
-//     0b01111, 0b00100, 0b01111,  // 03 |◼️🟪⬜️🟪🟪|
-//     0b00001, 0b01110, 0b01111,  // 04 |◼️🟥🟥🟥🟪|
-//     0b01011, 0b00100, 0b01111,  // 05 |◼️🟪🟥🟪🟪|
-//     0b01111, 0b00100, 0b01111,  // 06 |◼️🟪⬜️🟪🟪|
-//     0b01111, 0b00000, 0b01111,  // 07 |◼️🟪🟪🟪🟪|
-//     0b01111, 0b00000, 0b01111,  // 08 |◼️🟪🟪🟪🟪|
-//     0b01111, 0b00000, 0b01111,  // 09 |◼️🟪🟪🟪🟪|
-// };
-
-/*
-
-
-void doDrawBitmap(const unsigned char *shape, int x, int y) {
-
-    unsigned char *pf_FL = RAM + _BUF_SKULL_PF + y;
-    unsigned char *pf_CL = pf_FL + _SCANLINES;
-    unsigned char *pf_CR = pf_CL + _SCANLINES;
-    unsigned char *pf_FR = pf_CR + _SCANLINES;
-
-    int size = shape[0];
-    const unsigned char *bf = shape + 1;
-
-    int baseRoll = roller;
-
-    union g {
-        int bGraphic;
-        unsigned char g[4];
-    } gfx;
-
-    union masker {
-        int mask;
-        unsigned char mask2[4];
-    } mask;
-
-    for (int i = 0; i < size; i += 3) {
-
-        mask.mask = ((bf[0] | bf[1] | bf[2]) << x) ^ 0xFFFFFFFF;
-
-        for (int line = 0; line < 3; line++) {
-
-            gfx.bGraphic = bf[baseRoll] << x;
-
-
-            *pf_FL = (*pf_FL & mask.mask2[3]) | gfx.g[3];                              // far left
-            *pf_CL = (*pf_CL & reverseBits[mask.mask2[2]]) | reverseBits[gfx.g[2]];    // center left
-            *pf_CR = (*pf_CR & mask.mask2[1]) | gfx.g[1];                              // center right
-            *pf_FR = (*pf_FR & reverseBits[mask.mask2[0]]) | reverseBits[gfx.g[0]];    // far right
-
-            if (++baseRoll > 2)
-                baseRoll = 0;
-
-            pf_FL++;
-            pf_CL++;
-            pf_FR++;
-            pf_CR++;
-        }
-
-        bf += 3;
-    }
-}
-*/
-
-
-// void drawCharacterPart(int ch, int x, int y, unsigned char *buffer) {
-
-//     // draw to a 20-wide buffer (left or right side of screen)
-
-//     if (x >= 20 || x <= -CHAR_X)
-//         return;
-
-//     const unsigned char *shape = charSet[ch];
-
-//     for (int i = 0; i < CHAR_TRIX_Y; i++) {
-
-
-//         int lineShape = *shape << (19 - CHAR_TRIX_X - x);
-
-//         *buffer &= mask;
-//         *buffer |= ();
-
-
-//     }
-
-
-// }
-
-
-// void drawCharacter(int ch, int x, int y) {
-
-//     if (ch >= CH_MAX)
-//         return;
-
-//     unsigned char *buffer;
-
-//     buffer = (unsigned char *)(RAM +_BUF_GAME_PF0_LEFT);
-//     drawCharacterPart(ch, x, y, buffer);
-
-//     buffer = (unsigned char *)(RAM +_BUF_GAME_PF0_RIGHT);
-//     drawCharacterPart(ch, x - 20, y, buffer);
-
-// }
-
-
 void blitShape(int ch, int shift, int y, int offset) {
 
     //            X, (also SHIFT! when we go "<<20>>shift")
@@ -598,15 +484,12 @@ void blitShape(int ch, int shift, int y, int offset) {
 
     int modifier = y + 1;
 
-    //    if (y >= 0)
     while (modifier > 2)
         modifier -= 3;
 
-    //  else
     while (modifier < 0)
         modifier += 3;
 
-    // int r = 2;
     int bitsh = 19 - shift;
 
     const char nextRoller[] = {1, 2, 0, 1, 2, 0, 1, 2, 0};
@@ -655,15 +538,8 @@ void drawAttachedChar(int ch) {
     ch = GET(ch);
     int type = CharToType[ch];
 
-    // if (Animate[type])
-    //     ch = revectorChar[*Animate[type]];
-    // else
-    //     ch = revectorChar[ch];
-
     if (Animate[type])
         ch = *Animate[type];
-    // else
-    //     ch = revectorChar[ch];
 
 
     int ay = 0;
@@ -681,18 +557,11 @@ void drawAttachedChar(int ch) {
         offsetX = attachmentOffset->x;
         offsetY = attachmentOffset->y;
 
-
-        // if (!offsetX && !offsetY)
-        //     attachmentOffset = 0;
-
-        // else
-
         if ((attachmentOffset + 1)->x || (attachmentOffset + 1)->y)
             attachmentOffset++;
 
         else
             attachmentOffset = 0;
-        ;
     }
 
 
@@ -701,8 +570,6 @@ void drawAttachedChar(int ch) {
 
     int trixX = ((playerX - 1) * CHAR_TRIX_X) + -(scrollX >> 16) + (faceDirection * (frameAdjustX + (autoMoveX >> 2))) +
                 2 - (shakeX >> 16) - offsetX;
-
-    // y = trixY;
 
     if (y + CHAR_Y >= 0 && y < _SCANLINES && trixX > -8 && trixX < 40) {
         if (trixX > -8 && trixX < 20)

@@ -34,26 +34,19 @@ static unsigned char scoreLineNew[10];
 static unsigned char scoreLineColour[10];
 
 static int toggle = 0;
-int scorePulse = 0;
 
 void addScore(int score) {
 
     actualScore += score;
-
-    //    ADDAUDIO(SFX_SCORE);
 
     partialScore += score;
 
     while (partialScore >= 500) {
         partialScore -= 500;
         lives++;
-        //        FLASH(0x86,6);
         sparkleTimer = SPARKLE;
-        //        ADDAUDIO(SFX_EXTRA);
         setScoreCycle(SCORELINE_LIVES);
     }
-
-    // scorePulse = 200;
 }
 
 const int pwr[] = {
@@ -589,40 +582,13 @@ void drawBigDigit(int digit, int pos, int offset, int colour, bool blackBackgrou
     unsigned char pmask = mask[pos];
     unsigned char *p = RAM + base[pos] + offset;
 
-    // if (digit == DIGIT_SPACE) {
-    //     for (int line = 0; line < DIGIT_SIZE; line++)
-    //         p[line] &= pmask;
-    //     return;
-    // }
-
     int shift2 = pmask == 0x0F ? 0 : 4;
-
-    // pmask = ~pmask;
-    // if (blackBackground) {
-    //  if (mirror[pos])
-    //      pmask = (pmask >> 1);
-    //  else
-    //      pmask |= (pmask << 1);
-    //}
-    // pmask = ~pmask;
-
-    // if (digit & 0x80)
-    //     pmask = 0xFF;
-
-    // if (colour && enableICC != LEFT_DIFFICULTY_A)
-    //     colour |= 7;
 
     int shift = (digit & 1) << 2;
     digit >>= 1;
 
     if (!mirror[pos])
         shift2 ^= 4;
-
-    int dbase = offset + roller;
-    while (dbase > 2)
-        dbase -= 3;
-
-    dbase = 1 << dbase;
 
     if (offset && blackBackground && !(colour & 0x40)) {    // offset && (!digit & 0x40)) {
         p[0] &= pmask;
@@ -637,29 +603,17 @@ void drawBigDigit(int digit, int pos, int offset, int colour, bool blackBackgrou
     } else
         dig = bigDigitBuffer;
 
-    unsigned char /*rdl,*/ rdl2;
+    unsigned char rdl2;
     if (mirror[pos]) {
         for (int line = 0; line < DIGIT_SIZE; line++) {
 
             rdl2 = ((dig[line] >> shift) & 0xF) << shift2;
-            //        rdl = ~rdl2;
-            // if (!(colour & 7 & dbase))
-            //     rdl2 = 0;
-            // if (blackBackground)
-            //     rdl = ~pmask;
-            //          dbase = (dbase << 1) | (dbase >> 2);
             p[line] = (p[line] & reverseBits[(unsigned char)~rdl2]) | reverseBits[rdl2];
         }
     } else {
         for (int line = 0; line < DIGIT_SIZE; line++) {
 
             rdl2 = ((dig[line] >> shift) & 0xF) << shift2;
-            // rdl = ~rdl2;
-            // if (!(colour & 7 & dbase))
-            //     rdl2 = 0;
-            // if (blackBackground)
-            //     rdl = pmask;
-            //            dbase = (dbase << 1) | (dbase >> 2);
             p[line] = (p[line] & ~rdl2) | rdl2;
         }
     }
@@ -762,22 +716,6 @@ void drawPlanetName() {
         scoreLineNew[i] = LETTER(*p++);
         scoreLineColour[i] = col++ & 7;
     }
-
-
-    // scoreLineNew[1] = LETTER('P');
-    // scoreLineNew[2] = LETTER('L');
-    // scoreLineNew[3] = LETTER('A');
-    // scoreLineNew[4] = LETTER('N');
-    // scoreLineNew[5] = LETTER('E');
-    // scoreLineNew[6] = LETTER('T');
-
-    //    scoreLineNew[7] = LETTER('A' + cave);
-    // scoreLineNew[8] = level + 1;
-
-    // scoreLineColour[2] = scoreLineColour[3] = scoreLineColour[4] = scoreLineColour[5] =
-    // RGB_YELLOW;
-
-    // scoreLineColour[7] = scoreLineColour[8] = RGB_AQUA;
 }
 
 void drawSpeedRun() {
@@ -794,7 +732,6 @@ void drawDoge() {
 
     if (doges < 0) {
         scoreLineNew[1] = DIGIT_PLUS;
-        // scoreLineNew[0] = DIGIT_DOGE;
         scoreLineColour[1] = scoreLineColour[0] = rangeRandom(8);
     }
 
@@ -846,8 +783,6 @@ void drawTheScore(int score) {
 
 void drawScore() {
 
-    //    doubleSizeScore(0, 0, 'a', 7);
-
     static int scc = 0;
     scc++;
 
@@ -877,12 +812,8 @@ void drawScore() {
     case SCORELINE_TIME:
     case SCORELINE_SCORE:
         drawDoge();
-        //        drawTime();
-        //        break;
-        // drawTheScore(actualScore);
         break;
     case SCORELINE_LIVES:
-        //        drawTime();
         drawLives();
         break;
     case SCORELINE_CAVELEVEL:

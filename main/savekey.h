@@ -24,10 +24,6 @@ bool getPerfectStatus(int lot);
 void setPerfectStatus(int lot);
 bool isGameCompleted();
 bool unlockLevels();
-bool isGroupSolved(int lot);
-bool isGroupPerfect(int lot);
-// bool isPriorSolved(int lot);
-// bool isPriorPerfect(int lot);
 void setSolveStatus(int lot);
 
 

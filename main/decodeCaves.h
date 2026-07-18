@@ -33,9 +33,6 @@ struct CAVE_DEFINITION {
 
     unsigned char objectCount;
     unsigned char objectData;
-
-    //    unsigned char extraObjectType[4];
-    //    unsigned char extraObjectProbability[5][4];
 };
 
 extern struct CAVE_DEFINITION *theCave;

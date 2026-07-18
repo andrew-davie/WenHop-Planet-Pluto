@@ -131,10 +131,6 @@ void VB_Copyright() {
             *c++ = convertColour(sl < TOP + BAND ? 0xC4 : 0x16);
         }
 
-        // for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++) {
-        //     *l++ = *r++ = *c++ = *spc++ = 0;
-        // }
-
         drawString(FONT_LARGE, 0xC2, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=Grumpy", 66);
         while (drawNextChar())
             ;
@@ -144,12 +140,6 @@ void VB_Copyright() {
         while (drawNextChar())
             ;
 
-        // draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_champ_gif,
-        //             gfx_grid_champgames_champ_gif_HEIGHT, TOP + CGSPACER + 1, 0);
-        // draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_games_gif,
-        //             gfx_grid_champgames_games_gif_HEIGHT, TOP + BAND + CGSPACER + 1, 0);
-
-
         if (frame > 60) {
             if (presentsColour < (PRESENTS_LUM << FADE_SHIFT))
                 presentsColour += FADE_SPEED;
@@ -158,10 +148,6 @@ void VB_Copyright() {
             drawString(FONT_COMPACT, 0x14, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=PRODUCT", 95);
             while (drawNextChar())
                 ;
-
-            // draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_champgames_presents_gif,
-            //             gfx_grid_champgames_presents_gif_HEIGHT, TOP + 2 * BAND + 10, (presentsColour >>
-            //             FADE_SHIFT));
         }
 
         if ((RAM[_SK_ID] == _WENHOP_SK_ID) && frame > 70) {
@@ -174,9 +160,6 @@ void VB_Copyright() {
                 draw6Bitmap(_BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, gfx_grid_savekey_reset_gif,
                             gfx_grid_savekey_reset_gif_HEIGHT,
                             _SCANLINES - 16 - gfx_grid_savekey_gif_HEIGHT - gfx_grid_savekey_reset_gif_HEIGHT, 6);
-
-                // if (!(frame & 15))
-                //     ADDAUDIO(SFX_SELECTION);
             }
         }
     }

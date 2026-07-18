@@ -500,9 +500,6 @@ void processAnimationCommand() {
             if (playerDead)
                 startPlayerAnimation(ID_Skeleton);
 
-            // else if (exitMode)
-            //     startPlayerAnimation(ID_Shades);
-
             else {
                 if (playerAnimationLoop)
                     playerAnimation = playerAnimationLoop;

@@ -131,23 +131,15 @@ bool drawMaskBit(int x, int y) {
 
 void swipe(int reserved) {
 
-    // if (gameSchedule == SCHEDULE_UNPACK_CAVE)
-    //     return;
-
     // We do the circle processing at start of VB or OS
 
-    // int start = T1TC;
-    while (!swipeComplete && T1TC < availableIdleTime - reserved) {    //< availableIdleTime - 70000) {
+    while (!swipeComplete && T1TC < availableIdleTime - reserved) {
 
         switch (swipeType) {
         case SWIPE_CIRCLE: {
 
-            //            FLASH(0xD2, 2);
-
             int x2 = (circleX * 7) >> 4;
             int y2 = (circleY * 7) >> 4;
-
-            //            int start = T1TC;
 
             swipeVisible |= drawMaskBit(swipeCenterX + x2, swipeCenterY + circleY) |
                             drawMaskBit(swipeCenterX + y2, swipeCenterY + circleX) |
@@ -157,8 +149,6 @@ void swipe(int reserved) {
                             drawMaskBit(swipeCenterX - y2, swipeCenterY - circleX) |
                             drawMaskBit(swipeCenterX - y2, swipeCenterY + circleX) |
                             drawMaskBit(swipeCenterX - x2, swipeCenterY + circleY);
-
-            //          actualScore = T1TC - start;
 
             circleY++;
 
@@ -214,12 +204,6 @@ void swipe(int reserved) {
             return;
         }
     }
-
-    // int t = availableIdleTime - T1TC;
-    // if (!actualScore || t < actualScore)
-    //     actualScore = t;
-    // if ((T1TC - start) > actualScore)
-    //     actualScore = T1TC - start;
 }
 
 // clang-format off

@@ -7,47 +7,12 @@
 #include "main.h"
 #include "particle.h"
 
-// #define LINE 0b01000000
-// #define FILLRECT 0b10000000
-// #define RECT 0b11000000
-
 #define DIRT CH_DIRT
 #define STEEL CH_STEELWALL
 
-// #define XY(x,y) (x),(y)
-// #define CAVEHEADER(milling, doge, dollar, rain) (milling), (doge), (dollar), (rain)
-
 #define R 2
-// #define L 6
-//  #define U 0
-//  #define D 4
 
 #define LINER(char, x, y, length, direction) DRAW_LINE, char, x, y, direction, length,
-
-// #define RECTR(char, fill, x, y, width, height) 0x80 + char, x, y, width, height, fill,
-// #define RECTE(char, x, y, width, height) 0xC0 + char, x, y, width, height,
-
-// #define LINE_N 0
-// #define LINE_NE 1
-// #define LINE_E 2
-// #define LINE_SE 3
-// #define LINE_S 4
-// #define LINE_SW 5
-// #define LINE_W 6
-// #define LINE_NW 7
-
-// #define DRAW_LINE(character, x, y, length, direction) (LINE + (character)), (x), (y),
-// (direction), (length) #define SIZE(x, y) (x), (y) #define DRAW_SOLID_RECTANGLE(character, x, y,
-// width, height, interior) (FILLRECT + (character)), (x), (y), (width), (height), (interior)
-
-// #define UP 0
-// #define UPRIGHT 1
-//  #define RIGHT 2
-// #define DOWNRIGHT 3
-//  #define DOWN 4
-// #define DOWNLEFT 5
-//  #define LEFT 6
-// #define UPLEFT 7
 
 
 const unsigned char caveUseWall[] = {
@@ -82,14 +47,9 @@ const unsigned char caveUseWall[] = {
     CH_ROCK, 50,40,40,40,40,
 
 
-
     CH_INSULATOR_L, 4,4,
     CH_INSULATOR_R, 8,4,
     // Start of cave draw
-    // CH_MOUNT_R, 3,4,
-
-    // CH_MOUNT_L, 3,5,
-    // CH_INSULATOR_TOP, 3,6,
 
 
     CH_ROCK_BONUS, 7,3,
@@ -200,7 +160,6 @@ const unsigned char caveWyrms[] = {
     DRAW_FILLED_RECT,CH_BRICKWALL,4,4,3,3,CH_ROCK,
 
 
-
     CH_DOORCLOSED, 5, 4,
     CH_MELLON_HUSK_BIRTH, 5, 5,
 
@@ -255,19 +214,14 @@ const unsigned char caveMace[] = {
 
     1,
     CH_BLANK, 10,100,100,100,100,
-    // CH_PEBBLE1, 30, 255, 0, 255, 10,
-    // CH_PEBBLE2, 30, 255, 0, 255, 10,
 
 //    DRAW_FILLED_RECT,CH_STEELWALL,1,1,9,8,CH_DIRT,
     // DRAW_FILLED_RECT,CH_BRICKWALL,4,4,3,3,CH_ROCK,
 
 
-
     CH_DOORCLOSED, 5, 4,
     CH_MELLON_HUSK_BIRTH, 5, 5,
 
-//    0xFE, CH_WATER, 1, 20,
-    //0xFE, CH_LAVA_BLANK, 1, 20,
 
     //DRAW_LINE,CH_WATERFLOW_0,1,1,38,2,
     
@@ -316,11 +270,8 @@ const unsigned char caveTest[] = {
 
     1,
  CH_BLANK, 60, 255, 0, 255, 10,
-    // CH_PEBBLE1, 5, 0, 240, 0, 20,
-    // CH_PEBBLE2, 5, 0, 240, 0, 20,
 
 
-    // CH_DOORCLOSED, 38, 16,
     CH_MELLON_HUSK_BIRTH, 20, 10,
 
     DRAW_EOF,
@@ -362,10 +313,6 @@ const unsigned char caveFast[] = {
     0, STEEL, DIRT,
 
     0,
-    // CH_BLANK, 60, 255, 0, 255, 10,
-    // CH_PEBBLE1, 120, 0, 240, 0, 20,
-    // CH_PEBBLE2, 120, 0, 240, 0, 20,
-    // CH_ROCK, 50, 0, 240, 0, 20,
 
 
     CH_DOORCLOSED, 38, 16, CH_MELLON_HUSK_BIRTH, 10, 15,
@@ -414,87 +361,22 @@ const unsigned char caveA[] = {
 
     2,
     CH_BLANK, 60, 255, 0, 255, 10,
-    // CH_PEBBLE1, 120, 0, 240, 0, 20,
-    // CH_PEBBLE2, 120, 0, 240, 0, 20,
     CH_ROCK, 50, 0, 240, 0, 20,
 
-    // 0xFE, CH_FLIP_GRAVITY_0, 16, 8,
-    // 0xFE, CH_FLIP_GRAVITY_0, 8, 12,
 
-    //     0xFE,CH_PUSH_DOWN,16,9,
     // //    0xFE,CH_PUSH_DOWN,7,1,
-    //     0xFE,CH_PUSH_RIGHT,17,8,
     //   //  0xFE,CH_PUSH_DOWN,9,1,
-    //     0xFE,CH_PUSH_LEFT,15,8,
     //     //0xFE,CH_PUSH_DOWN,11,1,
-    //     0xFE,CH_PUSH_UP,16,7,
     //     //0xFE,CH_PUSH_DOWN,13,1,
-    //     0xFE, CH_HUB, 16,8,
 
-//    0xFE, CH_WYRM_BODY, 8, 4,
-
-    // 0xFE, CH_FLOOD_0, 5, 5,
 
     CH_WYRM_BODY, 12, 8,
 
     CH_HORIZONTAL_BAR, 0,3,
     CH_HORIZONTAL_BAR, 1,3,
-    // CH_TAP_0, 2,2,
     CH_HUB, 2,3,
     CH_OUTLET, 2,4,
 
-
-        // 0xFE, CH_HORIZONTAL_BAR, 3,3,
-        // 0xFE, CH_HORIZONTAL_BAR, 4,3,
-        // 0xFE, CH_TAP_0, 5,2,
-        // 0xFE, CH_HUB, 5,3,
-        // 0xFE, CH_OUTLET, 5,4,
-
-        // 0xFE, CH_TAP_0, 6,2,
-        // 0xFE, CH_HUB, 6,3,
-        // 0xFE, CH_OUTLET, 6,4,
-
-
-        // 0xFE, CH_TAP_0, 7,2,
-        // 0xFE, CH_HUB, 7,3,
-        // 0xFE, CH_OUTLET, 7,4,
-
-
-        // 0xFE, CH_TAP_0, 8,2,
-        // 0xFE, CH_HUB, 8,3,
-        // 0xFE, CH_OUTLET, 8,4,
-
-        // 0xFE, CH_TAP_0, 9,2,
-        // 0xFE, CH_HUB, 9,3,
-        // 0xFE, CH_OUTLET, 9,4,
-
-        // 0xFE, CH_TAP_0, 10,2,
-        // 0xFE, CH_HUB, 10,3,
-        // 0xFE, CH_OUTLET, 10,4,
-
-        // 0xFE, CH_HORIZONTAL_BAR, 6,3,
-        // 0xFE, CH_HORIZONTAL_BAR, 7,3,
-        // 0xFE, CH_TAP_0, 8,2,
-        // 0xFE, CH_HUB, 8,3,
-        // 0xFE, CH_OUTLET, 8,4,
-
-        // 0xFE, CH_HORIZONTAL_BAR, 9,3,
-        // 0xFE, CH_HORIZONTAL_BAR, 10,3,
-        // 0xFE, CH_TAP_0, 11,2,
-        // 0xFE, CH_HUB, 11,3,
-        // 0xFE, CH_OUTLET, 11,4,
-
-
-    // CH_FLIP_GRAVITY_0,   100, 10, 10, 10, 10,
-    // CH_GEODOGE, 80, 80, 80, 80, 80,
-    //        CH_WYRM_HEAD_U, 50, 60, 70, 80, 90,
-
-    // CH_PUSH_LEFT,    0,  10,   5,   0,  20,
-    // CH_PUSH_RIGHT,   0,  10,   5,   0,  20,
-    // CH_PUSH_UP,      0,  10,   5,   0,  20,
-    // CH_PUSH_DOWN,    0,  10,   5,   0,  20,
-
-    // CH_DOGE_00, 4, 2,
 
     // LINE + CH_LADDER_0, 4,2,4,10,
 
@@ -503,47 +385,23 @@ const unsigned char caveA[] = {
     // #define VS 3
     // #define HS 3
 
-    //     0xFE,CH_PUSH_DOWN,6,9,
     // //    0xFE,CH_PUSH_DOWN,7,1,
-    //     0xFE,CH_PUSH_RIGHT,7,8,
     //   //  0xFE,CH_PUSH_DOWN,9,1,
-    //     0xFE,CH_PUSH_LEFT,5,8,
     //     //0xFE,CH_PUSH_DOWN,11,1,
-    //     0xFE,CH_PUSH_UP,6,7,
     //     //0xFE,CH_PUSH_DOWN,13,1,
-    //     0xFE, CH_HUB, 6,8,
 
-    //     0xFE,CH_PUSH_DOWN,6+HS,9+VS,
     // //    0xFE,CH_PUSH_DOWN,7,1,
-    //     0xFE,CH_PUSH_RIGHT,7+HS,8+VS,
     //   //  0xFE,CH_PUSH_DOWN,9,1,
-    //     0xFE,CH_PUSH_LEFT,5+HS,8+VS,
     //     //0xFE,CH_PUSH_DOWN,11,1,
-    //     0xFE,CH_PUSH_UP,6+HS,7+VS,
     //     //0xFE,CH_PUSH_DOWN,13,1,
-    //     0xFE, CH_HUB, 6+HS,8+VS,
 
-    //     0xFE,CH_PUSH_DOWN,6+HS*3,9+VS*2,
     // //    0xFE,CH_PUSH_DOWN,7,1,
-    //     0xFE,CH_PUSH_RIGHT,7+HS*3,8+VS*2,
     //   //  0xFE,CH_PUSH_DOWN,9,1,
-    //     0xFE,CH_PUSH_LEFT,5+HS*3,8+VS*2,
     //     //0xFE,CH_PUSH_DOWN,11,1,
-    //     0xFE,CH_PUSH_UP,6+HS*3,7+VS*2,
     //     //0xFE,CH_PUSH_DOWN,13,1,
-    //     0xFE, CH_HUB, 6+HS*3,8+VS*2,
 
-    //     0xFE, CH_HUB, 1,4+VS*2,
-    //     0xFE, CH_HUB, 2,4+VS*2,
-    //     0xFE, CH_HUB, 3,4+VS*2,
-    //     0xFE, CH_HUB, 1,5+VS*2,
     // //    0xFE, CH_HUB, 2+HS*3,5+VS*2,
-    //     0xFE, CH_HUB, 3,5+VS*2,
-    //     0xFE, CH_HUB, 1,6+VS*2,
-    //     0xFE, CH_HUB, 2,6+VS*2,
-    //     0xFE, CH_HUB, 3,6+VS*2,
 
-    //   0xFE, CH_WYRM_HEAD_U, 3, 6,
 
     // LINE + CH_BRICKWALL,1,7,2,31,
     // LINE + CH_BRICKWALL,8,14,2,31,
@@ -559,94 +417,9 @@ const unsigned char caveA[] = {
     CH_DOORCLOSED, 38, 16,
     CH_MELLON_HUSK_BIRTH, 4, 2,
 
-    // 0xFE, CH_GRINDER_0, 4, 9,
-    // 0xFE, CH_GRINDER_0, 5, 8,
-    // 0xFE, CH_GRINDER_0, 6, 6,
-    // 0xFE, CH_GRINDER_0, 7, 6,
-    // 0xFE, CH_GRINDER_0, 8, 5,
-
-    // 0xFE, CH_GRINDER_0, 8, 9,
-    // 0xFE, CH_GRINDER_1, 9, 9,
-    // 0xFE, CH_GRINDER_0, 9, 8,
-    // 0xFE, CH_GRINDER_1, 10, 8,
-    // 0xFE, CH_GRINDER_0, 10, 7,
-
-    // 0xFE, CH_GRINDER_1, 11, 12,
-    // 0xFE, CH_BELT_0, 12, 12,
-    // 0xFE, CH_BELT_1, 13, 12,
-    // 0xFE, CH_GRINDER_1, 14, 12,
-    // 0xFE, CH_BELT_1, 15, 12,
-    // 0xFE, CH_BELT_0, 16, 12,
-    // 0xFE, CH_GRINDER_1, 17, 12,
-    // 0xFE, CH_BELT_1, 18, 12,
-    // 0xFE, CH_BELT_0, 19, 12,
-    // 0xFE, CH_GRINDER_1, 20, 12,
-
-    // 0xFE, CH_HUB_1, 20, 8,
-    //  0xFE, CH_PUSH_DOWN, 20, 9,
-
-    // 0xFE, CH_GRINDER_0, 15, 15,
-    // 0xFE, CH_BELT_0, 16, 15,
-    // 0xFE, CH_BELT_1, 17, 15,
-    // 0xFE, CH_BELT_0, 18, 15,
-    // 0xFE, CH_BELT_1, 19, 15,
-    // 0xFE, CH_BELT_0, 20, 15,
-    // 0xFE, CH_BELT_1, 21, 15,
-    // 0xFE, CH_GRINDER_0, 22, 15,
-
-    // 0xFE, CH_HORIZONTAL_BAR, 1, 13,
-    // 0xFE, CH_HORIZONTAL_BAR, 2, 13,
-    // 0xFE, CH_HORIZONTAL_BAR, 3, 13,
-    // 0xFE, CH_TAP_0, 4, 12,
-    // 0xFE, CH_HUB_1, 4, 13,
-    // 0xFE, CH_OUTLET, 4, 14,
-
-    // 0xFE, CH_WATERFLOW_0, 4, 12,
-    // 0xFE, CH_WATERFLOW_0, 4, 13,
-    // 0xFE, CH_WATERFLOW_0, 4, 14,
-    // 0xFE, CH_WATERFLOW_0, 4, 15,
-    // 0xFE, CH_WATERFLOW_0, 4, 16,
-    // 0xFE, CH_WATERFLOW_0, 4, 17,
-    // 0xFE, CH_WATERFLOW_0, 4, 18,
-    // 0xFE, CH_WATERFLOW_0, 4, 19,
-
-    // 0xFE, CH_HORIZ_ZAP_3, 3,7,
-    // 0xFE, CH_HORIZ_ZAP_3, 3,8,
-    // 0xFE, CH_HORIZ_ZAP_3, 3,9,
-
-    // LINER(CH_LAVA_BLANK, 1,20,10,R)
-
-    //    0xFE, CH_WATER_0, 1, 20,
-
-//    0xFE, CH_LAVA_BLANK, 1, 20,
 
     CH_WATER, 1, 20,
 
-    // 0xFE, CH_BRICKWALL, 20,10,
-    // 0xFE, CH_BRICKWALL, 21,10,
-    // 0xFE, CH_BRICKWALL, 22,10,
-    // 0xFE, CH_BRICKWALL, 23,10,
-    // 0xFE, CH_BRICKWALL, 24,10,
-    // 0xFE, CH_BRICKWALL, 25,10,
-    // 0xFE, CH_BRICKWALL, 26,10,
-    // 0xFE, CH_BRICKWALL, 27,10,
-    // 0xFE, CH_BRICKWALL, 28,10,
-    // 0xFE, CH_BRICKWALL, 29,10,
-    // 0xFE, CH_BRICKWALL, 30,10,
-
-    // 0xFE, CH_SWITCH_LEFT_OFF, 1, 19,
-
-    // 0xFE, CH_WYRM_BODY, 6, 4,
-    //    0xFE, CH_WYRM_BODY, 16, 10,
-
-    // 0xFE, CH_WYRM_BODY, 12, 2,
-    // 0xFE, CH_WYRM_BODY, 16, 14,
-    // 0xFE, CH_WYRM_BODY, 16, 18,
-    // 0xFE, CH_WYRM_BODY, 11, 12,
-    // 0xFE, CH_WYRM_BODY, 16, 4,
-    // 0xFE, CH_WYRM_BODY, 16, 8,
-    // 0xFE, CH_WYRM_BODY, 12, 12,
-    // 0xFE, CH_WYRM_BODY, 2, 12,
 
     DRAW_EOF,
 
@@ -689,13 +462,7 @@ const unsigned char caveA2[] = {
     2,
     CH_BLANK, 100, 10, 5, 0, 20,
     CH_GEODOGE, 50, 10, 5, 0, 20,
-    // CH_PUSH_RIGHT, 0, 10, 5, 0, 20,
-    // CH_PUSH_UP, 0, 10, 5, 0, 20,
-    // CH_PUSH_DOWN, 0, 10, 5, 0, 20,
-//    CH_WYRM_HEAD_U, 50,20,30,40,50,
 
-    //   CH_BLANK,       60, 255,   0, 255,  10,
-    //     CH_ROCK,     90,   0, 240,   0,  20,
 
     //0x80 + CH_STEELWALL, 10, 5, 20, 12, CH_DIRT,
 
@@ -707,7 +474,6 @@ const unsigned char caveA2[] = {
 
     CH_LAVA_BLANK, 1, 20,
 
-    //    0xFE, CH_DOORCLOSED,38,16,
     CH_MELLON_HUSK_BIRTH, 8, 6,
 
     CH_WYRM_HEAD_U, 11, 6,
@@ -751,8 +517,6 @@ const unsigned char caveA2[] = {
     CH_BELT_1, 21, 15,
     CH_GRINDER_0, 22, 15,
 
-    //0xFE, CH_LAVA_BLANK, 1, 20,
-
 
     // EXTRAS
     // LEVEL 0
@@ -791,49 +555,8 @@ const unsigned char caveA5[] = {
     0, STEEL, CH_BLANK,
 
     0,
-    // CH_DIRT, 50, 10, 5, 0, 20,
-    // CH_GEODOGE, 50, 10, 5, 0, 20,
-    // CH_PUSH_RIGHT, 0, 10, 5, 0, 20,
-    // CH_PUSH_UP, 0, 10, 5, 0, 20,
-    // CH_PUSH_DOWN, 0, 10, 5, 0, 20,
 
-    //    0xFE, CH_DOORCLOSED,38,16,
     CH_MELLON_HUSK_BIRTH, 7, 6,
-
-    // 0xFE, CH_WYRM_HEAD_U, 11, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 12, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 13, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 14, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 15, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 16, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 17, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 18, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 19, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 20, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 21, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 22, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 23, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 24, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 25, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 26, 6,
-
-    // 0xFE, CH_WYRM_HEAD_U, 21, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 22, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 23, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 24, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 25, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 26, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 27, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 28, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 29, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 30, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 31, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 32, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 33, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 34, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 35, 6,
-    // 0xFE, CH_WYRM_HEAD_U, 36, 6,
-
 
 
     // EXTRAS
@@ -875,20 +598,10 @@ const unsigned char caveA3[] = {
 
     DRAW_FILLED_RECT, CH_STEELWALL, 10, 5, 20, 5, CH_BLANK,
 
-    //    LINER(CH_HORIZ_ZAP_0, 13,7,10,R)
     LINER(CH_DOGE_00, 13, 8, 9, R)
-    //    0xFE, CH_FLIP_GRAVITY_0, 16,6,
-    // 0xFE, CH_FLIP_GRAVITY_0, 22,8,
-    // 0xFE, CH_FLIP_GRAVITY_0, 11,8,
     CH_DOGE_00, 16, 8, 0xFE, CH_ROCK, 1, 6, 0xFE, CH_STEELWALL, 12, 7,
 
-    // 0xFE, CH_FLIP_GRAVITY_0, 16,6,
-    //    0xFE, CH_FLIP_GRAVITY_0, 16,6,
-    //    0xFE, CH_FLIP_GRAVITY_0, 17,8,
-    //  0xFE, CH_FLIP_GRAVITY_0, 12,6,
 
-    // 0xFE, CH_STEELWALL, 16,7,
-    
     CH_DOORCLOSED, 16, 5,
     CH_BLOCK, 16, 6,
     CH_BLOCK, 16, 7,
@@ -905,47 +618,27 @@ const unsigned char caveA3[] = {
     CH_ROCK, 16, 17,
     CH_ROCK, 16, 18,
     
-    // 0xFE, CH_DOGE_00, 16,18,
     CH_FLIP_GRAVITY_0, 16, 18,
     CH_FLIP_GRAVITY_0, 16, 19,
     CH_BLOCK, 16, 20,
 
-    //    0xFE, CH_ROCK, 16,9,
     CH_FLIP_GRAVITY_0, 16, 8,
 
-    // LINER(CH_PUSH_DOWN,11,6,18,R)
-    // LINER(CH_PUSH_UP,11,11,18,R)
     /*
         0xFE, CH_PUSH_DOWN, 11, 6,
-    //    0xFE, CH_PUSH_DOWN, 13, 6,
         0xFE, CH_PUSH_DOWN, 15, 6,
-    //    0xFE, CH_PUSH_DOWN, 17, 6,
         0xFE, CH_PUSH_DOWN, 19, 6,
-    //    0xFE, CH_PUSH_DOWN, 21, 6,
         0xFE, CH_PUSH_DOWN, 23, 6,
-    //    0xFE, CH_PUSH_DOWN, 25, 6,
 
 
         0xFE, CH_PUSH_UP, 11, 12,
-    //    0xFE, CH_PUSH_UP, 13, 12,
         0xFE, CH_PUSH_UP, 15, 12,
-    //    0xFE, CH_PUSH_UP, 17, 12,
         0xFE, CH_PUSH_UP, 19, 12,
-    //    0xFE, CH_PUSH_UP, 21, 12,
         0xFE, CH_PUSH_UP, 23, 12,
-    //    0xFE, CH_PUSH_UP, 25, 12,
     */
 
-    //    0xFE, CH_DOORCLOSED,38,16,
     CH_MELLON_HUSK_BIRTH, 11, 7,
 
-    //    0xFE, CH_WYRM_HEAD_U, 16, 9,
-
-    // 0xFE, CH_WYRM_HEAD_U, 11, 9,
-    // 0xFE, CH_WYRM_HEAD_U, 12, 9,
-    // 0xFE, CH_WYRM_HEAD_U, 13, 9,
-    // 0xFE, CH_WYRM_HEAD_U, 14, 9,
-    // 0xFE, CH_WYRM_HEAD_U, 15, 9,
 
     DRAW_EOF,
 
@@ -1001,7 +694,6 @@ const unsigned char starsAndStripes[] = {
     0,
     DRAW_FILLED_RECT, CH_BRICKWALL, 1,1,9,8, CH_DOGE_00,
     DRAW_FILLED_RECT, 0x80|CH_STAR, 2, 2, 7, 6, 8,
-
 
 
     DRAW_EOF,
@@ -1124,17 +816,7 @@ const unsigned char caveA4[] = {
     DRAW_FILLED_RECT, 0x80|CH_GEODOGE, 9, 2, 18, 5, 6,
     DRAW_FILLED_RECT, 0x80|CH_ROCK_BONUS, 9, 2, 18, 5, 26,
 
-    //    LINER(CH_HORIZ_ZAP_0, 13,7,10,R)
-    // LINER(CH_DOGE_00, 13,8,16,R)
-    // LINER(CH_DOGE_00, 13,7,16,R)
-    //LINER(CH_GEODOGE, 13, 4, 16, R)
-    //    0xFE, CH_FLIP_GRAVITY_0, 16,6,
-    // 0xFE, CH_FLIP_GRAVITY_0, 22,8,
-    // 0xFE, CH_FLIP_GRAVITY_0, 11,8,
-    //    0xFE, CH_DOGE_00, 16,8,
     // 0xFE,
-    // CH_ROCK, 1, 4,
-    // CH_ELECTRIC_0, 12, 5,
     CH_INSULATOR_BOTTOM,12,7,
     CH_INSULATOR_TOP,12,2,
 
@@ -1143,31 +825,15 @@ const unsigned char caveA4[] = {
     CH_STEELWALL, 14, 5,
     CH_STEELWALL, 14, 6,
 
-    // CH_ROCK_BONUS,10,4,
-//    CH_PEBBLE1, 13, 5,
-    // 0xFE, CH_DIRT, 11,6,
-    // 0xFE, CH_DIRT, 11,8,
 
-    // 0xFE, CH_FLIP_GRAVITY_0, 16,6,
-    //    0xFE, CH_FLIP_GRAVITY_0, 16,6,
-    //    0xFE, CH_FLIP_GRAVITY_0, 17,8,
-    //  0xFE, CH_FLIP_GRAVITY_0, 12,6,
-
-    // 0xFE, CH_STEELWALL, 16,7,
     CH_DOORCLOSED, 16, 3,
-    // 0xFE, CH_BLOCK, 16,6,
-    // 0xFE, CH_BLOCK, 16,7,
-    // 0xFE, CH_ROCK, 16,9,
 
     CH_MELLON_HUSK_BIRTH, 11, 4,
 
 
-    // CH_INSULATOR_TOP,18,4,
-    // CH_ELECTRIC_0, 18,6,
     CH_INSULATOR_BOTTOM,18,7,
     CH_INSULATOR_TOP,18,2,
  
-    // CH_ELECTRIC_0, 18,6,
     CH_INSULATOR_BOTTOM,24,7,
     CH_INSULATOR_TOP,24,2,
 
@@ -1190,8 +856,6 @@ void none() {
 }
 
 void spec() {
-
-    // FLASH(0x94, 4);
 }
 
 
@@ -1202,22 +866,10 @@ void empty() {
 const struct caveHandler caveList[] = {
 
     // cave definition, condition handler
-    // {caveTest, none},
-
-    // {caveA3, none},    //
-    // {caveMace, none},
-    // {caveA2, none},        //
-    {caveUseWall, none},        //
-    {caveA4, none},             //
-    {caveWyrms, empty},         //
-    {starsAndStripes, spec},    //
-
-
-    // {caveA, none},          //
-
-
-    //    caveFast,
-    //    caveA5,  // bad
+    {caveUseWall, none},
+    {caveA4, none},
+    {caveWyrms, empty},
+    {starsAndStripes, spec},
 };
 
 const int caveCount = sizeof(caveList) / sizeof(caveList[0]);

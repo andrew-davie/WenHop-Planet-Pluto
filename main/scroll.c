@@ -13,14 +13,6 @@
 int scrollX, scrollY;
 
 static int scrollSpeedX, scrollSpeedY;
-// static int targetScrollSpeed, targetYScrollSpeed;
-
-// #define accel 4096
-// #define accelY (accel * 16)
-// #define decel (accel * 8 / 8)
-// #define decelY (decel * 8)
-
-// void calculateVisibleBorders();
 
 bool isScrolling() {
     return (scrollSpeedX || scrollSpeedY);
@@ -49,7 +41,6 @@ int approach(int current, int target, int speed) {
 
 void scroll() {
 
-    // if (true) {
     if (playerDead && !waitRelease) {    // && *playerAnimation == FRAME_BLANK) {
 
         // Manual look-around
@@ -99,11 +90,6 @@ void scroll() {
     scrollY += scrollSpeedY;
 
 
-    // int bounds_l = ((theCave->bounds_l) * CHAR_TRIX_X) << 16;
-    // int bounds_r = ((theCave->bounds_r) * CHAR_TRIX_X - SCREEN_TRIX_X) << 16;
-    // int bounds_t = ((theCave->bounds_t) * CHAR_TRIX_Y) << 16;
-    // int bounds_b = ((theCave->bounds_b) * CHAR_TRIX_Y - SCREEN_TRIX_Y) << 16;
-
     int bounds_l = (theCave->bounds_l) << 16;
     int bounds_r = (theCave->bounds_r) << 16;
     int bounds_t = (theCave->bounds_t) << 16;
@@ -128,17 +114,6 @@ void scroll() {
         scrollY = bounds_t;
         scrollSpeedY = 0;
     }
-
-
-    // if (theCave->flags & CAVEDEF_LOCK_X) {
-    //     scrollX = 0x70000;
-    //     scrollSpeedX = 0;
-    // }
-
-    // if (theCave->flags & CAVEDEF_LOCK_Y) {
-    //     scrollY = 0x110000;
-    //     scrollSpeedY = 0;
-    // }
 }
 
 

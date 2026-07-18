@@ -29,9 +29,6 @@
 #define BOARD_TRIX_X (_BOARD_COLS * CHAR_TRIX_X)
 #define BOARD_TRIX_Y (_BOARD_ROWS * CHAR_TRIX_Y)
 
-// #define HALFWAY_X (BOARD_TRIX_X / 2)
-// #define HALFWAY_Y (BOARD_TRIX_Y / 2)
-
 #define SCREEN_TRIX_X 40
 #define SCREEN_TRIX_Y (_SCANLINES / 3)
 
@@ -39,10 +36,6 @@
 
 
 //------------------------------------------------------------------------------
-
-// #define CHAR_SIZE (PIECE_DEPTH)
-// #define TRILINES (PIECE_DEPTH / 3)
-
 
 #define GET(a) (((unsigned char)((a) << 1)) >> 1)
 
@@ -72,14 +65,12 @@ extern int armCycles;
 extern unsigned int rand;
 extern unsigned char colubk;
 extern int level;
-// extern bool lockDisplay;
 extern int millingTime;    // negative = expired
 extern int doges;
 extern int time;
 extern int lavaSurfaceTrixel;
 extern bool showWater;
 extern bool showLava;
-// extern bool exitTrigger;
 
 extern int cave;
 extern bool caveCompleted;
@@ -128,14 +119,7 @@ void Random(unsigned int count);
 
 void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAddress, int length);
 
-// unsigned int rangeRandom(short int range);
-
 void setGameState(enum GAME_STATE state);
-
-// int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char colour);
-// void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed);
-
-// void nDotsAt(int count, int x, int y, int age, int speed);
 
 int dirFromCoords(int x, int y, int prevX, int prevY);
 void initNewGame();

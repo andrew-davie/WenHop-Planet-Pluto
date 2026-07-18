@@ -17,7 +17,6 @@
 
 /* **************************************** */
 /* Types */
-// typedef const unsigned char UBYTE;
 typedef unsigned char objectType;
 
 /* DrawLine data */
@@ -33,20 +32,12 @@ void StoreObject(int x, int y, objectType anObject);
 void DrawLine(objectType anObject, int x, int y, int aLength, int aDirection);
 void DrawFilledRect(objectType anObject, int x, int y, int aWidth, int aHeight, objectType aFillObject);
 void DrawRect(objectType anObject, int x, int y, int aWidth, int aHeight);
-// void DrawHorizontalLine(objectType anObject, int x, int y, int aLength);
-
-#if 0
-void NextRandom(int *RandSeed1, int *RandSeed2);
-int RandSeed1, RandSeed2;
-#endif
 
 const unsigned char *theCaveData;
-// int caveFlags;
 int decodingRow;
 unsigned char caveMirrorXY;
 static int doorX, doorY;
 int processedLevel;
-// extern int thumbnailSpeed;
 int totalDogePossible;
 
 enum DECODE_STATE decodeState;

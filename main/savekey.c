@@ -4,7 +4,6 @@
 
 #include "main.h"
 #include "savekey.h"
-// #include "puzzles.h"
 
 
 enum CC saveKeyEnableICC;
@@ -15,9 +14,6 @@ unsigned char saveKeyPerfect[SAVEKEY_SIZE];
 
 int unlockedStart;
 int unlockedEnd;
-
-// bool priorGroupSolved[PUZZLE_MAX / GROUPING];
-// bool priorGroupPerfect[PUZZLE_MAX / GROUPING];
 
 void setUnlockStatus(int lot) {
     int l = (lot >> 3);
@@ -104,70 +100,6 @@ bool unlockLevels() {
 
     return unlocked;
 }
-
-// bool isGroupSolved(int lot) {
-
-// 	// is the current GROUPING block completely solved?
-// 	bool solved = false;
-
-// 	for (int i = 0; i < PUZZLE_MAX; i += GROUPING)
-// 		for (int j = 0; j < GROUPING; j++)
-// 			if (i + j == lot) {
-// 				solved = true;
-// 				for (int k = 0; k < GROUPING; k++)
-// 					if (!getSolveStatus(i + k)) {
-// 						solved = false;
-// 						goto done;
-// 					}
-// 				goto done;
-// 			}
-
-// done:
-// 	return solved;
-// }
-
-// bool isGroupPerfect(int lot) {
-
-// 	// is the current GROUPING block completely solved?
-// 	bool solved = false;
-
-// 	for (int i = 0; i < PUZZLE_MAX; i += GROUPING)
-// 		for (int j = 0; j < GROUPING; j++)
-// 			if (i + j == lot) {
-// 				solved = true;
-// 				for (int k = 0; k < GROUPING; k++)
-// 					if (!getPerfectStatus(i + k)) {
-// 						solved = false;
-// 						goto done;
-// 					}
-// 				goto done;
-// 			}
-
-// done:
-// 	return solved;
-// }
-
-// bool isPriorSolved(int lot) {
-
-// 	int grp = 0;
-// 	while (lot >= GROUPING) {
-// 		lot -= GROUPING;
-// 		grp++;
-// 	}
-
-// 	return priorGroupSolved[grp];
-// }
-
-// bool isPriorPerfect(int lot) {
-
-// 	int grp = 0;
-// 	while (lot >= GROUPING) {
-// 		lot -= GROUPING;
-// 		grp++;
-// 	}
-
-// 	return priorGroupPerfect[grp];
-// }
 
 void setSolveStatus(int lot) {
     int l = lot >> 3;

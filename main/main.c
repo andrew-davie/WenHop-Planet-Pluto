@@ -42,8 +42,6 @@ int shakeTime;
 void setShake(int time) {
 
     shakeTime = time;
-    // if (time)
-    //     startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
 }
 
 
@@ -59,14 +57,12 @@ int armFrequency;    // 60 or 70
 int armCycles;
 
 int level;
-// bool lockDisplay;
 int millingTime;    // negative = expired
 int doges;
 int time;
 int lavaSurfaceTrixel;
 bool showWater;
 bool showLava;
-// bool exitTrigger;
 
 int cave;
 bool caveCompleted;
@@ -159,20 +155,10 @@ void runARM_VerticalBlank();
 void runARM_Overscan();
 
 void HandleControls();
-void SilenceWaves();
 void SilenceTIA();
 
 void initNextLife();
 
-
-// function defines from ASM_routines.S
-// these use ASM with unrolled loops to make them FAST
-// use/remove as desired
-
-// unsigned int rangeRandom(short int range) {
-//     // generate a random between 0 and range-1 (16-bit)
-//     return ((getRandom32() >> 16) * range) >> 16;
-// }
 
 /******************************* Variables *******************************/
 // stay ARM-side
@@ -483,17 +469,6 @@ void HandleControls() {
     }
 }
 
-// Used to set waveforms to all silent / no note
-void SilenceWaves() {
-
-    // setWaveform(0, WAV_SILENCE);
-    // setWaveform(1, WAV_SILENCE);
-    // setWaveform(2, WAV_SILENCE);
-    // setNote(0, 0);
-    // setNote(1, 0);
-    // setNote(2, 0);
-}
-
 // Used to set TIA sound to all silent / no note
 void SilenceTIA() {
 
@@ -535,8 +510,6 @@ void initNewGame() {
 
     lives = 3;
 
-    // invincible = false;
-
     initNextLife();
 }
 
@@ -545,85 +518,6 @@ void initNextLife() {
 
     pulsePlayerColour = 0;
 }
-
-
-#if 0
-
-void initNextLife() {
-
-
-#if __ENABLE_WATER
-    //    water = 0;
-    //    lava = 0;
-    lastWater = 0;
-#endif
-
-#if ENABLE_SHAKE
-    shakeTime = 0;
-    // shakeX = 0;
-    // shakeY = 0;
-#endif
-
-    bufferedSWCHA = 0xFF;
-
-    caveCompleted = false;
-    exitTrigger = false;
-
-    perfectTimer = 80;
-
-    exitMode = 0;
-    idleTimer = 0;
-    sparkleTimer = 0;
-    gameFrame = 0;
-    triggerPressCounter = 0;
-    triggerOffCounter = 0;
-    // expandSpeed = 0;
-    nextGravity = 1;
-
-    // dogeBlockCount = 0;
-    // cumulativeBlockCount = 0;
-    explodeCount = 0;
-
-    resetDelay = 0;
-    // selectResetDelay = 0;
-
-    showTool = false;
-
-#if ENABLE_DEBUG
-    selectDelay = 0;
-#endif
-
-    lavaSurfaceTrixel = 10000; // 0x1C2/3; //22 * PIECE_DEPTH - 1;
-    showLava = false;
-    showWater = false;
-
-    // lastDisplayMode = DISPLAY_NONE;
-
-#ifdef ENABLE_SWITCH
-    switchOn = true;
-#endif
-
-    frameCounter = gameSpeed; // force initial
-    selectorCounter = 0;
-
-    initWyrms();
-    initPlayer();
-    initSprites();
-
-    for (int i = 0; i < PARTICLE_COUNT; i++)
-        particle[i].age = -1;
-
-#if CIRCLE
-    initSwipeCircle(CIRCLE_ZOOM_ZERO + 1);
-#endif
-
-    initCharAnimations();
-
-    spacing = 0;
-
-    setScoreCycle(SCORELINE_CAVELEVEL);
-}
-#endif
 
 
 void initDataStreams(const struct dataStreams *streams, int streamCount) {

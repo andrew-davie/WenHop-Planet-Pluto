@@ -29,9 +29,6 @@
 #include "swipe.h"
 #include "wyrm.h"
 
-extern const unsigned char trackGridLockMelodyIntro[];
-extern const unsigned char trackGridLockBase[];
-
 int attachment = 0;
 const OFFSET *attachmentOffset = 0;
 
@@ -52,10 +49,6 @@ void initDataStreams_Game() {
         {_DS_GAME_COLUP1, _BUF_GAME_COLUP1},
         {_DS_GAME_GRP0A, _BUF_GAME_GRP0},
         {_DS_GAME_GRP1A, _BUF_GAME_GRP1},
-
-        // {_DS_GAME_AUDV, _BUF_AUDV},
-        // {_DS_GAME_AUDC, _BUF_AUDC},
-        // {_DS_GAME_AUDF, _BUF_AUDF},
 
         {DSJMP1PTR, _BUF_GAME_JUMP},
     };
@@ -124,8 +117,6 @@ void initGameState_Game() {
 
 
     sound_volume = VOLUME_PLAYING;
-    // loadTrack(0, trackGridLockMelodyIntro, 50, 0xC0, 1);
-    // loadTrack(10, trackGridLockBase, 100, 0xC0, 0);
 }
 
 
@@ -162,13 +153,8 @@ void VB_Game() {
     processCharAnimations();
     setPalette(_BUF_GAME_COLUBK);
 
-    // if (gameSchedule != SCHEDULE_UNPACK_CAVE)
-    //     drawScreen(1);
-
-
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
-        // drawScore();
         drawPlayerSprite();
 
         drawMace();

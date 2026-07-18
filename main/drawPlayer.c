@@ -62,7 +62,6 @@ void initSprites() {
 
     for (int i = 0; i < 16; i++) {
         playerBaseColour[i] = playerColour[i] + rcol;
-        // postProcessPlayerColours[i] = playerBaseColour[i];
     }
 
     luminance = oldlum;
@@ -84,12 +83,10 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
     int rooted = cx[1][(root >> 3) & 3];
 
     if (pulsePlayerColour) {
-        //    if (--pulsePlayerColour) {
-        --pulsePlayerColour;                           //       if (!(--pulsePlayerColour & 7)) {
-        int cswitch = rangeRandom(4) ? 0x40 : 0x20;    // getRandom32() & 0xF0;
+        --pulsePlayerColour;
+        int cswitch = rangeRandom(4) ? 0x40 : 0x20;
         for (int i = 0; i < 16; i++)
             postProcessPlayerColours[i] = cswitch;
-        //     }
     }
 
     else {
@@ -132,10 +129,6 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
         int pX = (xpos) * 4 + (faceDirection * (8 + frameXOffset + frameAdjustX + autoMoveX)) + 3;
 
-        // if (shapeHeight & SPRITE_DOUBLE)
-        //     pX -= 8 * faceDirection;
-
-
         if (pulsePlayerColour) {
 
             int ppc = ((pulsePlayerColour * 1) >> 5) + 3;
@@ -167,11 +160,6 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
             unsigned char *p1Colour = p0Colour + _SCANLINES + 2;
             unsigned char *p1 = p0 + _SCANLINES + 2;
-
-            // p0++[destLine] = 0xFF;
-            // p0Colour++[destLine] = 0xF;
-            // p1++[destLine] = 0xFF;
-            // p1Colour++[destLine] = 0x44;
 
             for (int line = 0; line < (shapeHeight & 0x3f); line++) {
 
@@ -227,9 +215,6 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
             unsigned char *p0Colour = RAM + _BUF_GAME_COLUP0 + playerSpriteY + 1;
             unsigned char *p0 = RAM + _BUF_GAME_GRP0 + playerSpriteY;
-
-            // p0++[destLine] = 0xFF;
-            // p0Colour++[destLine] = 0xF;
 
             for (int line = 0; line < (shapeHeight & 0x3F); line++) {
 
