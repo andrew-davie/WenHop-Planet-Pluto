@@ -1,8 +1,5 @@
 #pragma once
 
-#include "main.h"
-
-
 enum ObjectType {
 
     // update Attribute[] in attribute.c

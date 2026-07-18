@@ -6,7 +6,6 @@
 #include "wyrm.h"
 
 #include "attribute.h"
-#include "characterset.h"
 #include "particle.h"
 #include "random.h"
 

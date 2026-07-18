@@ -1,11 +1,10 @@
+
 #include "defines_dasm.h"
 
 #include "attribute.h"
 #include "caveData.h"
-#include "colour.h"
 #include "decodeCaves.h"
 #include "main.h"
-#include "particle.h"
 
 #define DIRT CH_DIRT
 #define STEEL CH_STEELWALL

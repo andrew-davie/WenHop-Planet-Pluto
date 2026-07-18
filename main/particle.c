@@ -7,8 +7,6 @@
 
 #include "T1TC.h"
 #include "attribute.h"
-#include "characterset.h"
-#include "colour.h"
 #include "decodeCaves.h"
 #include "drawScreen.h"
 #include "main.h"
@@ -16,7 +14,6 @@
 #include "particle.h"
 #include "playerAnimation.h"
 #include "random.h"
-#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 

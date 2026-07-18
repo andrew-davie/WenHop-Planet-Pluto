@@ -3,10 +3,8 @@
 
 #include "cdfjplus.h"
 
-#include "colour.h"
 #include "gameState.h"
 #include "main.h"
-#include "score.h"
 
 #define DETECT_FRAME_COUNT 10
 

@@ -5,8 +5,6 @@
 #include "cdfjplus.h"
 
 #include "colour.h"
-#include "main.h"
-#include "random.h"
 #include "rasterBleed.h"
 
 

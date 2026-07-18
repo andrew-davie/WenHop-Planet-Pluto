@@ -5,7 +5,6 @@
 
 #include "cdfjplus.h"
 
-#include "colour.h"
 #include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"

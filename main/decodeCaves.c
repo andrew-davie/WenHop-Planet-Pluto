@@ -6,7 +6,6 @@
 #include "animations.h"
 #include "attribute.h"
 #include "caveData.h"
-#include "characterset.h"
 #include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"

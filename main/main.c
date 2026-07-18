@@ -5,7 +5,6 @@ Gamax Software 2026 - Craig Daniels
 
 #include <stdbool.h>
 
-#include "decodeCaves.h"
 #include "defines_dasm.h"    // defines_dasm.h MUST come before defines_cdfjplus.h
 
 // MUST have whitespace here, otherwise auto-code formatters will change
@@ -16,17 +15,13 @@ Gamax Software 2026 - Craig Daniels
 
 #include "main.h"
 
-#include "animations.h"
-#include "attribute.h"
 #include "colour.h"
 #include "gameState.h"
 #include "kernels.h"
 #include "main.h"
-#include "mellon.h"
 #include "random.h"
 #include "savekey.h"
 #include "score.h"
-#include "scroll.h"
 #include "sound.h"
 
 
@@ -70,7 +65,6 @@ unsigned char bufferedSWCHA;
 unsigned int usableSWCHA;
 unsigned int inhibitSWCHA;
 
-unsigned char *me;
 int exitMode;
 bool waitRelease;
 bool showTool;

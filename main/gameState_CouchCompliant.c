@@ -8,7 +8,6 @@
 #include "grid6.h"
 #include "kernels.h"
 #include "main.h"
-#include "sound.h"
 
 
 #define DURATION_COUCH 400

@@ -9,7 +9,7 @@
 #include "characterset.h"
 #include "colour.h"
 #include "draw.h"
-#include "drawScreen.h"
+#include "main.h"
 #include "mellon.h"
 #include "playerAnimation.h"
 #include "reverseBits.h"

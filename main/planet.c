@@ -1,5 +1,4 @@
 #include "planet.h"
-#include "main.h"
 
 #include "spinningGlobe/blood2.h"
 #include "spinningGlobe/bloodworld.h"
@@ -10,7 +9,6 @@
 #include "spinningGlobe/moon.h"
 #include "spinningGlobe/neptune.h"
 #include "spinningGlobe/pangea.h"
-#include "spinningGlobe/terra.h"
 #include "spinningGlobe/titan.h"
 
 const unsigned char neptune_ntsc_palette_override[3] = {

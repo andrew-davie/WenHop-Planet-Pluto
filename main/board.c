@@ -7,8 +7,7 @@
 #include "animations.h"
 #include "attribute.h"
 #include "board.h"
-#include "caveData.h"
-#include "characterset.h"
+// #include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
 #include "main.h"
@@ -17,7 +16,6 @@
 #include "playerAnimation.h"
 #include "random.h"
 #include "schedule.h"
-#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 #include "wyrm.h"
@@ -32,31 +30,29 @@ int explodeCount;
 int explodeRadius;
 
 // init'd locally
-unsigned char creature;
-enum ObjectType type;
 int conveyorDirection;
 int activeStar;
 int lastActiveStar;
 bool single;
 
 
-bool processTypes();
-void processCreatures();
+bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature);
+void processCreatures(BoardCursor *cur, unsigned char creature);
 void restartBoardScan();
 
-void processDoge();
-void processPebble();
-void processWater();
-void processWaterFlow();
-void processCharBeltAndGrinder();
-void processFallingThings();
-void processCharGeoDogeAndRock();
+void processDoge(unsigned char *me, int row, int col);
+void processPebble(unsigned char *me, int row, int col);
+void processWater(unsigned char *me, int row);
+void processWaterFlow(unsigned char *me, int row, int col);
+void processCharBeltAndGrinder(unsigned char *me, unsigned char creature);
+void processFallingThings(unsigned char *me, int row, int col, unsigned char creature);
+void processCharGeoDogeAndRock(unsigned char *me);
 
-void genericPush(int offsetX, int offsetY);
-void genericPushReverse(int offsetX, int offsetY);
-void chainReact_GeoDogeToDoge();
-void chainReact_Pipe();
-void doRoll();
+void genericPush(unsigned char *me, int row, int col, int offsetX, int offsetY);
+void genericPushReverse(unsigned char *me, int offsetX, int offsetY);
+void chainReact_GeoDogeToDoge(unsigned char *me);
+void chainReact_Pipe(unsigned char *me);
+void doRoll(unsigned char *me, int row, int col);
 void setInsulator(unsigned char *p, int row, int col);
 
 //------------------------------------------------------------------------------
@@ -205,22 +201,30 @@ void processBoardSquares() {
 
     while (T1TC < availableIdleTime - 7500) {
 
-        me = RAM + _BOARD + boardRow * _1ROW + boardCol;
+        // boardRow/boardCol are the only pieces of this that genuinely need
+        // to survive across frames (this loop yields when its time budget
+        // runs out and resumes here next frame). Everything else is
+        // per-cell context, so from here down it's threaded explicitly via
+        // 'cur' instead of leaning on implicit globals.
+        BoardCursor cur;
+        cur.row = boardRow;
+        cur.col = boardCol;
+        cur.me = RAM + _BOARD + cur.row * _1ROW + cur.col;
 
-        creature = *me;
+        unsigned char creature = *cur.me;
 
         if (creature < FLAG_THISFRAME) {
 
-            type = CharToType[creature];
+            enum ObjectType type = CharToType[creature];
 
             // Any blanks/dissolves underwater/lava gets transformed to water/lava chars
-            if (isVisible(boardCol, boardRow))
-                if (boardRow * CHAR_TRIX_Y >= lavaSurfaceTrixel && Attribute[type] & ATT_CONVERT)
-                    *me = showLava ? CH_LAVA_BLANK : CH_WATER;
+            if (isVisible(cur.col, cur.row))
+                if (cur.row * CHAR_TRIX_Y >= lavaSurfaceTrixel && Attribute[type] & ATT_CONVERT)
+                    *cur.me = showLava ? CH_LAVA_BLANK : CH_WATER;
 
             if (Attribute[type] & isActive[selectorCounter & 3]) {
-                if (!processTypes())
-                    processCreatures();
+                if (!processTypes(&cur, type, creature))
+                    processCreatures(&cur, creature);
             }
         }
 
@@ -229,55 +233,58 @@ void processBoardSquares() {
         // note: we need to also do the last row ... or do we? if it's steel wall, no
 
         if (gravity > 0) {
-            if (boardRow > 1) {
-                unsigned char *prev = me - _1ROW;
+            if (cur.row > 1) {
+                unsigned char *prev = cur.me - _1ROW;
                 *prev &= ~FLAG_THISFRAME;
             }
         }
 
         else {
-            if (boardRow < _BOARD_ROWS - 1) {
-                unsigned char *prev = me + _1ROW;
+            if (cur.row < _BOARD_ROWS - 1) {
+                unsigned char *prev = cur.me + _1ROW;
                 *prev &= ~FLAG_THISFRAME;
             }
         }
 
-        me += gravity;
-
-        boardCol += gravity;
+        cur.me += gravity;
+        cur.col += gravity;
 
         if (gravity < 0) {
-            if (boardCol < 0) {
-                boardCol = _BOARD_COLS - 1;
+            if (cur.col < 0) {
+                cur.col = _BOARD_COLS - 1;
 
-                if (!--boardRow) {
+                if (!--cur.row) {
                     // Leave boardRow negative so setupBoardScanner's
                     // "if (boardRow < 0)" restart branch actually triggers;
                     // otherwise the next scan wrongly restarts at (0,0)
                     // instead of the bottom row whenever gravity is negative.
                     boardRow = -1;
+                    boardCol = cur.col;
                     setSchedule(SCHEDULE_START_SCAN);
-                    //                    restartBoardScan();
                     return;
                 }
             }
         }
 
         else {
-            if (boardCol > (_BOARD_COLS - 1)) {
-                boardCol = 0;
-                if (++boardRow > _BOARD_ROWS - 1) {
+            if (cur.col > (_BOARD_COLS - 1)) {
+                cur.col = 0;
+                if (++cur.row > _BOARD_ROWS - 1) {
+                    boardRow = cur.row;
+                    boardCol = cur.col;
                     setSchedule(SCHEDULE_START_SCAN);
-                    //                    restartBoardScan();
                     return;
                 }
             }
         }
+
+        boardRow = cur.row;
+        boardCol = cur.col;
     }
 }
 
 
-bool processTypes() {
+bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature) {
 
     switch (type) {
 
@@ -287,8 +294,8 @@ bool processTypes() {
         activeStar++;
         if (*Animate[TYPE_STAR_EXPLODE] == CH_DUST_0) {
             ADDAUDIO(SFX_EXPLODE);
-            nDots(8, boardCol, boardRow, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 80, 7);
-            *me = FLAG(CH_DUST_0);
+            nDots(8, cur->col, cur->row, PT_TWO, 25, CHAR_CENTER_X, CHAR_CENTER_Y, 80, 7);
+            *cur->me = FLAG(CH_DUST_0);
         }
         break;
     }
@@ -307,11 +314,11 @@ bool processTypes() {
 
         // fall
 
-        unsigned char *next = me + _1ROW;
+        unsigned char *next = cur->me + _1ROW;
         if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
             *next = FLAG(CH_STAR_FALLING_BOTTOM);
-            *me = FLAG(CH_STAR_FALLING_TOP);
-            nDots(5, boardCol, boardRow, PT_TWO, 40, CHAR_CENTER_X, CHAR_CENTER_Y, 40, 2);
+            *cur->me = FLAG(CH_STAR_FALLING_TOP);
+            nDots(5, cur->col, cur->row, PT_TWO, 40, CHAR_CENTER_X, CHAR_CENTER_Y, 40, 2);
         }
 
 
@@ -321,24 +328,24 @@ bool processTypes() {
 
     case TYPE_OUTBOX:
         FLASH(0x28, 10);
-        nDots(10, boardCol, boardRow, PT_SPIRAL, 40, 2, 5, 0x40, 7);    // untested speed
+        nDots(10, cur->col, cur->row, PT_SPIRAL, 40, 2, 5, 0x40, 7);    // untested speed
         break;
 
     case TYPE_DOGE:
-        processDoge();
+        processDoge(cur->me, cur->row, cur->col);
         break;
 
     case TYPE_PEBBLE1:
-        processPebble();
+        processPebble(cur->me, cur->row, cur->col);
         break;
 
     case TYPE_WATER:
-        processWater();
+        processWater(cur->me, cur->row);
         break;
 
     case TYPE_MELLON_HUSK:
         if (!exitMode)
-            movePlayer(me);
+            movePlayer(cur);
 
         else {
 
@@ -357,23 +364,23 @@ bool processTypes() {
     case TYPE_WATERFLOW_2:
     case TYPE_WATERFLOW_3:
     case TYPE_WATERFLOW_4:
-        processWaterFlow();
+        processWaterFlow(cur->me, cur->row, cur->col);
         break;
 
     case TYPE_GRINDER:
     case TYPE_GRINDER_1:
         if (!(getRandom32() & 7))
-            nDots(1, boardCol, boardRow, PT_TWO, 10, 3, 7, 100, 7);
+            nDots(1, cur->col, cur->row, PT_TWO, 10, 3, 7, 100, 7);
 
         __attribute__((fallthrough));
 
     case TYPE_BELT:
     case TYPE_BELT_1:
-        processCharBeltAndGrinder();
+        processCharBeltAndGrinder(cur->me, creature);
         break;
 
     case TYPE_GEODOGE:
-        processCharGeoDogeAndRock();
+        processCharGeoDogeAndRock(cur->me);
         break;
 
     default:
@@ -517,7 +524,7 @@ int pickDifferent(int current) {
     return current;
 }
 
-void processCreatures() {
+void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     switch (creature) {
 
@@ -525,7 +532,7 @@ void processCreatures() {
     case CH_ELECTRIC_1:
     case CH_ELECTRIC_2:
     case CH_ELECTRIC_3: {
-        *me = pickDifferent(*me - CH_ELECTRIC_0) + CH_ELECTRIC_0;
+        *cur->me = pickDifferent(*cur->me - CH_ELECTRIC_0) + CH_ELECTRIC_0;
         break;
     }
 
@@ -533,102 +540,101 @@ void processCreatures() {
     case CH_ELECTRIC_H1:
     case CH_ELECTRIC_H2:
     case CH_ELECTRIC_H3: {
-        *me = pickDifferent(*me - CH_ELECTRIC_H0) + CH_ELECTRIC_H0;
+        *cur->me = pickDifferent(*cur->me - CH_ELECTRIC_H0) + CH_ELECTRIC_H0;
         break;
     }
 
 
     case CH_INSULATOR_TOP:
-        setInsulator(me, boardRow, boardCol);
+        setInsulator(cur->me, cur->row, cur->col);
         break;
 
     case CH_INSULATOR_L:
-        setInsulatorHoriz(me, boardRow, boardCol);
+        setInsulatorHoriz(cur->me, cur->row, cur->col);
         break;
 
     case CH_ROCK_PEBBLE_1:
-        *me = FLAG(CH_ROCK_PEBBLE);
+        *cur->me = FLAG(CH_ROCK_PEBBLE);
         break;
 
     case CH_ROCK_PEBBLE:
-        *me = FLAG(CH_BLANK);
+        *cur->me = FLAG(CH_BLANK);
         break;
 
     case CH_PEBBLE_ROCK:
-        *me = FLAG(CH_GEODOGE);
+        *cur->me = FLAG(CH_GEODOGE);
         break;
 
     case CH_PUSH_LEFT:
-        genericPush(-1, 0);
+        genericPush(cur->me, cur->row, cur->col, -1, 0);
         break;
 
     case CH_PUSH_LEFT_REVERSE:
-        genericPushReverse(1, 0);
+        genericPushReverse(cur->me, 1, 0);
         break;
 
     case CH_PUSH_RIGHT:
-        genericPush(1, 0);
+        genericPush(cur->me, cur->row, cur->col, 1, 0);
         break;
 
     case CH_PUSH_RIGHT_REVERSE:
-        genericPushReverse(-1, 0);
+        genericPushReverse(cur->me, -1, 0);
         break;
 
     case CH_PUSH_UP:
-        genericPush(0, -1);
+        genericPush(cur->me, cur->row, cur->col, 0, -1);
         break;
 
     case CH_PUSH_UP_REVERSE:
-        genericPushReverse(0, 1);
+        genericPushReverse(cur->me, 0, 1);
         break;
 
     case CH_PUSH_DOWN:
-        genericPush(0, 1);
+        genericPush(cur->me, cur->row, cur->col, 0, 1);
         break;
 
     case CH_PUSH_DOWN_REVERSE:
-        genericPushReverse(0, -1);
+        genericPushReverse(cur->me, 0, -1);
         break;
 
     case CH_DUST_2:
     case CH_DUST_ROCK_2:
-        *me = CH_BLANK;
+        *cur->me = CH_BLANK;
         break;
 
     case CH_DUST_0:
     case CH_DUST_1:
     case CH_DUST_ROCK_0:
     case CH_DUST_ROCK_1:
-        (*me)++;
+        (*cur->me)++;
         break;
 
     case CH_CONVERT_GEODE_TO_DOGE:
-        *me = FLAG(CH_DOGE_00);
-        chainReact_GeoDogeToDoge();
+        *cur->me = FLAG(CH_DOGE_00);
+        chainReact_GeoDogeToDoge(cur->me);
         break;
 
     case CH_CONVERT_PIPE:
-        chainReact_Pipe();
+        chainReact_Pipe(cur->me);
         break;
 
     case CH_BLOCK: {
 
-        unsigned char *next = me + _1ROW * gravity;
+        unsigned char *next = cur->me + _1ROW * gravity;
         enum ObjectType typeDown = CharToType[GET(*next)];
         if (Attribute[typeDown] & ATT_BLANK) {
-            *next = FLAG(*me);
-            *me = FLAG(CH_DUST_0);
+            *next = FLAG(*cur->me);
+            *cur->me = FLAG(CH_DUST_0);
         }
         break;
     }
 
     case CH_ROCK_BONUS: {
 
-        unsigned char *next = me + _1ROW * gravity;
+        unsigned char *next = cur->me + _1ROW * gravity;
         if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
-            *next = FLAG(*me);
-            *me = FLAG(CH_BLANK);
-            // startCharAnimation(TYPE_ROCK_BONUS, AnimateRockBonus + 2);
+            *next = FLAG(*cur->me);
+            *cur->me = FLAG(CH_BLANK);
         }
 
         break;
@@ -636,80 +642,80 @@ void processCreatures() {
 
 
     case CH_STAR_FALLING_TOP:
-        *me = FLAG(CH_DUST_ROCK_0);
+        *cur->me = FLAG(CH_DUST_ROCK_0);
         break;
 
     case CH_STAR_FALLING_BOTTOM:
-        *me = FLAG(CH_STAR);
+        *cur->me = FLAG(CH_STAR);
         break;
 
 
     case CH_ROCK:
-        processCharGeoDogeAndRock();
+        processCharGeoDogeAndRock(cur->me);
         break;
 
     case CH_ROCK_FALLING_TOP:
-        *me = FLAG(CH_DUST_ROCK_0);
+        *cur->me = FLAG(CH_DUST_ROCK_0);
         break;
 
     case CH_GEODOGE_FALLING_TOP:
 
-        nDots(3, boardCol, boardRow, PT_TWO, 15, rangeRandom(CHAR_TRIX_X), rangeRandom(CHAR_TRIX_Y), 0, 2);
+        nDots(3, cur->col, cur->row, PT_TWO, 15, rangeRandom(CHAR_TRIX_X), rangeRandom(CHAR_TRIX_Y), 0, 2);
 
-        *me = FLAG(CH_DUST_ROCK_0);
+        *cur->me = FLAG(CH_DUST_ROCK_0);
         break;
 
     case CH_DOGE_SIDE_1:
     case CH_DOGE_SIDE_2:
-        *me = FLAG(CH_BLANK);
+        *cur->me = FLAG(CH_BLANK);
         break;
 
     case CH_DOGE_SIDE_3:
     case CH_DOGE_SIDE_4:
 
-        *me = FLAG(CH_DOGE_FALLING_TOP);
-        *(me + gravity * _1ROW) = FLAG(CH_DOGE_FALLING_BOTTOM);
+        *cur->me = FLAG(CH_DOGE_FALLING_TOP);
+        *(cur->me + gravity * _1ROW) = FLAG(CH_DOGE_FALLING_BOTTOM);
         break;
 
     case CH_DOGE_FALLING_TOP2:
-        *me = FLAG(CH_DOGE_FALLING_TOP);
-        *(me + gravity * _1ROW) = FLAG(CH_DOGE_FALLING_BOTTOM);
+        *cur->me = FLAG(CH_DOGE_FALLING_TOP);
+        *(cur->me + gravity * _1ROW) = FLAG(CH_DOGE_FALLING_BOTTOM);
         break;
 
     case CH_DOGE_FALLING_TOP:
-        *me = FLAG(CH_BLANK);
+        *cur->me = FLAG(CH_BLANK);
         break;
 
     case CH_DOGE_FALLING_BOTTOM:
-        *me = FLAG(CH_DOGE_FALLING);
+        *cur->me = FLAG(CH_DOGE_FALLING);
         break;
 
     case CH_ROCK_FALLING_BOTTOM:
-        *me = FLAG(CH_ROCK_FALLING);
+        *cur->me = FLAG(CH_ROCK_FALLING);
         break;
 
     case CH_GEODOGE_FALLING_BOTTOM:
-        *me = FLAG(CH_GEODOGE_FALLING);
+        *cur->me = FLAG(CH_GEODOGE_FALLING);
         break;
 
     case CH_DOGE_FALLING:
     case CH_ROCK_FALLING:
     case CH_GEODOGE_FALLING: {
 
-        processFallingThings();
+        processFallingThings(cur->me, cur->row, cur->col, creature);
         break;
     }
 
     case CH_DOORCLOSED:
         if (!doges) {
-            *me = CH_DOOROPEN_0;
+            *cur->me = CH_DOOROPEN_0;
             FLASH(0x28, 10);
         }
         break;
 
     case CH_DOOROPEN_0:
         FLASH(0xC4, 10);
-        nDots(2, boardCol, boardRow, PT_TWO, 10, 3, 7, 100, 7);
+        nDots(2, cur->col, cur->row, PT_TWO, 10, 3, 7, 100, 7);
         break;
 
 
@@ -720,7 +726,7 @@ void processCreatures() {
             checkSwipeFinished() &&
 #endif
             (!isScrolling())) {
-            *me = CH_MELLON_HUSK;
+            *cur->me = CH_MELLON_HUSK;
         }
         break;
 
@@ -796,7 +802,7 @@ void restartBoardScan() {
 }
 
 
-void processDoge() {
+void processDoge(unsigned char *me, int row, int col) {
 
     unsigned char *next = me + _1ROW * gravity;
     const unsigned int attrNext = Attribute[CharToType[GET(*next)]];
@@ -807,14 +813,14 @@ void processDoge() {
     }
 
     else if (attrNext & ATT_ROLL)
-        doRoll();
+        doRoll(me, row, col);
 }
 
 
-void processPebble() {
+void processPebble(unsigned char *me, int row, int col) {
 
     // don't form way above player (but DO form 1 above)
-    if (boardCol == playerX && boardRow < playerY - 1)
+    if (col == playerX && row < playerY - 1)
         return;
 
     int chance = 250;
@@ -827,22 +833,21 @@ void processPebble() {
 
     if (!rangeRandom((chance))) {
         *me = FLAG(CH_PEBBLE_ROCK);
-        nDots(10, boardCol, boardRow, PT_SPIRAL, 20, 2, 5, 0x40, 7);
+        nDots(10, col, row, PT_SPIRAL, 20, 2, 5, 0x40, 7);
     }
 }
 
-void processWater() {
+void processWater(unsigned char *me, int row) {
 
-    if ((boardRow - 1) * CHAR_TRIX_Y >= lavaSurfaceTrixel) {
+    if ((row - 1) * CHAR_TRIX_Y >= lavaSurfaceTrixel) {
         unsigned char *neighbour = me + dirOffset[waterDir & 3];
         if (Attribute[CharToType[GET(*neighbour)]] & ATT_DISSOLVES) {
-            // FLASH(0x44, 2);
             *neighbour = CH_DUST_0;
         }
     }
 }
 
-void processWaterFlow() {
+void processWaterFlow(unsigned char *me, int row, int col) {
 
     // Lag the interruption of water flowing downwards
     unsigned char above = *(me - _1ROW);
@@ -851,9 +856,9 @@ void processWaterFlow() {
         return;
     }
 
-    int line = (boardRow + 1) * CHAR_TRIX_Y;
+    int line = (row + 1) * CHAR_TRIX_Y;
     if (line < lavaSurfaceTrixel) {
-        if (boardRow < 20) {
+        if (row < 20) {
 
             unsigned char *next = me + _1ROW * gravity;
             const unsigned int att = Attribute[CharToType[GET(*next)]];
@@ -872,7 +877,7 @@ void processWaterFlow() {
                 } else
 
                     // Water has hit something below
-                    nDots(3, boardCol, boardRow, PT_TWO + PARTICLE_GRAVITY_FLAG, 40, 2 + rangeRandom(3), 11, 100, 7);
+                    nDots(3, col, row, PT_TWO + PARTICLE_GRAVITY_FLAG, 40, 2 + rangeRandom(3), 11, 100, 7);
 #if ENABLE_SHAKE
                 // setShake(20);
 #endif
@@ -881,7 +886,7 @@ void processWaterFlow() {
     }
 }
 
-void processCharBeltAndGrinder() {
+void processCharBeltAndGrinder(unsigned char *me, unsigned char creature) {
 
 
     if (creature == CH_GRINDER_1)
@@ -898,7 +903,7 @@ void processCharBeltAndGrinder() {
     }
 }
 
-void processCharGeoDogeAndRock() {
+void processCharGeoDogeAndRock(unsigned char *me) {
 
     unsigned char *next = me + _1ROW * gravity;
     enum ObjectType typeDown = CharToType[GET(*next)];
@@ -915,7 +920,7 @@ void processCharGeoDogeAndRock() {
     }
 }
 
-void processFallingThings() {
+void processFallingThings(unsigned char *me, int row, int col, unsigned char creature) {
 
     unsigned char *next = me + _1ROW * gravity;
     enum ObjectType typeDown = CharToType[GET(*next)];
@@ -957,11 +962,11 @@ void processFallingThings() {
                     unsigned char *dR = dL + 2;
 
                     if (!CharToType[GET(*dR)]) {
-                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
+                        nDots(4, col, row + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
                     }
 
                     if (!CharToType[GET(*dL)]) {
-                        nDots(4, boardCol, boardRow + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
+                        nDots(4, col, row + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
                     }
                 }
             }
@@ -977,7 +982,7 @@ void processFallingThings() {
             *me = FLAG(CH_BLANK);
             pulsePlayerColour = 5;
             grabDoge();
-            nDots(6, boardCol, boardRow + 1, PT_TWO, 40, 3, 1, 100, 7);
+            nDots(6, col, row + 1, PT_TWO, 40, 3, 1, 100, 7);
         }
 
         else {
@@ -1011,19 +1016,16 @@ void processFallingThings() {
         }
 
         if (creature != CH_DOGE_FALLING && CharToType[creature] != TYPE_GEODOGE_FALLING)
-            nDots(6, boardCol, boardRow, PT_TWO, 20, 2, 10, 60, 7);
-
-        // if (att & ATT_ROLL && creature == CH_DOGE_FALLING)
-        //     doRoll(me, creature);
+            nDots(6, col, row, PT_TWO, 20, 2, 10, 60, 7);
 
         if (sfx && !(att & ATT_NOROCKNOISE))
             ADDAUDIO(sfx);
     }
 }
 
-void genericPush(int offsetX, int offsetY) {
+void genericPush(unsigned char *me, int row, int col, int offsetX, int offsetY) {
 
-    bool atEdge = (boardCol < 3) || (boardCol > 36) || (boardRow < 3) || (boardRow > 18);
+    bool atEdge = (col < 3) || (col > 36) || (row < 3) || (row > 18);
     unsigned char *playerPos = RAM + _BOARD + playerY * _1ROW + playerX;
 
     int adjustOffset = offsetY * _1ROW + offsetX;
@@ -1035,10 +1037,9 @@ void genericPush(int offsetX, int offsetY) {
 
     //??
     if (playerPos == pushPos && (atEdge || !(attPushPosFurther & ATT_PERMEABLE))) {
-        // setShake(20);
         FLASH(0x42, 8);
         startPlayerAnimation(ID_Xray);
-        nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 50, 3, 4, 0x180, 7);
+        nDots(6, col + offsetX, row + offsetY, PT_TWO, 50, 3, 4, 0x180, 7);
     }
 
     const unsigned int attPushPos = Attribute[CharToType[GET(*pushPos)]];
@@ -1071,7 +1072,7 @@ void genericPush(int offsetX, int offsetY) {
 
             //??
             if (!(attPushPos & ATT_PERMEABLE))
-                nDots(6, boardCol + offsetX, boardRow + offsetY, PT_TWO, 150, 3, 4, 0x100, 7);
+                nDots(6, col + offsetX, row + offsetY, PT_TWO, 150, 3, 4, 0x100, 7);
             return;
         }
     }
@@ -1079,7 +1080,7 @@ void genericPush(int offsetX, int offsetY) {
     *me = (*me) + 1;    // reverse
 }
 
-void genericPushReverse(int offsetX, int offsetY) {
+void genericPushReverse(unsigned char *me, int offsetX, int offsetY) {
 
     unsigned char *pushPos = me + offsetY * _BOARD_COLS + offsetX;
     enum ObjectType pushType = CharToType[GET(*pushPos)];
@@ -1094,7 +1095,7 @@ void genericPushReverse(int offsetX, int offsetY) {
 
 const unsigned char thisFrame[] = {0, FLAG_THISFRAME, FLAG_THISFRAME, 0};
 
-void chainReact_GeoDogeToDoge() {
+void chainReact_GeoDogeToDoge(unsigned char *me) {
 
 
     bool ongoing = false;
@@ -1116,7 +1117,7 @@ void chainReact_GeoDogeToDoge() {
         killAudio(SFX_UNCOVER);
 }
 
-void chainReact_Pipe() {
+void chainReact_Pipe(unsigned char *me) {
 
     bool ongoing = false;
     *me = FLAG(CH_DUST_0);
@@ -1138,7 +1139,7 @@ void chainReact_Pipe() {
 }
 
 
-void doRoll() {
+void doRoll(unsigned char *me, int row, int col) {
 
     for (int offset = -1; offset < 2; offset += 2) {
 
@@ -1165,10 +1166,10 @@ void doRoll() {
 
                     int off = offset < 0 ? 4 : 0;
 
-                    nDots(1, boardCol, boardRow, PT_TWO, 15, offset * 2 + off, 4 * gravity, 0, 1);
-                    nDots(1, boardCol, boardRow, PT_TWO, 20, offset * 4 + off, 4 * gravity, 0, 1);
-                    nDots(1, boardCol, boardRow, PT_TWO, 25, offset * 6 + off, 7 * gravity, 0, 1);
-                    nDots(1, boardCol, boardRow, PT_TWO, 30, offset * 7 + off, 10 * gravity, 0, 1);
+                    nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4 * gravity, 0, 1);
+                    nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4 * gravity, 0, 1);
+                    nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7 * gravity, 0, 1);
+                    nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10 * gravity, 0, 1);
 
                     return;
                 }

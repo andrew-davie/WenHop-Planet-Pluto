@@ -6,13 +6,9 @@
 #include "colour.h"
 #include "draw.h"
 #include "drawGridPreview.h"
-#include "grid6.h"
 #include "joystick.h"
 #include "life.h"
 #include "main.h"
-#include "menuCharacterSet.h"
-#include "random.h"
-#include "savekey.h"
 #include "sound.h"
 
 int base2;

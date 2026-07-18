@@ -1,13 +1,9 @@
 
 #include "defines_dasm.h"
 
-#include "caveData.h"
-#include "characterset.h"
-#include "colour.h"
 #include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"
-#include "playerAnimation.h"
 #include "scroll.h"
 
 int scrollX, scrollY;

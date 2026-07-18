@@ -2,7 +2,9 @@
 
 #include <stdbool.h>
 
-void movePlayer(unsigned char *mes);
+#include "board.h"
+
+void movePlayer(BoardCursor *cur);
 void initPlayer();
 void grabDoge();
 void bubbles(int count, int dripX, int dripY, int age, int /*speed*/);

@@ -4,7 +4,7 @@
 
 #include "cdfjplus.h"
 
-#include "characterset.h"
+// #include "characterset.h"
 #include "colour.h"
 #include "main.h"
 #include "random.h"

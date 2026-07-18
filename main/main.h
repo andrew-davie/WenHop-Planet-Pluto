@@ -84,8 +84,6 @@ extern bool showTool;
 
 extern int gameFrame, gameSpeed;
 
-extern unsigned char *me;
-
 extern const signed char dirOffset[];
 extern const signed char xdir[];
 extern const signed char ydir[];

@@ -6,7 +6,6 @@
 #include "cdfjplus.h"
 
 #include "animations.h"
-#include "attribute.h"
 #include "board.h"
 #include "caveData.h"
 #include "colour.h"
@@ -23,7 +22,6 @@
 #include "playerAnimation.h"
 #include "random.h"
 #include "schedule.h"
-#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 #include "swipe.h"

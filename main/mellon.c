@@ -8,7 +8,6 @@
 #include "colour.h"
 #include "decodeCaves.h"
 #include "gameState.h"
-#include "kernels.h"
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"
@@ -239,7 +238,7 @@ const OFFSET *dropOffset[] = {
     dropOffsetLeft,     // left
 };
 
-bool checkHighPriorityMove(int dir) {
+bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
     static int zapDelay = 0;
     if (zapDelay)
@@ -253,7 +252,7 @@ bool checkHighPriorityMove(int dir) {
     if (!kdelay && !waitRelease) {
         if (!(inpt4 & 0x80)) {
 
-            meAtt = me + dirOffset[dir];
+            meAtt = cur->me + dirOffset[dir];
 
             if (attachment) {
 
@@ -305,7 +304,7 @@ bool checkHighPriorityMove(int dir) {
         faceDirection = faceDirectionDef[dir];
     }
 
-    unsigned char *meOffset = me + dirOffset[dir];
+    unsigned char *meOffset = cur->me + dirOffset[dir];
     enum ObjectType destType = CharToType[GET(*meOffset)];
 
     {    // no fire button
@@ -377,7 +376,7 @@ bool checkHighPriorityMove(int dir) {
             playerX += xdir[dir];
             playerY += ydir[dir];
 
-            moveHusk(dir, me, meOffset);
+            moveHusk(dir, cur->me, meOffset);
 
             int dir2 = (gravity < 0) ? dir ^ 2 : dir;
 
@@ -432,7 +431,7 @@ bool checkHighPriorityMove(int dir) {
 
             if (!exitMode) {
 
-                moveHusk(dir, me, meOffset);
+                moveHusk(dir, cur->me, meOffset);
             }
 
             // Fix bar stuff
@@ -468,12 +467,12 @@ bool checkHighPriorityMove(int dir) {
                     };
 
                     for (int d = 0; d < 4; d++) {
-                        if ((ATTRIBUTE_BIT(*(me + dirOffset[d]), ATT_PIPE)) ||
-                            GET(*(me + dirOffset[d])) == CH_MELLON_HUSK)
+                        if ((ATTRIBUTE_BIT(*(cur->me + dirOffset[d]), ATT_PIPE)) ||
+                            GET(*(cur->me + dirOffset[d])) == CH_MELLON_HUSK)
                             udlr |= 1 << d;
                     }
 
-                    *me = udlrChar[udlr];
+                    *cur->me = udlrChar[udlr];
 
                     showTool = true;
                 }
@@ -512,7 +511,7 @@ bool checkHighPriorityMove(int dir) {
     return handled;
 }
 
-bool checkLowPriorityMove(int dir) {
+bool checkLowPriorityMove(BoardCursor *cur, int dir) {
 
     unsigned char joyBit = joyDirectBit[dir] << 4;
     if (usableSWCHA & joyBit) {
@@ -520,7 +519,7 @@ bool checkLowPriorityMove(int dir) {
     }
 
     int offset = dirOffset[dir];
-    unsigned char *meOffset = me + offset;
+    unsigned char *meOffset = cur->me + offset;
     enum ObjectType destType = CharToType[GET(*meOffset)];
 
 #if 1    // disable push
@@ -579,8 +578,8 @@ bool checkLowPriorityMove(int dir) {
             pushCounter = 0;
 
             if (faceDirection > 0) {
-                me += 2;
-                boardCol += 2;    // SKIP processing it!
+                cur->me += 2;
+                cur->col += 2;    // SKIP processing it!
             }
         }
 
@@ -606,7 +605,7 @@ void bubbles(int count, int dripX, int dripY, int age, int /*speed*/) {
 }
 
 
-void movePlayer(unsigned char *me) {
+void movePlayer(BoardCursor *cur) {
 
     if (kdelay)
         --kdelay;
@@ -660,11 +659,11 @@ void movePlayer(unsigned char *me) {
 
 
     for (int dir = 0; dir < 4; dir++)
-        if (checkHighPriorityMove(dir))
+        if (checkHighPriorityMove(cur, dir))
             return;
 
     for (int dir = 0; dir < 4 && !handled; dir++)
-        if (checkLowPriorityMove(dir))
+        if (checkLowPriorityMove(cur, dir))
             return;
 
     // switch back to standing facing forward, turning if required
@@ -684,7 +683,7 @@ void movePlayer(unsigned char *me) {
     // after all movement checked, anything falling on player?
     // potential bug - if you're pushing and something falls on you
 
-    if (Attribute[CharToType[*(me - _1ROW * gravity)]] & ATT_CRUSHES) {
+    if (Attribute[CharToType[*(cur->me - _1ROW * gravity)]] & ATT_CRUSHES) {
         startPlayerAnimation(ID_Die);
         return;
     }

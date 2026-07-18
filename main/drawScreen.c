@@ -16,7 +16,6 @@
 #include "decodeCaves.h"
 #include "main.h"
 #include "reverseBits.h"
-#include "score.h"
 #include "scroll.h"
 
 extern int roller;

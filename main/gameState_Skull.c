@@ -4,12 +4,10 @@
 
 #include "bitPatterns.h"
 #include "colour.h"
-#include "draw.h"
 #include "gameState.h"
 #include "joystick.h"
 #include "main.h"
 #include "random.h"
-#include "rasterBleed.h"
 #include "reverseBits.h"
 #include "scroll.h"
 #include "sound.h"

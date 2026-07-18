@@ -2,14 +2,11 @@
 
 #include "cdfjplus.h"
 #include "main.h"
-#include "sound.h"
 
 #include "colour.h"
 #include "draw.h"
 #include "gameState.h"
-#include "grid6.h"
 #include "joystick.h"
-#include "random.h"
 #include "rasterBleed.h"
 
 
