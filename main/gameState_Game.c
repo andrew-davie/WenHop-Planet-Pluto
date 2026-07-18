@@ -24,7 +24,6 @@
 #include "schedule.h"
 #include "scroll.h"
 #include "sound.h"
-#include "swipe.h"
 #include "wyrm.h"
 
 int attachment = 0;

@@ -9,14 +9,13 @@ KNO                 SET KNO + 1
     ENDM
 
     KERNEL DETECT_CONSOLE       ; 0
-    KERNEL RAINBOW              ; 1
-    KERNEL COPYRIGHT            ; 2
-    KERNEL COUCH_COMPLIANT      ; 3
-    KERNEL MENU                 ; 4
-    KERNEL GAME                 ; 5
-    KERNEL SKULL                ; 6
-    KERNEL GLOBE                ; 7
-    KERNEL RASTER_BLEED         ; 8
+    KERNEL COPYRIGHT            ; 1
+    KERNEL COUCH_COMPLIANT      ; 2
+    KERNEL MENU                 ; 3
+    KERNEL GAME                 ; 4
+    KERNEL SKULL                ; 5
+    KERNEL GLOBE                ; 6
+    KERNEL RASTER_BLEED         ; 7
     KERNEL MAX
 
 
@@ -29,7 +28,6 @@ kernelBank_L
 .START
                     ; >>> kernel
                     .byte <BANK_kernelDetectConsole     ; 0 KERNEL_DETECT_CONSOLE
-                    .byte <BANK_kernelRainbow           ; 1 KERNEL_RAINBOW
                     .byte <BANK_kernelCopyright         ; 2 KERNEL_COPYRIGHT
                     .byte <BANK_kernelCopyright         ; 3 KERNEL_COUCH_COMPLIANT (re-uses COPYRIGHT)
                     .byte <BANK_kernelMenu              ; 4 KERNEL_MENU
@@ -40,7 +38,6 @@ kernelBank_L
 
                     ; >>> VB
                     .byte <BANK_kernelDetectConsole
-                    .byte <BANK_kernelRainbow
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelMenu
@@ -51,7 +48,6 @@ kernelBank_L
 
                     ; >>> OS
                     .byte <BANK_kernelDetectConsole
-                    .byte <BANK_kernelRainbow
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelCopyright
                     .byte <BANK_kernelMenu
@@ -63,7 +59,6 @@ kernelBank_L
 
 kernelRoutine_L
                     .byte <kernelDetectConsole
-                    .byte <kernelRainbow
                     .byte <kernelCopyright
                     .byte <kernelCopyright
                     .byte <kernelMenu
@@ -73,7 +68,6 @@ kernelRoutine_L
                     .byte <kernelCopyright
 
                     .byte <VB_kernelDetectConsole
-                    .byte <VB_kernelRainbow
                     .byte <VB_kernelCopyright
                     .byte <VB_kernelCopyright
                     .byte <VB_kernelMenu
@@ -83,7 +77,6 @@ kernelRoutine_L
                     .byte <VB_kernelCopyright
 
                     .byte <OS_kernelDetectConsole
-                    .byte <OS_kernelRainbow
                     .byte <OS_kernelCopyright
                     .byte <OS_kernelCopyright
                     .byte <OS_kernelMenu
@@ -94,7 +87,6 @@ kernelRoutine_L
 
 kernelRoutine_H
                     .byte >kernelDetectConsole
-                    .byte >kernelRainbow
                     .byte >kernelCopyright
                     .byte >kernelCopyright
                     .byte >kernelMenu
@@ -104,7 +96,6 @@ kernelRoutine_H
                     .byte >kernelCopyright
 
                     .byte >VB_kernelDetectConsole
-                    .byte >VB_kernelRainbow
                     .byte >VB_kernelCopyright
                     .byte >VB_kernelCopyright
                     .byte >VB_kernelMenu
@@ -114,7 +105,6 @@ kernelRoutine_H
                     .byte >VB_kernelCopyright
 
                     .byte >OS_kernelDetectConsole
-                    .byte >OS_kernelRainbow
                     .byte >OS_kernelCopyright
                     .byte >OS_kernelCopyright
                     .byte >OS_kernelMenu

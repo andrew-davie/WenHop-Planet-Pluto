@@ -83,18 +83,6 @@ _BUFFERS = *
 
 ;-------------------------------------------------------------------------------
 
-    SEG.U GS_RAINBOW
-    ORG _BUFFERS
-
-    DEFBUF 2, RB_JUMP
-    DEFBUF 1, RB_COLUBK
-
-    if * > END_BUFFERS
-END_BUFFERS SET *
-    endif
-
-;-------------------------------------------------------------------------------
-
     SEG.U GS_COPYRIGHT
     ORG _BUFFERS
 

@@ -104,7 +104,6 @@ SRCS = \
  gameState_DetectConsole.c \
  gameState_Game.c \
  gameState_Menu.c \
- gameState_Rainbow.c \
  gameState_Skull.c \
  gameState_Globe.c \
  gameState_RasterBleed.c \

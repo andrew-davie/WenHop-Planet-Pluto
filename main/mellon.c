@@ -4,7 +4,6 @@
 #include "attribute.h"
 #include "board.h"
 #include "caveData.h"
-#include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
 #include "gameState.h"
@@ -558,8 +557,8 @@ bool checkLowPriorityMove(BoardCursor *cur, int dir) {
 
                     ADDAUDIO(SFX_ROCK);
 
-                    nDots(10, playerX, playerY, PT_ONE, 30, xOffset[dir] + CHAR_CENTER_X,
-                          yOffset[dir] + CHAR_CENTER_Y, 40, 2);
+                    nDots(10, playerX, playerY, PT_ONE, 30, xOffset[dir] + CHAR_CENTER_X, yOffset[dir] + CHAR_CENTER_Y,
+                          40, 2);
                 } else {
                     ADDAUDIO(SFX_DOGE);
 

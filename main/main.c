@@ -1,17 +1,9 @@
-/******************************************************************************
-CDFJ+ Project Framework
-Gamax Software 2026 - Craig Daniels
-******************************************************************************/
 
 #include <stdbool.h>
 
-#include "defines_dasm.h"    // defines_dasm.h MUST come before defines_cdfjplus.h
+#include "defines_dasm.h"
 
-// MUST have whitespace here, otherwise auto-code formatters will change
-// the order of the includes, causing a symbol not defined error.
-
-#include "cdfjplus.h"    // <- contains references from defines_dasm.h
-// #include "tia_constants_c.h"
+#include "cdfjplus.h"
 
 #include "main.h"
 
@@ -235,7 +227,6 @@ void (*const initialiseGameState[GS_MAX])() = {
     Null,                            // 0
     initGameState_DetectConsole,     // 1  GS_DETECT_CONSOLE
     initGameState_Copyright,         // 2  GS_COPYRIGHT
-    initGameState_Rainbow,           // 3  GS_RAINBOW
     initGameState_CouchCompliant,    // 4  GS_COUCH_COMPLIANT
     initGameState_Menu,              // 5  GS_MENU
     initGameState_Game,              // 6  GS_GAME
@@ -247,7 +238,6 @@ void (*const initialiseGameState[GS_MAX])() = {
 void (*const initialiseKernel[_KERNEL_MAX])() = {
 
     initKernel_DetectConsole,     // 0
-    initKernel_Rainbow,           // 1
     initKernel_Copyright,         // 2
     initKernel_CouchCompliant,    // 3
     initKernel_Menu,              // 4
@@ -338,13 +328,12 @@ void (*const verticalBlank[GS_MAX])() = {
     Null,                 // 0
     VB_DetectConsole,     // 1
     VB_Copyright,         // 2
-    VB_Rainbow,           // 3
-    VB_CouchCompliant,    // 4
-    VB_Menu,              // 5
-    VB_Game,              // 6
-    VB_Skull,             // 7
-    VB_Globe,             // 8
-    VB_RasterBleed,       // 9
+    VB_CouchCompliant,    // 3
+    VB_Menu,              // 4
+    VB_Game,              // 5
+    VB_Skull,             // 6
+    VB_Globe,             // 7
+    VB_RasterBleed,       // 8
 };
 
 void runARM_VerticalBlank() {
@@ -364,13 +353,12 @@ void (*const overscan[GS_MAX])() = {
     Null,                 // 0
     OS_DetectConsole,     // 1  GS_DETECT_CONSOLE
     OS_Copyright,         // 2  GS_COPYRIGHT
-    OS_Rainbow,           // 3  GS_RAINBOW
-    OS_CouchCompliant,    // 4  GS_COUCH_COMPLIANT
-    OS_Menu,              // 5  GS_MENU
-    OS_Game,              // 6  GS_GAME
-    OS_Skull,             // 7  GS_SKULL
-    OS_Globe,             // 8  GS_GLOBE
-    OS_RasterBleed,       // 9 GS_RASTER_BLEED
+    OS_CouchCompliant,    // 3  GS_COUCH_COMPLIANT
+    OS_Menu,              // 4  GS_MENU
+    OS_Game,              // 5  GS_GAME
+    OS_Skull,             // 6  GS_SKULL
+    OS_Globe,             // 7  GS_GLOBE
+    OS_RasterBleed,       // 8 GS_RASTER_BLEED
 };
 
 int whichKernel[GS_MAX] = {
@@ -378,13 +366,12 @@ int whichKernel[GS_MAX] = {
     0,                         // 0
     _KERNEL_DETECT_CONSOLE,    // 1 GS_DETECT_CONSOLE
     _KERNEL_COPYRIGHT,         // 2 GS_COPYRIGHT
-    _KERNEL_RAINBOW,           // 3 GS_RAINBOW
-    _KERNEL_COPYRIGHT,         // 4 GS_COUCH_COMPLIANT (re-used COPYRIGHT)
-    _KERNEL_MENU,              // 5 GS_MENU
-    _KERNEL_GAME,              // 6 GS_GAME
-    _KERNEL_SKULL,             // 7 GS_SKULL
-    _KERNEL_GLOBE,             // 8 GS_GLOBE
-    _KERNEL_COPYRIGHT,         // 9 GS_RASTER_BLEED
+    _KERNEL_COPYRIGHT,         // 3 GS_COUCH_COMPLIANT (re-used COPYRIGHT)
+    _KERNEL_MENU,              // 4 GS_MENU
+    _KERNEL_GAME,              // 5 GS_GAME
+    _KERNEL_SKULL,             // 6 GS_SKULL
+    _KERNEL_GLOBE,             // 7 GS_GLOBE
+    _KERNEL_COPYRIGHT,         // 8 GS_RASTER_BLEED
 };
 
 int intim;

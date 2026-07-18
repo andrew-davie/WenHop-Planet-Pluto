@@ -8,21 +8,16 @@ enum GAME_STATE {
     GS_NULL,               // 0
     GS_DETECT_CONSOLE,     // 1
     GS_COPYRIGHT,          // 2
-    GS_RAINBOW,            // 3
-    GS_COUCH_COMPLIANT,    // 4
-    GS_MENU,               // 5
-    GS_GAME,               // 6
-    GS_SKULL,              // 7
-    GS_GLOBE,              // 8
-    GS_RASTER_BLEED,       // 9
+    GS_COUCH_COMPLIANT,    // 3
+    GS_MENU,               // 4
+    GS_GAME,               // 5
+    GS_SKULL,              // 6
+    GS_GLOBE,              // 7
+    GS_RASTER_BLEED,       // 8
 
     GS_MAX
 
 };
-
-void initGameState_Rainbow();
-void VB_Rainbow();
-void OS_Rainbow();
 
 void initGameState_Copyright();
 void VB_Copyright();

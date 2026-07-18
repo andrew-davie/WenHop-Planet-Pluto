@@ -17,9 +17,6 @@ BANK0_START
 BANK_kernelDetectConsole = BANK0
     include "kernels/kernel_DetectConsole.asm"
 
-BANK_kernelRainbow = BANK0
-    include "kernels/kernel_Rainbow.asm"
-
 ;-------------------------------------------------------------------------------
 
     CHECK_OVERFLOW 0, $FF0

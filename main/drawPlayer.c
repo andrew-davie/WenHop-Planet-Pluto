@@ -5,7 +5,7 @@
 
 #include "cdfjplus.h"
 
-#include "characterset.h"
+// #include "characterset.h"
 
 #include "main.h"
 

@@ -424,15 +424,14 @@ void setInsulator(unsigned char *p, int row, int col) {
 
             if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES)) {
                 *p = CH_ELECTRIC_0;
-                nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
                 return;
             }
 
             if (att & ATT_BLANK) {
 
                 if (ch >= CH_ELECTRIC_H0 && ch <= CH_ELECTRIC_H3) {
-                    *p = FLAG(CH_CROSSED_STREAMS);
-                    nDots(5, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
+                    *p = CH_CROSSED_STREAMS;
                 }
 
                 else {
@@ -446,9 +445,14 @@ void setInsulator(unsigned char *p, int row, int col) {
             else if (type2 == TYPE_ROCK_BONUS) {
 
                 *p = FLAG(CH_STAR);
-                nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
                 return;
             }
+
+
+            // if (*p == CH_CROSSED_STREAMS)
+            //     nDots(3, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 2);
+
             p += _1ROW;
         }
     }
@@ -469,15 +473,14 @@ void setInsulatorHoriz(unsigned char *p, int row, int col) {
 
 
             *p = CH_ELECTRIC_H0;
-            nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+            // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
             return;
         }
 
         if (att & ATT_BLANK) {
 
             if (ch >= CH_ELECTRIC_0 && ch <= CH_ELECTRIC_3) {
-                *p = FLAG(CH_CROSSED_STREAMS);
-                nDots(5, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
+                *p = CH_CROSSED_STREAMS;
             }
 
             else if (type2 != TYPE_ELECTRIC)
@@ -488,8 +491,13 @@ void setInsulatorHoriz(unsigned char *p, int row, int col) {
         else if (type2 == TYPE_ROCK_BONUS) {
 
             *p = FLAG(CH_STAR);
-            nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+            // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
             return;
+        }
+
+
+        if (*p == CH_CROSSED_STREAMS) {
+            nDots(5, col, row, PT_SPIRAL2, 25, CHAR_CENTER_X + 1, CHAR_CENTER_Y, 10 + rangeRandom(20), rangeRandom(7)+1;
         }
         p++;
     }
