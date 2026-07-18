@@ -11,18 +11,17 @@
 #include "savekey.h"
 #include "scroll.h"
 
-unsigned char bgPalette[_BOARD_ROWS];
-unsigned char fgPalette[2];
+static unsigned char bgPalette[_BOARD_ROWS];
+static unsigned char fgPalette[2];
 
 static int lastPfCharLine;
 static int lastBgCharLine;
-int currentPalette;
+static int currentPalette;
 int luminance;
 int lumTarget = 0;
 
-int flashTime = 1;
+static int flashTime = 1;
 
-int openSlot;
 int roller;
 
 

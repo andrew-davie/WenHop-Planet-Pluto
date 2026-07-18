@@ -25,8 +25,4 @@ void initStarSwipe();
 void clearMask(int v);
 
 int abs(int value);
-extern bool swipeComplete;
-
-extern enum SWIPE swipeType;
-extern enum CIRCLEPHASE swipePhase;
 #endif

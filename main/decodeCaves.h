@@ -47,9 +47,6 @@ enum DECODE_STATE {
     DECODE_FLASH,
 };
 
-extern enum DECODE_STATE decodeState;
-extern int decodingRow;
-extern const unsigned char *theCaveData;
 extern int totalDogePossible;
 
 // EOF

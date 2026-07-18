@@ -10,27 +10,27 @@
 
 #include "swipe.h"
 
-unsigned char swipeMask[6][SCREEN_TRIX_Y];
+static unsigned char swipeMask[6][SCREEN_TRIX_Y];
 
 bool drawMaskBit(int x, int y);
 void generateStar();
 bool star();
 void initStar(int x, int y);
 
-short starX[10];
-short starY[10];
+static short starX[10];
+static short starY[10];
 
-int swipeRadius;    // 24.8
-int swipeStep;      // 24.8
+static int swipeRadius;    // 24.8
+static int swipeStep;      // 24.8
 
-int swipeCenterX;
-int swipeCenterY;
-int circleX, circleY, circleDelta;
-bool swipeComplete;
-bool swipeVisible;
+static int swipeCenterX;
+static int swipeCenterY;
+static int circleX, circleY, circleDelta;
+static bool swipeComplete;
+static bool swipeVisible;
 
-enum CIRCLEPHASE swipePhase;
-enum SWIPE swipeType;
+static enum CIRCLEPHASE swipePhase;
+static enum SWIPE swipeType;
 
 
 enum PHASE {
@@ -44,14 +44,12 @@ enum PHASE {
     PHASE_END = 5
 };
 
-enum PHASE exitPhase;
+static enum PHASE exitPhase;
 
 
 void applySwipeMask() {
 
     if (!swipeComplete || exitPhase == PHASE_END) {    //! swipeComplete || triggerNextLife) {
-
-        //        FLASH(0xD2, 10);
 
         unsigned char *p = RAM + _BUF_PF0_LEFT;
         for (int col = 0; col < 6; col++)

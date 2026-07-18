@@ -42,8 +42,6 @@ extern const int AnimationIndex[];
 
 extern enum AnimationIdent playerAnimationID;
 extern const signed char *playerAnimation;
-extern const signed char *playerAnimationLoop;
-extern unsigned int playerAnimationCount;
 
 void processAnimationCommand();
 void updatePlayerAnimation();

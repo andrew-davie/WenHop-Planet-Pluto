@@ -21,7 +21,7 @@
 #define _BUF_CC_GRP _BUF_COPYRIGHT_GRP
 #define _BUF_CC_PF _BUF_COPYRIGHT_PF
 
-int colx;
+static int colx;
 
 
 void initKernel_CouchCompliant() {

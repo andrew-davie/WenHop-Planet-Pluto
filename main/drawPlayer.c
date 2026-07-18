@@ -27,8 +27,8 @@
 
 static int playerSpriteY;
 
-unsigned char playerBaseColour[16];
-unsigned char postProcessPlayerColours[16];
+static unsigned char playerBaseColour[16];
+static unsigned char postProcessPlayerColours[16];
 
 static const unsigned char playerColour[] = {
 

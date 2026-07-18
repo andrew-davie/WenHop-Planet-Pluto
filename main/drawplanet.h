@@ -7,7 +7,6 @@
 
 extern int scalex;
 extern int planetDir;
-extern int rotationAccel;
 
 void drawPlanet(int half);
 void initPlanet(int planet);

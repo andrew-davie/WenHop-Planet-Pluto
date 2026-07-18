@@ -3,7 +3,7 @@
 
 
 const unsigned char *Animate[TYPE_MAX];
-char AnimCount[TYPE_MAX];
+static char AnimCount[TYPE_MAX];
 
 // clang-format off
 

@@ -10,7 +10,6 @@
 extern const unsigned char *const AnimateBase[];
 extern const unsigned char PickupCharacter[];
 extern const unsigned char *Animate[];
-extern char AnimCount[];
 
 void initCharAnimations();
 void startCharAnimation(int type, const unsigned char *idx);

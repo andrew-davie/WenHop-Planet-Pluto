@@ -43,7 +43,7 @@ static int pif;
 static int lines;
 static int pa_lines;
 static int infoPhase;
-int wait;
+static int wait;
 static int planet = -1;
 static bool finished;
 
@@ -265,7 +265,7 @@ void drawPaletteGlobe(const unsigned char *palette) {
 
 #include "planetHuffman.h"
 
-char huffBuff[PHRASE_BUF_SIZE];
+static char huffBuff[PHRASE_BUF_SIZE];
 
 #else /* unencoded */
 
@@ -276,7 +276,7 @@ char huffBuff[PHRASE_BUF_SIZE];
 #endif
 
 
-bool seen[PHRASE_COUNT];
+static bool seen[PHRASE_COUNT];
 
 
 const char *review[] = {
@@ -316,9 +316,6 @@ void VB_Globe() {
     drawPlanet(5);
     drawStars();
 
-
-    //    life(1);
-
     static int nsv = VOLUME_PLAYING;
 
     if (!rangeRandom(100))
@@ -341,7 +338,6 @@ void OS_Globe() {
     adjustLuminance(1);
 
     drawPlanet(0);
-    //    drawGridPreview();
 
     if (!drawNextChar() && --wait < 0) {
 

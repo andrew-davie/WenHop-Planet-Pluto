@@ -22,8 +22,6 @@ extern const OFFSET *attachmentOffset;
 extern int frameAdjustX;
 extern int frameAdjustY;
 
-extern unsigned int pushCounter;
-
 enum JOYSTICK_DIRECTION {
     JOYSTICK_UP = 1,
     JOYSTICK_DOWN = 2,

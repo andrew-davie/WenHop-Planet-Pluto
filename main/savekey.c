@@ -8,12 +8,12 @@
 
 enum CC saveKeyEnableICC;
 
-unsigned char saveKeyUnlocked[SAVEKEY_SIZE];
-unsigned char saveKeySolved[SAVEKEY_SIZE];
-unsigned char saveKeyPerfect[SAVEKEY_SIZE];
+static unsigned char saveKeyUnlocked[SAVEKEY_SIZE];
+static unsigned char saveKeySolved[SAVEKEY_SIZE];
+static unsigned char saveKeyPerfect[SAVEKEY_SIZE];
 
-int unlockedStart;
-int unlockedEnd;
+static int unlockedStart;
+static int unlockedEnd;
 
 void setUnlockStatus(int lot) {
     int l = (lot >> 3);

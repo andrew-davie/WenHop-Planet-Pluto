@@ -17,7 +17,7 @@
 #include "scroll.h"
 #include "sound.h"
 
-unsigned int weaponLength = 0;
+static unsigned int weaponLength = 0;
 
 #define TOOL_MAX 60
 
@@ -121,7 +121,7 @@ void modifyCharAtTip(int x, int y) {
     }
 }
 
-const int PIXEL_ASPECT = 110;
+static const int PIXEL_ASPECT = 110;
 
 unsigned char turn_toward(unsigned char current, unsigned char target, unsigned char speed) {
     if (current == target)
@@ -196,9 +196,9 @@ void drawMace() {
     // Weapon runs randomly if player not locked
     // Otherwise direction controls it
     int hard = 0;
-    static const int xy[] = {1, -1, _1ROW, -_1ROW};
+    static const int xy[] = {1, -1, _BOARD_COLS, -_BOARD_COLS};
 
-    unsigned char *man = RAM + _BOARD + playerY * _1ROW + playerX;
+    unsigned char *man = RAM + _BOARD + playerY * _BOARD_COLS + playerX;
     for (int dir = 0; dir < 4; dir++) {
         unsigned char type = CharToType[GET(*(man + xy[dir]))];
         if (type == TYPE_OUTBOX || Attribute[CharToType[GET(*(man + xy[dir]))]] & ATT_HARD)
@@ -385,8 +385,8 @@ void drawRope() {
 }
 
 struct Particle particle[PARTICLE_COUNT];
-int particleStack[PARTICLE_COUNT];
-int particleStackPointer;
+static int particleStack[PARTICLE_COUNT];
+static int particleStackPointer;
 
 int pushParticle(int prt) {
     particleStack[particleStackPointer++] = prt;

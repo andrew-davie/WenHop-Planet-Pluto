@@ -9,7 +9,7 @@
 #define DETECT_FRAME_COUNT 10
 
 
-int detectionFrame;
+static int detectionFrame;
 
 
 const struct fmt {

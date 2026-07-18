@@ -27,7 +27,7 @@ int actualScore;
 int partialScore;
 static int forceScoreDraw;
 
-enum SCORE_MODE scoreCycle;
+static enum SCORE_MODE scoreCycle;
 
 static unsigned char scoreLineNew[10];
 static unsigned char scoreLineColour[10];

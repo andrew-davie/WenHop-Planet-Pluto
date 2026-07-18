@@ -454,8 +454,8 @@ _Static_assert(sizeof(AnimationVector) / sizeof(AnimationVector[0]) == ID_MAX, "
 
 enum AnimationIdent playerAnimationID = ID_Stand;
 const signed char *playerAnimation = AnimationDefault;
-const signed char *playerAnimationLoop = AnimationDefault;
-unsigned int playerAnimationCount = 0;
+static const signed char *playerAnimationLoop = AnimationDefault;
+static unsigned int playerAnimationCount = 0;
 
 // #define HAIR 0x28
 // #define SKIN 0x46

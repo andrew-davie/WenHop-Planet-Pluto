@@ -30,7 +30,7 @@ const unsigned char wyrmChar[] = {
     0,                    // 15
 };
 
-struct wyrmDetails wyrms[WYRM_POP];
+static struct wyrmDetails wyrms[WYRM_POP];
 
 void initWyrms() {
     for (int i = 0; i < WYRM_POP; i++)
@@ -81,7 +81,7 @@ void processWyrms() {
         int candidateX = x + xdir[wyrm->dir];
         int candidateY = y + ydir[wyrm->dir];
 
-        unsigned char *newHead = RAM + _BOARD + candidateY * _1ROW + candidateX;
+        unsigned char *newHead = RAM + _BOARD + candidateY * _BOARD_COLS + candidateX;
 
         int mask = ATT_BLANK | ATT_GRAB;
         enum ObjectType whatsThere = CharToType[GET(*newHead)];
@@ -94,7 +94,7 @@ void processWyrms() {
             candidateX = x + xdir[wyrm->dir];
             candidateY = y + ydir[wyrm->dir];
 
-            newHead = RAM + _BOARD + candidateY * _1ROW + candidateX;
+            newHead = RAM + _BOARD + candidateY * _BOARD_COLS + candidateX;
             whatsThere = CharToType[GET(*newHead)];
             if (Attribute[whatsThere] & mask) {
                 moveable = true;
@@ -109,7 +109,7 @@ void processWyrms() {
 
             if (wyrm->head > 2 /* && (gameFrame & 1)*/) {
 
-                unsigned char *segment = RAM + _BOARD + wyrm->y[0] * 40 + wyrm->x[0];
+                unsigned char *segment = RAM + _BOARD + wyrm->y[0] * _BOARD_COLS + wyrm->x[0];
                 *segment = CH_DUST_ROCK_0;
 
                 for (int i = 0; i < WYRM_MAX - 1; i++) {
@@ -146,7 +146,7 @@ void processWyrms() {
 
                           dirFromCoords(wyrm->x[headPos - 1], wyrm->y[headPos - 1], wyrm->x[headPos], wyrm->y[headPos]);
 
-                segment = RAM + _BOARD + wyrm->y[headPos] * _1ROW + wyrm->x[headPos];
+                segment = RAM + _BOARD + wyrm->y[headPos] * _BOARD_COLS + wyrm->x[headPos];
                 *segment = wyrmChar[dir];
             }
 
@@ -154,7 +154,7 @@ void processWyrms() {
 
                 if (true /*tmp*/ || !(Attribute[whatsThere] & (ATT_WATERFLOW | ATT_GRAB)) ||
                     wyrm->length > WYRM_MAX - 2) {
-                    unsigned char *tailPos = RAM + _BOARD + wyrm->y[0] * _1ROW + wyrm->x[0];
+                    unsigned char *tailPos = RAM + _BOARD + wyrm->y[0] * _BOARD_COLS + wyrm->x[0];
 
                     *tailPos = CH_BLANK;    // CH_DUST_ROCK_0;
 
@@ -182,7 +182,7 @@ void processWyrms() {
 
             wyrm->head = headPos;
 
-            segment = RAM + _BOARD + candidateY * 40 + candidateX;
+            segment = RAM + _BOARD + candidateY * _BOARD_COLS + candidateX;
 
             if (TYPEOF(*segment) == TYPE_DOGE)
                 nDots(4, candidateX, candidateY, PT_TWO, 50, 3, 0, 100, 7);
@@ -192,7 +192,7 @@ void processWyrms() {
 
         if (headPos) {
 
-            unsigned char *tailPos = RAM + _BOARD + wyrm->y[0] * _1ROW + wyrm->x[0];
+            unsigned char *tailPos = RAM + _BOARD + wyrm->y[0] * _BOARD_COLS + wyrm->x[0];
 
             unsigned char tail = CH_WYRM_TAIL_R;
             if (wyrm->y[1] > wyrm->y[0])
@@ -216,7 +216,7 @@ void processWyrms() {
             else if (wyrm->y[headPos] > wyrm->y[headPos - 1])
                 headChar = CH_WYRM_HEAD_D;
 
-            unsigned char *head = RAM + _BOARD + wyrm->y[headPos] * _1ROW + wyrm->x[headPos];
+            unsigned char *head = RAM + _BOARD + wyrm->y[headPos] * _BOARD_COLS + wyrm->x[headPos];
             *head = headChar;
         }
 

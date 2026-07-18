@@ -16,18 +16,18 @@
 void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument);
 void processMusic();
 
-const unsigned char trackGridLockBase2[];
-const unsigned char trackGridLockMelodyIntro[];
-const unsigned char trackGridLockBase[];
-const unsigned char trackTrophy1[];
-const unsigned char trackTrophy2[];
+static const unsigned char trackGridLockBase2[];
+static const unsigned char trackGridLockMelodyIntro[];
+static const unsigned char trackGridLockBase[];
+static const unsigned char trackTrophy1[];
+static const unsigned char trackTrophy2[];
 
 int sound_volume = 128;
 int sound_max_volume = 768;
-int volume[2];
+static int volume[2];
 
 struct Audio sfx[CONCURRENT_SFX];
-struct trackInfo music[MUSIC_MAX];
+static struct trackInfo music[MUSIC_MAX];
 
 
 const unsigned char sampleTick[] = {
@@ -459,7 +459,7 @@ void playAudio() {
 // clang-format off
 
 
-const unsigned char trackTrophy1[] = {
+static const unsigned char trackTrophy1[] = {
 
     HALFNOTE
     c5  e5  g5
@@ -477,7 +477,7 @@ const unsigned char trackTrophy1[] = {
 };
 
 
-const unsigned char trackTrophy2[] = {
+static const unsigned char trackTrophy2[] = {
 
     FULLNOTE
 
@@ -508,7 +508,7 @@ const unsigned char trackGridLockMelody2[] = {
     TRACK_LOOP
 };
 
-const unsigned char trackGridLockBase2[] = {
+static const unsigned char trackGridLockBase2[] = {
     FULLNOTE
     c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
     c2 c2 e3 e3 g3 g3 c3 c3
@@ -525,7 +525,7 @@ const unsigned char trackGridLockBase2[] = {
     TRACK_LOOP
 };
 
-const unsigned char trackGridLockMelodyIntro[] = {
+static const unsigned char trackGridLockMelodyIntro[] = {
     FULLNOTE
     c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4 g3 b3
     d4 a3 c4 e4 b3 d4 f4 c3 e3 g3 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4
@@ -533,7 +533,7 @@ const unsigned char trackGridLockMelodyIntro[] = {
     TRACK_LOOP
 };
 
-const unsigned char trackGridLockBase[] = {
+static const unsigned char trackGridLockBase[] = {
     FULLNOTE
     c2 c2 g3 g3 a2_SHARP a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 c2 c2 g3 g3 a2_SHARP
     a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 f2 f2 c3 c3 g3 g3 d3 d3 a2_SHARP a2_SHARP

@@ -95,8 +95,6 @@ struct trackInfo {
 #define VOLUME_PLAYING 600
 #define VOLUME_MAX 1024
 
-extern struct trackInfo music[MUSIC_MAX];
-
 extern int sound_volume;
 extern int sound_max_volume;
 

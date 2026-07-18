@@ -37,8 +37,6 @@ void setShake(int time) {
 
 #define INTIM_TO_ARM_CYCLES 3749 /* INTIM * 64 / 76 * 4452 */
 
-int usedSolves;
-int whichLot;
 int tvSystem;
 int armFrequency;    // 60 or 70
 int armCycles;
@@ -52,7 +50,6 @@ bool showWater;
 bool showLava;
 
 int cave;
-bool caveCompleted;
 unsigned char bufferedSWCHA;
 unsigned int usableSWCHA;
 unsigned int inhibitSWCHA;
@@ -123,14 +120,14 @@ const int yInc[] = {
 };
 
 
-const signed char dirOffset[] = {-_1ROW, 1, _1ROW, -1, 0};
+const signed char dirOffset[] = {-_BOARD_COLS, 1, _BOARD_COLS, -1, 0};
 const signed char xdir[] = {0, 1, 0, -1, 0};
 const signed char ydir[] = {-1, 0, 1, 0, 0};
 
 
-enum GAME_STATE gameState, nextGameState;
+static enum GAME_STATE gameState, nextGameState;
 
-unsigned char kernel, nextKernel;    // use _KERNEL_* values from 6502
+unsigned char kernel;    // use _KERNEL_* values from 6502
 unsigned char colubk;
 
 void Null();    // empty function, for any use
@@ -211,7 +208,7 @@ unsigned char input_repeat[12] = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
 
 // internal control handling variables - no need for direct user access
 unsigned short input_counter[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned short input_target[12];
+static unsigned short input_target[12];
 
 
 //------------------------------------------------------------------------------
@@ -373,8 +370,6 @@ int whichKernel[GS_MAX] = {
     _KERNEL_GLOBE,             // 7 GS_GLOBE
     _KERNEL_COPYRIGHT,         // 8 GS_RASTER_BLEED
 };
-
-int intim;
 
 
 void runARM_Overscan() {

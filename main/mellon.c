@@ -20,13 +20,13 @@ int playerY;    // char pos 0-21 (use *10 for pixel and then *3 for scanline)
 
 int frameAdjustX;
 int frameAdjustY;
-unsigned int pushCounter;
+static unsigned int pushCounter;
 enum FaceDirectionX faceDirection;
 bool playerDead;
-int waitForNothing;
+static int waitForNothing;
 bool handled;
-bool gearsActive;
-bool gearsWaitRelease;
+static bool gearsActive;
+static bool gearsWaitRelease;
 static int kdelay = 0;
 
 static unsigned char *meAtt;
@@ -102,7 +102,7 @@ void grabDoge() {
     --doges;
 }
 
-int playerSlow = 0;
+static int playerSlow = 0;
 
 
 void moveHusk(int dir, unsigned char *me, unsigned char *meOffset) {
@@ -682,7 +682,7 @@ void movePlayer(BoardCursor *cur) {
     // after all movement checked, anything falling on player?
     // potential bug - if you're pushing and something falls on you
 
-    if (Attribute[CharToType[*(cur->me - _1ROW * gravity)]] & ATT_CRUSHES) {
+    if (Attribute[CharToType[*(cur->me - _BOARD_COLS * gravity)]] & ATT_CRUSHES) {
         startPlayerAnimation(ID_Die);
         return;
     }

@@ -73,7 +73,6 @@ extern bool showWater;
 extern bool showLava;
 
 extern int cave;
-extern bool caveCompleted;
 extern unsigned char bufferedSWCHA;
 extern unsigned int usableSWCHA;
 extern unsigned int inhibitSWCHA;

@@ -21,7 +21,7 @@
 #include "../gfx/fontlarge.h"
 
 
-int dramaticPause;
+static int dramaticPause;
 
 
 void draw6Bitmap(unsigned int grpOffset, unsigned int colup0Offset,    //

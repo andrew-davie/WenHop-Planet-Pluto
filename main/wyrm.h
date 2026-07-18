@@ -14,8 +14,6 @@ struct wyrmDetails {
     unsigned char pace;
 };
 
-extern struct wyrmDetails wyrms[WYRM_POP];
-
 void initWyrms();
 bool newWyrm(int x, int y);
 void processWyrms();

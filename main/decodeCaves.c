@@ -32,21 +32,20 @@ void DrawLine(objectType anObject, int x, int y, int aLength, int aDirection);
 void DrawFilledRect(objectType anObject, int x, int y, int aWidth, int aHeight, objectType aFillObject);
 void DrawRect(objectType anObject, int x, int y, int aWidth, int aHeight);
 
-const unsigned char *theCaveData;
-int decodingRow;
-unsigned char caveMirrorXY;
+static const unsigned char *theCaveData;
+static int decodingRow;
 static int doorX, doorY;
-int processedLevel;
+static int processedLevel;
 int totalDogePossible;
 
-enum DECODE_STATE decodeState;
+static enum DECODE_STATE decodeState;
 
 struct CAVE_DEFINITION *theCave;
 
 static int decodeFlasher;
 
-int last_prng_a;
-int last_prng_b;
+static int last_prng_a;
+static int last_prng_b;
 
 void decodeCave(int cave) {
 
@@ -80,8 +79,8 @@ void decodeCave(int cave) {
 
 unsigned char cmd;
 unsigned char x, y, c, d, e, f;
-unsigned char theCode;
-unsigned char theObject;
+static unsigned char theCode;
+static unsigned char theObject;
 
 
 int decodeExplicitData() {
@@ -97,7 +96,7 @@ int decodeExplicitData() {
             int bgchar = theCave->interiorCharacter;
             bgchar |= (bgchar << 24) | (bgchar << 16) | (bgchar << 8);
 
-            myMemsetInt((unsigned int *)(RAM + _BOARD + decodingRow * _1ROW), bgchar, _BOARD_COLS / 4);
+            myMemsetInt((unsigned int *)(RAM + _BOARD + decodingRow * _BOARD_COLS), bgchar, _BOARD_COLS / 4);
 
             for (int x = 0; x < _BOARD_COLS; x++)
                 for (int object = 0; object < theCave->objectCount; object++) {
@@ -111,7 +110,7 @@ int decodeExplicitData() {
             if (border) {
 
                 if (!decodingRow || decodingRow == _BOARD_ROWS - 1)
-                    myMemsetInt((unsigned int *)(RAM + _BOARD + decodingRow * _1ROW),
+                    myMemsetInt((unsigned int *)(RAM + _BOARD + decodingRow * _BOARD_COLS),
                                 (border << 24 | border << 16 | border << 8 | border), _BOARD_COLS / 4);
                 else {
                     StoreObject(0, decodingRow, border);
@@ -262,7 +261,7 @@ void StoreObject(int x, int y, objectType anObject) {
         || anObject >= CH_MAX)
         return;    // MAJOR bug but recover (?)
 
-    unsigned char *me = RAM + _BOARD + x + y * _1ROW;
+    unsigned char *me = RAM + _BOARD + x + y * _BOARD_COLS;
     unsigned char type = TYPEOF(anObject);
 
     if (TYPEOF(*me) == TYPE_DOGE)

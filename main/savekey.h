@@ -13,10 +13,6 @@ enum CC {
 #define PUZZLE_MAX 100
 #define SAVEKEY_SIZE ((PUZZLE_MAX + 7) / 8)
 
-extern unsigned char saveKeyUnlocked[SAVEKEY_SIZE];
-extern unsigned char saveKeySolved[SAVEKEY_SIZE];
-extern unsigned char saveKeyPerfect[SAVEKEY_SIZE];
-
 void setUnlockStatus(int lot);
 bool getUnlockStatus(int lot);
 bool getSolveStatus(int lot);

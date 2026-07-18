@@ -39,7 +39,7 @@ const unsigned char trackChamp2[] = {
 };
 
 // clang-format on
-unsigned int presentsColour;
+static unsigned int presentsColour;
 
 
 void initDataStreams_Copyright() {
@@ -168,10 +168,8 @@ void VB_Copyright() {
 
         lumTarget = -15;
 
-        // setGameState(GS_GAME);
         if (luminance == lumTarget)
             setGameState(GS_COUCH_COMPLIANT);
-        // setGameState(GS_RASTER_BLEED);
 
         RAM[_SK_RESET] = 0;    // superfluous when singleton
     }

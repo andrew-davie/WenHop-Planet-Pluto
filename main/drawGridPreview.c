@@ -14,15 +14,14 @@
 #define PREVIEW_BOTTOM_OFFSET 0
 #define PREVIEW_SLIDE_SPEED 5
 
-static const unsigned char *img[_1ROW];
+static const unsigned char *img[_BOARD_COLS];
 
 
-int previewStart;     // = _ARENA_SCANLINES;
-int previewTarget;    // = PREVIEW_Y;
+static int previewStart;     // = _ARENA_SCANLINES;
+static int previewTarget;    // = PREVIEW_Y;
 
 
 unsigned char wcol[100];
-unsigned char neighbours[100];
 
 void initGridPreview(int startLine, int endLine) {
 

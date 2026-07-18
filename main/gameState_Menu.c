@@ -11,8 +11,8 @@
 #include "main.h"
 #include "sound.h"
 
-int base2;
-int flashTime2;
+static int base2;
+static int flashTime2;
 
 __attribute__((nonstring)) const char showCaveName[][6] = {
     {";;MARS"},    //

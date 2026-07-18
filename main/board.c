@@ -24,16 +24,16 @@
 
 
 // must be init'd at startup
-int selectorCounter;
-int waterDir;
-int explodeCount;
-int explodeRadius;
+static int selectorCounter;
+static int waterDir;
+static int explodeCount;
+static int explodeRadius;
 
 // init'd locally
-int conveyorDirection;
-int activeStar;
-int lastActiveStar;
-bool single;
+static int conveyorDirection;
+static int activeStar;
+static int lastActiveStar;
+static bool single;
 
 
 bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature);
@@ -209,7 +209,7 @@ void processBoardSquares() {
         BoardCursor cur;
         cur.row = boardRow;
         cur.col = boardCol;
-        cur.me = RAM + _BOARD + cur.row * _1ROW + cur.col;
+        cur.me = RAM + _BOARD + cur.row * _BOARD_COLS + cur.col;
 
         unsigned char creature = *cur.me;
 
@@ -234,14 +234,14 @@ void processBoardSquares() {
 
         if (gravity > 0) {
             if (cur.row > 1) {
-                unsigned char *prev = cur.me - _1ROW;
+                unsigned char *prev = cur.me - _BOARD_COLS;
                 *prev &= ~FLAG_THISFRAME;
             }
         }
 
         else {
             if (cur.row < _BOARD_ROWS - 1) {
-                unsigned char *prev = cur.me + _1ROW;
+                unsigned char *prev = cur.me + _BOARD_COLS;
                 *prev &= ~FLAG_THISFRAME;
             }
         }
@@ -314,7 +314,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
         // fall
 
-        unsigned char *next = cur->me + _1ROW;
+        unsigned char *next = cur->me + _BOARD_COLS;
         if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
             *next = FLAG(CH_STAR_FALLING_BOTTOM);
             *cur->me = FLAG(CH_STAR_FALLING_TOP);
@@ -401,14 +401,14 @@ void setInsulator(unsigned char *p, int row, int col) {
         return;
     }
 
-    p += _1ROW;
+    p += _BOARD_COLS;
 
     if (!onOff[col]) {
         if (lastOnOff[col]) {
             while (++row < _BOARD_ROWS && CharToType[GET(*p)] != TYPE_INSULATOR) {
                 if (CharToType[GET(*p)] == TYPE_ELECTRIC)
                     *p = FLAG(CH_BLANK);
-                p += _1ROW;
+                p += _BOARD_COLS;
             }
         }
     }
@@ -453,7 +453,7 @@ void setInsulator(unsigned char *p, int row, int col) {
             // if (*p == CH_CROSSED_STREAMS)
             //     nDots(3, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 2);
 
-            p += _1ROW;
+            p += _BOARD_COLS;
         }
     }
 }
@@ -497,7 +497,8 @@ void setInsulatorHoriz(unsigned char *p, int row, int col) {
 
 
         if (*p == CH_CROSSED_STREAMS) {
-            nDots(5, col, row, PT_SPIRAL2, 25, CHAR_CENTER_X + 1, CHAR_CENTER_Y, 10 + rangeRandom(20), rangeRandom(7)+1;
+            nDots(5, col, row, PT_SPIRAL2, 25, CHAR_CENTER_X + 1, CHAR_CENTER_Y, 10 + rangeRandom(20),
+                  rangeRandom(7) + 1);
         }
         p++;
     }
@@ -628,7 +629,7 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     case CH_BLOCK: {
 
-        unsigned char *next = cur->me + _1ROW * gravity;
+        unsigned char *next = cur->me + _BOARD_COLS * gravity;
         enum ObjectType typeDown = CharToType[GET(*next)];
         if (Attribute[typeDown] & ATT_BLANK) {
             *next = FLAG(*cur->me);
@@ -639,7 +640,7 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     case CH_ROCK_BONUS: {
 
-        unsigned char *next = cur->me + _1ROW * gravity;
+        unsigned char *next = cur->me + _BOARD_COLS * gravity;
         if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
             *next = FLAG(*cur->me);
             *cur->me = FLAG(CH_BLANK);
@@ -682,12 +683,12 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
     case CH_DOGE_SIDE_4:
 
         *cur->me = FLAG(CH_DOGE_FALLING_TOP);
-        *(cur->me + gravity * _1ROW) = FLAG(CH_DOGE_FALLING_BOTTOM);
+        *(cur->me + gravity * _BOARD_COLS) = FLAG(CH_DOGE_FALLING_BOTTOM);
         break;
 
     case CH_DOGE_FALLING_TOP2:
         *cur->me = FLAG(CH_DOGE_FALLING_TOP);
-        *(cur->me + gravity * _1ROW) = FLAG(CH_DOGE_FALLING_BOTTOM);
+        *(cur->me + gravity * _BOARD_COLS) = FLAG(CH_DOGE_FALLING_BOTTOM);
         break;
 
     case CH_DOGE_FALLING_TOP:
@@ -755,7 +756,7 @@ void restartBoardScan() {
 
         bool oldDead = playerDead;
 
-        unsigned char *man = RAM + _BOARD + playerY * _1ROW + playerX;
+        unsigned char *man = RAM + _BOARD + playerY * _BOARD_COLS + playerX;
 
         enum ChName what = GET(*man);
 
@@ -812,7 +813,7 @@ void restartBoardScan() {
 
 void processDoge(unsigned char *me, int row, int col) {
 
-    unsigned char *next = me + _1ROW * gravity;
+    unsigned char *next = me + _BOARD_COLS * gravity;
     const unsigned int attrNext = Attribute[CharToType[GET(*next)]];
 
     if (attrNext & ATT_BLANK) {
@@ -858,7 +859,7 @@ void processWater(unsigned char *me, int row) {
 void processWaterFlow(unsigned char *me, int row, int col) {
 
     // Lag the interruption of water flowing downwards
-    unsigned char above = *(me - _1ROW);
+    unsigned char above = *(me - _BOARD_COLS);
     if (above < FLAG_THISFRAME && !(Attribute[CharToType[GET(above)]] & ATT_WATERFLOW)) {
         *me = FLAG(CH_BLANK);
         return;
@@ -868,7 +869,7 @@ void processWaterFlow(unsigned char *me, int row, int col) {
     if (line < lavaSurfaceTrixel) {
         if (row < 20) {
 
-            unsigned char *next = me + _1ROW * gravity;
+            unsigned char *next = me + _BOARD_COLS * gravity;
             const unsigned int att = Attribute[CharToType[GET(*next)]];
             if (!(att & ATT_WATERFLOW)) {
 
@@ -902,8 +903,8 @@ void processCharBeltAndGrinder(unsigned char *me, unsigned char creature) {
     else if (creature == CH_GRINDER_0)
         conveyorDirection = -1;
 
-    unsigned char *up = me - _1ROW;
-    unsigned char *up2 = me - _1ROW + conveyorDirection;
+    unsigned char *up = me - _BOARD_COLS;
+    unsigned char *up2 = me - _BOARD_COLS + conveyorDirection;
 
     if (ATTRIBUTE_BIT(*up, ATT_CONVEYOR) && (ATTRIBUTE_BIT(*up2, ATT_BLANK | ATT_DISSOLVES)) && *up < FLAG_THISFRAME) {
         *up2 = FLAG(*up);
@@ -913,7 +914,7 @@ void processCharBeltAndGrinder(unsigned char *me, unsigned char creature) {
 
 void processCharGeoDogeAndRock(unsigned char *me) {
 
-    unsigned char *next = me + _1ROW * gravity;
+    unsigned char *next = me + _BOARD_COLS * gravity;
     enum ObjectType typeDown = CharToType[GET(*next)];
 
     if (Attribute[typeDown] & ATT_BLANK) {
@@ -930,7 +931,7 @@ void processCharGeoDogeAndRock(unsigned char *me) {
 
 void processFallingThings(unsigned char *me, int row, int col, unsigned char creature) {
 
-    unsigned char *next = me + _1ROW * gravity;
+    unsigned char *next = me + _BOARD_COLS * gravity;
     enum ObjectType typeDown = CharToType[GET(*next)];
     if (Attribute[typeDown] & ATT_BLANK) {
 
@@ -952,7 +953,7 @@ void processFallingThings(unsigned char *me, int row, int col, unsigned char cre
             break;
         }
 
-        unsigned char *nextNext = next + _1ROW * gravity;
+        unsigned char *nextNext = next + _BOARD_COLS * gravity;
         enum ChName downCh = GET(*nextNext);
         typeDown = CharToType[downCh];
         const unsigned int attNextNext = Attribute[typeDown];
@@ -966,7 +967,7 @@ void processFallingThings(unsigned char *me, int row, int col, unsigned char cre
 
                     sfx = SFX_ROCK;
 
-                    unsigned char *dL = me + _1ROW - 1;
+                    unsigned char *dL = me + _BOARD_COLS - 1;
                     unsigned char *dR = dL + 2;
 
                     if (!CharToType[GET(*dR)]) {
@@ -1034,9 +1035,9 @@ void processFallingThings(unsigned char *me, int row, int col, unsigned char cre
 void genericPush(unsigned char *me, int row, int col, int offsetX, int offsetY) {
 
     bool atEdge = (col < 3) || (col > 36) || (row < 3) || (row > 18);
-    unsigned char *playerPos = RAM + _BOARD + playerY * _1ROW + playerX;
+    unsigned char *playerPos = RAM + _BOARD + playerY * _BOARD_COLS + playerX;
 
-    int adjustOffset = offsetY * _1ROW + offsetX;
+    int adjustOffset = offsetY * _BOARD_COLS + offsetX;
     unsigned char *pushPos = me + adjustOffset;
 
     unsigned char alternate = CH_STEELWALL;
@@ -1157,7 +1158,7 @@ void doRoll(unsigned char *me, int row, int col) {
             enum ObjectType sideType = CharToType[GET(*side)];
             if (Attribute[sideType] & ATT_BLANK) {
 
-                unsigned char *sideDown = side + gravity * _1ROW;
+                unsigned char *sideDown = side + gravity * _BOARD_COLS;
                 enum ObjectType sideDownType = CharToType[GET(*sideDown)];
                 if (Attribute[sideDownType] & ATT_BLANK) {
 

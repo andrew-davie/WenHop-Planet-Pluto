@@ -224,12 +224,13 @@ const short int line85[] = {
 #define MAXSCALE SCALE_FAR
 
 
-int rotationDelta = 0;    // 0x8800;    // C80;    // 0xA00;
+static int rotationDelta = 0;    // 0x8800;    // C80;    // 0xA00;
 
 
 int scalex = MAXSCALE;
 int planetDir;
-int body;
+static int body;
+static int rotationAccel;
 
 
 void initPlanet(int planet) {
@@ -258,9 +259,6 @@ int nextPlanet() {
     initPlanet(body);
     return body;
 }
-
-
-int rotationAccel;
 
 
 void drawPlanet(int half) {

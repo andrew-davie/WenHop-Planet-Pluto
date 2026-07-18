@@ -48,11 +48,6 @@ extern void *DDR;
 #define DSJMP2PTR 34
 #define AMPLITUDE_PTR 35
 
-// Queue variables
-extern unsigned int *const _QPTR;
-extern unsigned int *const _QINC;
-extern unsigned int *const _WAVEFORM;
-
 // Set fetcher pointer (offset from start of display data)
 void setPointer(const int fetcher, const unsigned int offset);
 

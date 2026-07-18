@@ -7,9 +7,9 @@
 void *DDR = (void *)0x40000800;
 
 // Queue variables
-unsigned int *const _QPTR = (unsigned int *)0x40000098;
-unsigned int *const _QINC = (unsigned int *)0x40000124;
-unsigned int *const _WAVEFORM = (unsigned int *)0x400001B0;
+static unsigned int *const _QPTR = (unsigned int *)0x40000098;
+static unsigned int *const _QINC = (unsigned int *)0x40000124;
+static unsigned int *const _WAVEFORM = (unsigned int *)0x400001B0;
 
 // Set fetcher pointer (offset from start of display data)
 void setPointer(const int fetcher, const unsigned int offset) {
