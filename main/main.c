@@ -15,6 +15,7 @@
 #include "savekey.h"
 #include "score.h"
 #include "sound.h"
+#include "swipe.h"
 
 
 #if ENABLE_SHAKE

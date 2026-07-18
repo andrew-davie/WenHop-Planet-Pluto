@@ -866,7 +866,7 @@ const struct caveHandler caveList[] = {
 
     // cave definition, condition handler
     {caveUseWall, none},
-    {caveA4, none},
+    // {caveA4, none},
     {caveWyrms, empty},
     {starsAndStripes, spec},
 };

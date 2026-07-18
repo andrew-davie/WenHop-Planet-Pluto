@@ -6,6 +6,7 @@
 #include "colour.h"
 #include "draw.h"
 #include "drawGridPreview.h"
+#include "gameState.h"
 #include "joystick.h"
 #include "life.h"
 #include "main.h"
@@ -127,7 +128,7 @@ void VB_Menu() {
     getJoystick();
 
     if (!(inpt4 & 0x80))
-        setGameState(GS_GAME);    // GS_GLOBE);
+        setGameState(GS_GLOBE);    // GS_GLOBE);
 }
 
 

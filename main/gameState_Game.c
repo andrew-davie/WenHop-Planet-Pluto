@@ -24,6 +24,7 @@
 #include "schedule.h"
 #include "scroll.h"
 #include "sound.h"
+#include "swipe.h"
 #include "wyrm.h"
 
 int attachment = 0;
@@ -79,6 +80,8 @@ void initGameState_Game() {
 #if ENABLE_SWIPE
     setSwipeType(SWIPE_STAR);
     initStarSwipe();
+    setSwipe(20, SCREEN_TRIX_Y / 2, 0, 512,
+             SWIPE_GROW);    // screen-centered iris-in; radius/step are starting guesses, tune to taste
 #endif
 
     exitMode = 0;    // --> initNextlife
@@ -123,6 +126,10 @@ void VB_Game() {
     T1TC = 0;
     T1TCR = 1;
 
+#if ENABLE_SWIPE
+    swipe(10000);    // TODO: tune reserved-cycles budget once the rest of VB_Game's cost is measured
+#endif
+
     initDataStreams_Game();
 
     gameFrame++;
@@ -166,6 +173,10 @@ void VB_Game() {
     adjustLuminance(1);
 
     scheduledTasks();    // gets the MOST time
+
+#if ENABLE_SWIPE
+    applySwipeMask(_BUF_GAME_PF0_LEFT);    // must happen after everything else has drawn
+#endif
 }
 
 void OS_Game() {

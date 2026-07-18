@@ -18,6 +18,7 @@
 #include "schedule.h"
 #include "scroll.h"
 #include "sound.h"
+#include "swipe.h"
 #include "wyrm.h"
 
 #define PARTICLE_GRAVITY_FLAG 0x80
@@ -788,10 +789,21 @@ void restartBoardScan() {
             lives--;
 
             sound_max_volume = VOLUME_NONPLAYING;
+
+#if ENABLE_SWIPE
+            if (playerDead)
+                startSwipeClose();
+#endif
         }
 
 
-        if (playerDead && !shakeTime && !(inpt4 & 0x80)) {
+        if (playerDead && !shakeTime
+#if ENABLE_SWIPE
+            && checkSwipeFinished()
+#else
+            && !(inpt4 & 0x80)
+#endif
+        ) {
             setGameState(GS_MENU);
         }
 

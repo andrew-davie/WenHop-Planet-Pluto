@@ -10,6 +10,12 @@
 
 #include "swipe.h"
 
+// per-column bit within the byte a given x-coordinate (0-19, one screen half) maps to
+static const unsigned char rebase[20] = {
+    1 << 4, 1 << 5, 1 << 6, 1 << 7, 1 << 7, 1 << 6, 1 << 5, 1 << 4, 1 << 3, 1 << 2,
+    1 << 1, 1 << 0, 1 << 0, 1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6, 1 << 7,
+};
+
 static unsigned char swipeMask[6][SCREEN_TRIX_Y];
 
 bool drawMaskBit(int x, int y);
@@ -28,6 +34,7 @@ static int swipeCenterY;
 static int circleX, circleY, circleDelta;
 static bool swipeComplete;
 static bool swipeVisible;
+static bool maskNeeded = true;    // false once fully open (grown-in) -- lets applySwipeMask skip the AND loop
 
 static enum CIRCLEPHASE swipePhase;
 static enum SWIPE swipeType;
@@ -47,19 +54,36 @@ enum PHASE {
 static enum PHASE exitPhase;
 
 
-void applySwipeMask() {
+void applySwipeMask(int buffer) {
 
-    if (!swipeComplete || exitPhase == PHASE_END) {    //! swipeComplete || triggerNextLife) {
+    // Skip entirely once the mask is known fully-open (all 255 -- a no-op AND
+    // either way, so there's nothing to gain by running it). Do NOT gate this
+    // on swipeComplete generally though -- that was the previous bug: shrink
+    // finishing also sets swipeComplete, but the mask is mostly-0 at that
+    // point, not open, so skipping there let the raw buffer flash through.
+    // maskNeeded only goes false when a grow genuinely finishes (see swipe()).
+    if (!maskNeeded)
+        return;
 
-        unsigned char *p = RAM + _BUF_PF0_LEFT;
-        for (int col = 0; col < 6; col++)
-            for (int y = 0; y < _ICC_SCANLINES; y++) {
-                unsigned char mask = swipeMask[col][y];
-                *p++ &= mask;
-                *p++ &= mask;
-                *p++ &= mask;
-            }
+    // buffer is the left column (PF0_LEFT) of whichever kernel's six
+    // PF0/PF1/PF2 LEFT/RIGHT planes we're masking; each plane is
+    // _BUFFER_SIZE apart, so address each one from buffer rather than
+    // walking a single pointer across all six (they aren't contiguous
+    // with the SCREEN_TRIX_Y*3 content -- there's _BUFFER_SIZE - _SCANLINES
+    // bytes of slack after each plane).
+    for (int col = 0; col < 6; col++) {
+        unsigned char *p = RAM + buffer + col * _BUFFER_SIZE;
+        for (int y = 0; y < SCREEN_TRIX_Y; y++) {
+            unsigned char mask = swipeMask[col][y];
+            *p++ &= mask;
+            *p++ &= mask;
+            *p++ &= mask;
+        }
     }
+}
+
+bool checkSwipeFinished() {
+    return swipeComplete;
 }
 
 void setSwipeType(enum SWIPE newSwipeType) {
@@ -96,32 +120,43 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
     }
 }
 
+void startSwipeClose() {
+
+    // Reuses whatever centre/radius the last setSwipe() left us at (i.e. wherever
+    // the grow finished, already covering the screen) and reverses direction --
+    // no need for the SEARCH/REGROW/RESHRINK dance since we already know we're
+    // fully covering. Shrinks at the same rate the grow used, just backwards.
+    maskNeeded = true;    // grow completing turned this off; shrinking needs it applied again
+    setSwipe(swipeCenterX, swipeCenterY, swipeRadius, -swipeStep, SWIPE_SHRINK);
+}
+
 void clearMask(int v) {
     unsigned char *p = (unsigned char *)swipeMask;
-    for (int i = 0; i < 6 * _ICC_SCANLINES; i++)
+    for (int i = 0; i < 6 * SCREEN_TRIX_Y; i++)
         p[i] = v;
 }
 
 void initStarSwipe() {
     swipeType = SWIPE_STAR;
     clearMask(0);
+    maskNeeded = true;
 }
 
 bool drawMaskBit(int x, int y) {
 
-    if (x < 0 || x >= _1ROW || y < 0 || y >= _ICC_SCANLINES)
+    if (x < 0 || x >= _1ROW || y < 0 || y >= SCREEN_TRIX_Y)
         return false;
 
     if (swipePhase == SWIPE_SHRINK) {
 
         if (x >= 20) {
             x -= 20;
-            y += 3 * _ICC_SCANLINES;
+            y += 3 * SCREEN_TRIX_Y;
         }
 
-        y += ((x + 4) >> 3) * _ICC_SCANLINES;
+        y += ((x + 4) >> 3) * SCREEN_TRIX_Y;
 
-        ((unsigned char *)swipeMask)[y] &= ~EXTERNAL(__rebase)[x];
+        ((unsigned char *)swipeMask)[y] &= ~rebase[x];
     }
 
     return true;
@@ -193,6 +228,7 @@ void swipe(int reserved) {
             case SWIPE_GROW:
                 if (!swipeVisible) {
                     clearMask(255);
+                    maskNeeded = false;
                     return;
                 }
                 break;
@@ -262,10 +298,10 @@ bool bresenhamLine(int x0, int y0, int x1, int y1) {
     }
 
     if (y0 <= y1) {
-        if (y0 >= _ICC_SCANLINES || y1 < 0)
+        if (y0 >= SCREEN_TRIX_Y || y1 < 0)
             return false;
     } else {
-        if (y1 >= _ICC_SCANLINES || y0 < 0)
+        if (y1 >= SCREEN_TRIX_Y || y0 < 0)
             return false;
     }
 
@@ -280,20 +316,25 @@ bool bresenhamLine(int x0, int y0, int x1, int y1) {
 
     while (true) {
 
-        if (x0 >= 0 && x0 < _1ROW && y0 >= 0 && y0 < _ICC_SCANLINES - 1) {
+        if (x0 >= 0 && x0 < _1ROW && y0 >= 0 && y0 < SCREEN_TRIX_Y - 1) {
 
             int x = x0;
             int y = y0;
 
             if (x >= 20) {
                 x -= 20;
-                y += 3 * _ICC_SCANLINES;
+                y += 3 * SCREEN_TRIX_Y;
             }
 
-            y += ((x + 4) >> 3) * _ICC_SCANLINES;
+            y += ((x + 4) >> 3) * SCREEN_TRIX_Y;
 
-            ((unsigned char *)swipeMask)[y] |= EXTERNAL(__rebase)[x];
-            ((unsigned char *)swipeMask)[y + 1] |= EXTERNAL(__rebase)[x];
+            if (swipePhase == SWIPE_SHRINK) {
+                ((unsigned char *)swipeMask)[y] &= ~rebase[x];
+                ((unsigned char *)swipeMask)[y + 1] &= ~rebase[x];
+            } else {
+                ((unsigned char *)swipeMask)[y] |= rebase[x];
+                ((unsigned char *)swipeMask)[y + 1] |= rebase[x];
+            }
 
             visible = true;
         }
@@ -326,7 +367,10 @@ bool star() {
     if (starNextPoint > 9) {
         starNextPoint = 0;
         swipeComplete = true;
-        swipeStep += 20;
+        // was: swipeStep += 20; -- accumulated every lap regardless of phase, so the
+        // growth rate itself accelerated every frame and any starting step blew up
+        // within a handful of frames. Keep growth flat/linear (set explicitly by
+        // whoever calls setSwipe()) until there's a deliberate reason to accelerate.
     }
 
     bool visible = bresenhamLine(starX[starPoint], starY[starPoint], starX[starNextPoint], starY[starNextPoint]);

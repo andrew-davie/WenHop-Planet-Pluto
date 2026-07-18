@@ -12,7 +12,7 @@
 #define END_STRING NEW_LINE, NEW_LINE
 
 #define ENABLE_SHAKE 1
-#define ENABLE_SWIPE 0
+#define ENABLE_SWIPE 1
 
 //------------------------------------------------------------------------------
 

@@ -19,10 +19,12 @@ void swipe(int reserved);
 void setSwipePhase(enum CIRCLEPHASE newPhase);
 void setSwipeType(enum SWIPE newSwipeType);
 void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase);
-void applySwipeMask();
+void startSwipeClose();
+void applySwipeMask(int buffer);
 // void initSwipe(enum SWIPE type, int mask);
 void initStarSwipe();
 void clearMask(int v);
+bool checkSwipeFinished();
 
 int abs(int value);
 #endif

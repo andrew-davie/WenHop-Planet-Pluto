@@ -71,13 +71,13 @@ void VB_RasterBleed() {
 
 
     static int y = (_SCANLINES - 128) >> 1;    //_SCANLINES - 30;
-    rasterBleed(PARROT_FRAME, y);
+    rasterBleed(SKULL_FRAME, y);
 
 
     if (luminance == lumTarget)
         drawNextChar();
 
-    if (!(inpt4 & 0x80))    // > DURATION_SKULL)    // || !(RAM[_INPT4] & 0x80))
+    if (!(inpt4 & 0x80) || frame > 200)    // || !(RAM[_INPT4] & 0x80))
         setGameState(GS_MENU);
 }
 
