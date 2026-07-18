@@ -12,14 +12,19 @@ icc/
 main/board_temp.c
 main/processTypes.c
 main/processTypes.h
-tools/.idea/misc.xml
 .gitignore
-tools/.idea/modules.xml
-tools/.idea/tools.iml
-tools/.idea/vcs.xml
-tools/.idea/inspectionProfiles/profiles_settings.xml
 main/characterset.c.bak
 *.mp4
+
+# IDE / editor metadata (any depth)
+.idea/
+
+# Python virtualenvs and bytecode caches (any depth) -- there are several
+# of these scattered around (tools/, gfx/tools/, main/spinningGlobe/) for
+# the various image/data-conversion helper scripts; none should be committed.
+.venv/
+__pycache__/
+*.pyc
 main/spinningGlobe/_vgood.py
 main/spinningGlobe/cset_awesome.py
 main/spinningGlobe/*.png

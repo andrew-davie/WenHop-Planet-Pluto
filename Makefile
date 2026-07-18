@@ -45,7 +45,7 @@ OUTPUT = output
 DASM_TO_C = defines_dasm.h
 
 CFLAGS = -g3 -gdwarf-4 -gstrict-dwarf -mcpu=arm7tdmi -march=armv4t -mthumb \
-         -Wall -Wextra -Wno-unused-function -ffunction-sections -Os \
+         -Wall -Wextra -Wshadow -Wno-unused-function -ffunction-sections -Os \
         -Wl,--print-memory-usage,--build-id=none -flto -fno-builtin \
 		-mno-thumb-interwork -fextended-identifiers \
         -MMD -MP
@@ -63,6 +63,14 @@ CUSTOMOBJS    = ASM_routines.o
 
 ###############################################################################
 # append new .c files to SRCS
+#
+# NOTE: "custom.c" below is deliberately NOT a real file -- the actual source
+# is main/custom/custom.S (assembly). It's listed here only so the
+# $(SRCS:.c=.o) / $(SRCS:.c=.d) substitutions below produce "custom.o" /
+# "custom.d" in $(OBJS)/$(DEPS); custom.o then actually gets built by the
+# "%.o: %.S" rule instead of the "%.o: %.c" rule, since no custom.c exists
+# for vpath to find. Don't "fix" this by renaming it to custom.S here, or
+# $(OBJS) will end up with a literal "custom.S" entry instead of "custom.o".
 
 SRCS = \
  animations.c \
@@ -129,29 +137,28 @@ SRCS = \
  spinningGlobe/moon.c \
  spinningGlobe/terra.c \
  \
- ../gfx/alphanumeric.c \
- ../gfx/fontcompact.c \
- ../gfx/fontlarge.c \
+ gfx/alphanumeric.c \
+ gfx/fontcompact.c \
+ gfx/fontlarge.c \
  \
- ../tools/sam.c \
- ../tools/playboy.c \
- ../tools/donald.c \
- ../tools/toystory.c \
- ../tools/lena.c \
- ../tools/dh.c \
- ../tools/obama.c \
- ../tools/buzz.c \
- ../tools/skull.c \
- ../tools/zph.c \
- ../tools/parrot.c \
- ../tools/pirate.c \
+ tools/sam.c \
+ tools/playboy.c \
+ tools/donald.c \
+ tools/toystory.c \
+ tools/lena.c \
+ tools/dh.c \
+ tools/obama.c \
+ tools/buzz.c \
+ tools/skull.c \
+ tools/zph.c \
+ tools/parrot.c \
+ tools/pirate.c \
  \
  charset.c \
 
 
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
-HDRS = $(SRCS:.c=.h)
 
 IMAGES = \
 	gfx/image/WenHop.png
@@ -171,20 +178,23 @@ spinningGlobe/%.o: $(BASE)/spinningGlobe/%.c $(BASE)/$(DASM_TO_C)
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
 
-../gfx/%.o: ../gfx/%.c $(BASE)/$(DASM_TO_C)
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
-
-../tools/%.o: ../tools/%.c $(BASE)/$(DASM_TO_C)
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -I$(BASE) -c $< -o $@
+# gfx/*.o and tools/*.o are handled by the general "%.o: %.c %.h ..." rule
+# above -- gfx.c/gfx.h and tools/*.c/*.h already live directly under the
+# repo root, so no special-cased rule is needed. (Previously these were
+# listed in SRCS as "../gfx/..." / "../tools/...", which vpath resolved
+# correctly for the *input* .c file but NOT for the compiler's -o output,
+# since vpath never touches a target/output path. That silently wrote the
+# resulting .o/.d files one directory above the repo root -- outside this
+# project entirely -- whenever make was run from here, the repo root,
+# which is the natural place to invoke it from.)
 
 ###############################################################################
 # Default target (first in file) will build with 'make'
 
 .PHONY: all
 all: tools make_rom run_emulator
-	mv *.jpg screenshots 2>/dev/null || true
+	mkdir -p screenshots
+	mv *.jpg screenshots/ 2>/dev/null || true
 
 ###############################################################################
 # EMULATOR = gopher|stella  -- or can be absent
@@ -385,8 +395,7 @@ TRANSIENTS = $(CUSTOMTARGETS) \
 .PHONY: clean
 clean:
 	rm -f $(TRANSIENTS)
-	find . -name "*.o" -delete
-	find . -name "*.d" -delete
+	find $(BASE) spinningGlobe gfx tools \( -name ".venv" -prune \) -o \( -name "*.o" -o -name "*.d" \) -print -delete
 
 
 ###############################################################################

@@ -5,6 +5,7 @@
 #define ANIM_HALT 0
 #define ANIM_LOOP 255
 #define ANIM_JUMP 254
+#define ANIM_ELECTRIC 253
 
 extern const unsigned char *const AnimateBase[];
 extern const unsigned char PickupCharacter[];

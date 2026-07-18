@@ -1,5 +1,4 @@
 #include "animations.h"
-#include "cavedata.h"
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
@@ -8,7 +7,7 @@
 #include "attribute.h"
 #include "caveData.h"
 #include "characterset.h"
-#include "decodecaves.h"
+#include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"

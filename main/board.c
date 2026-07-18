@@ -1,6 +1,5 @@
 #include <stdbool.h>
 
-#include "decodecaves.h"
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
@@ -48,10 +47,8 @@ void restartBoardScan();
 void processDoge();
 void processPebble();
 void processWater();
-// void processLava();
 void processWaterFlow();
 void processCharBeltAndGrinder();
-// void processOutlet();
 void processFallingThings();
 void processCharGeoDogeAndRock();
 
@@ -81,14 +78,19 @@ void calculateVisibleMasks() {
     int eX = sX + 40 + CHAR_TRIX_X;
     int x = (sX * (0x10000 / CHAR_TRIX_X)) >> 16;
 
-    for (int i = sX; i <= eX && i < 40; i += CHAR_TRIX_X)
+    // Bounded by the board's actual trixel width (BOARD_TRIX_X) rather than
+    // SCREEN_TRIX_X/_BOARD_COLS (a different unit that happens to share the
+    // value 40) -- otherwise this stops marking columns visible as soon as
+    // scrollX passes ~1/4 of the way across the level. Also cap the array
+    // index directly so a scroll near the right edge can't overrun onScreenX.
+    for (int i = sX; i <= eX && i < BOARD_TRIX_X && x < _BOARD_COLS; i += CHAR_TRIX_X)
         onScreenX[x++] = true;
 
     int sY = scrollY >> 16;
     int eY = sY + _SCANLINES / 3;
     int y = (sY * (0x10000 / CHAR_TRIX_Y)) >> 16;
 
-    for (int i = sY; i < eY; i += CHAR_TRIX_Y)
+    for (int i = sY; i < eY && y < _BOARD_ROWS; i += CHAR_TRIX_Y)
         onScreenY[y++] = true;
 }
 
@@ -107,6 +109,7 @@ void initBoard() {
     selectorCounter = 0;
     waterDir = 0;
     explodeCount = 0;
+    explodeRadius = 0;
     conveyorDirection = -1;    // ?
     activeStar = lastActiveStar = 0;
     single = false;
@@ -248,6 +251,11 @@ void processBoardSquares() {
                 boardCol = _BOARD_COLS - 1;
 
                 if (!--boardRow) {
+                    // Leave boardRow negative so setupBoardScanner's
+                    // "if (boardRow < 0)" restart branch actually triggers;
+                    // otherwise the next scan wrongly restarts at (0,0)
+                    // instead of the bottom row whenever gravity is negative.
+                    boardRow = -1;
                     setSchedule(SCHEDULE_START_SCAN);
                     //                    restartBoardScan();
                     return;
@@ -408,7 +416,7 @@ void setInsulator(unsigned char *p, int row, int col) {
 
 
             if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES)) {
-                *p = FLAG(CH_ELECTRIC_0 + rangeRandom(4));
+                *p = CH_ELECTRIC_0;
                 nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
                 return;
             }
@@ -417,11 +425,19 @@ void setInsulator(unsigned char *p, int row, int col) {
 
                 if (ch >= CH_ELECTRIC_H0 && ch <= CH_ELECTRIC_H3) {
                     *p = FLAG(CH_CROSSED_STREAMS);
-                    nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
+                    nDots(5, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
                 }
 
-                else
-                    *p = FLAG(CH_ELECTRIC_0 + rangeRandom(4));
+                else {
+
+                    // if (*p > CH_ELECTRIC_0 && &p <= CH_ELECTRIC_2)
+                    //     (*p)++;
+
+                    // else
+
+                    if (type2 != TYPE_ELECTRIC)
+                        *p = CH_ELECTRIC_0;    // + (!rangeRandom(230) ? 1 : 0);
+                }
             }
 
 
@@ -467,8 +483,15 @@ void setInsulatorHoriz(unsigned char *p, int row, int col) {
         unsigned int att = Attribute[type2];
 
 
+        static const enum ChName insSh[] = {
+            CH_BLANK, CH_ELECTRIC_H0, CH_ELECTRIC_H1, CH_ELECTRIC_H2, CH_ELECTRIC_H3,
+        };
+
+
         if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES)) {
-            *p = FLAG(CH_ELECTRIC_H0 + rangeRandom(3));
+
+
+            *p = CH_ELECTRIC_H0;
             nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
             return;
         }
@@ -477,11 +500,11 @@ void setInsulatorHoriz(unsigned char *p, int row, int col) {
 
             if (ch >= CH_ELECTRIC_0 && ch <= CH_ELECTRIC_3) {
                 *p = FLAG(CH_CROSSED_STREAMS);
-                nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
+                nDots(5, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
             }
 
-            else
-                *p = FLAG(CH_ELECTRIC_H0 + rangeRandom(4));
+            else if (type2 != TYPE_ELECTRIC)
+                *p = CH_ELECTRIC_H0;    // + (!rangeRandom(230) ? 1 : 0);
         }
 
 
@@ -512,10 +535,18 @@ void setInsulatorPattern() {
 }
 
 int pickDifferent(int current) {
-    int r = rangeRandom(4);
+    //    int r = rangeRandom(4);
     // if (r >= current)
-    //     r++;
-    return r;
+
+    if (!rangeRandom(10))
+        return 0;
+
+    if (current || !rangeRandom(10)) {
+        if (++current > 3)
+            current = 1;
+    }
+
+    return current;
 }
 
 void processCreatures() {
@@ -607,17 +638,6 @@ void processCreatures() {
     case CH_DUST_ROCK_1:
         (*me)++;
         break;
-
-        // case CH_EXPLODETOBLANK_0:
-        // case CH_EXPLODETOBLANK_1:
-        // case CH_EXPLODETOBLANK_2:
-        // case CH_EXPLODETOBLANK_3:
-        //     *me = FLAG(creature + 1);
-        //     break;
-
-        // case CH_EXPLODETOBLANK_4:
-        //     *me = FLAG(CH_BLANK);
-        //     break;
 
     case CH_CONVERT_GEODE_TO_DOGE:
         *me = FLAG(CH_DOGE_00);
@@ -749,24 +769,6 @@ void processCreatures() {
 
 void restartBoardScan() {
 
-    // // randomly place a new pebble
-    // if (rangeRandom(256) < theCave->millingTime) {
-
-
-    //     int dX = playerX + rangeRandom(11) - 5;
-    //     int dY = playerY + rangeRandom(11) - 5;
-
-    //     if (dX >= 0 && dX < _BOARD_COLS && dY >= 0 && dY < _BOARD_ROWS) {
-    //         unsigned char *sq = RAM + _BOARD + dY * _1ROW + dX;
-    //         if (GET(*sq) == CH_DIRT)
-    //             *sq = FLAG(CH_PEBBLE1 + (getRandom32() & 1));
-    //     }
-    // }
-
-
-    // if (rangeRandom(256) < theCave->weather)
-    //     setShake(rangeRandom(20));
-
     // Change insulator pattern
 
     setInsulatorPattern();
@@ -786,8 +788,9 @@ void restartBoardScan() {
         if ((usableSWCHA & 0xF0) == 0xF0)
             waitRelease = false;
 
-        enum ObjectType type = CharToType[what];
-        playerDead = (type != TYPE_MELLON_HUSK && type != TYPE_MELLON_HUSK_PRE && type != TYPE_OUTBOX && !exitMode);
+        enum ObjectType manType = CharToType[what];
+        playerDead =
+            (manType != TYPE_MELLON_HUSK && manType != TYPE_MELLON_HUSK_PRE && manType != TYPE_OUTBOX && !exitMode);
 
 
         if (oldDead != playerDead) {
@@ -881,50 +884,6 @@ void processWater() {
     }
 }
 
-void processLava() {
-
-    if (isVisible(boardCol, boardRow)) {
-
-        int rand = getRandom32();
-        if ((boardRow - 1) * CHAR_TRIX_Y >= lavaSurfaceTrixel) {
-
-            int i = waterDir & 3;
-
-            unsigned char *neighbour = me + dirOffset[i];
-            const unsigned int att = Attribute[CharToType[GET(*neighbour)]];
-
-            if (att & ATT_DISSOLVES) {
-                *neighbour = CH_LAVA_BLANK;
-            }
-
-            else if (att & ATT_MELTS && !(rand & 63)) {
-
-                *neighbour = FLAG((att & ATT_GEODOGE) ? CH_DOGE_00 : CH_DUST_0);
-                nDots(8, boardCol + xdir[i], boardRow + ydir[i], PT_TWO, 50, 3, 4, 0x100, 7);
-            }
-        }
-
-        // Animate lava bubble
-        switch (*me) {
-        case CH_LAVA_BLANK: {
-            if (!(rand & (15 << 7))) {
-                (*me)++;
-                nDots(3, boardCol, boardRow, PT_SPIRAL, 30, 2, 5, 0xC0, 7);
-            }
-        } break;
-        case CH_LAVA_SMALL:
-            *me = CH_LAVA_MEDIUM;
-            break;
-        case CH_LAVA_MEDIUM:
-            *me = CH_LAVA_BLANK;
-            break;
-        case CH_LAVA_LARGE:
-            *me = CH_LAVA_BLANK;
-            break;
-        }
-    }
-}
-
 void processWaterFlow() {
 
     // Lag the interruption of water flowing downwards
@@ -980,31 +939,6 @@ void processCharBeltAndGrinder() {
         *up = CH_DUST_0;
     }
 }
-
-// void processOutlet() {
-
-//     if ((boardRow + 2) * CHAR_TRIX_Y <= lavaSurfaceTrixel) {
-
-//         if (GET(*(me - _1ROW * 2)) == CH_TAP_0) {
-
-//             enum ChName under = GET(*(me + _1ROW));
-
-//             if (!(Attribute[CharToType[under]] & ATT_WATERFLOW)) {
-
-//                 if (Attribute[CharToType[under]] & ATT_PERMEABLE)
-//                     *(me + _1ROW) = CH_WATERFLOW_0 + (getRandom32() & 3);
-
-//                 else
-//                     nDots(1, boardCol, boardRow, PT_TWO, 30, rangeRandom(3) + 2, 10, 0x80, 7);
-//             }
-//         }
-
-//         else if (GET(*(me - _1ROW * 2)) == CH_TAP_1) {
-//             if (Attribute[CharToType[GET(*(me + _1ROW))]] & ATT_BLANK)
-//                 *(me + _1ROW) = CH_BLANK;
-//         }
-//     }
-// }
 
 void processCharGeoDogeAndRock() {
 
@@ -1229,9 +1163,9 @@ void genericPush(int offsetX, int offsetY) {
 void genericPushReverse(int offsetX, int offsetY) {
 
     unsigned char *pushPos = me + offsetY * _BOARD_COLS + offsetX;
-    enum ObjectType type = CharToType[GET(*pushPos)];
+    enum ObjectType pushType = CharToType[GET(*pushPos)];
 
-    if (type == TYPE_PUSHER) {
+    if (pushType == TYPE_PUSHER) {
         *pushPos = FLAG(*me);
         *me = CH_BLANK;
     } else
@@ -1342,10 +1276,10 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 
     for (int i = 0; i < (int)(sizeof(offset) / sizeof(offset[0])); i++) {
         unsigned char *cell = where + offset[i];
-        enum ObjectType type = CharToType[GET(*cell)];
-        if (Attribute[type] & ATT_EXPLODABLE) {
+        enum ObjectType cellType = CharToType[GET(*cell)];
+        if (Attribute[cellType] & ATT_EXPLODABLE) {
 
-            bool wasDoge = (type == TYPE_DOGE);
+            bool wasDoge = (cellType == TYPE_DOGE);
             bool becomesDoge = (shape[i] == CH_DOGE_00);
 
             if (wasDoge && !becomesDoge)
@@ -1360,32 +1294,6 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 
     FLASH(4, 4);
 }
-
-
-// void surroundingConglomerate(int col, int row) {
-//     return;
-//     if (isVisible(col, row)) {
-
-//         //        if (rangeRandom(10))
-//         //          return;
-
-//         unsigned char *pos = RAM + _BOARD + row * _1ROW + col;
-//         for (int i = 4; i < 5; i++) {
-
-//             unsigned char *offsetPos = pos + dirOffset[i];
-//             if (Attribute[CharToType[GET(*offsetPos)]] & ATT_GEODOGE) {
-
-//                 int cong = CH_GEODOGE;
-
-//                 for (int j = 0; j < 4; j++)
-//                     if (Attribute[CharToType[GET(*(offsetPos + dirOffset[j]))]] & ATT_GEODOGE)
-//                         cong += 1 << j;
-
-//                 *offsetPos = cong;
-//             }
-//         }
-//     }
-// }
 
 
 // EOF

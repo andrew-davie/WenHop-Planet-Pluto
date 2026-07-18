@@ -1,10 +1,9 @@
 #include "defines_dasm.h"
 
 #include "attribute.h"
-#include "cavedata.h"
+#include "caveData.h"
 #include "colour.h"
 #include "decodeCaves.h"
-#include "decodecaves.h"
 #include "main.h"
 #include "particle.h"
 
@@ -87,10 +86,10 @@ const unsigned char caveUseWall[] = {
     CH_INSULATOR_L, 4,4,
     CH_INSULATOR_R, 8,4,
     // Start of cave draw
-    CH_MOUNT_R, 3,4,
+    // CH_MOUNT_R, 3,4,
 
-    CH_MOUNT_L, 3,5,
-    CH_INSULATOR_TOP, 3,6,
+    // CH_MOUNT_L, 3,5,
+    // CH_INSULATOR_TOP, 3,6,
 
 
     CH_ROCK_BONUS, 7,3,

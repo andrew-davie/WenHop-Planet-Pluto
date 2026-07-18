@@ -5,7 +5,6 @@
 #include "colour.h"
 #include "draw.h"
 #include "drawGridPreview.h"
-#include "drawPlanet.h"
 #include "drawplanet.h"
 #include "joystick.h"
 #include "life.h"

@@ -6,7 +6,7 @@
 #include "cdfjplus.h"
 
 #include "colour.h"
-#include "decodecaves.h"
+#include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"
 #include "random.h"

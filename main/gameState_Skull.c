@@ -15,16 +15,10 @@
 #include "sound.h"
 
 
-#define CHAMP_VOL 100
-#define DURATION_SKULL 18000
-#define PRESENTS_LUM 8
-#define FADE_SPEED 17000
-#define FADE_SHIFT 16
-
 static int eyeX = 0;
 static int eyeY;
-int rndm = 0;
-static int sin = 0;
+static int rndm = 0;
+static int sinPhase = 0;
 
 
 static int eyeXOffset;
@@ -563,7 +557,7 @@ void drawICCSkull() {
         // if (!rangeRandom(rndm >> 8))
         //     return;
 
-        int bone1y = sinoid[(++sin >> 3) & 15] * 3;
+        int bone1y = sinoid[(++sinPhase >> 3) & 15] * 3;
 
         static const unsigned char *shape[] = {
             __componentbone1c,
@@ -614,7 +608,7 @@ void drawICCSkull() {
             --laugh;
 
 
-        int jawy = laugh ? ((sinoid[sin & 15] * 3) >> 2) * 3 : 0;
+        int jawy = laugh ? ((sinoid[sinPhase & 15] * 3) >> 2) * 3 : 0;
 
         doDrawBitmap(componentskulljawa, 11, skully + 141 - 3 + jawy);
         doDrawBitmap(componentskulljawb, 19, skully + 129 + jawy);

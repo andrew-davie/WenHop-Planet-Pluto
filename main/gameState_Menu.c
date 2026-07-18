@@ -15,16 +15,11 @@
 #include "savekey.h"
 #include "sound.h"
 
-int menuLine;
-int pushCount;
 int base2;
 int flashTime2;
 // int cave;
 // int level;
-int menuLineTVType;
 int tempName;
-
-#define LETTER_HEIGHT 10
 
 enum MENU_OPTION {
 
@@ -95,7 +90,6 @@ void initKernel_Menu() {
 
     cave = showCave;
     level = 4;    // tmp;
-    menuLineTVType = 0;
 
     colubk = 0;
 
@@ -131,9 +125,7 @@ void initKernel_Menu() {
     // draw6Bitmap(_BUF_MENU_GRP, _BUF_MENU_COLUP0,    //
     //             gfx_grid_menu_bravado_gif, gfx_grid_menu_bravado_gif_HEIGHT, 120 + 30, 6);
 
-    menuLine = 0;
     base2 = 0;
-    pushCount = 0;
 
     initGridPreview(_SCANLINES + 50, PREVIEW_Y);
 
@@ -169,42 +161,6 @@ void initGameState_Menu() {
 }
 
 
-void drawCharacter(int x, int y, int ch) {
-
-    if (ch == ' ')
-        ch = '0' + 11;
-
-    ch -= 'A';
-    if (ch < 0)
-        ch += 43;
-    const unsigned char *p = charAtoZ + ch * 10;
-    unsigned char *col = RAM + _BUF_MENU_GRP + _BUFFER_SIZE * x + y;
-
-    for (int i = 0; i < LETTER_HEIGHT; i++)
-        *col++ = *p++;
-}
-
-// void xxxdrawString(int x, int y, const char *text, int colour) {
-
-//     while (*text && x < 6)
-//         drawCharacter(x++, y, *text++);
-
-//     for (int i = 0; i < LETTER_HEIGHT; i++)
-//         RAM[_BUF_MENU_COLUP0 + i + y - 1] = convertColour(colour);
-// }
-
-void drawSmallString(int y, const char *smallText) {
-
-    int colour = convertColour(0x98);
-
-    for (int line = 0; line < 6; line++) {
-        RAM[_BUF_MENU_COLUP0 + y + line - 1] = colour;
-        for (int i = 0; i < 6; i++)
-            RAM[_BUF_MENU_GRP + _BUFFER_SIZE * i + y + line] = *smallText++;
-    }
-}
-
-
 void VB_Menu() {
 
     initDataStreams_Menu();
@@ -226,44 +182,6 @@ void VB_Menu() {
     //     setGameState(GS_GAME);    // GS_GLOBE);
 }
 
-
-// const char wordTvType0[] = {
-//     ________, XXXXXX__, _X___XXX, X___X_XX, XXXXXXXX, XX_X___X, ________, XXXX_XX_, XX__XX__,
-//     XX_XXXX_, _XXXX_XX, XX_XX_XX, ________, __X___X_, X____XXX, _XXX__XX, X__X__X_, ___XXXXX,
-//     ________, __X___XX, X______X, X_X_____, XX_X__XX, X__X_X_X, ________, __X____X, ____XXXX,
-//     X_X__XXX, XX_X__X_, ___X___X, ________, __X____X, ____XXXX, __X__XXX, X__X__XX, XX_X___X,
-// };
-
-// const char wordStartAt[] = {
-//     ________, ________, ___XXX__, X____XX_, _X__X_XX, XX_XXXXX, ________, ________, ___X__X_,
-//     X___XXXX, _XX_X_X_, ___XXXXX, ________, ________, ___X__X_, X___X__X, _XX_X_XX, X____X__,
-//     ________, ________, ___XXX__, X___XXXX, _X_XX_X_, _____X__, ________, ________, ___X____,
-//     X___X__X, _X_XX_XX, XX___X__, ________, ________, ___X____, XXX_X__X, _X__X_XX, XX___X__,
-// };
-
-// const char wordDifficulty[] = {
-
-//     ________, _____XXX, ___XXX__, _XX__X__, X__XX__X, X____XX_, ________, _____X__, XX_XX_X_,
-//     XXXX_X__, X_XXXX_X, _X__X__X, ________, _____XXX, ___X__X_, X__X_X__, X_X__X_X, __X_X__X,
-//     ________, _____X__, XX_XXX__, XXXX_X__, X_XXXX_X, __X_X__X, ________, _____XXX, XX_X_X__,
-//     X__X_XXX, __X__X_X, XXX_XXXX, ________, _____XXX, X__X__X_, X__X__X_, __X__X_X, XX___XX_,
-// };
-
-
-// const char *smallWord[] = {
-//     wordStartAt,
-//     wordDifficulty,
-//     //    wordTvType0,
-// };
-
-
-// const char TV[][6] = {
-
-//     {";;NTSC"},    //
-//     {";;;PAL"},    //
-//     {";PAL60"},    //
-//     {";SECAM"},    //
-// };
 
 __attribute__((nonstring)) const char Level[][6] = {
 

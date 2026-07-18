@@ -124,10 +124,11 @@ void VB_Copyright() {
             *r++ = 255;
             *spc++ = 0x6;
 
-            if (tvSystem == _TV_SYSTEM_NTSC)
-                *c++ = convertColour(sl < TOP + BAND ? 0xC4 : 0x16);
-            else
-                *c++ = convertColour(sl < TOP + BAND ? 0xC4 : 0x16);
+            // NOTE: both branches of this used to compute the exact same value
+            // (tvSystem was never actually used to pick a different colour).
+            // Collapsed to a single statement; if PAL/SECAM was meant to use
+            // different hex constants here, those need to be supplied.
+            *c++ = convertColour(sl < TOP + BAND ? 0xC4 : 0x16);
         }
 
         // for (int sl = TOP + 2 * BAND; sl < _SCANLINES; sl++) {

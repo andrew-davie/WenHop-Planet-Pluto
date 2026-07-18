@@ -2,7 +2,6 @@
 
 #include "drawScreen.h"
 
-#include "cavedata.h"
 #include "defines_dasm.h"
 
 

@@ -1,7 +1,7 @@
 
 #include "defines_dasm.h"
 
-#include "cavedata.h"
+#include "caveData.h"
 #include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"

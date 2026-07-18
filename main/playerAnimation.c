@@ -2,7 +2,7 @@
 
 #include "main.h"
 
-#include "bitpatterns.h"
+#include "bitPatterns.h"
 #include "mellon.h"
 #include "particle.h"
 #include "playerAnimation.h"

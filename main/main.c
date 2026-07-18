@@ -5,7 +5,7 @@ Gamax Software 2026 - Craig Daniels
 
 #include <stdbool.h>
 
-#include "decodecaves.h"
+#include "decodeCaves.h"
 #include "defines_dasm.h"    // defines_dasm.h MUST come before defines_cdfjplus.h
 
 // MUST have whitespace here, otherwise auto-code formatters will change
@@ -165,7 +165,7 @@ void SilenceTIA();
 void initNextLife();
 
 
-// function defines from ASM_routines.s
+// function defines from ASM_routines.S
 // these use ASM with unrolled loops to make them FAST
 // use/remove as desired
 
