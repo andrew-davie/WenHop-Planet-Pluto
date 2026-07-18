@@ -21,6 +21,7 @@ void setSwipeType(enum SWIPE newSwipeType);
 void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase);
 void startSwipeClose();
 void applySwipeMask(int buffer);
+void setSwipeMaskColour(bool white);    // true = white/COLUPF reveal, false = black/background reveal
 // void initSwipe(enum SWIPE type, int mask);
 void initStarSwipe();
 void clearMask(int v);

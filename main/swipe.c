@@ -34,7 +34,8 @@ static int swipeCenterY;
 static int circleX, circleY, circleDelta;
 static bool swipeComplete;
 static bool swipeVisible;
-static bool maskNeeded = true;    // false once fully open (grown-in) -- lets applySwipeMask skip the AND loop
+bool maskNeeded = true;           // false once fully open (grown-in) -- lets applySwipeMask skip the AND loop
+static bool maskWhite = false;    // true: hidden area forced ON (COLUPF/white); false: forced OFF (background/black)
 
 static enum CIRCLEPHASE swipePhase;
 static enum SWIPE swipeType;
@@ -54,6 +55,104 @@ enum PHASE {
 static enum PHASE exitPhase;
 
 
+// buffer is the left column (PF0_LEFT) of whichever kernel's six
+// PF0/PF1/PF2 LEFT/RIGHT planes we're masking; each plane is
+// _BUFFER_SIZE apart, so address each one from buffer rather than
+// walking a single pointer across all six (they aren't contiguous
+// with the SCREEN_TRIX_Y*3 content -- there's _BUFFER_SIZE - _SCANLINES
+// bytes of slack after each plane).
+// Each row writes the same byte 3 times (one per real scanline), so a row
+// doesn't align to a 4-byte int on its own -- but every 4 rows (12 bytes)
+// is exactly 3 ints, so we bulk-process 4 rows at a time as 3 int32 writes
+// (one read-modify-write instead of four).
+// Endianness assumption: little-endian (standard for this target), byte0 =
+// low byte of the int.
+// Split into two colour-specific variants (rather than branching on
+// maskWhite inside the loop) so the hot path never re-tests it per int --
+// applySwipeMask() below picks one once, outside any loop.
+
+static void applySwipeMaskBlack(int buffer) {
+
+    for (int col = 0; col < 6; col++) {
+        unsigned char *p = RAM + buffer + col * _BUFFER_SIZE;
+        int y = 0;
+
+        for (; y + 4 <= SCREEN_TRIX_Y; y += 4) {
+            unsigned int r0 = swipeMask[col][y];
+            unsigned int r1 = swipeMask[col][y + 1];
+            unsigned int r2 = swipeMask[col][y + 2];
+            unsigned int r3 = swipeMask[col][y + 3];
+            unsigned int *ip = (unsigned int *)p;
+
+            // int0 = [r0,r0,r0,r1], int1 = [r1,r1,r2,r2], int2 = [r2,r3,r3,r3]
+            if (!(r0 == 0xFF && r1 == 0xFF))
+                ip[0] &= r0 | (r0 << 8) | (r0 << 16) | (r1 << 24);
+            if (!(r1 == 0xFF && r2 == 0xFF))
+                ip[1] &= r1 | (r1 << 8) | (r2 << 16) | (r2 << 24);
+            if (!(r2 == 0xFF && r3 == 0xFF))
+                ip[2] &= r2 | (r3 << 8) | (r3 << 16) | (r3 << 24);
+
+            p += 12;
+        }
+
+        // Tail: SCREEN_TRIX_Y (66) isn't a multiple of 4, so 2 rows (64,65) are
+        // left over here -- but now that the 2 padding bytes after each plane's
+        // real content are confirmed unused/safe to touch, these last 2 rows
+        // plus the 2 padding bytes (8 bytes total = exactly 2 more ints) can
+        // still be done as int32 ops instead of dropping to a byte loop.
+        // int0 = [r64,r64,r64,r65] (same pattern as a normal group's int0).
+        // int1 = [r65,r65,pad,pad] -- broadcasting r65 into the padding bytes
+        // is harmless since nothing reads them; this keeps the formula uniform
+        // instead of inventing a "don't care" representation.
+        if (y < SCREEN_TRIX_Y) {
+            unsigned int r0 = swipeMask[col][y];
+            unsigned int r1 = swipeMask[col][y + 1];
+            unsigned int *ip = (unsigned int *)p;
+
+            if (!(r0 == 0xFF && r1 == 0xFF))
+                ip[0] &= r0 | (r0 << 8) | (r0 << 16) | (r1 << 24);
+            if (r1 != 0xFF)
+                ip[1] &= r1 | (r1 << 8) | (r1 << 16) | (r1 << 24);
+        }
+    }
+}
+
+static void applySwipeMaskWhite(int buffer) {
+
+    for (int col = 0; col < 6; col++) {
+        unsigned char *p = RAM + buffer + col * _BUFFER_SIZE;
+        int y = 0;
+
+        for (; y + 4 <= SCREEN_TRIX_Y; y += 4) {
+            unsigned int r0 = swipeMask[col][y];
+            unsigned int r1 = swipeMask[col][y + 1];
+            unsigned int r2 = swipeMask[col][y + 2];
+            unsigned int r3 = swipeMask[col][y + 3];
+            unsigned int *ip = (unsigned int *)p;
+
+            if (!(r0 == 0xFF && r1 == 0xFF))
+                ip[0] |= ~(r0 | (r0 << 8) | (r0 << 16) | (r1 << 24));
+            if (!(r1 == 0xFF && r2 == 0xFF))
+                ip[1] |= ~(r1 | (r1 << 8) | (r2 << 16) | (r2 << 24));
+            if (!(r2 == 0xFF && r3 == 0xFF))
+                ip[2] |= ~(r2 | (r3 << 8) | (r3 << 16) | (r3 << 24));
+
+            p += 12;
+        }
+
+        if (y < SCREEN_TRIX_Y) {
+            unsigned int r0 = swipeMask[col][y];
+            unsigned int r1 = swipeMask[col][y + 1];
+            unsigned int *ip = (unsigned int *)p;
+
+            if (!(r0 == 0xFF && r1 == 0xFF))
+                ip[0] |= ~(r0 | (r0 << 8) | (r0 << 16) | (r1 << 24));
+            if (r1 != 0xFF)
+                ip[1] |= ~(r1 | (r1 << 8) | (r1 << 16) | (r1 << 24));
+        }
+    }
+}
+
 void applySwipeMask(int buffer) {
 
     // Skip entirely once the mask is known fully-open (all 255 -- a no-op AND
@@ -65,21 +164,14 @@ void applySwipeMask(int buffer) {
     if (!maskNeeded)
         return;
 
-    // buffer is the left column (PF0_LEFT) of whichever kernel's six
-    // PF0/PF1/PF2 LEFT/RIGHT planes we're masking; each plane is
-    // _BUFFER_SIZE apart, so address each one from buffer rather than
-    // walking a single pointer across all six (they aren't contiguous
-    // with the SCREEN_TRIX_Y*3 content -- there's _BUFFER_SIZE - _SCANLINES
-    // bytes of slack after each plane).
-    for (int col = 0; col < 6; col++) {
-        unsigned char *p = RAM + buffer + col * _BUFFER_SIZE;
-        for (int y = 0; y < SCREEN_TRIX_Y; y++) {
-            unsigned char mask = swipeMask[col][y];
-            *p++ &= mask;
-            *p++ &= mask;
-            *p++ &= mask;
-        }
-    }
+    if (maskWhite)
+        applySwipeMaskWhite(buffer);
+    else
+        applySwipeMaskBlack(buffer);
+}
+
+void setSwipeMaskColour(bool white) {
+    maskWhite = white;
 }
 
 bool checkSwipeFinished() {
@@ -137,7 +229,9 @@ void clearMask(int v) {
 }
 
 void initStarSwipe() {
-    swipeType = SWIPE_STAR;
+    // Despite the name, this is shape-agnostic setup (mask clear + flag) -- it used
+    // to hardcode swipeType = SWIPE_STAR here too, which silently overrode whatever
+    // setSwipeType() the caller had just set immediately before calling this.
     clearMask(0);
     maskNeeded = true;
 }
@@ -147,17 +241,21 @@ bool drawMaskBit(int x, int y) {
     if (x < 0 || x >= _1ROW || y < 0 || y >= SCREEN_TRIX_Y)
         return false;
 
-    if (swipePhase == SWIPE_SHRINK) {
-
-        if (x >= 20) {
-            x -= 20;
-            y += 3 * SCREEN_TRIX_Y;
-        }
-
-        y += ((x + 4) >> 3) * SCREEN_TRIX_Y;
-
-        ((unsigned char *)swipeMask)[y] &= ~rebase[x];
+    if (x >= 20) {
+        x -= 20;
+        y += 3 * SCREEN_TRIX_Y;
     }
+
+    y += ((x + 4) >> 3) * SCREEN_TRIX_Y;
+
+    // Used to only ever clear (and only during SHRINK) -- meaning GROW/SEARCH/
+    // REGROW/RESHRINK never actually revealed anything, just probed bounds, so
+    // the circle grew invisibly and the screen only ever snapped from fully
+    // hidden to fully revealed the instant grow's completion check fired.
+    if (swipePhase == SWIPE_SHRINK)
+        ((unsigned char *)swipeMask)[y] &= ~rebase[x];
+    else
+        ((unsigned char *)swipeMask)[y] |= rebase[x];
 
     return true;
 }
@@ -367,10 +465,6 @@ bool star() {
     if (starNextPoint > 9) {
         starNextPoint = 0;
         swipeComplete = true;
-        // was: swipeStep += 20; -- accumulated every lap regardless of phase, so the
-        // growth rate itself accelerated every frame and any starting step blew up
-        // within a handful of frames. Keep growth flat/linear (set explicitly by
-        // whoever calls setSwipe()) until there's a deliberate reason to accelerate.
     }
 
     bool visible = bresenhamLine(starX[starPoint], starY[starPoint], starX[starNextPoint], starY[starNextPoint]);

@@ -791,8 +791,10 @@ void restartBoardScan() {
             sound_max_volume = VOLUME_NONPLAYING;
 
 #if ENABLE_SWIPE
-            if (playerDead)
+            if (playerDead) {
+                setSwipeType(SWIPE_CIRCLE);
                 startSwipeClose();
+            }
 #endif
         }
 

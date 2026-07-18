@@ -80,7 +80,7 @@ void initGameState_Game() {
 #if ENABLE_SWIPE
     setSwipeType(SWIPE_STAR);
     initStarSwipe();
-    setSwipe(20, SCREEN_TRIX_Y / 2, 0, 512,
+    setSwipe(20, SCREEN_TRIX_Y / 2, 0, 256,
              SWIPE_GROW);    // screen-centered iris-in; radius/step are starting guesses, tune to taste
 #endif
 
@@ -127,7 +127,7 @@ void VB_Game() {
     T1TCR = 1;
 
 #if ENABLE_SWIPE
-    swipe(10000);    // TODO: tune reserved-cycles budget once the rest of VB_Game's cost is measured
+    swipe(20000);    // TODO: tune reserved-cycles budget once the rest of VB_Game's cost is measured
 #endif
 
     initDataStreams_Game();
@@ -143,8 +143,8 @@ void VB_Game() {
 
     if (shakeTime) {
         shakeTime--;
-        shakeX = (rangeRandom(5) - 2) << 16;
-        shakeY = (rangeRandom(5) - 2) << 16;
+        shakeX = (rangeRandom(3) - 1) << 16;
+        shakeY = (rangeRandom(3) - 1) << 16;
     }
 
     else
