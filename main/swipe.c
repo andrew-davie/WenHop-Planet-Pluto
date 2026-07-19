@@ -179,7 +179,7 @@ static void applySwipeMaskBlack(int buffer) {
         unsigned char *p = RAM + buffer + col * _BUFFER_SIZE;
         int y = 0;
 
-        for (; y + 4 <= SCREEN_TRIX_Y - 12; y += 4) {
+        for (; y + 4 <= SCREEN_TRIX_Y; y += 4) {
             unsigned int r0 = swipeMask[col][y];
             unsigned int r1 = swipeMask[col][y + 1];
             unsigned int r2 = swipeMask[col][y + 2];
@@ -211,26 +211,26 @@ static void applySwipeMaskBlack(int buffer) {
             p += 12;
         }
 
-        // // Tail: same 2-leftover-rows-plus-padding handling as before, now also
-        // // folding in the border rows the same way.
-        // if (y < SCREEN_TRIX_Y) {
-        //     unsigned int r0 = swipeMask[col][y];
-        //     unsigned int r1 = swipeMask[col][y + 1];
-        //     unsigned int b0 = borderMaskCur[col][y] | borderMaskPrev[col][y];
-        //     unsigned int b1 = borderMaskCur[col][y + 1] | borderMaskPrev[col][y + 1];
-        //     unsigned int *ip = (unsigned int *)p;
+        // Tail: same 2-leftover-rows-plus-padding handling as before, now also
+        // folding in the border rows the same way.
+        if (y < SCREEN_TRIX_Y) {
+            unsigned int r0 = swipeMask[col][y];
+            unsigned int r1 = swipeMask[col][y + 1];
+            unsigned int b0 = borderMaskCur[col][y] | borderMaskPrev[col][y];
+            unsigned int b1 = borderMaskCur[col][y + 1] | borderMaskPrev[col][y + 1];
+            unsigned int *ip = (unsigned int *)p;
 
-        //     if (!(r0 == 0xFF && r1 == 0xFF && b0 == 0 && b1 == 0)) {
-        //         unsigned int R = r0 | (r0 << 8) | (r0 << 16) | (r1 << 24);
-        //         unsigned int B = b0 | (b0 << 8) | (b0 << 16) | (b1 << 24);
-        //         ip[0] = (ip[0] & R) | B;
-        //     }
-        //     if (!(r1 == 0xFF && b1 == 0)) {
-        //         unsigned int R = r1 | (r1 << 8) | (r1 << 16) | (r1 << 24);
-        //         unsigned int B = b1 | (b1 << 8) | (b1 << 16) | (b1 << 24);
-        //         ip[1] = (ip[1] & R) | B;
-        //     }
-        // }
+            if (!(r0 == 0xFF && r1 == 0xFF && b0 == 0 && b1 == 0)) {
+                unsigned int R = r0 | (r0 << 8) | (r0 << 16) | (r1 << 24);
+                unsigned int B = b0 | (b0 << 8) | (b0 << 16) | (b1 << 24);
+                ip[0] = (ip[0] & R) | B;
+            }
+            if (!(r1 == 0xFF && b1 == 0)) {
+                unsigned int R = r1 | (r1 << 8) | (r1 << 16) | (r1 << 24);
+                unsigned int B = b1 | (b1 << 8) | (b1 << 16) | (b1 << 24);
+                ip[1] = (ip[1] & R) | B;
+            }
+        }
     }
 }
 
@@ -423,7 +423,16 @@ static int circleCoverRadius() {
     int dx = swipeCenterX > (_1ROW - 1 - swipeCenterX) ? swipeCenterX : (_1ROW - 1 - swipeCenterX);
     int dy = swipeCenterY > (SCREEN_TRIX_Y - 1 - swipeCenterY) ? swipeCenterY : (SCREEN_TRIX_Y - 1 - swipeCenterY);
     int rForX = ((dx * 16 + 6) * (0x10000 / 7)) >> 16;    // ceil(dx*16/7)
-    int r = (dy > rForX) ? dy : rForX;
+    // Compensate for squashDy2()'s ~5% vertical trim in circle(): the disk's
+    // actual dy-reach for a given radius is only radius*sqrt(64/71) now, so
+    // the radius needed to cover a given dy is dy/sqrt(64/71) =~ dy*1.053.
+    // dy + dy>>4 (dy*17/16 = 1.0625x) rounds that up a little further, which
+    // is fine -- this only runs once per sequence (not the per-row path
+    // squashDy2() itself is the cheap-on-purpose one for), and erring
+    // towards slightly MORE coverage is the safe direction; the existing
+    // "+2" margin below absorbs the rest of any rounding regardless.
+    int rForY = dy + (dy >> 4);
+    int r = (rForY > rForX) ? rForY : rForX;
     return r + 2;    // small safety margin
 }
 
@@ -540,12 +549,13 @@ static void fillHalfSpan(int xa, int xb, int rowBase, bool setBits) {
             unsigned char b = ((unsigned char *)swipeMask)[rowBase];
             ((unsigned char *)swipeMask)[rowBase] = (b & 0x0F) | (setBits ? 0xF0 : 0x00);
         } else {
-            for (int x = lo; x <= hi; x++) {
-                if (setBits)
+
+            if (setBits)
+                for (int x = lo; x <= hi; x++)
                     ((unsigned char *)swipeMask)[rowBase] |= rebase[x];
-                else
+            else
+                for (int x = lo; x <= hi; x++)
                     ((unsigned char *)swipeMask)[rowBase] &= ~rebase[x];
-            }
         }
     }
 
@@ -556,12 +566,13 @@ static void fillHalfSpan(int xa, int xb, int rowBase, bool setBits) {
         if (lo == 4 && hi == 11) {
             ((unsigned char *)swipeMask)[rowBase + SCREEN_TRIX_Y] = setBits ? 0xFF : 0x00;
         } else {
-            for (int x = lo; x <= hi; x++) {
-                if (setBits)
+
+            if (setBits)
+                for (int x = lo; x <= hi; x++)
                     ((unsigned char *)swipeMask)[rowBase + SCREEN_TRIX_Y] |= rebase[x];
-                else
+            else
+                for (int x = lo; x <= hi; x++)
                     ((unsigned char *)swipeMask)[rowBase + SCREEN_TRIX_Y] &= ~rebase[x];
-            }
         }
     }
 
@@ -572,12 +583,13 @@ static void fillHalfSpan(int xa, int xb, int rowBase, bool setBits) {
         if (lo == 12 && hi == 19) {
             ((unsigned char *)swipeMask)[rowBase + 2 * SCREEN_TRIX_Y] = setBits ? 0xFF : 0x00;
         } else {
-            for (int x = lo; x <= hi; x++) {
-                if (setBits)
+
+            if (setBits)
+                for (int x = lo; x <= hi; x++)
                     ((unsigned char *)swipeMask)[rowBase + 2 * SCREEN_TRIX_Y] |= rebase[x];
-                else
+            else
+                for (int x = lo; x <= hi; x++)
                     ((unsigned char *)swipeMask)[rowBase + 2 * SCREEN_TRIX_Y] &= ~rebase[x];
-            }
         }
     }
 }
@@ -600,8 +612,8 @@ static void fillMaskSpan(int x0, int x1, int y) {
     fillHalfSpan(la, lb, y, setBits);
 
     // Right half: x 20-39 (xx = x-20), group rows start at y + 3*SCREEN_TRIX_Y.
-    int ra = (x0 > 20 ? x0 : 20) - 20;
-    int rb = (x1 < 39 ? x1 : 39) - 20;
+    int ra = x0 >= 20 ? x0 - 20 : 0;
+    int rb = x1 < 39 ? x1 - 20 : 19;
     fillHalfSpan(ra, rb, y + 3 * SCREEN_TRIX_Y, setBits);
 }
 
@@ -874,6 +886,23 @@ static int isqrt(int n) {
     return res;
 }
 
+// The circle rendered very slightly taller than wide -- this trims the
+// vertical reach by ~5% to compensate, leaving the horizontal reach (which
+// only ever depends on dy==0, unaffected by this term) untouched. Scales
+// dy^2 by 71/64 (~1.109) before it's subtracted from radius^2 in circle()'s
+// rem calculation: a bigger dy^2 term makes rem hit zero at a smaller |dy|,
+// i.e. the disk's pole is reached sooner going up/down -- shrinking the
+// vertical reach to radius*sqrt(64/71) =~ 0.949x, about 5% shorter. Done
+// via shifts+add/subtract on the ALREADY-computed dy*dy (dy2 + dy2>>3 -
+// dy2>>6 = dy2*71/64) rather than an extra multiply, so this costs nothing
+// beyond what dy*dy already cost. circleCoverRadius()'s own dy reach is
+// scaled up to compensate (see there) so the disk still fully covers the
+// screen at the start of a shrink.
+static int squashDy2(int dy) {
+    int dy2 = dy * dy;
+    return dy2 + (dy2 >> 3) - (dy2 >> 6);
+}
+
 // Border-only Bresenham line: marks borderMaskCur (via drawBorderBit()) for
 // every pixel from (x0,y0) EXCLUSIVE to (x1,y1) inclusive, without touching
 // swipeMask (that's fillMaskSpan()'s job elsewhere). Used to connect one
@@ -991,7 +1020,8 @@ bool circle() {
     int topRowY = swipeCenterY - dy;
     int botRowY = swipeCenterY + dy;
 
-    int rem = circleRadius * circleRadius - dy * dy;
+    int dy2 = squashDy2(dy);
+    int rem = circleRadius * circleRadius - dy2;
 
     // Last lap's radius, if any -- SHRINK's circleRadius decreases by
     // `step` each lap, GROW's increases by `step`, so the previous value
@@ -1002,7 +1032,7 @@ bool circle() {
     int oldLeft = 0, oldRight = 0;
     if (circleHasOldRadius) {
         int oldRadius = circleRadius - (swipeStep >> 8);
-        int oldRem = oldRadius * oldRadius - dy * dy;
+        int oldRem = oldRadius * oldRadius - dy2;
         if (oldRem >= 0) {
             int oldW = isqrt(oldRem);
             int oldHalfWidth = (oldW * 7) >> 4;
