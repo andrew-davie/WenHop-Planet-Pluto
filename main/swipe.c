@@ -18,7 +18,13 @@ static const unsigned char rebase[20] = {
     1 << 1, 1 << 0, 1 << 0, 1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6, 1 << 7,
 };
 
-static unsigned char swipeMask[6][SCREEN_TRIX_Y];
+// aligned(4) on all three buffers below: clearBorderCur()/clearBorderPrev()/
+// clearMask()/the star hold-copy in swipe() all bulk-access these 4 bytes
+// at a time via an unsigned int* cast for speed. ARMv4T doesn't handle
+// unaligned word access safely, and a plain "unsigned char[]" isn't
+// guaranteed 4-byte aligned by the compiler on its own -- this attribute
+// makes that guarantee explicit instead of relying on it happening to work.
+static unsigned char swipeMask[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 
 // Border ring: NOT permanent like swipeMask. borderMaskCur is this lap's
 // trace (cleared at the start of each new lap); borderMaskPrev is a copy of
@@ -30,8 +36,8 @@ static unsigned char swipeMask[6][SCREEN_TRIX_Y];
 // laps can trace almost the exact same pixels -- a pure blink with no
 // visible motion to mask it, vs. later laps where the shape has moved
 // enough that any gap reads as motion rather than a flash).
-static unsigned char borderMaskCur[6][SCREEN_TRIX_Y];
-static unsigned char borderMaskPrev[6][SCREEN_TRIX_Y];
+static unsigned char borderMaskCur[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
+static unsigned char borderMaskPrev[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 
 static void fillMaskSpan(int x0, int x1, int y);
 bool drawBorderBit(int x, int y);
@@ -319,16 +325,33 @@ void setSwipePhase(enum CIRCLEPHASE newPhase) {
 }
 
 
+// Byte count of one of these buffers, as a word count (+ tail bytes if it
+// doesn't divide evenly -- it currently does, 6*SCREEN_TRIX_Y=396=99*4, but
+// this stays correct if that ever changes instead of silently dropping the
+// remainder).
+#define MASK_BUF_BYTES (6 * SCREEN_TRIX_Y)
+#define MASK_BUF_WORDS (MASK_BUF_BYTES / 4)
+
 static void clearBorderCur() {
-    unsigned char *p = (unsigned char *)borderMaskCur;
-    for (int i = 0; i < 6 * SCREEN_TRIX_Y; i++)
+    unsigned int *p = (unsigned int *)borderMaskCur;
+    for (int i = 0; i < MASK_BUF_WORDS; i++)
         p[i] = 0;
+    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
+        ((unsigned char *)borderMaskCur)[i] = 0;
 }
 
+// Tracks whether borderMaskPrev is already known to be all-zero, so a
+// redundant clear can be skipped -- see clearBorderPrev()'s call site in
+// swipe() for why this is safe.
+static bool borderPrevIsZero;
+
 static void clearBorderPrev() {
-    unsigned char *p = (unsigned char *)borderMaskPrev;
-    for (int i = 0; i < 6 * SCREEN_TRIX_Y; i++)
+    unsigned int *p = (unsigned int *)borderMaskPrev;
+    for (int i = 0; i < MASK_BUF_WORDS; i++)
         p[i] = 0;
+    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
+        ((unsigned char *)borderMaskPrev)[i] = 0;
+    borderPrevIsZero = true;
 }
 
 // Gate the lap-transition handling on "a new lap started", not "a new frame
@@ -444,9 +467,13 @@ void startSwipeClose(int x, int y) {
 }
 
 void clearMask(int v) {
-    unsigned char *p = (unsigned char *)swipeMask;
-    for (int i = 0; i < 6 * SCREEN_TRIX_Y; i++)
-        p[i] = v;
+    unsigned char b = (unsigned char)v;
+    unsigned int word = b | (b << 8) | (b << 16) | (b << 24);
+    unsigned int *p = (unsigned int *)swipeMask;
+    for (int i = 0; i < MASK_BUF_WORDS; i++)
+        p[i] = word;
+    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
+        ((unsigned char *)swipeMask)[i] = b;
 }
 
 void initStarSwipe() {
@@ -644,9 +671,20 @@ void swipe(int reserved) {
     // property, so it still needs the hold.
     if (newLapPending) {
         if (swipeType == SWIPE_STAR) {
-            for (int i = 0; i < 6 * SCREEN_TRIX_Y; i++)
+            unsigned int *pPrev = (unsigned int *)borderMaskPrev;
+            unsigned int *pCur = (unsigned int *)borderMaskCur;
+            for (int i = 0; i < MASK_BUF_WORDS; i++)
+                pPrev[i] = pCur[i];
+            for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
                 ((unsigned char *)borderMaskPrev)[i] = ((unsigned char *)borderMaskCur)[i];
-        } else {
+            borderPrevIsZero = false;    // now holds real border data (or did last we touched it)
+        } else if (!borderPrevIsZero) {
+            // Circle never writes to borderMaskPrev at all (see above), so
+            // once it's zero for a circle sequence it STAYS zero every lap
+            // after the first -- re-clearing an already-all-zero buffer
+            // every single lap was pure waste. Only the first circle lap
+            // after switching away from star (when prev still holds star's
+            // last-held ring) actually needs this.
             clearBorderPrev();
         }
         clearBorderCur();
