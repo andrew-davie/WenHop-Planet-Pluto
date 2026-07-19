@@ -18,18 +18,30 @@ static const unsigned char rebase[20] = {
     1 << 1, 1 << 0, 1 << 0, 1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6, 1 << 7,
 };
 
-// aligned(4) on all three buffers below: clearBorderCur()/clearBorderPrev()/
-// clearMask()/the star hold-copy in swipe() all bulk-access these 4 bytes
-// at a time via an unsigned int* cast for speed. ARMv4T doesn't handle
-// unaligned word access safely, and a plain "unsigned char[]" isn't
-// guaranteed 4-byte aligned by the compiler on its own -- this attribute
-// makes that guarantee explicit instead of relying on it happening to work.
-static unsigned char swipeMask[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
+// aligned(4) on all four buffers below: clearBorderCur()/clearBorderPrev()/
+// clearMask()/copyBuf() all bulk-access these 4 bytes at a time via an
+// unsigned int* cast for speed. ARMv4T doesn't handle unaligned word access
+// safely, and a plain "unsigned char[]" isn't guaranteed 4-byte aligned by
+// the compiler on its own -- this attribute makes that guarantee explicit
+// instead of relying on it happening to work.
+//
+// swipeMaskA/B: the revealed/hidden mask, double-buffered the same way the
+// border is (see maskShow/swipeWriteMask below) -- was a single buffer,
+// updated immediately in place, until it was observed on hardware that the
+// mask could visibly run ahead of the (already double-buffered) border
+// during a multi-frame lap: rows/segments already processed this lap had
+// their mask pulled in to the new edge right away, while the border stayed
+// frozen at last lap's position until the whole lap finished, briefly
+// exposing revealed content beyond/outside where the border line actually
+// sat. Now both buffers only ever become visible together, at the same
+// lap-boundary swap.
+static unsigned char swipeMaskA[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
+static unsigned char swipeMaskB[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 
-// Border ring: NOT permanent like swipeMask, and the two swipe types use
-// these two physical buffers completely differently -- applySwipeMask()
-// doesn't hardcode either name; it goes through borderShowA/B below instead
-// (see their declaration for why).
+// Border ring: NOT cumulative like the mask -- a lap fully redraws its own
+// connected trace from scratch rather than only touching a changed band,
+// so its double buffer (below) doesn't need a copy-forward step the way
+// the mask's does (see copyBuf()'s call site in swipe()).
 static unsigned char borderMaskCur[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 static unsigned char borderMaskPrev[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 
@@ -94,6 +106,25 @@ static unsigned char (*borderShowB)[SCREEN_TRIX_Y] = borderMaskPrev;
 // border half (star) both target this unconditionally, no swipeType check
 // needed either place.
 static unsigned char (*swipeWriteBorder)[SCREEN_TRIX_Y] = borderMaskPrev;
+
+// Mask's own display/write pair -- same idea as borderShowA/B, but only one
+// display pointer is needed (never OR'd with anything; the mask was never a
+// blend, just a single revealed/hidden bitmap). applySwipeMask() reads
+// *maskShow instead of the literal swipeMaskA/B name. fillMaskSpan() (circle)
+// and bresenhamLine()'s mask half (star) both write through swipeWriteMask.
+//
+// Unlike the border, a new lap's write target can't just start cleared --
+// the mask is CUMULATIVE (each lap only touches the thin band between old
+// and new radius/size; everything outside that band has to carry over
+// unchanged from every earlier lap), so its write buffer has to start as a
+// full copy of whatever's currently displayed, THEN this lap's span-fills
+// apply on top of that copy. See copyBuf()'s call site in swipe() for where
+// that copy happens -- same lap-boundary moment the border's clear already
+// happens unconditionally (no time-budget check), which was never a
+// problem for a buffer this size at that point in a lap, so doubling that
+// one-time cost here follows the same reasoning.
+static unsigned char (*maskShow)[SCREEN_TRIX_Y] = swipeMaskA;
+static unsigned char (*swipeWriteMask)[SCREEN_TRIX_Y] = swipeMaskB;
 
 static void fillMaskSpan(int x0, int x1, int y);
 bool drawBorderBit(int x, int y);
@@ -249,7 +280,9 @@ static int swipeWatchdogFrames;
 // frames as it actually takes -- no arbitrary margin constant involved,
 // no sweep-speed change involved either.
 enum {
-    FINISH_MASK,          // clearing swipeMask (255 for GROW, 0 for SHRINK)
+    FINISH_MASK_A,        // clearing swipeMaskA (255 for GROW, 0 for SHRINK)
+    FINISH_MASK_B,        // clearing swipeMaskB (255 for GROW, 0 for SHRINK) -- both physical mask
+                          // buffers need setting now that the mask is double-buffered too
     FINISH_BORDER_CUR,    // clearing borderMaskCur (always -- real data every time)
     FINISH_BORDER_PREV,   // clearing borderMaskPrev (skipped entirely if already known zero)
     FINISH_DONE
@@ -299,7 +332,7 @@ static enum PHASE exitPhase;
 // declaration for what these actually name per swipe type) is set, force
 // the bit fully ON (that's the "all
 // pixels set" ring at the current edge of the swipe, same in both colour
-// modes). Otherwise, if swipeMask (revealed) is set, leave the real content
+// modes). Otherwise, if maskShow (revealed) is set, leave the real content
 // alone. Otherwise, force per the black/white hidden-area rule as before.
 // Per-int this collapses to:
 //   black: final = (orig & R) | B
@@ -314,10 +347,10 @@ static void applySwipeMaskBlack(int buffer) {
         int y = 0;
 
         for (; y + 4 <= SCREEN_TRIX_Y; y += 4) {
-            unsigned int r0 = swipeMask[col][y];
-            unsigned int r1 = swipeMask[col][y + 1];
-            unsigned int r2 = swipeMask[col][y + 2];
-            unsigned int r3 = swipeMask[col][y + 3];
+            unsigned int r0 = maskShow[col][y];
+            unsigned int r1 = maskShow[col][y + 1];
+            unsigned int r2 = maskShow[col][y + 2];
+            unsigned int r3 = maskShow[col][y + 3];
             unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
             unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
             unsigned int b2 = borderShowA[col][y + 2] | borderShowB[col][y + 2];
@@ -348,8 +381,8 @@ static void applySwipeMaskBlack(int buffer) {
         // Tail: same 2-leftover-rows-plus-padding handling as before, now also
         // folding in the border rows the same way.
         if (y < SCREEN_TRIX_Y) {
-            unsigned int r0 = swipeMask[col][y];
-            unsigned int r1 = swipeMask[col][y + 1];
+            unsigned int r0 = maskShow[col][y];
+            unsigned int r1 = maskShow[col][y + 1];
             unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
             unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
             unsigned int *ip = (unsigned int *)p;
@@ -375,10 +408,10 @@ static void applySwipeMaskWhite(int buffer) {
         int y = 0;
 
         for (; y + 4 <= SCREEN_TRIX_Y; y += 4) {
-            unsigned int r0 = swipeMask[col][y];
-            unsigned int r1 = swipeMask[col][y + 1];
-            unsigned int r2 = swipeMask[col][y + 2];
-            unsigned int r3 = swipeMask[col][y + 3];
+            unsigned int r0 = maskShow[col][y];
+            unsigned int r1 = maskShow[col][y + 1];
+            unsigned int r2 = maskShow[col][y + 2];
+            unsigned int r3 = maskShow[col][y + 3];
             unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
             unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
             unsigned int b2 = borderShowA[col][y + 2] | borderShowB[col][y + 2];
@@ -405,8 +438,8 @@ static void applySwipeMaskWhite(int buffer) {
         }
 
         if (y < SCREEN_TRIX_Y) {
-            unsigned int r0 = swipeMask[col][y];
-            unsigned int r1 = swipeMask[col][y + 1];
+            unsigned int r0 = maskShow[col][y];
+            unsigned int r1 = maskShow[col][y + 1];
             unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
             unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
             unsigned int *ip = (unsigned int *)p;
@@ -497,6 +530,23 @@ static void clearBorderBuf(unsigned char (*buf)[SCREEN_TRIX_Y]) {
         p[i] = 0;
     for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
         ((unsigned char *)buf)[i] = 0;
+}
+
+// Copies one [6][SCREEN_TRIX_Y] buffer over another -- used to seed the
+// mask's write target with everything accumulated so far before this lap's
+// span-fills apply on top of it (see swipeWriteMask's declaration). Run
+// unconditionally, no time-budget check, same as clearBorderBuf() above --
+// this happens at the same lap-boundary moment the border's own
+// unconditional clear already does, where there's normally a whole lap's
+// worth of budget still ahead, not the razor-thin, budget-already-spent
+// moment finishPending's incremental clear exists for.
+static void copyBuf(unsigned char (*dst)[SCREEN_TRIX_Y], unsigned char (*src)[SCREEN_TRIX_Y]) {
+    unsigned int *pd = (unsigned int *)dst;
+    unsigned int *ps = (unsigned int *)src;
+    for (int i = 0; i < MASK_BUF_WORDS; i++)
+        pd[i] = ps[i];
+    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
+        ((unsigned char *)dst)[i] = ((unsigned char *)src)[i];
 }
 
 // Gate the lap-transition handling on "a new lap started", not "a new frame
@@ -639,14 +689,23 @@ void startSwipeClose(int x, int y) {
     setSwipe(x, y, radius, -step, SWIPE_SHRINK);
 }
 
+// Sets BOTH physical mask buffers, not just whichever one is currently
+// maskShow/swipeWriteMask -- called at sequence start/finish, when the
+// intent is "both agree on this value from here on", not a per-lap update,
+// so there's no single "the buffer" to name.
 void clearMask(int v) {
     unsigned char b = (unsigned char)v;
     unsigned int word = b | (b << 8) | (b << 16) | (b << 24);
-    unsigned int *p = (unsigned int *)swipeMask;
-    for (int i = 0; i < MASK_BUF_WORDS; i++)
-        p[i] = word;
-    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
-        ((unsigned char *)swipeMask)[i] = b;
+    unsigned int *pA = (unsigned int *)swipeMaskA;
+    unsigned int *pB = (unsigned int *)swipeMaskB;
+    for (int i = 0; i < MASK_BUF_WORDS; i++) {
+        pA[i] = word;
+        pB[i] = word;
+    }
+    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++) {
+        ((unsigned char *)swipeMaskA)[i] = b;
+        ((unsigned char *)swipeMaskB)[i] = b;
+    }
 }
 
 void initStarSwipe() {
@@ -705,21 +764,23 @@ static void fillHalfSpan(int xa, int xb, int rowBase, bool setBits) {
     if (xa > xb)
         return;
 
+    // Writes through swipeWriteMask, NOT the literal swipeMaskA/B -- see
+    // swipeWriteMask's declaration.
     // Group 0: xx 0-3, upper nibble only.
     if (xa <= 3 && xb >= 0) {
         int lo = xa > 0 ? xa : 0;
         int hi = xb < 3 ? xb : 3;
         if (lo == 0 && hi == 3) {
-            unsigned char b = ((unsigned char *)swipeMask)[rowBase];
-            ((unsigned char *)swipeMask)[rowBase] = (b & 0x0F) | (setBits ? 0xF0 : 0x00);
+            unsigned char b = ((unsigned char *)swipeWriteMask)[rowBase];
+            ((unsigned char *)swipeWriteMask)[rowBase] = (b & 0x0F) | (setBits ? 0xF0 : 0x00);
         } else {
 
             if (setBits)
                 for (int x = lo; x <= hi; x++)
-                    ((unsigned char *)swipeMask)[rowBase] |= rebase[x];
+                    ((unsigned char *)swipeWriteMask)[rowBase] |= rebase[x];
             else
                 for (int x = lo; x <= hi; x++)
-                    ((unsigned char *)swipeMask)[rowBase] &= ~rebase[x];
+                    ((unsigned char *)swipeWriteMask)[rowBase] &= ~rebase[x];
         }
     }
 
@@ -728,15 +789,15 @@ static void fillHalfSpan(int xa, int xb, int rowBase, bool setBits) {
         int lo = xa > 4 ? xa : 4;
         int hi = xb < 11 ? xb : 11;
         if (lo == 4 && hi == 11) {
-            ((unsigned char *)swipeMask)[rowBase + SCREEN_TRIX_Y] = setBits ? 0xFF : 0x00;
+            ((unsigned char *)swipeWriteMask)[rowBase + SCREEN_TRIX_Y] = setBits ? 0xFF : 0x00;
         } else {
 
             if (setBits)
                 for (int x = lo; x <= hi; x++)
-                    ((unsigned char *)swipeMask)[rowBase + SCREEN_TRIX_Y] |= rebase[x];
+                    ((unsigned char *)swipeWriteMask)[rowBase + SCREEN_TRIX_Y] |= rebase[x];
             else
                 for (int x = lo; x <= hi; x++)
-                    ((unsigned char *)swipeMask)[rowBase + SCREEN_TRIX_Y] &= ~rebase[x];
+                    ((unsigned char *)swipeWriteMask)[rowBase + SCREEN_TRIX_Y] &= ~rebase[x];
         }
     }
 
@@ -745,15 +806,15 @@ static void fillHalfSpan(int xa, int xb, int rowBase, bool setBits) {
         int lo = xa > 12 ? xa : 12;
         int hi = xb < 19 ? xb : 19;
         if (lo == 12 && hi == 19) {
-            ((unsigned char *)swipeMask)[rowBase + 2 * SCREEN_TRIX_Y] = setBits ? 0xFF : 0x00;
+            ((unsigned char *)swipeWriteMask)[rowBase + 2 * SCREEN_TRIX_Y] = setBits ? 0xFF : 0x00;
         } else {
 
             if (setBits)
                 for (int x = lo; x <= hi; x++)
-                    ((unsigned char *)swipeMask)[rowBase + 2 * SCREEN_TRIX_Y] |= rebase[x];
+                    ((unsigned char *)swipeWriteMask)[rowBase + 2 * SCREEN_TRIX_Y] |= rebase[x];
             else
                 for (int x = lo; x <= hi; x++)
-                    ((unsigned char *)swipeMask)[rowBase + 2 * SCREEN_TRIX_Y] &= ~rebase[x];
+                    ((unsigned char *)swipeWriteMask)[rowBase + 2 * SCREEN_TRIX_Y] &= ~rebase[x];
         }
     }
 }
@@ -781,7 +842,7 @@ static void fillMaskSpan(int x0, int x1, int y) {
     fillHalfSpan(ra, rb, y + 3 * SCREEN_TRIX_Y, setBits);
 }
 
-// Border-only: marks the visible ring outline, without touching swipeMask
+// Border-only: marks the visible ring outline, without touching the mask
 // (that's fillMaskSpan()'s job for circle now -- see above).
 //
 // Marks 2 consecutive trix-rows per point (y and y+1), not 1 -- same thing
@@ -832,7 +893,7 @@ void swipe(int reserved) {
     if (swipeComplete && !finishPending) {
         swipeWatchdogFrames = 0;
     } else if (!finishPending && ++swipeWatchdogFrames > SWIPE_WATCHDOG_FRAMES) {
-        finishStage = FINISH_MASK;
+        finishStage = FINISH_MASK_A;
         finishIndex = 0;
         finishPending = true;
         swipeComplete = false;    // not really done until the incremental finish below actually runs
@@ -850,14 +911,29 @@ void swipe(int reserved) {
                                                                      // 4) -- kept generic, same as
                                                                      // clearBorderCur()/clearMask()
             switch (finishStage) {
-            case FINISH_MASK: {
+            case FINISH_MASK_A: {
                 unsigned char v = (swipePhase == SWIPE_GROW) ? 0xFF : 0;
                 if (finishIndex < MASK_BUF_WORDS) {
                     unsigned int word = v | (v << 8) | (v << 16) | (v << 24);
-                    ((unsigned int *)swipeMask)[finishIndex] = word;
+                    ((unsigned int *)swipeMaskA)[finishIndex] = word;
                     finishIndex++;
                 } else if (finishIndex - MASK_BUF_WORDS < tailBytes) {
-                    ((unsigned char *)swipeMask)[MASK_BUF_WORDS * 4 + (finishIndex - MASK_BUF_WORDS)] = v;
+                    ((unsigned char *)swipeMaskA)[MASK_BUF_WORDS * 4 + (finishIndex - MASK_BUF_WORDS)] = v;
+                    finishIndex++;
+                } else {
+                    finishStage = FINISH_MASK_B;
+                    finishIndex = 0;
+                }
+                break;
+            }
+            case FINISH_MASK_B: {
+                unsigned char v = (swipePhase == SWIPE_GROW) ? 0xFF : 0;
+                if (finishIndex < MASK_BUF_WORDS) {
+                    unsigned int word = v | (v << 8) | (v << 16) | (v << 24);
+                    ((unsigned int *)swipeMaskB)[finishIndex] = word;
+                    finishIndex++;
+                } else if (finishIndex - MASK_BUF_WORDS < tailBytes) {
+                    ((unsigned char *)swipeMaskB)[MASK_BUF_WORDS * 4 + (finishIndex - MASK_BUF_WORDS)] = v;
                     finishIndex++;
                 } else {
                     finishStage = FINISH_BORDER_CUR;
@@ -932,13 +1008,27 @@ void swipe(int reserved) {
     // boot), so "promoting" swipeWriteBorder's leftover value just displays
     // blank until lap 1 actually finishes -- no separate first-lap or
     // type-switch case needed.
+    //
+    // The mask swaps at the exact same moment, for the exact same reason:
+    // it was observed on hardware that the (previously single-buffered)
+    // mask could visibly outrun the border during a multi-frame lap,
+    // revealing pixels beyond where the border line had actually reached
+    // yet. Doing both swaps in this one block guarantees mask and border
+    // only ever change together -- there's no way to see one updated
+    // without the other any more. Unlike the border, the mask can't just
+    // start its write target blank: it's cumulative (a lap only touches the
+    // thin band between old and new radius/size; everything else has to
+    // carry over from every earlier lap), so its write target has to start
+    // as a full copy of whatever's currently displayed, via copyBuf(), with
+    // THIS lap's span-fills then applying on top of that copy.
     if (newLapPending) {
-        unsigned char(*justFinished)[SCREEN_TRIX_Y] = swipeWriteBorder;
-        unsigned char(*nextWrite)[SCREEN_TRIX_Y] = (justFinished == borderMaskCur) ? borderMaskPrev : borderMaskCur;
+        unsigned char(*justFinishedBorder)[SCREEN_TRIX_Y] = swipeWriteBorder;
+        unsigned char(*nextWriteBorder)[SCREEN_TRIX_Y] =
+            (justFinishedBorder == borderMaskCur) ? borderMaskPrev : borderMaskCur;
 
-        borderShowA = justFinished;
-        borderShowB = justFinished;
-        swipeWriteBorder = nextWrite;
+        borderShowA = justFinishedBorder;
+        borderShowB = justFinishedBorder;
+        swipeWriteBorder = nextWriteBorder;
 
         // Pessimistically mark not-zero the instant we hand this buffer
         // over as a write target, rather than after the lap fills it in --
@@ -947,10 +1037,18 @@ void swipe(int reserved) {
         // declaration) runs right after, and it needs to already see "not
         // zero" for whatever real data this lap is about to trace, not the
         // split-second-stale "just cleared" state.
-        if (nextWrite == borderMaskPrev)
+        if (nextWriteBorder == borderMaskPrev)
             borderPrevIsZero = false;
 
-        clearBorderBuf(nextWrite);
+        clearBorderBuf(nextWriteBorder);
+
+        unsigned char(*justFinishedMask)[SCREEN_TRIX_Y] = swipeWriteMask;
+        unsigned char(*nextWriteMask)[SCREEN_TRIX_Y] = (justFinishedMask == swipeMaskA) ? swipeMaskB : swipeMaskA;
+
+        maskShow = justFinishedMask;
+        swipeWriteMask = nextWriteMask;
+        copyBuf(nextWriteMask, justFinishedMask);
+
         newLapPending = false;
     }
 
@@ -994,7 +1092,7 @@ void swipe(int reserved) {
                     // thin per-lap outline is gap-prone, same reasoning as
                     // GROW's clearMask(255)) AND clearing borderMaskCur
                     // (applySwipeMask() forces a pixel fully ON wherever
-                    // border is set, completely regardless of swipeMask, so
+                    // border is set, completely regardless of the mask, so
                     // the final lap's last-drawn ring would otherwise sit on
                     // screen forever). That's real, unavoidable work -- up to
                     // ~200 words -- so don't do it here unconditionally: hand
@@ -1004,7 +1102,7 @@ void swipe(int reserved) {
                     // lap that just finished may have already spent the
                     // frame's whole budget getting here, is exactly what
                     // caused a CPU jam right as the shrink was about to end.
-                    finishStage = FINISH_MASK;
+                    finishStage = FINISH_MASK_A;
                     finishIndex = 0;
                     finishPending = true;
                     swipeComplete = false;    // not really done until finishPending's clear actually runs
@@ -1017,7 +1115,7 @@ void swipe(int reserved) {
                     // Same reasoning as SWIPE_SHRINK above -- clearMask(255)
                     // is real work, deferred to finishPending instead of run
                     // unconditionally right here.
-                    finishStage = FINISH_MASK;
+                    finishStage = FINISH_MASK_A;
                     finishIndex = 0;
                     finishPending = true;
                     swipeComplete = false;
@@ -1169,7 +1267,7 @@ static int squashDy2(int dy) {
 
 // Border-only Bresenham line: marks swipeWriteBorder (via drawBorderBit())
 // for every pixel from (x0,y0) EXCLUSIVE to (x1,y1) inclusive, without touching
-// swipeMask (that's fillMaskSpan()'s job elsewhere). Used to connect one
+// the mask (that's fillMaskSpan()'s job elsewhere). Used to connect one
 // row's edge point to the next's -- see circle()'s comment for why an
 // isolated dot per row can't form a connected curve on its own.
 //
@@ -1488,12 +1586,14 @@ bool bresenhamLine(int x0, int y0, int x1, int y1) {
 
             y += ((x + 4) >> 3) * SCREEN_TRIX_Y;
 
+            // Writes through swipeWriteMask, NOT the literal swipeMaskA/B --
+            // see swipeWriteMask's declaration.
             if (swipePhase == SWIPE_SHRINK) {
-                ((unsigned char *)swipeMask)[y] &= ~rebase[x];
-                ((unsigned char *)swipeMask)[y + 1] &= ~rebase[x];
+                ((unsigned char *)swipeWriteMask)[y] &= ~rebase[x];
+                ((unsigned char *)swipeWriteMask)[y + 1] &= ~rebase[x];
             } else {
-                ((unsigned char *)swipeMask)[y] |= rebase[x];
-                ((unsigned char *)swipeMask)[y + 1] |= rebase[x];
+                ((unsigned char *)swipeWriteMask)[y] |= rebase[x];
+                ((unsigned char *)swipeWriteMask)[y + 1] |= rebase[x];
             }
 
             // Border ring -- see drawBorderBit() for why this isn't
