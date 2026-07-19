@@ -77,8 +77,10 @@ static int swipeCenterY;
 // from -sweep to sweep -- circle() processes the row at +dy and the row at
 // -dy together off a single isqrt() call, since they're always the same
 // half-width by construction. Halves the isqrt() count per lap.
-static int circleRadius;    // current lap's disk radius, whole trix
-static int circleRow;       // |dy| cursor this lap, 0 .. sweep
+static int circleRadius;      // current lap's disk radius, whole trix
+static int circleRadiusSq;    // circleRadius*circleRadius, hoisted out of circle()'s per-row
+                               // loop -- same value all lap, no need to re-multiply every row
+static int circleRow;         // |dy| cursor this lap, 0 .. sweep
 
 // Tracks the previous row's edge points so circle() can connect consecutive
 // rows' edges with an actual line instead of leaving them as isolated dots
@@ -118,6 +120,10 @@ static bool botHasPrev;
 // randomizeStarAngle().
 static bool circleFreshSequence = true;
 static bool circleHasOldRadius;
+static int oldRadiusSq;    // oldRadius*oldRadius, hoisted the same way as circleRadiusSq --
+                           // oldRadius is constant for the whole lap (derived from circleRadius
+                           // and swipeStep, neither of which change mid-lap), so this only needs
+                           // computing once per lap instead of once per row.
 
 void markCircleFreshSequence() {
     circleFreshSequence = true;
@@ -375,6 +381,7 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
     switch (swipeType) {
     case SWIPE_CIRCLE: {
         circleRadius = swipeRadius >> 8;
+        circleRadiusSq = circleRadius * circleRadius;
         // For SHRINK, sweep circleRadius PLUS one step's worth of margin --
         // not the current radius alone, and NOT the whole original starting
         // extent either (that was tried and swept ~150-190 rows every
@@ -399,6 +406,10 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
         botHasPrev = false;
         circleHasOldRadius = !circleFreshSequence;    // false only for a sequence's very first lap
         circleFreshSequence = false;                  // consumed -- every later lap this sequence has an old radius
+        if (circleHasOldRadius) {
+            int oldRadius = circleRadius - (swipeStep >> 8);
+            oldRadiusSq = oldRadius * oldRadius;    // hoisted -- see oldRadiusSq's declaration
+        }
         break;
     }
 
@@ -1021,18 +1032,16 @@ bool circle() {
     int botRowY = swipeCenterY + dy;
 
     int dy2 = squashDy2(dy);
-    int rem = circleRadius * circleRadius - dy2;
+    int rem = circleRadiusSq - dy2;
 
-    // Last lap's radius, if any -- SHRINK's circleRadius decreases by
-    // `step` each lap, GROW's increases by `step`, so the previous value
-    // is always circleRadius -/+ (swipeStep>>8) accordingly. swipeStep is
-    // negative for SHRINK already (see setSwipe()/startSwipeClose()), so
-    // circleRadius - (swipeStep>>8) is correct for both directions.
+    // Last lap's radius-squared, if any -- both circleRadiusSq and
+    // oldRadiusSq are computed once per lap in setSwipe() now (they're
+    // constant for the whole lap), not re-multiplied here on every single
+    // row -- see their declarations.
     bool haveOld = false;
     int oldLeft = 0, oldRight = 0;
     if (circleHasOldRadius) {
-        int oldRadius = circleRadius - (swipeStep >> 8);
-        int oldRem = oldRadius * oldRadius - dy2;
+        int oldRem = oldRadiusSq - dy2;
         if (oldRem >= 0) {
             int oldW = isqrt(oldRem);
             int oldHalfWidth = (oldW * 7) >> 4;
