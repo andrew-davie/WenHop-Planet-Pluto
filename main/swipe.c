@@ -1267,16 +1267,28 @@ bool circle() {
         // Nothing ever connects left and right HORIZONTALLY on the same row --
         // only the vertical row-to-row chains (bresenhamBorderLine above) do.
         // Doesn't matter at wide (equatorial) rows, where the gap between them
-        // is most of the screen and clearly "inside" the shape. But near a
-        // pole -- wherever this lap's disk is narrowest, which is always
-        // somewhere near the top/bottom of whatever's currently visible, every
-        // single lap -- left and right end up only 1-2 trix apart, and the
-        // handful of columns between them never get a border mark: two
-        // isolated dots with a visible gap between, right where the shape
-        // should look rounded off. Once the gap's small, just fill it in too --
-        // this only ever fires within a trix or two of a pole, so it's a
-        // handful of extra points at most, not a per-row cost.
-        if (right - left <= 4) {
+        // is most of the screen and clearly "inside" the shape. At the true
+        // TIP of the disk though -- the last row this lap has any width at
+        // all, where there's no next row for the vertical chains to connect
+        // to -- left and right stop only 1-2 trix apart with nothing marking
+        // the columns between: two isolated dots with a real gap, right where
+        // the shape should round off.
+        //
+        // First attempt gated this on "right - left is small" instead of
+        // "this is actually the last row" -- wrong condition: for a small
+        // enough disk, EVERY row in the lap satisfies "small gap", not just
+        // the tip, so it filled in every narrow row's span, each one already
+        // 2 trix-rows tall via drawBorderBit(), all just 1 dy apart and so
+        // overlapping vertically -- the whole tiny disk turned into one solid
+        // chunky blob (visibly 4+ trix-rows tall, not the correct 2) instead
+        // of a thin ring, and the intended one-row cap. Checking the NEXT
+        // row's rem instead (one extra cheap squashDy2() call, no isqrt
+        // needed since only its sign matters) correctly finds just the
+        // single tip row per chain, so only that one row gets the extra
+        // horizontal fill -- every other narrow-but-not-last row is left
+        // exactly as the vertical chains alone draw it, same as before this
+        // whole gap-fix existed.
+        if (circleRadiusSq - squashDy2(dy + 1) < 0) {
             for (int x = left + 1; x < right; x++)
                 visible |= drawBorderBit(x, topRowY);
             if (dy != 0)
