@@ -99,6 +99,20 @@ static int circleRadiusSq;    // circleRadius*circleRadius, hoisted out of circl
                                // loop -- same value all lap, no need to re-multiply every row
 static int circleRow;         // |dy| cursor this lap, 0 .. sweep
 
+// The step that was actually applied to reach THIS lap's circleRadius from
+// the previous one (24.8, signed -- same representation as swipeStep).
+// SHRINK's per-lap step is no longer constant for a whole sequence (see
+// its computation in setSwipe()'s SWIPE_CIRCLE case): large radii take
+// bigger jumps so the expensive large-sweep laps get through faster, fine
+// 1-trix jumps return once radius is small enough for it to matter
+// visually. That means swipeStep, by the time circle() runs, already holds
+// the step for the NEXT lap, not the one that produced the CURRENT
+// oldRadiusSq/sweep-margin relationship -- circleLastStep is captured
+// before swipeStep gets overwritten with the next lap's value, so
+// circle()'s delta-fill and sweep margin (both of which need "how much
+// bigger was the PREVIOUS lap") stay correct regardless.
+static int circleLastStep;
+
 // Tracks the previous row's edge points so circle() can connect consecutive
 // rows' edges with an actual line instead of leaving them as isolated dots
 // -- see circle()'s comment. Processing top and bottom rows outward from
@@ -451,6 +465,8 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
 
     switch (swipeType) {
     case SWIPE_CIRCLE: {
+        circleLastStep = step;    // what got us here -- see its declaration; capture BEFORE any
+                                   // adaptive-step recomputation below overwrites swipeStep
         circleRadius = swipeRadius >> 8;
         circleRadiusSq = circleRadius * circleRadius;
         // For SHRINK, sweep circleRadius PLUS one step's worth of margin --
@@ -478,8 +494,32 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
         circleHasOldRadius = !circleFreshSequence;    // false only for a sequence's very first lap
         circleFreshSequence = false;                  // consumed -- every later lap this sequence has an old radius
         if (circleHasOldRadius) {
-            int oldRadius = circleRadius - (swipeStep >> 8);
+            int oldRadius = circleRadius - (circleLastStep >> 8);
             oldRadiusSq = oldRadius * oldRadius;    // hoisted -- see oldRadiusSq's declaration
+        }
+
+        // Adaptive SHRINK step: bigger jumps while radius is still large (up
+        // to 4 trix/lap), tapering to the original fine 1-trix step by
+        // radius 8 and below. Cuts the number of expensive large-sweep laps
+        // roughly in half to a third (60 trix start: ~59 laps at a flat 1
+        // trix down to ~22 here, verified by simulation) -- fewer of those
+        // laps means fewer chances for one to spill across more than one
+        // frame, which is what was producing a repeating blank-then-redraw
+        // flicker at whichever pole stayed on-screen (borderMaskCur is wiped
+        // once at the start of each lap, then rebuilt row by row as circleRow
+        // advances -- a lap spanning multiple frames leaves the not-yet-
+        // reached rows with no border until the lap catches up, every lap,
+        // while the sweep is large enough for that to keep happening). Only
+        // applies to SHRINK -- GROW and STAR are untouched. Trade-off: bigger
+        // per-lap jumps are a slightly less perfectly smooth motion than the
+        // fixed 1-trix step gave, but only while the disk is still large,
+        // where a few-trix jump is proportionally minor -- worth confirming
+        // on hardware whether the step curve here needs to be gentler.
+        if (phase == SWIPE_SHRINK) {
+            int stepTrix = 1 + (circleRadius >> 3);
+            if (stepTrix > 4)
+                stepTrix = 4;
+            swipeStep = -(stepTrix << 8);
         }
         break;
     }
@@ -1301,7 +1341,9 @@ bool circle() {
 
     int sweep = circleRadius;
     if (swipePhase == SWIPE_SHRINK)
-        sweep += abs(swipeStep >> 8);
+        sweep += abs(circleLastStep >> 8);    // how much bigger the PREVIOUS lap was -- see
+                                               // circleLastStep's declaration; swipeStep now holds
+                                               // the NEXT lap's (adaptive) step, not this one's
     if (circleRow > sweep)
         swipeComplete = true;
 
