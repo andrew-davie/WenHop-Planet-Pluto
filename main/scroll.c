@@ -5,6 +5,7 @@
 #include "main.h"
 #include "mellon.h"
 #include "scroll.h"
+#include "swipe.h"
 
 int scrollX, scrollY;
 
@@ -37,7 +38,7 @@ int approach(int current, int target, int speed) {
 
 void scroll() {
 
-    if (playerDead && !waitRelease) {    // && *playerAnimation == FRAME_BLANK) {
+    if (!maskNeeded && playerDead && !waitRelease) {    // && *playerAnimation == FRAME_BLANK) {
 
         // Manual look-around
 

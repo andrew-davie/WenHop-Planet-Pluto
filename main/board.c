@@ -200,7 +200,7 @@ void setupBoardScanner() {
 void processBoardSquares() {
 
 
-    while (T1TC < availableIdleTime - 7500) {
+    while (T1TC < availableIdleTime - 6500) {
 
         // boardRow/boardCol are the only pieces of this that genuinely need
         // to survive across frames (this loop yields when its time budget
@@ -803,7 +803,7 @@ void restartBoardScan() {
                 // (same offset particle.c's baseX/baseY use to centre effects
                 // on the player).
                 startSwipeClose(playerX * CHAR_TRIX_X + CHAR_CENTER_X - (scrollX >> 16),
-                                 playerY * CHAR_TRIX_Y + CHAR_CENTER_Y - (scrollY >> 16));
+                                playerY * CHAR_TRIX_Y + CHAR_CENTER_Y - (scrollY >> 16));
             }
 #endif
         }
