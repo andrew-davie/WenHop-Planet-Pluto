@@ -760,7 +760,21 @@ void swipe(int reserved) {
                     // diagonal segments, so proportionally far gappier) look
                     // like it wasn't masking at all. Force fully hidden
                     // regardless of how completely the traces covered it.
+                    //
+                    // Also clear the border buffers here, not just the mask:
+                    // applySwipeMask() forces a pixel fully ON whenever
+                    // borderMaskCur|borderMaskPrev has that bit set, completely
+                    // regardless of swipeMask -- so whatever the final lap's
+                    // ring last drew (a small dot near the pole, since the
+                    // shrink was almost closed) would otherwise sit on screen
+                    // forever: swipeComplete never gets reset after this
+                    // early return, so swipe() does nothing on every later
+                    // frame and nothing else ever clears it. That's the "shrinks
+                    // to ~2 trix and stops" bug -- the mask genuinely finished,
+                    // but a stray border pixel was stuck on top of it.
                     clearMask(0);
+                    clearBorderCur();
+                    clearBorderPrev();
                     return;
                 }
                 break;
