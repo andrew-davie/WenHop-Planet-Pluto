@@ -761,7 +761,7 @@ void swipe(int reserved) {
                     // like it wasn't masking at all. Force fully hidden
                     // regardless of how completely the traces covered it.
                     //
-                    // Also clear the border buffers here, not just the mask:
+                    // Also clear borderMaskCur here, not just the mask:
                     // applySwipeMask() forces a pixel fully ON whenever
                     // borderMaskCur|borderMaskPrev has that bit set, completely
                     // regardless of swipeMask -- so whatever the final lap's
@@ -772,9 +772,21 @@ void swipe(int reserved) {
                     // frame and nothing else ever clears it. That's the "shrinks
                     // to ~2 trix and stops" bug -- the mask genuinely finished,
                     // but a stray border pixel was stuck on top of it.
+                    //
+                    // borderMaskPrev does NOT need the same treatment: circle()
+                    // never writes to it at all (only STAR's hold-copy does --
+                    // see newLapPending's handling above), so once it's zero for
+                    // a circle sequence it stays zero every lap after the
+                    // first -- borderPrevIsZero already tracks exactly that.
+                    // Clearing it again here unconditionally was pure unbudgeted
+                    // work landing at the single worst moment (right as the
+                    // frame's already-tight time budget runs out, no time-check
+                    // guards this path at all) -- exactly the kind of thing that
+                    // can overrun the frame and lock the ARM.
                     clearMask(0);
                     clearBorderCur();
-                    clearBorderPrev();
+                    if (!borderPrevIsZero)
+                        clearBorderPrev();
                     return;
                 }
                 break;
