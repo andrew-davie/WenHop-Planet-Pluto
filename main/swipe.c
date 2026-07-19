@@ -170,6 +170,24 @@ static bool swipeVisible;
 #define SWIPE_WATCHDOG_FRAMES 600
 static int swipeWatchdogFrames;
 
+// Finishing a sequence (SHRINK's clearMask(0)+clearBorderCur(), GROW's
+// clearMask(255)) costs up to ~200 words of clearing -- real work, and it
+// used to run completely unconditionally the instant the last lap's
+// termination check tripped, with no time-budget check at all. That's
+// landing exactly at the worst possible moment: right when the lap that
+// just finished may have already spent the frame's whole budget getting
+// there. Reported as a CPU jam right as the circle was about to finish --
+// this is why. finishPending defers the actual clearing to whichever
+// frame (this one or a later one) genuinely has room left for it, instead
+// of doing it unconditionally on top of whatever's already been spent.
+// swipeComplete is deliberately kept false while this is pending (even
+// though circle()/star() already finished their last lap) so
+// checkSwipeFinished() doesn't report done before the screen is actually
+// in its finished state.
+#define SWIPE_FINISH_MARGIN 500    // rough guess at the ~200-300 words of clearing's cost in T1TC
+                                   // ticks -- needs real hardware numbers to tighten up
+static bool finishPending;
+
 bool maskNeeded = true;           // false once fully open (grown-in) -- lets applySwipeMask skip the AND loop
 static bool maskWhite = false;    // true: hidden area forced ON (COLUPF/white); false: forced OFF (background/black)
 
@@ -722,20 +740,34 @@ void swipe(int reserved) {
     // Watchdog -- see swipeWatchdogFrames' declaration. Idle (swipeComplete
     // true, the normal state whenever nothing is actively growing/shrinking)
     // keeps it reset to 0 every frame; only an ACTIVE sequence that hasn't
-    // finished after SWIPE_WATCHDOG_FRAMES gets force-closed.
-    if (swipeComplete) {
+    // finished after SWIPE_WATCHDOG_FRAMES gets force-closed. Doesn't do the
+    // clearing itself -- just hands off to the SAME budget-checked
+    // finishPending path a normal termination uses (see below), so a
+    // watchdog-triggered finish can't overrun the frame any more than a
+    // normal one can.
+    if (swipeComplete && !finishPending) {
         swipeWatchdogFrames = 0;
-    } else if (++swipeWatchdogFrames > SWIPE_WATCHDOG_FRAMES) {
-        // Force-finish, mirroring whichever natural termination this
-        // sequence was heading for so state stays consistent for whatever
-        // checks swipeComplete/maskNeeded next (checkSwipeFinished() etc).
-        clearMask(swipePhase == SWIPE_GROW ? 255 : 0);
-        clearBorderCur();
-        if (!borderPrevIsZero)
-            clearBorderPrev();
-        if (swipePhase == SWIPE_GROW)
-            maskNeeded = false;
-        swipeComplete = true;
+    } else if (!finishPending && ++swipeWatchdogFrames > SWIPE_WATCHDOG_FRAMES) {
+        finishPending = true;
+        swipeComplete = false;    // not really done until the deferred finish below actually runs
+    }
+
+    // Deferred finish -- see finishPending's declaration. Only does the
+    // actual clearing once T1TC confirms there's still real budget left
+    // this frame (SWIPE_FINISH_MARGIN's worth); otherwise tries again next
+    // frame rather than doing unbudgeted work on top of whatever this frame
+    // already spent. swipeComplete only becomes true once this succeeds.
+    if (finishPending) {
+        if (T1TC < availableIdleTime - reserved - SWIPE_FINISH_MARGIN) {
+            clearMask(swipePhase == SWIPE_GROW ? 255 : 0);
+            clearBorderCur();
+            if (!borderPrevIsZero)
+                clearBorderPrev();
+            if (swipePhase == SWIPE_GROW)
+                maskNeeded = false;
+            finishPending = false;
+            swipeComplete = true;
+        }
         return;
     }
 
@@ -823,51 +855,33 @@ void swipe(int reserved) {
 
             case SWIPE_SHRINK:
                 if (!swipeVisible || swipeRadius <= -swipeStep) {
-                    // Mirror of GROW's clearMask(255) below: the accumulated
-                    // AND-clearing from each lap's thin outline is gap-prone
-                    // (same "successive outlines must overlap closely"
-                    // constraint as the fill side), and unlike GROW this had
-                    // no blanket fallback -- so whatever the outlines missed
-                    // stayed visible forever, which is what made circle (a
-                    // much thinner per-lap sweep than star's ten long
-                    // diagonal segments, so proportionally far gappier) look
-                    // like it wasn't masking at all. Force fully hidden
-                    // regardless of how completely the traces covered it.
-                    //
-                    // Also clear borderMaskCur here, not just the mask:
-                    // applySwipeMask() forces a pixel fully ON whenever
-                    // borderMaskCur|borderMaskPrev has that bit set, completely
-                    // regardless of swipeMask -- so whatever the final lap's
-                    // ring last drew (a small dot near the pole, since the
-                    // shrink was almost closed) would otherwise sit on screen
-                    // forever: swipeComplete never gets reset after this
-                    // early return, so swipe() does nothing on every later
-                    // frame and nothing else ever clears it. That's the "shrinks
-                    // to ~2 trix and stops" bug -- the mask genuinely finished,
-                    // but a stray border pixel was stuck on top of it.
-                    //
-                    // borderMaskPrev does NOT need the same treatment: circle()
-                    // never writes to it at all (only STAR's hold-copy does --
-                    // see newLapPending's handling above), so once it's zero for
-                    // a circle sequence it stays zero every lap after the
-                    // first -- borderPrevIsZero already tracks exactly that.
-                    // Clearing it again here unconditionally was pure unbudgeted
-                    // work landing at the single worst moment (right as the
-                    // frame's already-tight time budget runs out, no time-check
-                    // guards this path at all) -- exactly the kind of thing that
-                    // can overrun the frame and lock the ARM.
-                    clearMask(0);
-                    clearBorderCur();
-                    if (!borderPrevIsZero)
-                        clearBorderPrev();
+                    // Needs both clearMask(0) (force fully hidden -- circle's
+                    // thin per-lap outline is gap-prone, same reasoning as
+                    // GROW's clearMask(255)) AND clearing borderMaskCur
+                    // (applySwipeMask() forces a pixel fully ON wherever
+                    // border is set, completely regardless of swipeMask, so
+                    // the final lap's last-drawn ring would otherwise sit on
+                    // screen forever). That's real, unavoidable work -- up to
+                    // ~200 words -- so don't do it here unconditionally: hand
+                    // off to the budget-checked finishPending path instead
+                    // (see its declaration and use just above). Doing it here
+                    // directly, with no time-check at all, right as the
+                    // lap that just finished may have already spent the
+                    // frame's whole budget getting here, is exactly what
+                    // caused a CPU jam right as the shrink was about to end.
+                    finishPending = true;
+                    swipeComplete = false;    // not really done until finishPending's clear actually runs
                     return;
                 }
                 break;
 
             case SWIPE_GROW:
                 if (!swipeVisible) {
-                    clearMask(255);
-                    maskNeeded = false;
+                    // Same reasoning as SWIPE_SHRINK above -- clearMask(255)
+                    // is real work, deferred to finishPending instead of run
+                    // unconditionally right here.
+                    finishPending = true;
+                    swipeComplete = false;
                     return;
                 }
                 break;
