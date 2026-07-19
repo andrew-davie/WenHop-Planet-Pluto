@@ -127,12 +127,13 @@ void VB_Game() {
     T1TCR = 1;
 
 #if ENABLE_SWIPE
-    swipe(34000);    // Confirmed on hardware: 34000 is as much as swipe() can take from the frame's
-                      // idle time before other VB_Game systems start missing their own budget. See
-                      // circle()'s circleRadiusSq/oldRadiusSq caching (swipe.c) for the per-lap cost
-                      // reduction that gives this more headroom for large-sweep laps (e.g. a
-                      // bottom-of-screen swipe centre, whose covering radius has to reach much
-                      // further than a centred one).
+    swipe(35000);    // Confirmed on hardware: 35000 is as much as swipe() can take from the frame's
+                     // idle time before other VB_Game systems start missing their own budget --
+                     // bumped from 34000, needed a bit more still. See circle()'s
+                     // circleRadiusSq/oldRadiusSq caching (swipe.c) for the per-lap cost reduction
+                     // that gives this more headroom for large-sweep laps (e.g. a bottom-of-screen
+                     // swipe centre, whose covering radius has to reach much further than a
+                     // centred one).
 #endif
 
     initDataStreams_Game();
@@ -146,14 +147,14 @@ void VB_Game() {
 
 #if ENABLE_SHAKE
 
-    // if (shakeTime) {
-    //     shakeTime--;
-    //     shakeX = (rangeRandom(3) - 1) << 16;
-    //     shakeY = (rangeRandom(5) - 2) << 16;
-    // }
+    if (shakeTime) {
+        shakeTime--;
+        shakeX = (rangeRandom(3) - 1) << 16;
+        shakeY = (rangeRandom(5) - 2) << 16;
+    }
 
-    // else
-    shakeX = shakeY = 0;
+    else
+        shakeX = shakeY = 0;
 #endif
 
     if (RAM[_SWCHB] != 0x3F)
