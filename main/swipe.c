@@ -629,20 +629,37 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
     }
 }
 
-// Radius (in whole trix, not 24.8) a circle centred at swipeCenterX/Y needs
-// to fully cover the screen. NOT a plain Euclidean corner distance: circle()
-// scales its x-extent by 7/16 relative to the true (isotropic) half-width
-// (halfWidth = (w*7)>>4) as a display aspect-ratio correction -- trix
-// columns are physically wider than trix rows are tall,
-// so the x-reach needs compressing for the shape to actually look round.
-// That means the radius needed to cover the x-extent is dx*16/7, not just
-// dx -- confirmed empirically (simulation): using the plain Euclidean
-// distance here left the shape's x-reach several trix short at the sides,
-// so a whole PF plane near the centre column never got touched by the
-// shrink no matter how many laps ran.
-static int circleCoverRadius() {
-    int dx = swipeCenterX > (_1ROW - 1 - swipeCenterX) ? swipeCenterX : (_1ROW - 1 - swipeCenterX);
-    int dy = swipeCenterY > (SCREEN_TRIX_Y - 1 - swipeCenterY) ? swipeCenterY : (SCREEN_TRIX_Y - 1 - swipeCenterY);
+// Radius (in whole trix, not 24.8) a circle centred at (cx, cy) needs to
+// fully cover the screen. Takes the centre as explicit PARAMETERS -- NOT
+// swipeCenterX/Y (a prior version read those globals directly instead, which
+// was wrong: startSwipeClose() calls this BEFORE setSwipe() updates
+// swipeCenterX/Y to the new death position, so it was computing the covering
+// radius for wherever the PREVIOUS sequence had been centred -- e.g. the
+// star's level-start position -- not the death position it was about to draw
+// around. Confirmed by simulation: for ~1 in 6 randomised (stale-centre,
+// real-centre) pairs, the mismatch was bad enough that the radius handed to
+// the very first lap didn't fit the ACTUAL draw centre at all -- the ring
+// missed the screen in both x and y for every row of that lap, tripping
+// circle()'s (otherwise correct) "not visible this lap" safety check
+// immediately: PF snaps to black with no ring ever drawn, then straight to
+// the post-death transition once shakeTime runs out. Matches "instant black,
+// no border, next level ~10-20 frames later" exactly, and explains why it
+// only happened "a couple of instances" -- it depends on how far the player
+// had wandered from the level's start position before dying.
+//
+// NOT a plain Euclidean corner distance either: circle() scales its x-extent
+// by 7/16 relative to the true (isotropic) half-width (halfWidth =
+// (w*7)>>4) as a display aspect-ratio correction -- trix columns are
+// physically wider than trix rows are tall, so the x-reach needs
+// compressing for the shape to actually look round. That means the radius
+// needed to cover the x-extent is dx*16/7, not just dx -- confirmed
+// empirically (simulation): using the plain Euclidean distance here left the
+// shape's x-reach several trix short at the sides, so a whole PF plane near
+// the centre column never got touched by the shrink no matter how many laps
+// ran.
+static int circleCoverRadius(int cx, int cy) {
+    int dx = cx > (_1ROW - 1 - cx) ? cx : (_1ROW - 1 - cx);
+    int dy = cy > (SCREEN_TRIX_Y - 1 - cy) ? cy : (SCREEN_TRIX_Y - 1 - cy);
     int rForX = ((dx * 16 + 6) * (0x10000 / 7)) >> 16;    // ceil(dx*16/7)
     // Compensate for squashDy2()'s ~5% vertical trim in circle(): the disk's
     // actual dy-reach for a given radius is only radius*sqrt(64/71) now, so
@@ -684,7 +701,7 @@ void startSwipeClose(int x, int y) {
     // step still means consecutive laps' outlines sit several trix apart,
     // which reads as visible gaps/jumps between frames. A fine 1-trix step
     // keeps consecutive laps close enough to look like continuous motion.
-    int radius = (swipeType == SWIPE_CIRCLE) ? (circleCoverRadius() << 8) : swipeRadius;
+    int radius = (swipeType == SWIPE_CIRCLE) ? (circleCoverRadius(x, y) << 8) : swipeRadius;
     int step = (swipeType == SWIPE_CIRCLE) ? (1 << 8) : swipeStep;    // 1 trix/lap for circle
 
     if (swipeType == SWIPE_STAR)
