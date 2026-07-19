@@ -19,11 +19,10 @@ static const unsigned char rebase[20] = {
 };
 
 // aligned(4) on all four buffers below: clearBorderCur()/clearBorderPrev()/
-// clearMask()/the lapPrepPending state machine all bulk-access these 4 bytes
-// at a time via an unsigned int* cast for speed. ARMv4T doesn't handle
-// unaligned word access safely, and a plain "unsigned char[]" isn't
-// guaranteed 4-byte aligned by the compiler on its own -- this attribute
-// makes that guarantee explicit
+// clearMask()/copyBuf() all bulk-access these 4 bytes at a time via an
+// unsigned int* cast for speed. ARMv4T doesn't handle unaligned word access
+// safely, and a plain "unsigned char[]" isn't guaranteed 4-byte aligned by
+// the compiler on its own -- this attribute makes that guarantee explicit
 // instead of relying on it happening to work.
 //
 // swipeMaskA/B: the revealed/hidden mask, double-buffered the same way the
@@ -42,7 +41,7 @@ static unsigned char swipeMaskB[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 // Border ring: NOT cumulative like the mask -- a lap fully redraws its own
 // connected trace from scratch rather than only touching a changed band,
 // so its double buffer (below) doesn't need a copy-forward step the way
-// the mask's does (see lapPrepPending's LAPPREP_MASK stage in swipe()).
+// the mask's does (see copyBuf()'s call site in swipe()).
 static unsigned char borderMaskCur[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 static unsigned char borderMaskPrev[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 
@@ -119,12 +118,11 @@ static unsigned char (*swipeWriteBorder)[SCREEN_TRIX_Y] = borderMaskPrev;
 // and new radius/size; everything outside that band has to carry over
 // unchanged from every earlier lap), so its write buffer has to start as a
 // full copy of whatever's currently displayed, THEN this lap's span-fills
-// apply on top of that copy. See lapPrepPending's LAPPREP_MASK stage in
-// swipe() for where that copy happens -- budget-checked the same way
-// finishPending's clear is, one word at a time, rather than done in one
-// unconditional block (that's what it used to be, and was a real source of
-// intermittent CPU-overtime lockups on a lap-transition frame -- see
-// lapPrepPending's declaration).
+// apply on top of that copy. See copyBuf()'s call site in swipe() for where
+// that copy happens -- same lap-boundary moment the border's clear already
+// happens unconditionally (no time-budget check), which was never a
+// problem for a buffer this size at that point in a lap, so doubling that
+// one-time cost here follows the same reasoning.
 static unsigned char (*maskShow)[SCREEN_TRIX_Y] = swipeMaskA;
 static unsigned char (*swipeWriteMask)[SCREEN_TRIX_Y] = swipeMaskB;
 
@@ -523,43 +521,38 @@ static void clearBorderPrev() {
     borderPrevIsZero = true;
 }
 
+// Same clear as clearBorderCur()/clearBorderPrev() above, but by pointer --
+// needed because the write target (swipeWriteBorder) alternates between
+// the two physical buffers lap to lap (see borderShowA/B's declaration).
+static void clearBorderBuf(unsigned char (*buf)[SCREEN_TRIX_Y]) {
+    unsigned int *p = (unsigned int *)buf;
+    for (int i = 0; i < MASK_BUF_WORDS; i++)
+        p[i] = 0;
+    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
+        ((unsigned char *)buf)[i] = 0;
+}
+
+// Copies one [6][SCREEN_TRIX_Y] buffer over another -- used to seed the
+// mask's write target with everything accumulated so far before this lap's
+// span-fills apply on top of it (see swipeWriteMask's declaration). Run
+// unconditionally, no time-budget check, same as clearBorderBuf() above --
+// this happens at the same lap-boundary moment the border's own
+// unconditional clear already does, where there's normally a whole lap's
+// worth of budget still ahead, not the razor-thin, budget-already-spent
+// moment finishPending's incremental clear exists for.
+static void copyBuf(unsigned char (*dst)[SCREEN_TRIX_Y], unsigned char (*src)[SCREEN_TRIX_Y]) {
+    unsigned int *pd = (unsigned int *)dst;
+    unsigned int *ps = (unsigned int *)src;
+    for (int i = 0; i < MASK_BUF_WORDS; i++)
+        pd[i] = ps[i];
+    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
+        ((unsigned char *)dst)[i] = ((unsigned char *)src)[i];
+}
+
 // Gate the lap-transition handling on "a new lap started", not "a new frame
 // happened", so this stays correct even if a lap ever does span multiple
 // frames (we don't want to disturb swipeWriteBorder mid-trace).
 static bool newLapPending;
-
-// Incremental version of what used to be newLapPending's clearBorderBuf() +
-// copyBuf() call, run completely unconditionally with no time-budget check
-// at all -- same class of bug finishPending (above) already fixed for a
-// SEQUENCE's final clear, just not yet applied to an ORDINARY lap
-// transition. That fixed ~200-word cost (one buffer clear, one buffer copy)
-// happens every single lap, not just the last one, and nothing gated it on
-// how much of `reserved` was actually left: T1TC resets to 0 at the top of
-// VB_Game()/OS_Game(), and swipe() is called partway through, after
-// updatePlayerAnimation()/scroll() have already spent some of it -- so this
-// block could, on its own, push T1TC past availableIdleTime - reserved
-// without ever checking, on ANY frame a lap happened to finish, however
-// tight reserved was tuned. That reads as an intermittent CPU-overtime
-// lockup tied to ordinary swipe progress -- worse the more laps a sequence
-// needs (every one is a chance), not just at the very end.
-//
-// Same fix as finishPending: one word at a time, re-checking T1TC before
-// each one. The new lap's actual row-processing (circle()/star(), in the
-// main while loop below) is gated on this being fully done first --
-// circleRow/starPoint are already reset by setSwipe(), but the buffers
-// they're about to draw into have to actually be ready (cleared/copied)
-// before that's safe.
-enum {
-    LAPPREP_BORDER,    // clearing lapPrepNextBorder
-    LAPPREP_MASK,      // copying lapPrepSrcMask -> lapPrepNextMask
-    LAPPREP_DONE
-};
-static unsigned char lapPrepStage;
-static int lapPrepIndex;
-static bool lapPrepPending;
-static unsigned char (*lapPrepNextBorder)[SCREEN_TRIX_Y];
-static unsigned char (*lapPrepNextMask)[SCREEN_TRIX_Y];
-static unsigned char (*lapPrepSrcMask)[SCREEN_TRIX_Y];
 
 void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
 
@@ -1064,71 +1057,16 @@ void swipe(int reserved) {
         if (nextWriteBorder == borderMaskPrev)
             borderPrevIsZero = false;
 
+        clearBorderBuf(nextWriteBorder);
+
         unsigned char(*justFinishedMask)[SCREEN_TRIX_Y] = swipeWriteMask;
         unsigned char(*nextWriteMask)[SCREEN_TRIX_Y] = (justFinishedMask == swipeMaskA) ? swipeMaskB : swipeMaskA;
 
         maskShow = justFinishedMask;
         swipeWriteMask = nextWriteMask;
-
-        // The actual clear (border) and copy (mask) are real work -- same
-        // ~200-word class of cost finishPending's clear is, so they don't
-        // run here directly any more (see lapPrepPending's declaration).
-        // They kick off now, budget-checked, immediately below.
-        lapPrepNextBorder = nextWriteBorder;
-        lapPrepNextMask = nextWriteMask;
-        lapPrepSrcMask = justFinishedMask;
-        lapPrepStage = LAPPREP_BORDER;
-        lapPrepIndex = 0;
-        lapPrepPending = true;
+        copyBuf(nextWriteMask, justFinishedMask);
 
         newLapPending = false;
-    }
-
-    if (lapPrepPending) {
-        int tailBytes = MASK_BUF_BYTES - MASK_BUF_WORDS * 4;    // 0 today, kept generic -- see finishPending
-
-        while (lapPrepStage != LAPPREP_DONE && T1TC < availableIdleTime - reserved) {
-            switch (lapPrepStage) {
-            case LAPPREP_BORDER: {
-                if (lapPrepIndex < MASK_BUF_WORDS) {
-                    ((unsigned int *)lapPrepNextBorder)[lapPrepIndex] = 0;
-                    lapPrepIndex++;
-                } else if (lapPrepIndex - MASK_BUF_WORDS < tailBytes) {
-                    ((unsigned char *)lapPrepNextBorder)[MASK_BUF_WORDS * 4 + (lapPrepIndex - MASK_BUF_WORDS)] = 0;
-                    lapPrepIndex++;
-                } else {
-                    lapPrepStage = LAPPREP_MASK;
-                    lapPrepIndex = 0;
-                }
-                break;
-            }
-            case LAPPREP_MASK: {
-                if (lapPrepIndex < MASK_BUF_WORDS) {
-                    ((unsigned int *)lapPrepNextMask)[lapPrepIndex] = ((unsigned int *)lapPrepSrcMask)[lapPrepIndex];
-                    lapPrepIndex++;
-                } else if (lapPrepIndex - MASK_BUF_WORDS < tailBytes) {
-                    int i = lapPrepIndex - MASK_BUF_WORDS;
-                    ((unsigned char *)lapPrepNextMask)[MASK_BUF_WORDS * 4 + i] =
-                        ((unsigned char *)lapPrepSrcMask)[MASK_BUF_WORDS * 4 + i];
-                    lapPrepIndex++;
-                } else {
-                    lapPrepStage = LAPPREP_DONE;
-                }
-                break;
-            }
-            default:
-                break;
-            }
-        }
-
-        // Not ready yet -- don't start this lap's rows on top of a
-        // half-cleared/half-copied buffer. Same discipline as
-        // finishPending: come back next frame and pick up where this left
-        // off, however little progress a razor-thin frame allowed.
-        if (lapPrepStage != LAPPREP_DONE)
-            return;
-
-        lapPrepPending = false;
     }
 
     while (!swipeComplete && T1TC < availableIdleTime - reserved) {
