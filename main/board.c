@@ -793,7 +793,11 @@ void restartBoardScan() {
 #if ENABLE_SWIPE
             if (playerDead) {
                 setSwipeType(SWIPE_CIRCLE);
-                startSwipeClose();
+                // Same world-to-screen math decodeCaves.c uses to centre the
+                // grow -- here it's the player's CURRENT position (death can
+                // happen anywhere on the board), not wherever the level
+                // started.
+                startSwipeClose(playerX * CHAR_TRIX_X - (scrollX >> 16), playerY * CHAR_TRIX_Y - (scrollY >> 16));
             }
 #endif
         }

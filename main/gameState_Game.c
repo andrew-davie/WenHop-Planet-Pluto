@@ -79,9 +79,9 @@ void initGameState_Game() {
 
 #if ENABLE_SWIPE
     setSwipeType(SWIPE_STAR);
-    initStarSwipe();
-    setSwipe(20, SCREEN_TRIX_Y / 2, 0, 256,
-             SWIPE_GROW);    // screen-centered iris-in; radius/step are starting guesses, tune to taste
+    initStarSwipe();    // clears to fully hidden and holds idle -- doesn't start growing yet,
+                        // since playerX/Y aren't placed until the cave decode runs. decodeCaves.c
+                        // calls setSwipe() for real, centred on the player, once that's known.
 #endif
 
     exitMode = 0;    // --> initNextlife
@@ -152,7 +152,7 @@ void VB_Game() {
 #endif
 
     if (RAM[_SWCHB] != 0x3F)
-        setGameState(GS_MENU);    // SKULL);    // GS_COUCH_COMPLIANT);
+        setGameState(GS_MENU);
 
     processCharAnimations();
     setPalette(_BUF_GAME_COLUBK);
@@ -161,22 +161,24 @@ void VB_Game() {
 
         drawPlayerSprite();
 
-        drawMace();
-        drawRope();
-        drawGun();
-        drawParticles();
+        if (!maskNeeded) {
+            drawMace();
+            drawRope();
+            drawGun();
+            drawParticles();
 
-        drawAttachedChar(attachment);
+            drawAttachedChar(attachment);
+        }
     }
 
     interleaveChronoColour(&roller);
     adjustLuminance(1);
 
-    scheduledTasks();    // gets the MOST time
-
 #if ENABLE_SWIPE
     applySwipeMask(_BUF_GAME_PF0_LEFT);    // must happen after everything else has drawn
 #endif
+
+    scheduledTasks();    // gets the MOST time
 }
 
 void OS_Game() {

@@ -12,6 +12,7 @@
 #include "particle.h"
 #include "random.h"
 #include "scroll.h"
+#include "swipe.h"
 #include "wyrm.h"
 
 /* **************************************** */
@@ -187,6 +188,21 @@ int decodeExplicitData() {
                     playerY = y;
 
                     resetTracking();
+
+#if ENABLE_SWIPE
+                    // initGameState_Game() left the swipe idle and the screen
+                    // fully hidden (see initStarSwipe()) since playerX/Y
+                    // weren't known yet at that point. Now that the cave
+                    // decode has actually placed the player and reset the
+                    // camera, start the iris-in for real, centred on the
+                    // player's actual on-screen position -- same
+                    // world-to-screen math used to draw the player (see
+                    // drawPlayer.c), minus the sprite-specific
+                    // animation/shake offsets we don't want here.
+                    randomizeStarAngle();    // fresh look each time -- see randomizeStarAngle()'s comment
+                    setSwipe(playerX * CHAR_TRIX_X - (scrollX >> 16), playerY * CHAR_TRIX_Y - (scrollY >> 16), 0,
+                             768, SWIPE_GROW);
+#endif
                 }
             }
 

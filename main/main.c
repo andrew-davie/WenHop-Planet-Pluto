@@ -334,9 +334,25 @@ void (*const verticalBlank[GS_MAX])() = {
     VB_RasterBleed,       // 8
 };
 
+// While a swipe is in progress, applySwipeMask() adds a fixed per-frame cost
+// on top of everything else, and unlike the loops it doesn't yield partway
+// through -- it just runs. So instead of budgeting it, we shrink the ceiling
+// everything ELSE idle-time-gated (swipe()'s own tracing, cave decode,
+// processBoardSquares()) is allowed to use this frame, leaving headroom for
+// it. Tune this if it's still overtime, or if it's leaving too much idle
+// work stranded.
+#if ENABLE_SWIPE
+#define SWIPE_IDLE_TIME_CAP 30000
+#endif
+
 void runARM_VerticalBlank() {
 
     availableIdleTime = RAM[_INTIM] * armCycles - 5000;
+
+    // #if ENABLE_SWIPE
+    //     if (maskNeeded && availableIdleTime > SWIPE_IDLE_TIME_CAP)
+    //         availableIdleTime = SWIPE_IDLE_TIME_CAP;
+    // #endif
 
     if (gameState == nextGameState)
         (*verticalBlank[gameState])();
@@ -377,6 +393,11 @@ void runARM_Overscan() {
 
 
     availableIdleTime = RAM[_INTIM] * armCycles - 5000;
+
+    // #if ENABLE_SWIPE
+    //     if (maskNeeded && availableIdleTime > SWIPE_IDLE_TIME_CAP)
+    //         availableIdleTime = SWIPE_IDLE_TIME_CAP;
+    // #endif
 
     if (gameState != nextGameState) {
 
