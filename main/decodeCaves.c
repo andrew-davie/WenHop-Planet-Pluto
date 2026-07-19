@@ -199,7 +199,8 @@ int decodeExplicitData() {
                     // world-to-screen math used to draw the player (see
                     // drawPlayer.c), minus the sprite-specific
                     // animation/shake offsets we don't want here.
-                    randomizeStarAngle();    // fresh look each time -- see randomizeStarAngle()'s comment
+                    randomizeStarAngle();         // fresh look each time -- see randomizeStarAngle()'s comment
+                    markCircleFreshSequence();    // fresh sequence -- see markCircleFreshSequence()'s comment
                     setSwipe(playerX * CHAR_TRIX_X - (scrollX >> 16), playerY * CHAR_TRIX_Y - (scrollY >> 16), 0,
                              768, SWIPE_GROW);
 #endif

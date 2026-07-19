@@ -98,6 +98,25 @@ static bool topHasPrev;
 static int botPrevLeft, botPrevRight, botPrevRow;
 static bool botHasPrev;
 
+// Lets circle() skip re-filling mask bands that didn't change since last
+// lap (see circle()'s comment) WITHOUT a per-row history cache -- SHRINK's
+// radius decreases by exactly `step` every lap (constant for a whole
+// sequence), so last lap's radius is just circleRadius + step, recomputed
+// on the fly with one extra isqrt() per row rather than ~540 bytes of
+// static per-row storage (tried, reverted: not worth the RAM for the
+// win). circleHasOldRadius is false only for a sequence's very first lap
+// (nothing to derive an old radius from -- the mask is uniformly
+// fully-revealed/hidden at that point, not shaped like any previous
+// circle), set via circleFreshSequence by startSwipeClose() and
+// decodeCaves.c's GROW-start call, same reasoning/pattern as
+// randomizeStarAngle().
+static bool circleFreshSequence = true;
+static bool circleHasOldRadius;
+
+void markCircleFreshSequence() {
+    circleFreshSequence = true;
+}
+
 static bool swipeComplete;
 static bool swipeVisible;
 bool maskNeeded = true;           // false once fully open (grown-in) -- lets applySwipeMask skip the AND loop
@@ -355,6 +374,8 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
         circleRow = 0;
         topHasPrev = false;    // fresh lap -- nothing to connect the first edge point to yet
         botHasPrev = false;
+        circleHasOldRadius = !circleFreshSequence;    // false only for a sequence's very first lap
+        circleFreshSequence = false;                  // consumed -- every later lap this sequence has an old radius
         break;
     }
 
@@ -415,6 +436,8 @@ void startSwipeClose(int x, int y) {
 
     if (swipeType == SWIPE_STAR)
         randomizeStarAngle();    // fresh look each time star is used to close, same reasoning as the grow
+    else
+        markCircleFreshSequence();    // fresh sequence -- last shrink/grow's radius doesn't apply here
 
     maskNeeded = true;    // grow completing turned this off; shrinking needs it applied again
     setSwipe(x, y, radius, -step, SWIPE_SHRINK);
@@ -899,6 +922,18 @@ bool bresenhamBorderLine(int x0, int y0, int x1, int y1) {
 // outside the shrinking disk gets explicitly, fully hidden the same lap
 // that happens, rather than freezing at its last partial reveal until the
 // final blanket clearMask(0) -- same correctness, bounded cost.
+//
+// Mask fill: only the band that changed since LAST lap gets touched --
+// same idea as the per-row edge cache that was tried and reverted for its
+// RAM cost, but derived arithmetically instead of stored: SHRINK/GROW's
+// radius changes by exactly `step` every lap (constant for a whole
+// sequence), so last lap's radius is just circleRadius +/- step,
+// recomputed here with one extra isqrt() per row rather than any per-row
+// storage. circleHasOldRadius is false only for a sequence's first lap
+// (see its declaration), when there's nothing to derive an old edge from
+// -- that one lap still does the full-span fill. Verified against the
+// always-full-refill behaviour by simulation across many multi-lap
+// sequences (both directions) before trusting it here.
 bool circle() {
 
     bool visible = false;
@@ -909,6 +944,25 @@ bool circle() {
 
     int rem = circleRadius * circleRadius - dy * dy;
 
+    // Last lap's radius, if any -- SHRINK's circleRadius decreases by
+    // `step` each lap, GROW's increases by `step`, so the previous value
+    // is always circleRadius -/+ (swipeStep>>8) accordingly. swipeStep is
+    // negative for SHRINK already (see setSwipe()/startSwipeClose()), so
+    // circleRadius - (swipeStep>>8) is correct for both directions.
+    bool haveOld = false;
+    int oldLeft = 0, oldRight = 0;
+    if (circleHasOldRadius) {
+        int oldRadius = circleRadius - (swipeStep >> 8);
+        int oldRem = oldRadius * oldRadius - dy * dy;
+        if (oldRem >= 0) {
+            int oldW = isqrt(oldRem);
+            int oldHalfWidth = (oldW * 7) >> 4;
+            oldLeft = swipeCenterX - oldHalfWidth;
+            oldRight = swipeCenterX + oldHalfWidth;
+            haveOld = true;
+        }
+    }
+
     if (rem < 0) {
         // Outside the current (shrunk) disk entirely -- SHRINK must fully
         // hide it now (see the sweep margin in setSwipe(), which
@@ -916,10 +970,18 @@ bool circle() {
         // transitions out -- GROW never sweeps beyond its own current
         // radius, so this branch can't be hit for GROW). No edge here, so
         // there's nothing to connect the next valid row's point to either.
+        // Only re-hides whatever was still revealed last lap (oldLeft..
+        // oldRight), not the whole row.
         if (swipePhase == SWIPE_SHRINK) {
-            fillMaskSpan(0, _1ROW - 1, topRowY);
-            if (dy != 0)
-                fillMaskSpan(0, _1ROW - 1, botRowY);
+            if (haveOld) {
+                fillMaskSpan(oldLeft, oldRight, topRowY);
+                if (dy != 0)
+                    fillMaskSpan(oldLeft, oldRight, botRowY);
+            } else {
+                fillMaskSpan(0, _1ROW - 1, topRowY);
+                if (dy != 0)
+                    fillMaskSpan(0, _1ROW - 1, botRowY);
+            }
         }
         topHasPrev = false;
         botHasPrev = false;
@@ -932,16 +994,34 @@ bool circle() {
         int right = swipeCenterX + halfWidth;
 
         if (swipePhase == SWIPE_SHRINK) {
-            fillMaskSpan(0, left - 1, topRowY);
-            fillMaskSpan(right + 1, _1ROW - 1, topRowY);
-            if (dy != 0) {
-                fillMaskSpan(0, left - 1, botRowY);
-                fillMaskSpan(right + 1, _1ROW - 1, botRowY);
+            if (haveOld) {
+                fillMaskSpan(oldLeft, left - 1, topRowY);
+                fillMaskSpan(right + 1, oldRight, topRowY);
+                if (dy != 0) {
+                    fillMaskSpan(oldLeft, left - 1, botRowY);
+                    fillMaskSpan(right + 1, oldRight, botRowY);
+                }
+            } else {
+                fillMaskSpan(0, left - 1, topRowY);
+                fillMaskSpan(right + 1, _1ROW - 1, topRowY);
+                if (dy != 0) {
+                    fillMaskSpan(0, left - 1, botRowY);
+                    fillMaskSpan(right + 1, _1ROW - 1, botRowY);
+                }
             }
         } else {
-            fillMaskSpan(left, right, topRowY);
-            if (dy != 0)
-                fillMaskSpan(left, right, botRowY);
+            if (haveOld) {
+                fillMaskSpan(left, oldLeft - 1, topRowY);
+                fillMaskSpan(oldRight + 1, right, topRowY);
+                if (dy != 0) {
+                    fillMaskSpan(left, oldLeft - 1, botRowY);
+                    fillMaskSpan(oldRight + 1, right, botRowY);
+                }
+            } else {
+                fillMaskSpan(left, right, topRowY);
+                if (dy != 0)
+                    fillMaskSpan(left, right, botRowY);
+            }
         }
 
         if (dy == 0) {

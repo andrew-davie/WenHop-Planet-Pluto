@@ -27,6 +27,7 @@ void setSwipeMaskColour(bool white);    // true = white/COLUPF reveal, false = b
 // void initSwipe(enum SWIPE type, int mask);
 void initStarSwipe();
 void randomizeStarAngle();    // re-rolls the star's one-time rotation; call once per fresh star sequence (grow or shrink), not per lap
+void markCircleFreshSequence();    // tells circle() the next lap has no previous-radius to derive an old edge from; call once per fresh circle sequence (grow or shrink), not per lap
 void clearMask(int v);
 bool checkSwipeFinished();
 
