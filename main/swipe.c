@@ -171,21 +171,35 @@ static bool swipeVisible;
 static int swipeWatchdogFrames;
 
 // Finishing a sequence (SHRINK's clearMask(0)+clearBorderCur(), GROW's
-// clearMask(255)) costs up to ~200 words of clearing -- real work, and it
-// used to run completely unconditionally the instant the last lap's
-// termination check tripped, with no time-budget check at all. That's
-// landing exactly at the worst possible moment: right when the lap that
-// just finished may have already spent the frame's whole budget getting
-// there. Reported as a CPU jam right as the circle was about to finish --
-// this is why. finishPending defers the actual clearing to whichever
-// frame (this one or a later one) genuinely has room left for it, instead
-// of doing it unconditionally on top of whatever's already been spent.
-// swipeComplete is deliberately kept false while this is pending (even
-// though circle()/star() already finished their last lap) so
-// checkSwipeFinished() doesn't report done before the screen is actually
-// in its finished state.
-#define SWIPE_FINISH_MARGIN 500    // rough guess at the ~200-300 words of clearing's cost in T1TC
-                                   // ticks -- needs real hardware numbers to tighten up
+// clearMask(255)) is real, unavoidable work -- up to ~200 words. It used
+// to run completely unconditionally the instant the last lap's
+// termination check tripped, with no time-budget check at all, landing
+// exactly when the lap that just finished may have already spent the
+// frame's whole budget getting there -- reported as a CPU jam right as
+// the circle was about to finish.
+//
+// First attempt deferred the WHOLE clear until T1TC showed some fixed
+// margin of slack -- wrong fix: with reserved already tuned right up
+// against the edge, that slack might not exist on ANY frame, which just
+// traded an occasional overrun crash for a deterministic hang at the same
+// spot (still reported as jammed, now every time instead of sometimes).
+//
+// Correct fix: clear it the same way circle()'s own row loop already
+// handles its budget -- one small unit of work at a time, re-checking
+// T1TC before each one, so even a razor-thin frame still makes SOME
+// forward progress (worst case a single word) instead of requiring a
+// specific amount of slack to exist all at once. finishStage/finishIndex
+// track exactly where this incremental clear is up to, across as many
+// frames as it actually takes -- no arbitrary margin constant involved,
+// no sweep-speed change involved either.
+enum {
+    FINISH_MASK,          // clearing swipeMask (255 for GROW, 0 for SHRINK)
+    FINISH_BORDER_CUR,    // clearing borderMaskCur (always -- real data every time)
+    FINISH_BORDER_PREV,   // clearing borderMaskPrev (skipped entirely if already known zero)
+    FINISH_DONE
+};
+static unsigned char finishStage;
+static int finishIndex;    // word cursor within whichever buffer finishStage currently names
 static bool finishPending;
 
 bool maskNeeded = true;           // false once fully open (grown-in) -- lets applySwipeMask skip the AND loop
@@ -741,28 +755,82 @@ void swipe(int reserved) {
     // true, the normal state whenever nothing is actively growing/shrinking)
     // keeps it reset to 0 every frame; only an ACTIVE sequence that hasn't
     // finished after SWIPE_WATCHDOG_FRAMES gets force-closed. Doesn't do the
-    // clearing itself -- just hands off to the SAME budget-checked
-    // finishPending path a normal termination uses (see below), so a
-    // watchdog-triggered finish can't overrun the frame any more than a
-    // normal one can.
+    // clearing itself -- just hands off to the SAME incremental finishPending
+    // path a normal termination uses (see below), so a watchdog-triggered
+    // finish can't overrun a frame any more than a normal one can.
     if (swipeComplete && !finishPending) {
         swipeWatchdogFrames = 0;
     } else if (!finishPending && ++swipeWatchdogFrames > SWIPE_WATCHDOG_FRAMES) {
+        finishStage = FINISH_MASK;
+        finishIndex = 0;
         finishPending = true;
-        swipeComplete = false;    // not really done until the deferred finish below actually runs
+        swipeComplete = false;    // not really done until the incremental finish below actually runs
     }
 
-    // Deferred finish -- see finishPending's declaration. Only does the
-    // actual clearing once T1TC confirms there's still real budget left
-    // this frame (SWIPE_FINISH_MARGIN's worth); otherwise tries again next
-    // frame rather than doing unbudgeted work on top of whatever this frame
-    // already spent. swipeComplete only becomes true once this succeeds.
+    // Incremental finish -- see finishStage's declaration. One word at a
+    // time, re-checking T1TC before each one -- exactly the same budget
+    // discipline circle()'s own row loop below uses, just applied to
+    // clearing instead of row processing. Guarantees forward progress every
+    // single frame, however little time is left, rather than needing some
+    // fixed amount of slack to exist all at once.
     if (finishPending) {
-        if (T1TC < availableIdleTime - reserved - SWIPE_FINISH_MARGIN) {
-            clearMask(swipePhase == SWIPE_GROW ? 255 : 0);
-            clearBorderCur();
-            if (!borderPrevIsZero)
-                clearBorderPrev();
+        while (finishStage != FINISH_DONE && T1TC < availableIdleTime - reserved) {
+            int tailBytes = MASK_BUF_BYTES - MASK_BUF_WORDS * 4;    // 0 today (396 divides evenly by
+                                                                     // 4) -- kept generic, same as
+                                                                     // clearBorderCur()/clearMask()
+            switch (finishStage) {
+            case FINISH_MASK: {
+                unsigned char v = (swipePhase == SWIPE_GROW) ? 0xFF : 0;
+                if (finishIndex < MASK_BUF_WORDS) {
+                    unsigned int word = v | (v << 8) | (v << 16) | (v << 24);
+                    ((unsigned int *)swipeMask)[finishIndex] = word;
+                    finishIndex++;
+                } else if (finishIndex - MASK_BUF_WORDS < tailBytes) {
+                    ((unsigned char *)swipeMask)[MASK_BUF_WORDS * 4 + (finishIndex - MASK_BUF_WORDS)] = v;
+                    finishIndex++;
+                } else {
+                    finishStage = FINISH_BORDER_CUR;
+                    finishIndex = 0;
+                }
+                break;
+            }
+            case FINISH_BORDER_CUR: {
+                if (finishIndex < MASK_BUF_WORDS) {
+                    ((unsigned int *)borderMaskCur)[finishIndex] = 0;
+                    finishIndex++;
+                } else if (finishIndex - MASK_BUF_WORDS < tailBytes) {
+                    ((unsigned char *)borderMaskCur)[MASK_BUF_WORDS * 4 + (finishIndex - MASK_BUF_WORDS)] = 0;
+                    finishIndex++;
+                } else {
+                    // borderMaskPrev is only ever dirtied by STAR (see
+                    // newLapPending's handling further down) -- if it's
+                    // already known zero, skip that whole stage instead of
+                    // clearing an already-all-zero buffer.
+                    finishStage = borderPrevIsZero ? FINISH_DONE : FINISH_BORDER_PREV;
+                    finishIndex = 0;
+                }
+                break;
+            }
+            case FINISH_BORDER_PREV: {
+                if (finishIndex < MASK_BUF_WORDS) {
+                    ((unsigned int *)borderMaskPrev)[finishIndex] = 0;
+                    finishIndex++;
+                } else if (finishIndex - MASK_BUF_WORDS < tailBytes) {
+                    ((unsigned char *)borderMaskPrev)[MASK_BUF_WORDS * 4 + (finishIndex - MASK_BUF_WORDS)] = 0;
+                    finishIndex++;
+                } else {
+                    borderPrevIsZero = true;
+                    finishStage = FINISH_DONE;
+                }
+                break;
+            }
+
+            default:
+                break;
+            }
+        }
+
+        if (finishStage == FINISH_DONE) {
             if (swipePhase == SWIPE_GROW)
                 maskNeeded = false;
             finishPending = false;
@@ -869,6 +937,8 @@ void swipe(int reserved) {
                     // lap that just finished may have already spent the
                     // frame's whole budget getting here, is exactly what
                     // caused a CPU jam right as the shrink was about to end.
+                    finishStage = FINISH_MASK;
+                    finishIndex = 0;
                     finishPending = true;
                     swipeComplete = false;    // not really done until finishPending's clear actually runs
                     return;
@@ -880,6 +950,8 @@ void swipe(int reserved) {
                     // Same reasoning as SWIPE_SHRINK above -- clearMask(255)
                     // is real work, deferred to finishPending instead of run
                     // unconditionally right here.
+                    finishStage = FINISH_MASK;
+                    finishIndex = 0;
                     finishPending = true;
                     swipeComplete = false;
                     return;
