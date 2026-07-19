@@ -53,6 +53,20 @@ static short starY[10];
 static int swipeRadius;    // 24.8
 static int swipeStep;      // 24.8
 
+// Star's GROW used a flat 768 (3 trix) per lap from the very first lap,
+// which covers so much ground so fast that the iris-in's actual genesis
+// (the tiny star appearing at the player) flashes past before it's visible
+// -- reads as if it just appears at a decent size already open. Ramps the
+// EFFECTIVE per-lap step from 1/4 up to the full target over the first 4
+// laps instead (see its use in setSwipe()), so the opening few frames are
+// slow enough to actually see it start, while every lap after that (where
+// the speed was already fine) is unaffected. starGrowLapCount is reset
+// once per fresh GROW sequence by randomizeStarAngle() (same "once per
+// fresh sequence, not per lap" hook already used for the rotation) --
+// harmless that it also resets for a star SHRINK-close, since the ramp
+// only ever applies when phase == SWIPE_GROW.
+static int starGrowLapCount;
+
 // One-time star rotation, chosen once per fresh star sequence (see
 // randomizeStarAngle()) and held fixed for every lap of that sequence --
 // generateStar() re-runs every lap (setSwipe() calls it each time to
@@ -131,6 +145,28 @@ void markCircleFreshSequence() {
 
 static bool swipeComplete;
 static bool swipeVisible;
+
+// Safety valve for a LOGIC stall -- something not advancing when it should
+// (e.g. a future bug leaves swipeComplete permanently false). Every real
+// sequence we've measured finishes in well under 100 frames (worst-case
+// simulated circle shrink was ~85 laps), so anything still running after
+// SWIPE_WATCHDOG_FRAMES is not "just slow", it's stuck -- force it closed
+// rather than leave the player staring at a frozen swipe forever.
+// Self-resetting, no separate "start of sequence" hook needed: swipe()
+// zeroes it every frame the sequence is genuinely idle (swipeComplete
+// true), which is the state for every ordinary gameplay frame between
+// sequences -- so it's always back at 0 well before the next setSwipe()
+// call flips swipeComplete false again and starts it counting.
+//
+// NOTE: this only catches a stall in swipe()'s own logic -- it can't do
+// anything about a genuine ARM timing overrun (busted the frame's cycle
+// budget badly enough to desync the 6502/TIA side), since that kind of
+// crash can take the whole system down before this code ever gets to run
+// again. The real defence against THAT is keeping every path in this file
+// inside its time budget in the first place, not a software fallback.
+#define SWIPE_WATCHDOG_FRAMES 600
+static int swipeWatchdogFrames;
+
 bool maskNeeded = true;           // false once fully open (grown-in) -- lets applySwipeMask skip the AND loop
 static bool maskWhite = false;    // true: hidden area forced ON (COLUPF/white); false: forced OFF (background/black)
 
@@ -370,8 +406,20 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
     swipeCenterX = x;
     swipeCenterY = y;
 
-    swipeRadius = radius + step;    // 24.8
-    swipeStep = step;               // 24.8
+    int effectiveStep = step;
+    if (swipeType == SWIPE_STAR && phase == SWIPE_GROW && starGrowLapCount < 4) {
+        // Ease-in -- see starGrowLapCount's declaration. Ramps the radius
+        // increment actually applied THIS lap from 1/4 up to the full step
+        // over the first 4 laps -- swipeStep itself still gets the real,
+        // unramped target value below, so nothing else that reads it (there's
+        // no such reader for STAR today, but keep it honest regardless) sees
+        // anything other than the true rate.
+        effectiveStep = (step * (starGrowLapCount + 1)) >> 2;
+        starGrowLapCount++;
+    }
+
+    swipeRadius = radius + effectiveStep;    // 24.8
+    swipeStep = step;                        // 24.8 -- true target rate, not the ramped one
 
     swipeComplete = false;
     swipeVisible = false;
@@ -666,6 +714,26 @@ bool drawBorderBit(int x, int y) {
 
 void swipe(int reserved) {
 
+    // Watchdog -- see swipeWatchdogFrames' declaration. Idle (swipeComplete
+    // true, the normal state whenever nothing is actively growing/shrinking)
+    // keeps it reset to 0 every frame; only an ACTIVE sequence that hasn't
+    // finished after SWIPE_WATCHDOG_FRAMES gets force-closed.
+    if (swipeComplete) {
+        swipeWatchdogFrames = 0;
+    } else if (++swipeWatchdogFrames > SWIPE_WATCHDOG_FRAMES) {
+        // Force-finish, mirroring whichever natural termination this
+        // sequence was heading for so state stays consistent for whatever
+        // checks swipeComplete/maskNeeded next (checkSwipeFinished() etc).
+        clearMask(swipePhase == SWIPE_GROW ? 255 : 0);
+        clearBorderCur();
+        if (!borderPrevIsZero)
+            clearBorderPrev();
+        if (swipePhase == SWIPE_GROW)
+            maskNeeded = false;
+        swipeComplete = true;
+        return;
+    }
+
     // We do the circle processing at start of VB or OS
 
     // Start of a new lap. For STAR: the ring that was just active
@@ -868,6 +936,7 @@ void randomizeStarAngle() {
     int r = rangeRandom(32) & 0x1F;
     starRotSin = sin_cos[r];
     starRotCos = sin_cos[(r + 8) & 0x1F];
+    starGrowLapCount = 0;    // fresh sequence -- see starGrowLapCount's declaration
 }
 
 void generateStar() {
