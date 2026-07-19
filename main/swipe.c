@@ -53,18 +53,21 @@ static short starY[10];
 static int swipeRadius;    // 24.8
 static int swipeStep;      // 24.8
 
-// Star's GROW used a flat 768 (3 trix) per lap from the very first lap,
-// which covers so much ground so fast that the iris-in's actual genesis
-// (the tiny star appearing at the player) flashes past before it's visible
-// -- reads as if it just appears at a decent size already open. Ramps the
-// EFFECTIVE per-lap step from 1/4 up to the full target over the first 4
-// laps instead (see its use in setSwipe()), so the opening few frames are
-// slow enough to actually see it start, while every lap after that (where
-// the speed was already fine) is unaffected. starGrowLapCount is reset
-// once per fresh GROW sequence by randomizeStarAngle() (same "once per
-// fresh sequence, not per lap" hook already used for the rotation) --
-// harmless that it also resets for a star SHRINK-close, since the ramp
-// only ever applies when phase == SWIPE_GROW.
+// Star's GROW used a flat per-lap step from the very first lap, which
+// covered so much ground so fast that the iris-in's actual genesis (the
+// tiny star appearing at the player) flashed past before it was visible --
+// read as if it just appeared at a decent size already open. Ramps the
+// EFFECTIVE per-lap step from 1/STAR_GROW_RAMP_LAPS up to the full target
+// over the first STAR_GROW_RAMP_LAPS laps instead (see its use in
+// setSwipe()), so the opening few frames are slow enough to actually see
+// it start, while later laps (where the speed was already fine, and is now
+// bumped a bit faster still -- see decodeCaves.c's GROW step) are
+// unaffected. starGrowLapCount is reset once per fresh GROW sequence by
+// randomizeStarAngle() (same "once per fresh sequence, not per lap" hook
+// already used for the rotation) -- harmless that it also resets for a
+// star SHRINK-close, since the ramp only ever applies when
+// phase == SWIPE_GROW.
+#define STAR_GROW_RAMP_LAPS 8
 static int starGrowLapCount;
 
 // One-time star rotation, chosen once per fresh star sequence (see
@@ -407,14 +410,16 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
     swipeCenterY = y;
 
     int effectiveStep = step;
-    if (swipeType == SWIPE_STAR && phase == SWIPE_GROW && starGrowLapCount < 4) {
+    if (swipeType == SWIPE_STAR && phase == SWIPE_GROW && starGrowLapCount < STAR_GROW_RAMP_LAPS) {
         // Ease-in -- see starGrowLapCount's declaration. Ramps the radius
-        // increment actually applied THIS lap from 1/4 up to the full step
-        // over the first 4 laps -- swipeStep itself still gets the real,
-        // unramped target value below, so nothing else that reads it (there's
-        // no such reader for STAR today, but keep it honest regardless) sees
-        // anything other than the true rate.
-        effectiveStep = (step * (starGrowLapCount + 1)) >> 2;
+        // increment actually applied THIS lap from 1/STAR_GROW_RAMP_LAPS up
+        // to the full step over the first STAR_GROW_RAMP_LAPS laps --
+        // swipeStep itself still gets the real, unramped target value below,
+        // so nothing else that reads it (there's no such reader for STAR
+        // today, but keep it honest regardless) sees anything other than the
+        // true rate. STAR_GROW_RAMP_LAPS is a power of 2 so this stays a
+        // shift, not a real divide.
+        effectiveStep = (step * (starGrowLapCount + 1)) >> 3;
         starGrowLapCount++;
     }
 
