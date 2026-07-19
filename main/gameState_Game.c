@@ -88,7 +88,7 @@ void initGameState_Game() {
 
     decodeCave(cave);    // TODO: in initNextLife instead
 
-    luminance = -15;
+    luminance = 0;    //-15;
     lumTarget = 0;
     loadPalette();
 
@@ -126,23 +126,36 @@ void VB_Game() {
     T1TC = 0;
     T1TCR = 1;
 
+    updatePlayerAnimation();
+    scroll();
+
 #if ENABLE_SWIPE
-    swipe(40000);    // Bumped from 35000, confirmed on hardware -- now safe to hold back more of the
-                     // frame for other VB_Game systems without any visible cost, because circle()'s
-                     // border is a real double buffer now (see swipe.c's borderShowA/B): a lap that
-                     // takes more frames to get through (the direct result of giving swipe() a
-                     // smaller slice here) just holds last lap's finished ring steady for longer
-                     // instead of showing a half-drawn one. Before that fix, raising this value
-                     // would have made the old bottom-of-circle flashing worse, not better.
+    // Don't advance the swipe while the cave is still being decoded --
+    // setSwipe() itself isn't called until scheduleUnpackCave() (schedule.c)
+    // confirms decode is fully done, so swipe() would just be idling/holding
+    // black anyway during SCHEDULE_UNPACK_CAVE. But it's not free to call:
+    // it still burns some of this frame's time budget (the finish-clear
+    // state machine, etc.), which is time taken away from
+    // scheduleUnpackCave()'s own per-frame decode slice (see schedule.c's
+    // "while (T1TC < availableIdleTime - 20000)"). Skipping it here lets
+    // cave decode use the full frame budget instead of sharing it with an
+    // idle swipe. applySwipeMask() below still runs unconditionally every
+    // frame -- that's what forces the screen black while drawScreen() itself
+    // is also skipped during unpack (see OS_Game()), regardless of whatever
+    // stale buffer contents are sitting there.
+    if (gameSchedule != SCHEDULE_UNPACK_CAVE)
+        swipe(40000);    // Bumped from 35000, confirmed on hardware -- now safe to hold back more of the
+                         // frame for other VB_Game systems without any visible cost, because circle()'s
+                         // border is a real double buffer now (see swipe.c's borderShowA/B): a lap that
+                         // takes more frames to get through (the direct result of giving swipe() a
+                         // smaller slice here) just holds last lap's finished ring steady for longer
+                         // instead of showing a half-drawn one. Before that fix, raising this value
+                         // would have made the old bottom-of-circle flashing worse, not better.
 #endif
 
     initDataStreams_Game();
 
     gameFrame++;
-
-
-    updatePlayerAnimation();
-    scroll();
 
 
 #if ENABLE_SHAKE
@@ -179,7 +192,7 @@ void VB_Game() {
     }
 
     interleaveChronoColour(&roller);
-    adjustLuminance(1);
+    adjustLuminance(0);
 
 #if ENABLE_SWIPE
     applySwipeMask(_BUF_GAME_PF0_LEFT);    // must happen after everything else has drawn
