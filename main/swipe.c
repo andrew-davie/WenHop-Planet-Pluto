@@ -1149,6 +1149,26 @@ bool circle() {
             botPrevRow = botRowY;
             botHasPrev = true;
         }
+
+        // Nothing ever connects left and right HORIZONTALLY on the same row --
+        // only the vertical row-to-row chains (bresenhamBorderLine above) do.
+        // Doesn't matter at wide (equatorial) rows, where the gap between them
+        // is most of the screen and clearly "inside" the shape. But near a
+        // pole -- wherever this lap's disk is narrowest, which is always
+        // somewhere near the top/bottom of whatever's currently visible, every
+        // single lap -- left and right end up only 1-2 trix apart, and the
+        // handful of columns between them never get a border mark: two
+        // isolated dots with a visible gap between, right where the shape
+        // should look rounded off. Once the gap's small, just fill it in too --
+        // this only ever fires within a trix or two of a pole, so it's a
+        // handful of extra points at most, not a per-row cost.
+        if (right - left <= 4) {
+            for (int x = left + 1; x < right; x++)
+                visible |= drawBorderBit(x, topRowY);
+            if (dy != 0)
+                for (int x = left + 1; x < right; x++)
+                    visible |= drawBorderBit(x, botRowY);
+        }
     }
 
     circleRow++;
