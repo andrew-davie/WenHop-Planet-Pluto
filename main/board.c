@@ -796,8 +796,14 @@ void restartBoardScan() {
                 // Same world-to-screen math decodeCaves.c uses to centre the
                 // grow -- here it's the player's CURRENT position (death can
                 // happen anywhere on the board), not wherever the level
-                // started.
-                startSwipeClose(playerX * CHAR_TRIX_X - (scrollX >> 16), playerY * CHAR_TRIX_Y - (scrollY >> 16));
+                // started. playerX/Y are the character CELL (top-left corner,
+                // in trix), not the player's actual on-screen centre -- a
+                // character is CHAR_TRIX_X x CHAR_TRIX_Y trix, so the middle of
+                // that cell is +CHAR_CENTER_X/+CHAR_CENTER_Y from the corner
+                // (same offset particle.c's baseX/baseY use to centre effects
+                // on the player).
+                startSwipeClose(playerX * CHAR_TRIX_X + CHAR_CENTER_X - (scrollX >> 16),
+                                 playerY * CHAR_TRIX_Y + CHAR_CENTER_Y - (scrollY >> 16));
             }
 #endif
         }

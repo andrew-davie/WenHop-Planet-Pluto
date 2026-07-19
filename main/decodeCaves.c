@@ -198,11 +198,16 @@ int decodeExplicitData() {
                     // player's actual on-screen position -- same
                     // world-to-screen math used to draw the player (see
                     // drawPlayer.c), minus the sprite-specific
-                    // animation/shake offsets we don't want here.
+                    // animation/shake offsets we don't want here. playerX/Y
+                    // are the character CELL (top-left corner, in trix), not
+                    // the middle of it -- a character is CHAR_TRIX_X x
+                    // CHAR_TRIX_Y trix, so +CHAR_CENTER_X/+CHAR_CENTER_Y gets
+                    // to the actual centre (same offset particle.c's
+                    // baseX/baseY use to centre effects on the player).
                     randomizeStarAngle();         // fresh look each time -- see randomizeStarAngle()'s comment
                     markCircleFreshSequence();    // fresh sequence -- see markCircleFreshSequence()'s comment
-                    setSwipe(playerX * CHAR_TRIX_X - (scrollX >> 16), playerY * CHAR_TRIX_Y - (scrollY >> 16), 0,
-                             768, SWIPE_GROW);
+                    setSwipe(playerX * CHAR_TRIX_X + CHAR_CENTER_X - (scrollX >> 16),
+                             playerY * CHAR_TRIX_Y + CHAR_CENTER_Y - (scrollY >> 16), 0, 768, SWIPE_GROW);
 #endif
                 }
             }
