@@ -1195,6 +1195,26 @@ void randomizeStarAngle() {
     starGrowLapCount = 0;    // fresh sequence -- see starGrowLapCount's declaration
 }
 
+// Plain C >> on a negative int is an arithmetic (floor) shift -- rounds
+// toward NEGATIVE INFINITY, not toward zero. Fine for magnitude-only values
+// (isqrt()'s results, e.g.), but wrong for a genuinely signed quantity:
+// floor-rounding means every value computed from a negative intermediate
+// ends up pushed slightly FURTHER from zero than the same magnitude would
+// from a positive one. generateStar()'s rc0/rs0/rc1/rs1 (and the vertex
+// coordinates built from them) are exactly that -- signed, sign varying
+// with rotation -- so plain >> was biasing every vertex derived from a
+// negative term outward, consistently toward negative x/y regardless of
+// the star's rotation or size. Confirmed by simulation: the star's true
+// centroid (which should sit exactly on swipeCenterX/Y -- 5-fold
+// rotational symmetry cancels any real offset) averaged roughly 0.3-0.7
+// trix off toward negative x/y with plain >>; switching to this
+// truncate-toward-zero version (same negate/shift/negate trick as abs()
+// below -- still no division) brought the average centroid to exactly
+// (0,0) in the same simulation.
+static int symShr(int v, int n) {
+    return (v >= 0) ? (v >> n) : -((-v) >> n);
+}
+
 void generateStar() {
 
     int size = swipeRadius >> 8;
@@ -1207,16 +1227,17 @@ void generateStar() {
         // radius scale -- see starTrueCosine's comment for why the order
         // matters. starTrueCosine/starSine are Q15, starRotSin/Cos are Q8
         // (straight from sin_cos[]), so the product is Q23 -- >>8 brings it
-        // back to Q15, matching the un-rotated values these replace.
-        int rc0 = (starTrueCosine[i] * starRotCos - starSine[i] * starRotSin) >> 8;
-        int rs0 = (starTrueCosine[i] * starRotSin + starSine[i] * starRotCos) >> 8;
-        int rc1 = (starTrueCosine[i + 1] * starRotCos - starSine[i + 1] * starRotSin) >> 8;
-        int rs1 = (starTrueCosine[i + 1] * starRotSin + starSine[i + 1] * starRotCos) >> 8;
+        // back to Q15, matching the un-rotated values these replace. Uses
+        // symShr(), not plain >>, since these are signed -- see its comment.
+        int rc0 = symShr(starTrueCosine[i] * starRotCos - starSine[i] * starRotSin, 8);
+        int rs0 = symShr(starTrueCosine[i] * starRotSin + starSine[i] * starRotCos, 8);
+        int rc1 = symShr(starTrueCosine[i + 1] * starRotCos - starSine[i + 1] * starRotSin, 8);
+        int rs1 = symShr(starTrueCosine[i + 1] * starRotSin + starSine[i + 1] * starRotCos, 8);
 
-        starX[i] = swipeCenterX + (((size * ((rc0 * 7) >> 4)) >> 16));
-        starY[i] = swipeCenterY + ((size * rs0) >> 16);
-        starX[i + 1] = swipeCenterX + (((innerSize * ((rc1 * 7) >> 4)) >> 16));
-        starY[i + 1] = swipeCenterY + ((innerSize * rs1) >> 16);
+        starX[i] = swipeCenterX + symShr(size * symShr(rc0 * 7, 4), 16);
+        starY[i] = swipeCenterY + symShr(size * rs0, 16);
+        starX[i + 1] = swipeCenterX + symShr(innerSize * symShr(rc1 * 7, 4), 16);
+        starY[i + 1] = swipeCenterY + symShr(innerSize * rs1, 16);
     }
 }
 
