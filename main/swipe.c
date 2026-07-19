@@ -492,6 +492,21 @@ static void clearBorderBuf(unsigned char (*buf)[SCREEN_TRIX_Y]) {
         ((unsigned char *)buf)[i] = 0;
 }
 
+// STAR's per-lap hold-copy, factored out so it doesn't hand-roll its own
+// word loop next to clearBorderBuf()'s -- purely a code-sharing tidy-up,
+// NOT an attempt to unify star and circle's actual persistence strategy:
+// see the newLapPending handling in swipe() for why they genuinely need
+// opposite behaviour (star blends two laps together on purpose; circle
+// must never blend two).
+static void copyBorderBuf(unsigned char (*dst)[SCREEN_TRIX_Y], unsigned char (*src)[SCREEN_TRIX_Y]) {
+    unsigned int *pd = (unsigned int *)dst;
+    unsigned int *ps = (unsigned int *)src;
+    for (int i = 0; i < MASK_BUF_WORDS; i++)
+        pd[i] = ps[i];
+    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
+        ((unsigned char *)dst)[i] = ((unsigned char *)src)[i];
+}
+
 // Gate the lap-transition handling on "a new lap started", not "a new frame
 // happened", so this stays correct even if a lap ever does span multiple
 // frames (we don't want to disturb borderMaskCur mid-trace).
@@ -914,28 +929,35 @@ void swipe(int reserved) {
     // reasoning. STAR holds: the ring that was just active (borderMaskCur,
     // as left by the lap that just finished) is copied into borderMaskPrev,
     // and applySwipeMask() (via borderShowA/B) renders the OR of both, so
-    // every lit pixel persists for 2 consecutive frames instead of 1.
+    // every lit pixel persists for 2 consecutive frames instead of 1 -- a
+    // DELIBERATE blend of two consecutive laps, needed because star's
+    // border is a handful of long, coarsely-stepped segments that trace
+    // different pixels lap to lap; without the blend a lit pixel would go
+    // dark the instant the next lap's trace doesn't happen to relight it,
+    // reading as blinking rather than motion.
     //
-    // CIRCLE swaps instead of holding: circleWriteBorder names this lap's
-    // just-finished, fully-connected trace -- promote it to display
-    // (borderShowA = borderShowB = that buffer, so the OR in applySwipeMask
-    // collapses to just it, never blended with anything older) and hand the
-    // OTHER physical buffer (the one that WAS on screen, no longer needed)
-    // to circleWriteBorder as the upcoming lap's write target, clearing it
-    // first since drawBorderBit() only ever ORs bits in. Works identically
-    // for a sequence's very first lap too: both physical buffers are
-    // already all-zero at that point (guaranteed by the previous sequence's
-    // finishPending clear, or by initStarSwipe() at boot), so "promoting"
-    // circleWriteBorder's leftover value just displays blank until lap 1
-    // actually finishes -- no separate first-lap case needed.
+    // CIRCLE swaps instead of holding, and must NEVER blend two laps
+    // together -- see borderShowA/B's declaration for why that reads as a
+    // ghost ring. circleWriteBorder names this lap's just-finished, fully-
+    // connected trace -- promote it to display (borderShowA = borderShowB =
+    // that buffer, so the OR in applySwipeMask collapses to just it) and
+    // hand the OTHER physical buffer (the one that WAS on screen, no longer
+    // needed) to circleWriteBorder as the upcoming lap's write target,
+    // clearing it first since drawBorderBit() only ever ORs bits in. Works
+    // identically for a sequence's very first lap too: both physical
+    // buffers are already all-zero at that point (guaranteed by the
+    // previous sequence's finishPending clear, or by initStarSwipe() at
+    // boot), so "promoting" circleWriteBorder's leftover value just
+    // displays blank until lap 1 actually finishes -- no separate first-lap
+    // case needed.
+    //
+    // These two are opposite requirements (star must blend, circle must
+    // not), so they can't share the same buffer-management scheme -- only
+    // the low-level word-copy/word-clear grunt work is shared, via
+    // copyBorderBuf()/clearBorderBuf() below.
     if (newLapPending) {
         if (swipeType == SWIPE_STAR) {
-            unsigned int *pPrev = (unsigned int *)borderMaskPrev;
-            unsigned int *pCur = (unsigned int *)borderMaskCur;
-            for (int i = 0; i < MASK_BUF_WORDS; i++)
-                pPrev[i] = pCur[i];
-            for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
-                ((unsigned char *)borderMaskPrev)[i] = ((unsigned char *)borderMaskCur)[i];
+            copyBorderBuf(borderMaskPrev, borderMaskCur);
             borderPrevIsZero = false;    // now holds real border data (or did last we touched it)
             borderShowA = borderMaskCur;
             borderShowB = borderMaskPrev;

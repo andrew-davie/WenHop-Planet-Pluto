@@ -127,13 +127,13 @@ void VB_Game() {
     T1TCR = 1;
 
 #if ENABLE_SWIPE
-    swipe(35000);    // Confirmed on hardware: 35000 is as much as swipe() can take from the frame's
-                     // idle time before other VB_Game systems start missing their own budget --
-                     // bumped from 34000, needed a bit more still. See circle()'s
-                     // circleRadiusSq/oldRadiusSq caching (swipe.c) for the per-lap cost reduction
-                     // that gives this more headroom for large-sweep laps (e.g. a bottom-of-screen
-                     // swipe centre, whose covering radius has to reach much further than a
-                     // centred one).
+    swipe(40000);    // Bumped from 35000, confirmed on hardware -- now safe to hold back more of the
+                     // frame for other VB_Game systems without any visible cost, because circle()'s
+                     // border is a real double buffer now (see swipe.c's borderShowA/B): a lap that
+                     // takes more frames to get through (the direct result of giving swipe() a
+                     // smaller slice here) just holds last lap's finished ring steady for longer
+                     // instead of showing a half-drawn one. Before that fix, raising this value
+                     // would have made the old bottom-of-circle flashing worse, not better.
 #endif
 
     initDataStreams_Game();
