@@ -26,18 +26,66 @@ static const unsigned char rebase[20] = {
 // makes that guarantee explicit instead of relying on it happening to work.
 static unsigned char swipeMask[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 
-// Border ring: NOT permanent like swipeMask. borderMaskCur is this lap's
-// trace (cleared at the start of each new lap); borderMaskPrev is a copy of
-// whatever borderMaskCur held at the end of the PREVIOUS lap. applySwipeMask
-// renders the OR of both, so the ring is always the last 2 laps' worth,
-// continuously sliding -- rather than periodically clearing to nothing and
-// redrawing, which reads as on/off blinking (especially early in a grow,
-// where generateStar()'s fixed-point rounding means several consecutive
-// laps can trace almost the exact same pixels -- a pure blink with no
-// visible motion to mask it, vs. later laps where the shape has moved
-// enough that any gap reads as motion rather than a flash).
+// Border ring: NOT permanent like swipeMask, and the two swipe types use
+// these two physical buffers completely differently -- applySwipeMask()
+// doesn't hardcode either name; it goes through borderShowA/B below instead
+// (see their declaration for why).
 static unsigned char borderMaskCur[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
 static unsigned char borderMaskPrev[6][SCREEN_TRIX_Y] __attribute__((aligned(4)));
+
+// applySwipeMask() reads *borderShowA | *borderShowB per pixel rather than
+// the two physical buffers by name, so each swipe type can use a completely
+// different persistence strategy without applySwipeMask() itself needing to
+// know which type is active:
+//
+//   STAR: borderShowA = borderMaskCur (this lap's fresh trace), borderShowB
+//   = borderMaskPrev (a held COPY of last lap's). ORing both means a pixel
+//   lit for only one lap still shows for 2 consecutive frames -- needed
+//   because star's border is a handful of long, coarsely-stepped (3
+//   trix/lap) segments; without the hold, a pixel lit for a single frame
+//   reads as a flash.
+//
+//   CIRCLE: a hold like star's doesn't work here -- it was tried, and
+//   caused a "ghost ring" bug: for SHRINK, the held previous lap's ring is
+//   always LARGER than the current one, so it sits entirely outside the
+//   current disk, in territory the mask has already hidden, and the
+//   border-forces-on rule below overrides that, showing a stale ring
+//   floating in blank space for an extra frame every lap.
+//
+//   Circle also can't get away with NO hold at all (which is what it did
+//   before this): a single lap's row loop can span several video frames
+//   for a large disk (reserved's per-frame time budget only fits so many
+//   rows), and borderMaskCur used to be cleared at lap-start and filled in
+//   row by row as budget allowed, so applySwipeMask() -- which runs every
+//   frame regardless -- displayed whatever partial trace existed at that
+//   point: for a big circle, the poles (the last rows computed) are
+//   genuinely missing for however many frames the lap takes, read as the
+//   bottom (and top) of the circle flashing on/off.
+//
+//   The actual fix is a real double buffer, not a hold: circleWriteBorder
+//   (declared below) names whichever physical buffer THIS lap's
+//   drawBorderBit() calls are actually writing into -- always the buffer
+//   that is NOT currently on screen. borderShowA and borderShowB both point
+//   at the OTHER one (the last lap that finished, fully connected,
+//   nothing partial) -- ORing a buffer with itself is just itself, so this
+//   shows exactly one complete ring, never a blend of two, never a
+//   half-finished one. The swap happens once per lap, in swipe()'s
+//   newLapPending handling, the moment the previous lap's trace is
+//   confirmed complete -- a multi-frame lap just holds last lap's finished
+//   ring steady for those extra frames instead of showing it mid-redraw,
+//   which costs nothing extra: the radius itself already only advances
+//   once per lap, not per frame, so the border was never meant to move
+//   faster than that anyway.
+static unsigned char (*borderShowA)[SCREEN_TRIX_Y] = borderMaskCur;
+static unsigned char (*borderShowB)[SCREEN_TRIX_Y] = borderMaskPrev;
+
+// Circle-only write target -- see borderShowA/B's comment above. Always the
+// physical buffer currently NOT named by borderShowA/B. Star doesn't use
+// this at all (it always writes fresh segments into borderMaskCur
+// directly, see bresenhamLine()); drawBorderBit() is only ever called from
+// circle()'s code path, so it can target this unconditionally with no
+// swipeType check needed.
+static unsigned char (*circleWriteBorder)[SCREEN_TRIX_Y] = borderMaskPrev;
 
 static void fillMaskSpan(int x0, int x1, int y);
 bool drawBorderBit(int x, int y);
@@ -239,7 +287,8 @@ static enum PHASE exitPhase;
 // maskWhite inside the loop) so the hot path never re-tests it per int --
 // applySwipeMask() below picks one once, outside any loop.
 //
-// Per pixel: if the border (borderMaskCur | borderMaskPrev) is set, force
+// Per pixel: if the border (borderShowA | borderShowB -- see their
+// declaration for what these actually name per swipe type) is set, force
 // the bit fully ON (that's the "all
 // pixels set" ring at the current edge of the swipe, same in both colour
 // modes). Otherwise, if swipeMask (revealed) is set, leave the real content
@@ -261,10 +310,10 @@ static void applySwipeMaskBlack(int buffer) {
             unsigned int r1 = swipeMask[col][y + 1];
             unsigned int r2 = swipeMask[col][y + 2];
             unsigned int r3 = swipeMask[col][y + 3];
-            unsigned int b0 = borderMaskCur[col][y] | borderMaskPrev[col][y];
-            unsigned int b1 = borderMaskCur[col][y + 1] | borderMaskPrev[col][y + 1];
-            unsigned int b2 = borderMaskCur[col][y + 2] | borderMaskPrev[col][y + 2];
-            unsigned int b3 = borderMaskCur[col][y + 3] | borderMaskPrev[col][y + 3];
+            unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
+            unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
+            unsigned int b2 = borderShowA[col][y + 2] | borderShowB[col][y + 2];
+            unsigned int b3 = borderShowA[col][y + 3] | borderShowB[col][y + 3];
             unsigned int *ip = (unsigned int *)p;
 
             // int0 = [r0,r0,r0,r1] / [b0,b0,b0,b1], int1 = [r1,r1,r2,r2] / [b1,b1,b2,b2], int2 = [r2,r3,r3,r3] /
@@ -293,8 +342,8 @@ static void applySwipeMaskBlack(int buffer) {
         if (y < SCREEN_TRIX_Y) {
             unsigned int r0 = swipeMask[col][y];
             unsigned int r1 = swipeMask[col][y + 1];
-            unsigned int b0 = borderMaskCur[col][y] | borderMaskPrev[col][y];
-            unsigned int b1 = borderMaskCur[col][y + 1] | borderMaskPrev[col][y + 1];
+            unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
+            unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
             unsigned int *ip = (unsigned int *)p;
 
             if (!(r0 == 0xFF && r1 == 0xFF && b0 == 0 && b1 == 0)) {
@@ -322,10 +371,10 @@ static void applySwipeMaskWhite(int buffer) {
             unsigned int r1 = swipeMask[col][y + 1];
             unsigned int r2 = swipeMask[col][y + 2];
             unsigned int r3 = swipeMask[col][y + 3];
-            unsigned int b0 = borderMaskCur[col][y] | borderMaskPrev[col][y];
-            unsigned int b1 = borderMaskCur[col][y + 1] | borderMaskPrev[col][y + 1];
-            unsigned int b2 = borderMaskCur[col][y + 2] | borderMaskPrev[col][y + 2];
-            unsigned int b3 = borderMaskCur[col][y + 3] | borderMaskPrev[col][y + 3];
+            unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
+            unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
+            unsigned int b2 = borderShowA[col][y + 2] | borderShowB[col][y + 2];
+            unsigned int b3 = borderShowA[col][y + 3] | borderShowB[col][y + 3];
             unsigned int *ip = (unsigned int *)p;
 
             if (!(r0 == 0xFF && r1 == 0xFF && b0 == 0 && b1 == 0)) {
@@ -350,8 +399,8 @@ static void applySwipeMaskWhite(int buffer) {
         if (y < SCREEN_TRIX_Y) {
             unsigned int r0 = swipeMask[col][y];
             unsigned int r1 = swipeMask[col][y + 1];
-            unsigned int b0 = borderMaskCur[col][y] | borderMaskPrev[col][y];
-            unsigned int b1 = borderMaskCur[col][y + 1] | borderMaskPrev[col][y + 1];
+            unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
+            unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
             unsigned int *ip = (unsigned int *)p;
 
             if (!(r0 == 0xFF && r1 == 0xFF && b0 == 0 && b1 == 0)) {
@@ -429,6 +478,18 @@ static void clearBorderPrev() {
     for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
         ((unsigned char *)borderMaskPrev)[i] = 0;
     borderPrevIsZero = true;
+}
+
+// Same clear as clearBorderCur()/clearBorderPrev() above, but by pointer --
+// needed because circle's write target (circleWriteBorder) alternates
+// between the two physical buffers lap to lap, unlike star's fixed Cur/Prev
+// roles (see borderShowA/B's declaration).
+static void clearBorderBuf(unsigned char (*buf)[SCREEN_TRIX_Y]) {
+    unsigned int *p = (unsigned int *)buf;
+    for (int i = 0; i < MASK_BUF_WORDS; i++)
+        p[i] = 0;
+    for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
+        ((unsigned char *)buf)[i] = 0;
 }
 
 // Gate the lap-transition handling on "a new lap started", not "a new frame
@@ -743,8 +804,13 @@ bool drawBorderBit(int x, int y) {
 
     y += ((x + 4) >> 3) * SCREEN_TRIX_Y;
 
-    ((unsigned char *)borderMaskCur)[y] |= rebase[x];
-    ((unsigned char *)borderMaskCur)[y + 1] |= rebase[x];
+    // Writes into whichever physical buffer circleWriteBorder currently
+    // names, NOT the literal borderMaskCur -- see its declaration. Safe to
+    // do unconditionally with no swipeType check: drawBorderBit() is only
+    // ever called from circle()'s code path (star's bresenhamLine() writes
+    // borderMaskCur directly, independently).
+    ((unsigned char *)circleWriteBorder)[y] |= rebase[x];
+    ((unsigned char *)circleWriteBorder)[y + 1] |= rebase[x];
 
     return true;
 }
@@ -802,10 +868,13 @@ void swipe(int reserved) {
                     ((unsigned char *)borderMaskCur)[MASK_BUF_WORDS * 4 + (finishIndex - MASK_BUF_WORDS)] = 0;
                     finishIndex++;
                 } else {
-                    // borderMaskPrev is only ever dirtied by STAR (see
-                    // newLapPending's handling further down) -- if it's
-                    // already known zero, skip that whole stage instead of
-                    // clearing an already-all-zero buffer.
+                    // borderMaskPrev holds real (non-zero) data any time
+                    // STAR's hold-copy or CIRCLE's write-target swap have
+                    // touched it (see newLapPending's handling further down,
+                    // and borderPrevIsZero's declaration) -- skip this whole
+                    // stage instead of clearing an already-all-zero buffer
+                    // only when neither of those has happened since the last
+                    // clear.
                     finishStage = borderPrevIsZero ? FINISH_DONE : FINISH_BORDER_PREV;
                     finishIndex = 0;
                 }
@@ -841,30 +910,24 @@ void swipe(int reserved) {
 
     // We do the circle processing at start of VB or OS
 
-    // Start of a new lap. For STAR: the ring that was just active
-    // (borderMaskCur, as left by the lap that just finished) becomes
-    // borderMaskPrev, and applySwipeMask renders the OR of both, so every
-    // lit border pixel persists for at least 2 consecutive frames instead
-    // of exactly 1 -- needed there because star's border is a handful of
-    // long, coarsely-stepped (3 trix/lap) segments; without holding, a
-    // pixel lit for only a single frame reads as a flash.
+    // Start of a new lap -- see borderShowA/B's declaration for the full
+    // reasoning. STAR holds: the ring that was just active (borderMaskCur,
+    // as left by the lap that just finished) is copied into borderMaskPrev,
+    // and applySwipeMask() (via borderShowA/B) renders the OR of both, so
+    // every lit pixel persists for 2 consecutive frames instead of 1.
     //
-    // Circle doesn't hold at all any more (it used to, and that's what
-    // caused the "ghost ring" bug: for SHRINK, the held previous lap's
-    // ring was drawn at a LARGER radius than the current one, so it sat
-    // entirely OUTSIDE the current disk -- in territory the mask had
-    // already hidden -- and the border-forces-on rule in applySwipeMask()
-    // overrode that, showing a stale ring floating in what should've been
-    // blank space for one extra frame every lap). Turns out circle doesn't
-    // need the workaround in the first place: each lap already traces a
-    // fully CONNECTED outline (bresenhamBorderLine() row-to-row, not
-    // isolated points), each point is already 2 trix-rows tall
-    // (drawBorderBit()), and the per-lap step is a fine 1 trix -- so
-    // consecutive frames' independently-drawn outlines are already close
-    // enough, and dense enough, to put plenty of the same pixels on screen
-    // frame after frame without needing to explicitly carry data over.
-    // Star's border (coarse, isolated segment endpoints) doesn't have that
-    // property, so it still needs the hold.
+    // CIRCLE swaps instead of holding: circleWriteBorder names this lap's
+    // just-finished, fully-connected trace -- promote it to display
+    // (borderShowA = borderShowB = that buffer, so the OR in applySwipeMask
+    // collapses to just it, never blended with anything older) and hand the
+    // OTHER physical buffer (the one that WAS on screen, no longer needed)
+    // to circleWriteBorder as the upcoming lap's write target, clearing it
+    // first since drawBorderBit() only ever ORs bits in. Works identically
+    // for a sequence's very first lap too: both physical buffers are
+    // already all-zero at that point (guaranteed by the previous sequence's
+    // finishPending clear, or by initStarSwipe() at boot), so "promoting"
+    // circleWriteBorder's leftover value just displays blank until lap 1
+    // actually finishes -- no separate first-lap case needed.
     if (newLapPending) {
         if (swipeType == SWIPE_STAR) {
             unsigned int *pPrev = (unsigned int *)borderMaskPrev;
@@ -874,16 +937,29 @@ void swipe(int reserved) {
             for (int i = MASK_BUF_WORDS * 4; i < MASK_BUF_BYTES; i++)
                 ((unsigned char *)borderMaskPrev)[i] = ((unsigned char *)borderMaskCur)[i];
             borderPrevIsZero = false;    // now holds real border data (or did last we touched it)
-        } else if (!borderPrevIsZero) {
-            // Circle never writes to borderMaskPrev at all (see above), so
-            // once it's zero for a circle sequence it STAYS zero every lap
-            // after the first -- re-clearing an already-all-zero buffer
-            // every single lap was pure waste. Only the first circle lap
-            // after switching away from star (when prev still holds star's
-            // last-held ring) actually needs this.
-            clearBorderPrev();
+            borderShowA = borderMaskCur;
+            borderShowB = borderMaskPrev;
+            clearBorderCur();
+        } else {
+            unsigned char(*justFinished)[SCREEN_TRIX_Y] = circleWriteBorder;
+            unsigned char(*nextWrite)[SCREEN_TRIX_Y] = (justFinished == borderMaskCur) ? borderMaskPrev : borderMaskCur;
+
+            borderShowA = justFinished;
+            borderShowB = justFinished;
+            circleWriteBorder = nextWrite;
+
+            // Pessimistically mark not-zero the instant we hand this buffer
+            // over as a write target, rather than after the lap fills it in
+            // -- if this turns out to be the sequence's LAST lap, the
+            // finishPending machine's borderPrevIsZero check (see its
+            // declaration) runs right after, and it needs to already see
+            // "not zero" for whatever real data this lap is about to trace,
+            // not the split-second-stale "just cleared" state.
+            if (nextWrite == borderMaskPrev)
+                borderPrevIsZero = false;
+
+            clearBorderBuf(nextWrite);
         }
-        clearBorderCur();
         newLapPending = false;
     }
 
@@ -1100,8 +1176,8 @@ static int squashDy2(int dy) {
     return dy2 + (dy2 >> 3) - (dy2 >> 6);
 }
 
-// Border-only Bresenham line: marks borderMaskCur (via drawBorderBit()) for
-// every pixel from (x0,y0) EXCLUSIVE to (x1,y1) inclusive, without touching
+// Border-only Bresenham line: marks circleWriteBorder (via drawBorderBit())
+// for every pixel from (x0,y0) EXCLUSIVE to (x1,y1) inclusive, without touching
 // swipeMask (that's fillMaskSpan()'s job elsewhere). Used to connect one
 // row's edge point to the next's -- see circle()'s comment for why an
 // isolated dot per row can't form a connected curve on its own.
