@@ -179,7 +179,7 @@ static void applySwipeMaskBlack(int buffer) {
         unsigned char *p = RAM + buffer + col * _BUFFER_SIZE;
         int y = 0;
 
-        for (; y + 4 <= SCREEN_TRIX_Y; y += 4) {
+        for (; y + 4 <= SCREEN_TRIX_Y - 12; y += 4) {
             unsigned int r0 = swipeMask[col][y];
             unsigned int r1 = swipeMask[col][y + 1];
             unsigned int r2 = swipeMask[col][y + 2];
@@ -211,26 +211,26 @@ static void applySwipeMaskBlack(int buffer) {
             p += 12;
         }
 
-        // Tail: same 2-leftover-rows-plus-padding handling as before, now also
-        // folding in the border rows the same way.
-        if (y < SCREEN_TRIX_Y) {
-            unsigned int r0 = swipeMask[col][y];
-            unsigned int r1 = swipeMask[col][y + 1];
-            unsigned int b0 = borderMaskCur[col][y] | borderMaskPrev[col][y];
-            unsigned int b1 = borderMaskCur[col][y + 1] | borderMaskPrev[col][y + 1];
-            unsigned int *ip = (unsigned int *)p;
+        // // Tail: same 2-leftover-rows-plus-padding handling as before, now also
+        // // folding in the border rows the same way.
+        // if (y < SCREEN_TRIX_Y) {
+        //     unsigned int r0 = swipeMask[col][y];
+        //     unsigned int r1 = swipeMask[col][y + 1];
+        //     unsigned int b0 = borderMaskCur[col][y] | borderMaskPrev[col][y];
+        //     unsigned int b1 = borderMaskCur[col][y + 1] | borderMaskPrev[col][y + 1];
+        //     unsigned int *ip = (unsigned int *)p;
 
-            if (!(r0 == 0xFF && r1 == 0xFF && b0 == 0 && b1 == 0)) {
-                unsigned int R = r0 | (r0 << 8) | (r0 << 16) | (r1 << 24);
-                unsigned int B = b0 | (b0 << 8) | (b0 << 16) | (b1 << 24);
-                ip[0] = (ip[0] & R) | B;
-            }
-            if (!(r1 == 0xFF && b1 == 0)) {
-                unsigned int R = r1 | (r1 << 8) | (r1 << 16) | (r1 << 24);
-                unsigned int B = b1 | (b1 << 8) | (b1 << 16) | (b1 << 24);
-                ip[1] = (ip[1] & R) | B;
-            }
-        }
+        //     if (!(r0 == 0xFF && r1 == 0xFF && b0 == 0 && b1 == 0)) {
+        //         unsigned int R = r0 | (r0 << 8) | (r0 << 16) | (r1 << 24);
+        //         unsigned int B = b0 | (b0 << 8) | (b0 << 16) | (b1 << 24);
+        //         ip[0] = (ip[0] & R) | B;
+        //     }
+        //     if (!(r1 == 0xFF && b1 == 0)) {
+        //         unsigned int R = r1 | (r1 << 8) | (r1 << 16) | (r1 << 24);
+        //         unsigned int B = b1 | (b1 << 8) | (b1 << 16) | (b1 << 24);
+        //         ip[1] = (ip[1] & R) | B;
+        //     }
+        // }
     }
 }
 
@@ -875,12 +875,27 @@ static int isqrt(int n) {
 }
 
 // Border-only Bresenham line: marks borderMaskCur (via drawBorderBit()) for
-// every pixel between the two points, without touching swipeMask (that's
-// fillMaskSpan()'s job elsewhere). Used to connect one row's edge point to
-// the next's -- see circle()'s comment for why an isolated dot per row
-// can't form a connected curve on its own. No early-exit optimisation like
-// bresenhamLine() has, since these are always short, adjacent-row lines,
-// not the far-off-screen star vertices that needed one.
+// every pixel from (x0,y0) EXCLUSIVE to (x1,y1) inclusive, without touching
+// swipeMask (that's fillMaskSpan()'s job elsewhere). Used to connect one
+// row's edge point to the next's -- see circle()'s comment for why an
+// isolated dot per row can't form a connected curve on its own.
+//
+// Deliberately does NOT draw the (x0,y0) start point: every call site
+// chains from the previous call's endpoint (or the chain's initial seed
+// point, drawn once directly via drawBorderBit() -- see circle()), so
+// (x0,y0) here was always already drawn by whatever came before. Drawing
+// it again is a pure no-op (drawBorderBit() just re-ORs the same bits) but
+// still costs 2 read-modify-write byte ops for nothing -- over ~100 rows a
+// lap, both edges, that's a real amount of wasted work for a stray pixel
+// that was never going anywhere. NOT the same as skipping the LAST point
+// instead: that would drop the true final endpoint of a chain (a pole
+// tip, or wherever the trace ends) since there's no later call to redraw
+// it -- skipping the *first* point is safe unconditionally because
+// there's always an earlier draw that already covered it.
+//
+// No early-exit optimisation like bresenhamLine() has, since these are
+// always short, adjacent-row lines, not the far-off-screen star vertices
+// that needed one.
 bool bresenhamBorderLine(int x0, int y0, int x1, int y1) {
 
     bool visible = false;
@@ -892,12 +907,7 @@ bool bresenhamBorderLine(int x0, int y0, int x1, int y1) {
     int err = dx - dy;
     int e2;
 
-    while (true) {
-        visible |= drawBorderBit(x0, y0);
-
-        if (x0 == x1 && y0 == y1)
-            break;
-
+    while (x0 != x1 || y0 != y1) {
         e2 = 2 * err;
         if (e2 > -dy) {
             err -= dy;
@@ -907,6 +917,7 @@ bool bresenhamBorderLine(int x0, int y0, int x1, int y1) {
             err += dx;
             y0 += sy;
         }
+        visible |= drawBorderBit(x0, y0);
     }
 
     return visible;
