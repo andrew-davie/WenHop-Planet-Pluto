@@ -116,11 +116,28 @@ void scroll() {
 
 void resetTracking() {
 
+    // Clamp against theCave->bounds_l/r/t/b -- the SAME per-cave range
+    // scroll()'s own hard clamp (above) enforces every frame -- not against
+    // SCROLL_MIN/MAX_X/Y (the absolute board-wide range, used only as
+    // drawScreen()'s last-ditch renderer safety clamp; see scroll.h). Those
+    // two ranges normally coincide for an ordinary cave, but a cave that
+    // locks an axis (e.g. a vertically-locked cave, where bounds_t ==
+    // bounds_b pins the camera to one fixed scrollY regardless of player
+    // position) has a per-cave range narrower than the board-wide one.
+    // Using the wrong, wider range here meant resetTracking() could place
+    // scrollX/scrollY somewhere scroll()'s own clamp would immediately
+    // overrule on the very next frame it ran -- and since setSwipe() (see
+    // schedule.c) can fire before or after that correction happens,
+    // depending on exactly how many frames cave decode takes and where in
+    // the object stream the player birth marker falls, the star's one-time
+    // centring could end up capturing either the right or the wrong value.
+    // Matching scroll()'s own clamp here removes that race entirely: this
+    // is now the same value scroll() would settle on immediately anyway.
     scrollX = ((playerX * CHAR_TRIX_X - (SCREEN_TRIX_X >> 1)) << 16) + (CHAR_TRIX_X << 15);
-    clamp(&scrollX, SCROLL_MIN_X, SCROLL_MAX_X);
+    clamp(&scrollX, theCave->bounds_l << 16, theCave->bounds_r << 16);
 
     scrollY = ((playerY * CHAR_TRIX_Y - (SCREEN_TRIX_Y >> 1)) << 16);    // + (CHAR_TRIX_Y << 16);
-    clamp(&scrollY, SCROLL_MIN_Y, SCROLL_MAX_Y);
+    clamp(&scrollY, theCave->bounds_t << 16, theCave->bounds_b << 16);
 
     scrollSpeedX = scrollSpeedY = 0;
 }
