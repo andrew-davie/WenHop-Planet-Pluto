@@ -152,8 +152,7 @@ static unsigned char finishStage;
 static int finishIndex;    // word cursor within whichever buffer finishStage currently names
 static bool finishPending;
 
-bool maskNeeded = true;           // false once fully open (grown-in) -- lets applySwipeMask skip the AND loop
-static bool maskWhite = false;    // true: hidden area forced ON (COLUPF/white); false: forced OFF (background/black)
+bool maskNeeded = true;    // false once fully open (grown-in) -- lets applySwipeMask skip the AND loop
 
 static enum CIRCLEPHASE swipePhase;
 static enum SWIPE swipeType;
@@ -176,16 +175,13 @@ static enum PHASE exitPhase;
 // buffer is the left column (PF0_LEFT) of whichever kernel's six PF0/PF1/PF2
 // LEFT/RIGHT planes we're masking; each plane is _BUFFER_SIZE apart.
 // Every 4 rows (12 bytes) is exactly 3 ints, so 4 rows get bulk-processed as
-// 3 int32 read-modify-writes. Little-endian assumed. Split into black/white
-// variants so the hot path never re-tests maskWhite per int.
+// 3 int32 read-modify-writes. Little-endian assumed.
 //
 // Per pixel: if the border is set, force the bit fully ON. Otherwise, if
 // maskShow (revealed) is set, leave the real content alone. Otherwise force
-// per the black/white hidden-area rule. Per-int:
-//   black: final = (orig & R) | B
-//   white: final = orig | (~R | B)
+// OFF (hidden, background). Per-int: final = (orig & R) | B.
 // Skipped entirely if the relevant rows are already all-revealed and border-free.
-static void applySwipeMaskBlack(int buffer) {
+static void applySwipeMaskImpl(int buffer) {
 
     for (int col = 0; col < 6; col++) {
         unsigned char *p = RAM + buffer + col * _BUFFER_SIZE;
@@ -243,63 +239,6 @@ static void applySwipeMaskBlack(int buffer) {
     }
 }
 
-static void applySwipeMaskWhite(int buffer) {
-
-    for (int col = 0; col < 6; col++) {
-        unsigned char *p = RAM + buffer + col * _BUFFER_SIZE;
-        int y = 0;
-
-        for (; y + 4 <= SCREEN_TRIX_Y; y += 4) {
-            unsigned int r0 = maskShow[col][y];
-            unsigned int r1 = maskShow[col][y + 1];
-            unsigned int r2 = maskShow[col][y + 2];
-            unsigned int r3 = maskShow[col][y + 3];
-            unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
-            unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
-            unsigned int b2 = borderShowA[col][y + 2] | borderShowB[col][y + 2];
-            unsigned int b3 = borderShowA[col][y + 3] | borderShowB[col][y + 3];
-            unsigned int *ip = (unsigned int *)p;
-
-            if (!(r0 == 0xFF && r1 == 0xFF && b0 == 0 && b1 == 0)) {
-                unsigned int R = r0 | (r0 << 8) | (r0 << 16) | (r1 << 24);
-                unsigned int B = b0 | (b0 << 8) | (b0 << 16) | (b1 << 24);
-                ip[0] |= ~R | B;
-            }
-            if (!(r1 == 0xFF && r2 == 0xFF && b1 == 0 && b2 == 0)) {
-                unsigned int R = r1 | (r1 << 8) | (r2 << 16) | (r2 << 24);
-                unsigned int B = b1 | (b1 << 8) | (b2 << 16) | (b2 << 24);
-                ip[1] |= ~R | B;
-            }
-            if (!(r2 == 0xFF && r3 == 0xFF && b2 == 0 && b3 == 0)) {
-                unsigned int R = r2 | (r3 << 8) | (r3 << 16) | (r3 << 24);
-                unsigned int B = b2 | (b3 << 8) | (b3 << 16) | (b3 << 24);
-                ip[2] |= ~R | B;
-            }
-
-            p += 12;
-        }
-
-        if (y < SCREEN_TRIX_Y) {
-            unsigned int r0 = maskShow[col][y];
-            unsigned int r1 = maskShow[col][y + 1];
-            unsigned int b0 = borderShowA[col][y] | borderShowB[col][y];
-            unsigned int b1 = borderShowA[col][y + 1] | borderShowB[col][y + 1];
-            unsigned int *ip = (unsigned int *)p;
-
-            if (!(r0 == 0xFF && r1 == 0xFF && b0 == 0 && b1 == 0)) {
-                unsigned int R = r0 | (r0 << 8) | (r0 << 16) | (r1 << 24);
-                unsigned int B = b0 | (b0 << 8) | (b0 << 16) | (b1 << 24);
-                ip[0] |= ~R | B;
-            }
-            if (!(r1 == 0xFF && b1 == 0)) {
-                unsigned int R = r1 | (r1 << 8) | (r1 << 16) | (r1 << 24);
-                unsigned int B = b1 | (b1 << 8) | (b1 << 16) | (b1 << 24);
-                ip[1] |= ~R | B;
-            }
-        }
-    }
-}
-
 void applySwipeMask(int buffer) {
 
     // maskNeeded only goes false when a GROW genuinely finishes -- not
@@ -308,14 +247,7 @@ void applySwipeMask(int buffer) {
     if (!maskNeeded)
         return;
 
-    if (maskWhite)
-        applySwipeMaskWhite(buffer);
-    else
-        applySwipeMaskBlack(buffer);
-}
-
-void setSwipeMaskColour(bool white) {
-    maskWhite = white;
+    applySwipeMaskImpl(buffer);
 }
 
 bool checkSwipeFinished() {
