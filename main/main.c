@@ -17,6 +17,8 @@
 #include "sound.h"
 #include "swipe.h"
 
+int debug[10] = {[0 ... 9] = -1};
+
 
 #if ENABLE_SHAKE
 
@@ -126,7 +128,7 @@ const signed char xdir[] = {0, 1, 0, -1, 0};
 const signed char ydir[] = {-1, 0, 1, 0, 0};
 
 
-static enum GAME_STATE gameState, nextGameState;
+enum GAME_STATE gameState, nextGameState;
 
 unsigned char kernel;    // use _KERNEL_* values from 6502
 unsigned char colubk;
@@ -334,30 +336,16 @@ void (*const verticalBlank[GS_MAX])() = {
     VB_RasterBleed,       // 8
 };
 
-// While a swipe is in progress, applySwipeMask() adds a fixed per-frame cost
-// on top of everything else, and unlike the loops it doesn't yield partway
-// through -- it just runs. So instead of budgeting it, we shrink the ceiling
-// everything ELSE idle-time-gated (swipe()'s own tracing, cave decode,
-// processBoardSquares()) is allowed to use this frame, leaving headroom for
-// it. Tune this if it's still overtime, or if it's leaving too much idle
-// work stranded.
-#if ENABLE_SWIPE
-#define SWIPE_IDLE_TIME_CAP 30000
-#endif
 
 void runARM_VerticalBlank() {
 
     availableIdleTime = RAM[_INTIM] * armCycles - 5000;
 
-    // #if ENABLE_SWIPE
-    //     if (maskNeeded && availableIdleTime > SWIPE_IDLE_TIME_CAP)
-    //         availableIdleTime = SWIPE_IDLE_TIME_CAP;
-    // #endif
-
     if (gameState == nextGameState)
         (*verticalBlank[gameState])();
 
     // common to ALL VB...
+    // (nothing yet)
 }
 
 // -----------------------------------------------------------------------------
@@ -388,70 +376,27 @@ int whichKernel[GS_MAX] = {
     _KERNEL_COPYRIGHT,         // 8 GS_RASTER_BLEED
 };
 
-
-// A state transition's own init (initialiseGameState[]/initialiseKernel[])
-// runs completely unconditionally below -- no T1TC check anywhere in that
-// path, unlike everything swipe.c does. That's real, sometimes substantial,
-// fixed-cost work (e.g. GS_MENU's init does a full _MENU_BUFFERS_SIZE
-// myMemsetInt, a grid-preview/Life init, stream registration, a drawString()
-// call), running against the REAL hardware deadline (availableIdleTime, off
-// RAM[_INTIM]) with no cushion at all -- not the soft `reserved` margin
-// swipe() gets to respect. Every state transition in this dispatcher has
-// this same gap; it just surfaces via the death->menu transition, since
-// that's the one swipe's circle shrink drives (checkSwipeFinished() flips
-// nextGameState the instant circleRadius reaches 0 -- see swipe.c). Nothing
-// about radius 0 itself is expensive; reaching it is just what triggers this
-// otherwise-unrelated, otherwise-unbudgeted jump.
-//
-// Fix: don't perform the transition on a frame where availableIdleTime looks
-// tight -- wait for one with real headroom instead. VB_Game() (and swipe())
-// already get skipped every frame gameState != nextGameState (see
-// runARM_VerticalBlank()), so waiting an extra frame or two costs nothing
-// visible, just a slightly longer hold on the last-drawn frame before the
-// menu appears. Bounded by stateTransitionWaitFrames so a chronically-tight
-// budget forces the transition through anyway rather than stalling forever
-// on a frozen screen -- same watchdog-over-ideal-conditions shape as
-// swipe.c's own SWIPE_WATCHDOG_FRAMES. STATE_TRANSITION_MIN_IDLE is a first
-// guess, not a measured figure -- tune if transitions still overrun, or if
-// this ends up waiting more than a frame or two in practice.
-#define STATE_TRANSITION_MIN_IDLE 40000
-#define STATE_TRANSITION_MAX_WAIT_FRAMES 60
-static int stateTransitionWaitFrames;
-
 void runARM_Overscan() {
 
 
     availableIdleTime = RAM[_INTIM] * armCycles - 5000;
 
-    // #if ENABLE_SWIPE
-    //     if (maskNeeded && availableIdleTime > SWIPE_IDLE_TIME_CAP)
-    //         availableIdleTime = SWIPE_IDLE_TIME_CAP;
-    // #endif
 
-    if (gameState != nextGameState) {
-
-        if (availableIdleTime < STATE_TRANSITION_MIN_IDLE && stateTransitionWaitFrames < STATE_TRANSITION_MAX_WAIT_FRAMES) {
-            stateTransitionWaitFrames++;
-        } else {
-
-            stateTransitionWaitFrames = 0;
-
-            gameState = nextGameState;
-            (*initialiseGameState[gameState])();
-
-            if (whichKernel[gameState] != kernel) {
-                kernel = whichKernel[gameState];
-                (*initialiseKernel[kernel])();
-            }
-        }
-    }
+    playAudio();
 
     (*overscan[gameState])();
 
+    if (gameState != nextGameState) {
 
-    // common to ALL OS...
+        gameState = nextGameState;
+        (*initialiseGameState[gameState])();
 
-    playAudio();
+        if (whichKernel[gameState] != kernel) {
+            kernel = whichKernel[gameState];
+            (*initialiseKernel[kernel])();
+        }
+    }
+
 
     frame++;
 

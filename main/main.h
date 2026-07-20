@@ -110,6 +110,10 @@ extern int pulsePlayerColour;
 extern int shakeX, shakeY, shakeTime;
 #endif
 
+
+extern int debug[10];
+
+
 void ClearChannel(void *ptr);
 void MemCopy32(void *ptr1, void *ptr2, unsigned int count);
 void Random(unsigned int count);

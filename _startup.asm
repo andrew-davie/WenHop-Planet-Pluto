@@ -1,33 +1,6 @@
+callARM         stx CALLFN
+                rts
 
-;-------------------------------------------------------------------------------
-; Code block that gets copied into RAM for bank routine dispatch
-
-; The code here is a 'template' copied into the RAM area and the bank and jump
-; address are modified before execution. The return will be to the caller of
-; the code that jumps to the RAM copy of this code.
-; DO NOT RUN *THIS* CODE AS IT WILL CRASH. JUMP TO THE RAM VERSION!
-
-
-JUMP_CODE_START
-jumpCode       	    cmp BANK1           ; hotspot bank-switch
-                    jsr 0               ; selfmod
-                    cmp BANK0           ; hotspot bank-switch
-                    rts
-JUMP_CODE_END
-
-;-------------------------------------------------------------------------------
-;@@@@@@@@@@@@ Tables for Frame Dispatch @@@@@@@@@@@@
-
-.sound_mode_table		;for auto-adjust to SETMODE mirror
-	.byte $00
-	.byte $f0
-	.byte $00
-
-.call_fn_table			;for auto-adjust to call_fn mirror
-	.byte $ff
-	.byte $fe
-	.byte $fe
-;-------------------------------------------------------------------------------
 
 
 CartReset
@@ -57,7 +30,8 @@ initJumpCode        lda jumpCode,x
                     stx DSWRITE
 
                     ldx #$FF
-                    stx CALLFN          		    ; Initialise via ARM function
+                    jsr callARM
+;                    stx CALLFN          		    ; Initialise via ARM function
 
                     jsr ReadSaveKey                 ; Load savekey to ZP SAVEKEY block (*fast mode OFF)
 
@@ -85,7 +59,8 @@ initJumpCode        lda jumpCode,x
                     stx DSWRITE
 
                     ldx #$FF
-                    stx CALLFN          		    ; Initialise via ARM function
+                    jsr callARM
+;                    stx CALLFN          		    ; Initialise via ARM function
 
 .notRealSKData
 
@@ -113,4 +88,37 @@ initJumpCode        lda jumpCode,x
     include "_mainLoop.asm"
 
 
+;-------------------------------------------------------------------------------
+;@@@@@@@@@@@@ Tables for Frame Dispatch @@@@@@@@@@@@
+
+.sound_mode_table		;for auto-adjust to SETMODE mirror
+	.byte $00
+	.byte $f0
+	.byte $00
+
+.call_fn_table			;for auto-adjust to call_fn mirror
+	.byte $ff
+	.byte $fe
+	.byte $fe
+
+
+
+;-------------------------------------------------------------------------------
+; Code block that gets copied into RAM for bank routine dispatch
+
+; The code here is a 'template' copied into the RAM area and the bank and jump
+; address are modified before execution. The return will be to the caller of
+; the code that jumps to the RAM copy of this code.
+; DO NOT RUN *THIS* CODE AS IT WILL CRASH. JUMP TO THE RAM VERSION!
+
+
+JUMP_CODE_START
+jumpCode       	    cmp BANK1           ; hotspot bank-switch
+                    jsr 0               ; selfmod
+                    cmp BANK0           ; hotspot bank-switch
+                    rts
+JUMP_CODE_END
+
+
+;-------------------------------------------------------------------------------
 ; EOF

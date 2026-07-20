@@ -5,6 +5,9 @@
 
 extern bool onOff[_BOARD_COLS];
 extern bool lastOnOff[_BOARD_COLS];
+extern bool onOffHoriz[_BOARD_ROWS];
+extern bool lastOnOffHoriz[_BOARD_ROWS];
+
 
 // The board scanner's current cell, threaded explicitly through the
 // per-cell handler chain instead of relying on implicit globals. me/row/col

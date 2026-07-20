@@ -5,6 +5,29 @@
 	SEG.U VARS
 	org $80
 
+;-------------------------------------------------------------------------------
+; PLACE THIS EARLY
+; Since the ARM code effectively disables the 6502 fetch (it's in a "NOP" lock)
+; but the 6502 PC is still incrementing, we want to avoid using so many ARM
+; cycles that the 6502 PC hits non NOP terrirory.
+
+jumpCodeRAM		    ds 10		    ; self-modifying bank routine call code
+
+  ;      Code                  bytes [] = modified
+  ; ----------------------------------------------------------------------------
+  ; cmp SelectBankX           0 = cmp, [1=SM_JumpBank_L],    2=high bank
+  ; jsr .called_bank_routine  3 = jsr, [4=SM_JumpRoutine_L], [5=SM_JumpRoutine_H]
+  ; cmp SelectBank0           6 = cmp, 7=low bank,           8=high bank
+  ; rts                       9 = rts
+
+SM_JumpBank_L       = (jumpCodeRAM + 1)
+SM_JumpRoutine_L    = (jumpCodeRAM + 4)
+SM_JumpRoutine_H    = (jumpCodeRAM + 5)
+
+;-------------------------------------------------------------------------------
+
+
+
 scanSK              ds 1
 
 
@@ -22,21 +45,6 @@ audv1			    ds 1
 audc1			    ds 1
 audf1			    ds 1
 
-
-;-------------------------------------------------------------------------------
-
-jumpCodeRAM		    ds 10		    ; self-modifying bank routine call code
-
-  ;      Code                  bytes [] = modified
-  ; ----------------------------------------------------------------------------
-  ; cmp SelectBankX           0 = cmp, [1=SM_JumpBank_L],    2=high bank
-  ; jsr .called_bank_routine  3 = jsr, [4=SM_JumpRoutine_L], [5=SM_JumpRoutine_H]
-  ; cmp SelectBank0           6 = cmp, 7=low bank,           8=high bank
-  ; rts                       9 = rts
-
-SM_JumpBank_L       = (jumpCodeRAM + 1)
-SM_JumpRoutine_L    = (jumpCodeRAM + 4)
-SM_JumpRoutine_H    = (jumpCodeRAM + 5)
 
 ;------------------------------------------------------------------------------
 ;SAVEKEY - a 'local' copy of the SaveKey DS variables

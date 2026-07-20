@@ -10,12 +10,14 @@
 // #include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
+#include "gameState.h"
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"
 #include "playerAnimation.h"
 #include "random.h"
 #include "schedule.h"
+#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 #include "swipe.h"
@@ -115,6 +117,8 @@ void initBoard() {
 
 void setupBoardScanner() {
 
+    actualScore = 383;
+
     // After board scan complete, throttles until we're at correct FPS
     if (gameFrame >= gameSpeed) {    // && !autoMoveFrameCount) {
 
@@ -122,7 +126,8 @@ void setupBoardScanner() {
 
         restartBoardScan();
 
-        processWyrms();
+        if (gameState == nextGameState)
+            processWyrms();
 
         gameFrame = 0;
 
@@ -179,28 +184,31 @@ void setupBoardScanner() {
         usableSWCHA = bufferedSWCHA;
         bufferedSWCHA = 0xFF;
 
-        if (boardRow < 0) {
-            boardRow = _BOARD_ROWS - 1;
-            boardCol = _BOARD_COLS - 1;
-        } else {
-            boardCol = 0;
-            boardRow = 0;
-        }
+        // if (boardRow < 0) {
+        //     boardRow = _BOARD_ROWS - 1;
+        //     boardCol = _BOARD_COLS - 1;
+        // } else {
+        boardCol = 0;
+        boardRow = 0;
+        // }
 
         calculateVisibleMasks();
 
         setSchedule(SCHEDULE_PROCESS_BOARD);
 
-
+        actualScore = 685;
         processBoardSquares();
+        actualScore = 339;
     }
 }
 
 
 void processBoardSquares() {
 
+    actualScore = 645;
+    debug[0] = T1TC;
 
-    while (T1TC < availableIdleTime - 6500) {
+    while (gameState == nextGameState && T1TC < availableIdleTime - 10000) {
 
         // boardRow/boardCol are the only pieces of this that genuinely need
         // to survive across frames (this loop yields when its time budget
@@ -233,55 +241,60 @@ void processBoardSquares() {
         // Clear any "scanned this frame" objects on the previous line
         // note: we need to also do the last row ... or do we? if it's steel wall, no
 
-        if (gravity > 0) {
-            if (cur.row > 1) {
-                unsigned char *prev = cur.me - _BOARD_COLS;
-                *prev &= ~FLAG_THISFRAME;
-            }
+        // if (gravity > 0) {
+        if (cur.row > 1) {
+            unsigned char *prev = cur.me - _BOARD_COLS;
+            *prev &= ~FLAG_THISFRAME;
         }
+        // }
 
-        else {
-            if (cur.row < _BOARD_ROWS - 1) {
-                unsigned char *prev = cur.me + _BOARD_COLS;
-                *prev &= ~FLAG_THISFRAME;
-            }
-        }
+        // else {
+        //     if (cur.row < _BOARD_ROWS - 1) {
+        //         unsigned char *prev = cur.me + _BOARD_COLS;
+        //         *prev &= ~FLAG_THISFRAME;
+        //     }
+        // }
 
         cur.me += gravity;
         cur.col += gravity;
 
-        if (gravity < 0) {
-            if (cur.col < 0) {
-                cur.col = _BOARD_COLS - 1;
+        // if (gravity < 0) {
+        //     if (cur.col < 0) {
+        //         cur.col = _BOARD_COLS - 1;
 
-                if (!--cur.row) {
-                    // Leave boardRow negative so setupBoardScanner's
-                    // "if (boardRow < 0)" restart branch actually triggers;
-                    // otherwise the next scan wrongly restarts at (0,0)
-                    // instead of the bottom row whenever gravity is negative.
-                    boardRow = -1;
-                    boardCol = cur.col;
-                    setSchedule(SCHEDULE_START_SCAN);
-                    return;
-                }
-            }
-        }
+        //         if (!--cur.row) {
+        //             // Leave boardRow negative so setupBoardScanner's
+        //             // "if (boardRow < 0)" restart branch actually triggers;
+        //             // otherwise the next scan wrongly restarts at (0,0)
+        //             // instead of the bottom row whenever gravity is negative.
+        //             boardRow = -1;
+        //             boardCol = cur.col;
+        //             setSchedule(SCHEDULE_START_SCAN);
+        //             return;
+        //         }
+        //     }
+        // }
 
-        else {
-            if (cur.col > (_BOARD_COLS - 1)) {
-                cur.col = 0;
-                if (++cur.row > _BOARD_ROWS - 1) {
-                    boardRow = cur.row;
-                    boardCol = cur.col;
-                    setSchedule(SCHEDULE_START_SCAN);
-                    return;
-                }
+        // else {
+        if (cur.col > (_BOARD_COLS - 1)) {
+            cur.col = 0;
+            if (++cur.row > _BOARD_ROWS - 1) {
+                boardRow = cur.row;
+                boardCol = cur.col;
+                actualScore = 546;
+                setSchedule(SCHEDULE_START_SCAN);
+                return;
             }
+            // }
         }
 
         boardRow = cur.row;
         boardCol = cur.col;
     }
+
+    debug[0] = T1TC - debug[0];
+    if (debug[0] > debug[1])
+        debug[1] = debug[0];
 }
 
 
@@ -353,8 +366,10 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
             exitMode--;
             if (exitMode < 20) {
                 lumTarget = -15;
-                if (lumTarget == luminance)
+                if (lumTarget == luminance) {
                     setGameState(GS_MENU);
+                    // return;
+                }
             }
         }
 
@@ -464,51 +479,65 @@ void setInsulatorHoriz(unsigned char *p, int row, int col) {
 
     p++;
 
-    while (++col < _BOARD_COLS && CharToType[GET(*p)] != TYPE_INSULATOR) {
 
-        int ch = GET(*p);
-        int type2 = CharToType[GET(*p)];
-        unsigned int att = Attribute[type2];
+    if (!onOffHoriz[row]) {
+        if (lastOnOffHoriz[row])
+            while (++col < _BOARD_COLS && CharToType[GET(*p)] != TYPE_INSULATOR) {
+                if (CharToType[GET(*p)] == TYPE_ELECTRIC)
+                    *p = FLAG(CH_BLANK);
+                p++;
+            }
+    }
 
-        if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES)) {
+    else {
+
+        while (++col < _BOARD_COLS && CharToType[GET(*p)] != TYPE_INSULATOR) {
+
+            int ch = GET(*p);
+            int type2 = CharToType[GET(*p)];
+            unsigned int att = Attribute[type2];
+
+            if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES)) {
 
 
-            *p = CH_ELECTRIC_H0;
-            // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
-            return;
-        }
-
-        if (att & ATT_BLANK) {
-
-            if (ch >= CH_ELECTRIC_0 && ch <= CH_ELECTRIC_3) {
-                *p = CH_CROSSED_STREAMS;
+                *p = CH_ELECTRIC_H0;
+                // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                return;
             }
 
-            else if (type2 != TYPE_ELECTRIC)
-                *p = CH_ELECTRIC_H0;    // + (!rangeRandom(230) ? 1 : 0);
+            if (att & ATT_BLANK) {
+
+                if (ch >= CH_ELECTRIC_0 && ch <= CH_ELECTRIC_3) {
+                    *p = CH_CROSSED_STREAMS;
+                }
+
+                else if (type2 != TYPE_ELECTRIC)
+                    *p = CH_ELECTRIC_H0;    // + (!rangeRandom(230) ? 1 : 0);
+            }
+
+
+            else if (type2 == TYPE_ROCK_BONUS) {
+
+                *p = FLAG(CH_STAR);
+                // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                return;
+            }
+
+
+            if (*p == CH_CROSSED_STREAMS) {
+                nDots(5, col, row, PT_SPIRAL2, 25, CHAR_CENTER_X + 1, CHAR_CENTER_Y, 10 + rangeRandom(20),
+                      rangeRandom(7) + 1);
+            }
+            p++;
         }
-
-
-        else if (type2 == TYPE_ROCK_BONUS) {
-
-            *p = FLAG(CH_STAR);
-            // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
-            return;
-        }
-
-
-        if (*p == CH_CROSSED_STREAMS) {
-            nDots(5, col, row, PT_SPIRAL2, 25, CHAR_CENTER_X + 1, CHAR_CENTER_Y, 10 + rangeRandom(20),
-                  rangeRandom(7) + 1);
-        }
-        p++;
     }
-    // }
 }
 
 
 bool onOff[_BOARD_COLS] = {false};
 bool lastOnOff[_BOARD_COLS] = {false};
+bool onOffHoriz[_BOARD_ROWS] = {false};
+bool lastOnOffHoriz[_BOARD_ROWS] = {false};
 
 void setInsulatorPattern() {
 
@@ -518,6 +547,11 @@ void setInsulatorPattern() {
     for (int i = 0; i < _BOARD_COLS; i++) {
         lastOnOff[i] = onOff[i];
         onOff[i] = sin_cos[(s + i * 20) & 31] < 128;
+    }
+
+    for (int i = 0; i < _BOARD_ROWS; i++) {
+        lastOnOffHoriz[i] = onOffHoriz[i];
+        onOffHoriz[i] = sin_cos[(s + i * 20) & 31] < 128;
     }
 }
 
@@ -817,6 +851,7 @@ void restartBoardScan() {
 #endif
         ) {
             setGameState(GS_MENU);
+            return;
         }
 
 

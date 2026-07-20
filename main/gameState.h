@@ -19,6 +19,8 @@ enum GAME_STATE {
 
 };
 
+extern enum GAME_STATE gameState, nextGameState;
+
 void initGameState_Copyright();
 void VB_Copyright();
 void OS_Copyright();

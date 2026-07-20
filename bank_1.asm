@@ -4,6 +4,10 @@
 BANK1_START
 
 ;-------------------------------------------------------------------------------
+; keep GAME early so the NOP lock will have lots of time
+BANK_kernelGame = BANK1
+    include "kernels/kernel_game.asm"
+
 
 BANK_kernelCopyright = BANK1
     include "kernels/kernel_Copyright.asm"
@@ -17,8 +21,6 @@ BANK_kernelCouchCompliant = BANK1
 BANK_kernelMenu = BANK1
     include "kernels/kernel_Menu.asm"
 
-BANK_kernelGame = BANK1
-    include "kernels/kernel_game.asm"
 
 BANK_kernelGlobe = BANK1
     include "kernels/kernel_Globe.asm"

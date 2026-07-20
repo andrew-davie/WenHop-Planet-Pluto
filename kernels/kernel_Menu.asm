@@ -98,23 +98,10 @@ _menuLoop                                           ;@3
 
 _menuExit           sta WSYNC
 
-                    ; _menuLoop writes PF1/PF2/GRP0/GRP1 every scanline (see
-                    ; above), but nothing here ever cleared them once the
-                    ; data streams run out -- whatever the last real scanline
-                    ; left on the TIA just kept riding along on every
-                    ; scanline after that, showing as playfield/sprite
-                    ; garbage on the bottom line(s). kernel_Game.asm's
-                    ; _gameExit already clears PF0/1/2 the same way; extended
-                    ; here to GRP0/GRP1 too, since Menu (unlike Game) has no
-                    ; VB-side GRP0/GRP1 clear to catch it before the next
-                    ; frame either (see VB_kernelMenu, which only zeroes
-                    ; PF0/1/2, not GRP0/GRP1/COLUBK/COLUP0/COLUP1 the way
-                    ; VB_kernelGame does).
                     lda #0
-                    sta PF1
-                    sta PF2
-                    sta GRP0
-                    sta GRP1
+                    sta COLUPF
+                    sta COLUP0
+                    sta COLUP1
                     rts
 
 

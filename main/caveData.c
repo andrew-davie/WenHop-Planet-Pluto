@@ -101,7 +101,7 @@ const unsigned char caveUseWall[] = {
     CH_WYRM_HEAD_U, 38, 2,
 
     CH_INSULATOR_L, 9,5,
-    CH_INSULATOR_R, 30,5,
+    CH_INSULATOR_R, 18,5,
 
     DRAW_EOF,
 
@@ -754,7 +754,7 @@ const unsigned char starsAndStripes[] = {
     // LEVEL 4
 
 
-    CH_MELLON_HUSK_BIRTH, 2, 2,
+    CH_MELLON_HUSK_BIRTH, 5, 5,
 
     DRAW_EOF,
 

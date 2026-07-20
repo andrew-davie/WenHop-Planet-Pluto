@@ -22,6 +22,7 @@
 #include "playerAnimation.h"
 #include "random.h"
 #include "schedule.h"
+#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 #include "swipe.h"
@@ -88,7 +89,7 @@ void initGameState_Game() {
 
     decodeCave(cave);    // TODO: in initNextLife instead
 
-    luminance = 0;    //-15;
+    luminance = -15;
     lumTarget = 0;
     loadPalette();
 
@@ -122,6 +123,7 @@ void initGameState_Game() {
 
 void VB_Game() {
 
+    actualScore = 343;
 
     T1TC = 0;
     T1TCR = 1;
@@ -143,14 +145,17 @@ void VB_Game() {
     // frame -- that's what forces the screen black while drawScreen() itself
     // is also skipped during unpack (see OS_Game()), regardless of whatever
     // stale buffer contents are sitting there.
+    actualScore = 111;
     if (gameSchedule != SCHEDULE_UNPACK_CAVE)
-        swipe(40000);    // Bumped from 35000, confirmed on hardware -- now safe to hold back more of the
+        swipe(50000);    // Bumped from 35000, confirmed on hardware -- now safe to hold back more of the
                          // frame for other VB_Game systems without any visible cost, because circle()'s
                          // border is a real double buffer now (see swipe.c's borderShowA/B): a lap that
                          // takes more frames to get through (the direct result of giving swipe() a
                          // smaller slice here) just holds last lap's finished ring steady for longer
                          // instead of showing a half-drawn one. Before that fix, raising this value
                          // would have made the old bottom-of-circle flashing worse, not better.
+    actualScore = 110;
+
 #endif
 
     initDataStreams_Game();
@@ -199,9 +204,14 @@ void VB_Game() {
 #endif
 
     scheduledTasks();    // gets the MOST time
+
+
+    actualScore = 344;
 }
 
 void OS_Game() {
+
+    actualScore = 341;
 
     T1TC = 0;
     T1TCR = 1;
@@ -216,6 +226,7 @@ void OS_Game() {
 
     setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
     scheduledTasks();    // gets the LEAST time because of drawScreen (~78K already used)
+    actualScore = 342;
 }
 
 // EOF
