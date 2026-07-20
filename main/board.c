@@ -17,7 +17,6 @@
 #include "playerAnimation.h"
 #include "random.h"
 #include "schedule.h"
-#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 #include "swipe.h"
@@ -117,8 +116,6 @@ void initBoard() {
 
 void setupBoardScanner() {
 
-    actualScore = 383;
-
     // After board scan complete, throttles until we're at correct FPS
     if (gameFrame >= gameSpeed) {    // && !autoMoveFrameCount) {
 
@@ -196,16 +193,13 @@ void setupBoardScanner() {
 
         setSchedule(SCHEDULE_PROCESS_BOARD);
 
-        actualScore = 685;
         processBoardSquares();
-        actualScore = 339;
     }
 }
 
 
 void processBoardSquares() {
 
-    actualScore = 645;
     debug[0] = T1TC;
 
     while (gameState == nextGameState && T1TC < availableIdleTime - 10000) {
@@ -281,7 +275,6 @@ void processBoardSquares() {
             if (++cur.row > _BOARD_ROWS - 1) {
                 boardRow = cur.row;
                 boardCol = cur.col;
-                actualScore = 546;
                 setSchedule(SCHEDULE_START_SCAN);
                 return;
             }
@@ -440,7 +433,9 @@ void setInsulator(unsigned char *p, int row, int col) {
 
             if (att & (ATT_EXPLODABLE | ATT_GEODOGE | ATT_DISSOLVES)) {
                 *p = CH_ELECTRIC_0;
-                // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+
+                if (type2 != TYPE_BLANK)
+                    nDots(10, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
                 return;
             }
 
@@ -501,7 +496,8 @@ void setInsulatorHoriz(unsigned char *p, int row, int col) {
 
 
                 *p = CH_ELECTRIC_H0;
-                // nDots(1, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, 0, 40, 7);
+                if (type2 != TYPE_BLANK)
+                    nDots(10, col, row, PT_SPIRAL, 10 + rangeRandom(10), CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
                 return;
             }
 
@@ -525,8 +521,7 @@ void setInsulatorHoriz(unsigned char *p, int row, int col) {
 
 
             if (*p == CH_CROSSED_STREAMS) {
-                nDots(5, col, row, PT_SPIRAL2, 25, CHAR_CENTER_X + 1, CHAR_CENTER_Y, 10 + rangeRandom(20),
-                      rangeRandom(7) + 1);
+                nDots(5, col, row, PT_SPIRAL2, 20, CHAR_CENTER_X + 1, CHAR_CENTER_Y, 10 + rangeRandom(20), 7);
             }
             p++;
         }

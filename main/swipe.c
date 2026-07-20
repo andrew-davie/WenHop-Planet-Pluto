@@ -4,7 +4,6 @@
 
 
 #include "main.h"
-#include "score.h"
 
 #if ENABLE_SWIPE
 
@@ -949,9 +948,6 @@ void swipe(int reserved) {
     if (finishPending) {
         while (finishStage != FINISH_DONE && T1TC < availableIdleTime - reserved) {
 
-            actualScore = 124;
-
-
             int tailBytes = MASK_BUF_BYTES - MASK_BUF_WORDS * 4;    // 0 today (396 divides evenly by
                                                                     // 4) -- kept generic, same as
                                                                     // clearBorderCur()/clearMask()
@@ -1068,8 +1064,6 @@ void swipe(int reserved) {
     // THIS lap's span-fills then applying on top of that copy.
     if (newLapPending) {
 
-        actualScore = 123;
-
         unsigned char (*justFinishedBorder)[SCREEN_TRIX_Y] = swipeWriteBorder;
         unsigned char (*nextWriteBorder)[SCREEN_TRIX_Y] =
             (justFinishedBorder == borderMaskCur) ? borderMaskPrev : borderMaskCur;
@@ -1101,8 +1095,6 @@ void swipe(int reserved) {
     }
 
     while (!swipeComplete && T1TC < availableIdleTime - reserved) {
-
-        actualScore = 125;
 
         switch (swipeType) {
         case SWIPE_CIRCLE:

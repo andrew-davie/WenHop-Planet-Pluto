@@ -10,7 +10,6 @@
 #include "joystick.h"
 #include "life.h"
 #include "main.h"
-#include "score.h"
 #include "sound.h"
 
 static int base2;
@@ -64,8 +63,6 @@ void initDataStreams_Menu() {
 
 void initKernel_Menu() {
 
-    actualScore = 143;
-
     setJumpVectors(_BUF_MENU_JUMP, _menuLoop, _menuExit, _SCANLINES);
     initDataStreams_Menu();
 
@@ -92,7 +89,6 @@ void initKernel_Menu() {
     initGridPreview(_SCANLINES + 50, PREVIEW_Y);
 
     // drawString(FONT_COMPACT, 0x1A, 6, _BUF_MENU_GRP, _BUF_MENU_COLUP0, "=[Conway]|101", PREVIEW_Y + 40);
-    actualScore = 144;
 }
 
 void drawPF(int buffer, const unsigned char image[66][4][3]) {
