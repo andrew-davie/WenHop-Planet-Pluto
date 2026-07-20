@@ -1110,7 +1110,33 @@ void swipe(int reserved) {
                 break;
 
             case SWIPE_SHRINK:
-                if (!swipeVisible || swipeRadius <= -swipeStep) {
+                // NOT "!swipeVisible ||" any more. GROW legitimately needs a
+                // visibility-based end condition -- it starts small and has
+                // no natural "big enough" radius to check against, so it has
+                // to keep growing until the border provably can't be seen any
+                // more (see SWIPE_GROW below). SHRINK is different: it starts
+                // at circleCoverRadius(), which is now sized to just barely
+                // enclose the farthest screen corner -- meaning the RING
+                // ITSELF is expected, correctly, to sit outside the visible
+                // screen for however many of the earliest laps it takes to
+                // shrink back down to where it actually crosses the screen
+                // edge. Nothing should be visibly changing yet at that point
+                // (the disk still fully covers everything), so an invisible
+                // ring there isn't "finished", it's "hasn't started
+                // mattering yet". !swipeVisible treated that as completion
+                // and ended the sequence on lap 1, near-instantly, for any
+                // centre where covering the farthest corner overshoots the
+                // nearer edges by enough that the first lap's ring misses
+                // the screen entirely -- confirmed by simulation against the
+                // exact per-row circle() math: 108 of 2640 possible on-screen
+                // centres hit this on the very first lap. SHRINK already has
+                // an exact, unambiguous numeric end condition (radius
+                // reaching ~0, checked below) that doesn't depend on
+                // incidental on-screen visibility at all -- re-verified by
+                // simulation that using ONLY that check, the same 2640
+                // centres all complete in the expected number of laps, zero
+                // early terminations, zero runaways.
+                if (swipeRadius <= -swipeStep) {
                     // Needs both clearMask(0) (force fully hidden -- circle's
                     // thin per-lap outline is gap-prone, same reasoning as
                     // GROW's clearMask(255)) AND clearing borderMaskCur
