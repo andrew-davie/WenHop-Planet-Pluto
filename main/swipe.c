@@ -185,7 +185,7 @@ static int swipeCenterY;
 // half-width by construction. Halves the isqrt() count per lap.
 static int circleRadius;      // current lap's disk radius, whole trix
 static int circleRadiusSq;    // circleRadius*circleRadius, hoisted out of circle()'s per-row
-                               // loop -- same value all lap, no need to re-multiply every row
+                              // loop -- same value all lap, no need to re-multiply every row
 static int circleRow;         // |dy| cursor this lap, 0 .. sweep
 
 // Tracks the previous row's edge points so circle() can connect consecutive
@@ -282,11 +282,11 @@ static int swipeWatchdogFrames;
 // frames as it actually takes -- no arbitrary margin constant involved,
 // no sweep-speed change involved either.
 enum {
-    FINISH_MASK_A,        // clearing swipeMaskA (255 for GROW, 0 for SHRINK)
-    FINISH_MASK_B,        // clearing swipeMaskB (255 for GROW, 0 for SHRINK) -- both physical mask
-                          // buffers need setting now that the mask is double-buffered too
-    FINISH_BORDER_CUR,    // clearing borderMaskCur (always -- real data every time)
-    FINISH_BORDER_PREV,   // clearing borderMaskPrev (skipped entirely if already known zero)
+    FINISH_MASK_A,         // clearing swipeMaskA (255 for GROW, 0 for SHRINK)
+    FINISH_MASK_B,         // clearing swipeMaskB (255 for GROW, 0 for SHRINK) -- both physical mask
+                           // buffers need setting now that the mask is double-buffered too
+    FINISH_BORDER_CUR,     // clearing borderMaskCur (always -- real data every time)
+    FINISH_BORDER_PREV,    // clearing borderMaskPrev (skipped entirely if already known zero)
     FINISH_DONE
 };
 static unsigned char finishStage;
@@ -578,6 +578,21 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
     swipeRadius = radius + effectiveStep;    // 24.8
     swipeStep = step;                        // 24.8 -- true target rate, not the ramped one
 
+    // Clamp SHRINK to never go negative -- a large step (several trix/lap)
+    // can easily overshoot past 0 in one jump (e.g. radius 300 minus an
+    // 8-trix step lands at -1748, not a small positive remainder). Without
+    // this, swipe()'s termination check had to stop PRE-EMPTIVELY, one
+    // whole step early, to guarantee it never handed circle() a negative
+    // radius -- which meant a big step visibly cut the shrink off with
+    // several trix of ring/disk still showing, then snapped straight to
+    // black, instead of shrinking cleanly down to a point. Clamping here
+    // means the worst case is a shrink's LAST lap landing exactly on 0 (a
+    // single point, drawn once, entirely reasonable) rather than some
+    // negative value -- so swipe()'s own check can just ask "have we
+    // reached 0 yet?" and mean it literally, at any step size.
+    if (phase == SWIPE_SHRINK && swipeRadius < 0)
+        swipeRadius = 0;
+
     swipeComplete = false;
     swipeVisible = false;
     swipePhase = phase;
@@ -704,7 +719,7 @@ void startSwipeClose(int x, int y) {
     // (1<<8) + (1<<6)) for a faster shrink; still fine enough that
     // consecutive laps' rings stay close together.
     int radius = (swipeType == SWIPE_CIRCLE) ? (circleCoverRadius(x, y) << 8) : swipeRadius;
-    int step = (swipeType == SWIPE_CIRCLE) ? ((1 << 8) + (1 << 6)) : swipeStep;    // 1.25 trix/lap for circle
+    int step = (swipeType == SWIPE_CIRCLE) ? ((1 << 8) + (1 << 7)) : swipeStep;    // 1.25 trix/lap for circle
 
     if (swipeType == SWIPE_STAR)
         randomizeStarAngle();    // fresh look each time star is used to close, same reasoning as the grow
@@ -934,8 +949,8 @@ void swipe(int reserved) {
     if (finishPending) {
         while (finishStage != FINISH_DONE && T1TC < availableIdleTime - reserved) {
             int tailBytes = MASK_BUF_BYTES - MASK_BUF_WORDS * 4;    // 0 today (396 divides evenly by
-                                                                     // 4) -- kept generic, same as
-                                                                     // clearBorderCur()/clearMask()
+                                                                    // 4) -- kept generic, same as
+                                                                    // clearBorderCur()/clearMask()
             switch (finishStage) {
             case FINISH_MASK_A: {
                 unsigned char v = (swipePhase == SWIPE_GROW) ? 0xFF : 0;
@@ -1048,8 +1063,8 @@ void swipe(int reserved) {
     // as a full copy of whatever's currently displayed, via copyBuf(), with
     // THIS lap's span-fills then applying on top of that copy.
     if (newLapPending) {
-        unsigned char(*justFinishedBorder)[SCREEN_TRIX_Y] = swipeWriteBorder;
-        unsigned char(*nextWriteBorder)[SCREEN_TRIX_Y] =
+        unsigned char (*justFinishedBorder)[SCREEN_TRIX_Y] = swipeWriteBorder;
+        unsigned char (*nextWriteBorder)[SCREEN_TRIX_Y] =
             (justFinishedBorder == borderMaskCur) ? borderMaskPrev : borderMaskCur;
 
         borderShowA = justFinishedBorder;
@@ -1068,8 +1083,8 @@ void swipe(int reserved) {
 
         clearBorderBuf(nextWriteBorder);
 
-        unsigned char(*justFinishedMask)[SCREEN_TRIX_Y] = swipeWriteMask;
-        unsigned char(*nextWriteMask)[SCREEN_TRIX_Y] = (justFinishedMask == swipeMaskA) ? swipeMaskB : swipeMaskA;
+        unsigned char (*justFinishedMask)[SCREEN_TRIX_Y] = swipeWriteMask;
+        unsigned char (*nextWriteMask)[SCREEN_TRIX_Y] = (justFinishedMask == swipeMaskA) ? swipeMaskB : swipeMaskA;
 
         maskShow = justFinishedMask;
         swipeWriteMask = nextWriteMask;
@@ -1139,7 +1154,19 @@ void swipe(int reserved) {
                 // simulation that using ONLY that check, the same 2640
                 // centres all complete in the expected number of laps, zero
                 // early terminations, zero runaways.
-                if (swipeRadius <= -swipeStep) {
+                //
+                // Checks swipeRadius <= 0 directly, not "<= -swipeStep" --
+                // that pre-emptive form used to exist only because setSwipe()
+                // didn't clamp SHRINK's radius, so it had to stop one whole
+                // step early to guarantee circle() never saw a negative
+                // radius. Now that setSwipe() clamps to exactly 0 instead of
+                // undershooting (see its declaration), the last lap this
+                // sequence ever draws genuinely IS radius 0 -- a single
+                // point -- so the plain, literal "are we there yet" check
+                // works at any step size, instead of cutting the shrink off
+                // early by an amount that scales with the step (barely
+                // noticeable at 1 trix/lap, glaringly obvious at 4+).
+                if (swipeRadius <= 0) {
                     // Needs both clearMask(0) (force fully hidden -- circle's
                     // thin per-lap outline is gap-prone, same reasoning as
                     // GROW's clearMask(255)) AND clearing borderMaskCur
