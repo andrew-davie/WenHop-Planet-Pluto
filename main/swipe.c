@@ -698,10 +698,13 @@ void startSwipeClose(int x, int y) {
     // longer holds border data across laps at all (see swipe()) -- each lap
     // draws a fully connected, tall-pixel outline of its own. But a coarse
     // step still means consecutive laps' outlines sit several trix apart,
-    // which reads as visible gaps/jumps between frames. A fine 1-trix step
-    // keeps consecutive laps close enough to look like continuous motion.
+    // which reads as visible gaps/jumps between frames. A fine step keeps
+    // consecutive laps close enough to look like continuous motion -- was a
+    // flat 1 trix/lap, bumped 25% to 1.25 trix/lap (320 in 24.8, i.e.
+    // (1<<8) + (1<<6)) for a faster shrink; still fine enough that
+    // consecutive laps' rings stay close together.
     int radius = (swipeType == SWIPE_CIRCLE) ? (circleCoverRadius(x, y) << 8) : swipeRadius;
-    int step = (swipeType == SWIPE_CIRCLE) ? (1 << 8) : swipeStep;    // 1 trix/lap for circle
+    int step = (swipeType == SWIPE_CIRCLE) ? ((1 << 8) + (1 << 6)) : swipeStep;    // 1.25 trix/lap for circle
 
     if (swipeType == SWIPE_STAR)
         randomizeStarAngle();    // fresh look each time star is used to close, same reasoning as the grow
