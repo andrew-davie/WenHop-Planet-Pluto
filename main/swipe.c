@@ -133,6 +133,8 @@ void generateStar();
 bool star();
 bool circle();
 void initStar(int x, int y);
+static int isqrt(int n);
+static int squashDy2(int dy);
 
 static short starX[10];
 static short starY[10];
@@ -640,30 +642,34 @@ void setSwipe(int x, int y, int radius, int step, enum CIRCLEPHASE phase) {
 // only happened "a couple of instances" -- it depends on how far the player
 // had wandered from the level's start position before dying.
 //
-// NOT a plain Euclidean corner distance either: circle() scales its x-extent
-// by 7/16 relative to the true (isotropic) half-width (halfWidth =
-// (w*7)>>4) as a display aspect-ratio correction -- trix columns are
-// physically wider than trix rows are tall, so the x-reach needs
-// compressing for the shape to actually look round. That means the radius
-// needed to cover the x-extent is dx*16/7, not just dx -- confirmed
-// empirically (simulation): using the plain Euclidean distance here left the
-// shape's x-reach several trix short at the sides, so a whole PF plane near
-// the centre column never got touched by the shrink no matter how many laps
-// ran.
+// Combines dx and dy into a true corner distance -- NOT max(rForX, rForY)
+// (a prior version took the max of "radius needed to cover dx alone" and
+// "radius needed to cover dy alone" independently, which is wrong: that only
+// guarantees each AXIS is covered on its own, not the actual corner where
+// both are farthest simultaneously. A corner needs radius >= the combined
+// (aspect/squash-corrected) distance to it, which is bigger than either
+// axis's own figure whenever both dx and dy are nonzero -- i.e. almost
+// always, unless the player happens to be exactly on the centre row or
+// column. Confirmed by simulation this was under-covering the corners at
+// EVERY single one of the 2640 possible on-screen positions -- not an edge
+// case, the formula was simply wrong throughout. Fixed by solving circle()'s
+// own per-row equation (halfWidth = isqrt(R^2 - squashDy2(dy)) * 7/16) for R
+// at the exact corner's (dx, dy) offset: R = isqrt(squashDy2(dy) + rForX^2).
+// Re-verified the same way: 0/2640 positions fail to fully cover the screen
+// with this formula (same +2 margin as before).
+//
+// rForX itself is still aspect-scaled (NOT a plain Euclidean dx): circle()
+// scales its x-extent by 7/16 relative to the true (isotropic) half-width
+// (halfWidth = (w*7)>>4) as a display aspect-ratio correction -- trix
+// columns are physically wider than trix rows are tall, so the x-reach
+// needs compressing for the shape to actually look round. That means the
+// radius needed to cover the x-extent is dx*16/7, not just dx.
 static int circleCoverRadius(int cx, int cy) {
     int dx = cx > (_1ROW - 1 - cx) ? cx : (_1ROW - 1 - cx);
     int dy = cy > (SCREEN_TRIX_Y - 1 - cy) ? cy : (SCREEN_TRIX_Y - 1 - cy);
     int rForX = ((dx * 16 + 6) * (0x10000 / 7)) >> 16;    // ceil(dx*16/7)
-    // Compensate for squashDy2()'s ~5% vertical trim in circle(): the disk's
-    // actual dy-reach for a given radius is only radius*sqrt(64/71) now, so
-    // the radius needed to cover a given dy is dy/sqrt(64/71) =~ dy*1.053.
-    // dy + dy>>4 (dy*17/16 = 1.0625x) rounds that up a little further, which
-    // is fine -- this only runs once per sequence (not the per-row path
-    // squashDy2() itself is the cheap-on-purpose one for), and erring
-    // towards slightly MORE coverage is the safe direction; the existing
-    // "+2" margin below absorbs the rest of any rounding regardless.
-    int rForY = dy + (dy >> 4);
-    int r = (rForY > rForX) ? rForY : rForX;
+    int dy2 = squashDy2(dy);                              // same squash circle() applies per-row
+    int r = isqrt(dy2 + rForX * rForX);
     return r + 2;    // small safety margin
 }
 
@@ -1265,8 +1271,10 @@ int abs(int value) {
 // Integer square root, floor(sqrt(n)) for n>=0 -- the standard "digit by
 // digit" method: shifts, adds, subtracts and compares only. No division
 // (this coprocessor has none, confirmed) and no float. Verified against
-// Python's exact math.isqrt() for every n in 0..95*95 (95 comfortably above
-// any radius circleCoverRadius() can produce) -- exact match throughout.
+// Python's exact math.isqrt() for every n in 0..13107 (circleCoverRadius()'s
+// combined dy2+rForX^2 term tops out at 12608 across every on-screen centre
+// -- comfortably inside the 1<<14 initial bit guess below) -- exact match
+// throughout.
 static int isqrt(int n) {
     if (n <= 0)
         return 0;
