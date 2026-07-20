@@ -389,6 +389,35 @@ int whichKernel[GS_MAX] = {
 };
 
 
+// A state transition's own init (initialiseGameState[]/initialiseKernel[])
+// runs completely unconditionally below -- no T1TC check anywhere in that
+// path, unlike everything swipe.c does. That's real, sometimes substantial,
+// fixed-cost work (e.g. GS_MENU's init does a full _MENU_BUFFERS_SIZE
+// myMemsetInt, a grid-preview/Life init, stream registration, a drawString()
+// call), running against the REAL hardware deadline (availableIdleTime, off
+// RAM[_INTIM]) with no cushion at all -- not the soft `reserved` margin
+// swipe() gets to respect. Every state transition in this dispatcher has
+// this same gap; it just surfaces via the death->menu transition, since
+// that's the one swipe's circle shrink drives (checkSwipeFinished() flips
+// nextGameState the instant circleRadius reaches 0 -- see swipe.c). Nothing
+// about radius 0 itself is expensive; reaching it is just what triggers this
+// otherwise-unrelated, otherwise-unbudgeted jump.
+//
+// Fix: don't perform the transition on a frame where availableIdleTime looks
+// tight -- wait for one with real headroom instead. VB_Game() (and swipe())
+// already get skipped every frame gameState != nextGameState (see
+// runARM_VerticalBlank()), so waiting an extra frame or two costs nothing
+// visible, just a slightly longer hold on the last-drawn frame before the
+// menu appears. Bounded by stateTransitionWaitFrames so a chronically-tight
+// budget forces the transition through anyway rather than stalling forever
+// on a frozen screen -- same watchdog-over-ideal-conditions shape as
+// swipe.c's own SWIPE_WATCHDOG_FRAMES. STATE_TRANSITION_MIN_IDLE is a first
+// guess, not a measured figure -- tune if transitions still overrun, or if
+// this ends up waiting more than a frame or two in practice.
+#define STATE_TRANSITION_MIN_IDLE 40000
+#define STATE_TRANSITION_MAX_WAIT_FRAMES 60
+static int stateTransitionWaitFrames;
+
 void runARM_Overscan() {
 
 
@@ -401,12 +430,19 @@ void runARM_Overscan() {
 
     if (gameState != nextGameState) {
 
-        gameState = nextGameState;
-        (*initialiseGameState[gameState])();
+        if (availableIdleTime < STATE_TRANSITION_MIN_IDLE && stateTransitionWaitFrames < STATE_TRANSITION_MAX_WAIT_FRAMES) {
+            stateTransitionWaitFrames++;
+        } else {
 
-        if (whichKernel[gameState] != kernel) {
-            kernel = whichKernel[gameState];
-            (*initialiseKernel[kernel])();
+            stateTransitionWaitFrames = 0;
+
+            gameState = nextGameState;
+            (*initialiseGameState[gameState])();
+
+            if (whichKernel[gameState] != kernel) {
+                kernel = whichKernel[gameState];
+                (*initialiseKernel[kernel])();
+            }
         }
     }
 
