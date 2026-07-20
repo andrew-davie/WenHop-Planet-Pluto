@@ -1063,32 +1063,6 @@ void swipe(int reserved) {
     // as a full copy of whatever's currently displayed, via copyBuf(), with
     // THIS lap's span-fills then applying on top of that copy.
     if (newLapPending) {
-
-        // Gate the whole block on there being ANY budget left at all --
-        // T1TC resets to 0 at the top of VB_Game()/OS_Game(), and swipe()
-        // is called partway through, after updatePlayerAnimation()/scroll()
-        // have already spent part of the frame. Without this check, this
-        // fixed ~200-word block (clear + copy) ran completely unconditionally
-        // on EVERY lap transition, with nothing capping it against `reserved`
-        // -- exactly the class of bug 373d76f already had to fix for
-        // finishPending's sequence-end clear (see there), just never applied
-        // here. A prior attempt to fix this (see git history: "make per-lap
-        // border/mask buffer prep budget-checked") replaced the block with a
-        // full word-at-a-time incremental state machine, gating the new
-        // lap's row-processing behind its completion -- and regressed on
-        // hardware ("locked up on circle size 0 again", reverted). Rather
-        // than retry that same shape of fix, this is deliberately simpler
-        // and coarser: all-or-nothing per frame. If there's no room left
-        // when a lap finishes, skip the ENTIRE swap+clear+copy this frame
-        // (newLapPending stays true, swipeWriteBorder/Mask stay pointing at
-        // their current buffers, nothing is left half-cleared or
-        // half-copied) and pick it up next frame instead, when T1TC starts
-        // fresh. Only once the block actually runs does it still do so in
-        // one unconditional shot -- but it can no longer fire on a frame
-        // that's already out of budget before it even starts.
-        if (T1TC >= availableIdleTime - reserved)
-            return;
-
         unsigned char (*justFinishedBorder)[SCREEN_TRIX_Y] = swipeWriteBorder;
         unsigned char (*nextWriteBorder)[SCREEN_TRIX_Y] =
             (justFinishedBorder == borderMaskCur) ? borderMaskPrev : borderMaskCur;
