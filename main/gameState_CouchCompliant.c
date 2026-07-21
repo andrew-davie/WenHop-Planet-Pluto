@@ -87,7 +87,7 @@ void VB_CouchCompliant() {
 
     if (frame >= DURATION_COUCH) {
         lumTarget = LUM_TARGET_EXIT;
-        if (luminance == lumTarget)
+        if (luminance == lumTarget && gameState == nextGameState)
             setGameState(GS_RASTER_BLEED);
     }
 }

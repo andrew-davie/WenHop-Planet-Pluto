@@ -14,6 +14,7 @@
 #include "main.h"
 #include "random.h"
 #include "savekey.h"
+#include "schedule.h"
 #include "score.h"
 #include "sound.h"
 #include "swipe.h"
@@ -194,7 +195,8 @@ static unsigned short input_target[12];
 
 void setGameState(enum GAME_STATE state) {
 
-    nextGameState = state;    // actioned in OS
+    nextGameState = state;           // actioned by scheduleInitState(), once a frame has budget for it
+    setSchedule(SCHEDULE_INIT_STATE);
 }
 
 
@@ -315,13 +317,23 @@ void (*const verticalBlank[GS_MAX])() = {
 
 void runARM_VerticalBlank() {
 
+    // Fresh per-phase idle-time stopwatch -- shared by scheduleInitState() and Game's own
+    // cave-unpack/board-scan pipeline (see schedule.c). GS_DETECT_CONSOLE is the one exception:
+    // it runs its OWN multi-frame T1TC stopwatch to measure real TV refresh timing (see
+    // gameState_DetectConsole.c), and would have that measurement wrecked by a reset every frame.
+    if (gameState != GS_DETECT_CONSOLE) {
+        T1TC = 0;
+        T1TCR = 1;
+    }
+
     availableIdleTime = RAM[_INTIM] * armCycles - 5000;
 
-    if (gameState == nextGameState)
-        (*verticalBlank[gameState])();
+    // Always dispatch on the CURRENTLY active state, even while a transition is pending --
+    // nextGameState only takes effect once scheduleInitState() finishes and flips gameState itself.
+    (*verticalBlank[gameState])();
 
-    // common to ALL VB...
-    // (nothing yet)
+    if (gameSchedule != SCHEDULE_NONE)
+        scheduledTasks();
 }
 
 // -----------------------------------------------------------------------------
@@ -352,27 +364,49 @@ const unsigned char whichKernel[GS_MAX] = {    // matches kernel's own type -- a
     _KERNEL_COPYRIGHT,         // 8 GS_RASTER_BLEED
 };
 
+// Headroom reserved for scheduleInitState() below: the single most expensive
+// initGameState_X()+initKernel_X() pairing has to fit inside whatever's left of
+// availableIdleTime once this margin is subtracted, in one shot (see scheduleInitState()) --
+// starting from the same order of magnitude as scheduleUnpackCave()'s own margin (schedule.c)
+// until real transitions get measured on hardware and this gets tuned properly.
+#define SCHEDULE_INIT_MARGIN 20000
+
+void scheduleInitState() {
+
+    if (T1TC >= availableIdleTime - SCHEDULE_INIT_MARGIN)
+        return;    // not enough of this phase's budget left -- old kernel/state keeps running
+                   // completely unchanged, try again next VB/OS
+
+    // Default to idle. initGameState_Game() overrides this itself (to SCHEDULE_UNPACK_CAVE) as
+    // its own last act, below, chaining straight into Game's own cave-unpack/board-scan pipeline.
+    // Every other state's init leaves it here.
+    setSchedule(SCHEDULE_NONE);
+
+    (*initialiseGameState[nextGameState])();
+
+    kernel = whichKernel[nextGameState];
+    (*initialiseKernel[kernel])();    // always -- even re-entering the same kernel
+
+    gameState = nextGameState;    // atomic handoff: only now does the new kernel actually go live
+}
+
 void runARM_Overscan() {
 
+    // See runARM_VerticalBlank() for why GS_DETECT_CONSOLE is excluded.
+    if (gameState != GS_DETECT_CONSOLE) {
+        T1TC = 0;
+        T1TCR = 1;
+    }
 
     availableIdleTime = RAM[_INTIM] * armCycles - 5000;
 
 
     playAudio();
 
-    (*overscan[gameState])();
+    (*overscan[gameState])();    // always the CURRENTLY active state, even mid-transition
 
-    if (gameState != nextGameState) {
-
-        gameState = nextGameState;
-        (*initialiseGameState[gameState])();
-
-        if (whichKernel[gameState] != kernel) {
-            kernel = whichKernel[gameState];
-            (*initialiseKernel[kernel])();
-        }
-    }
-
+    if (gameSchedule != SCHEDULE_NONE)
+        scheduledTasks();    // may run scheduleInitState(), or Game's own pipeline stages
 
     frame++;
 

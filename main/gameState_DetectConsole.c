@@ -93,7 +93,8 @@ void VB_DetectConsole() {
         armCycles = (armCycles * (64 * 0x10000 / 76)) >> 16;        // cycles/INTIM
 
         // setGameState(GS_COUCH_COMPLIANT);
-        setGameState(GS_GAME);
+        if (gameState == nextGameState)
+            setGameState(GS_GAME);
     }
     }
 

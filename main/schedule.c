@@ -85,10 +85,17 @@ void scheduleUnpackCave() {
         }
 }
 
+static void scheduleIdle() {
+    // never actually reached -- call site guards on gameSchedule != SCHEDULE_NONE -- kept only so
+    // the SCHEDULE_NONE slot in scheduleFunc[] below isn't left dangling
+}
+
 void scheduledTasks() {
 
     static void (*const scheduleFunc[])() = {
 
+        scheduleIdle,           // SCHEDULE_NONE
+        scheduleInitState,      // SCHEDULE_INIT_STATE
         scheduleUnpackCave,     // SCHEDULE_UNPACK_CAVE
         setupBoardScanner,      // SCHEDULE_START_SCAN
         processBoardSquares,    // SCHEDULE_PROCESS_BOARD

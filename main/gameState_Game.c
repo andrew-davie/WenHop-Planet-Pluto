@@ -122,8 +122,10 @@ void initGameState_Game() {
 
 void VB_Game() {
 
-    T1TC = 0;
-    T1TCR = 1;
+    // T1TC reset and the scheduledTasks() dispatch (was the last statement in this function) both
+    // moved to the generic runARM_VerticalBlank() in main.c -- same effective timing (T1TC reset
+    // right before this function is entered, scheduledTasks() called right after it returns), but
+    // now shared by every state instead of being wired specifically into Game.
 
     updatePlayerAnimation();
     scroll();
@@ -170,7 +172,7 @@ void VB_Game() {
         shakeX = shakeY = 0;
 #endif
 
-    if (RAM[_SWCHB] != 0x3F)
+    if (gameState == nextGameState && RAM[_SWCHB] != 0x3F)
         setGameState(GS_MENU);
 
     processCharAnimations();
@@ -198,13 +200,12 @@ void VB_Game() {
     applySwipeMask(_BUF_GAME_PF0_LEFT);    // must happen after everything else has drawn
 #endif
 
-    scheduledTasks();    // gets the MOST time
+    // scheduledTasks() used to be called here -- gets the MOST time of the two calls, since OS_Game's
+    // own scheduledTasks() call below runs after drawScreen() eats most of that phase's budget. Now
+    // dispatched generically by runARM_VerticalBlank() right after this function returns -- same slot.
 }
 
 void OS_Game() {
-
-    T1TC = 0;
-    T1TCR = 1;
 
     (*caveList[cave].handler)();
 
@@ -215,7 +216,10 @@ void OS_Game() {
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;
 
     setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
-    scheduledTasks();    // gets the LEAST time because of drawScreen (~78K already used)
+
+    // scheduledTasks() used to be called here -- gets the LEAST time of the two calls, because
+    // drawScreen() above has already used ~78K of this phase's budget. Now dispatched generically by
+    // runARM_Overscan() right after this function returns -- same slot.
 }
 
 // EOF

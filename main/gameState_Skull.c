@@ -640,7 +640,7 @@ void VB_Skull() {
     drawICCSkull();
     getJoystick();
 
-    if (!(inpt4 & 0x80))
+    if (gameState == nextGameState && !(inpt4 & 0x80))
         setGameState(GS_GAME);
 }
 

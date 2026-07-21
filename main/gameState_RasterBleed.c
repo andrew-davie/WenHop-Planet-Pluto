@@ -77,7 +77,7 @@ void VB_RasterBleed() {
     if (luminance == lumTarget)
         drawNextChar();
 
-    if (!(inpt4 & 0x80) || frame > 200)    // || !(RAM[_INPT4] & 0x80))
+    if (gameState == nextGameState && (!(inpt4 & 0x80) || frame > 200))    // || !(RAM[_INPT4] & 0x80))
         setGameState(GS_MENU);
 }
 
