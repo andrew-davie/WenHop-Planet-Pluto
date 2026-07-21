@@ -200,16 +200,10 @@ void setupBoardScanner() {
 
 void processBoardSquares() {
 
-    // Per-character timing: debug[chIndex] tracks the worst-case T1TC ticks
-    // spent between the ch fetch below and either the *next* ch fetch or
-    // this function exiting, whichever comes first -- i.e. the full cost of
-    // one board cell's iteration, attributed to whatever character occupied
-    // it. chIndex == -1 means "no window open yet" (first iteration this
-    // call, or the loop body never ran at all).
     int chIndex = -1;
     unsigned int chStart = 0;
 
-    while (gameState == nextGameState && T1TC < availableIdleTime - 10000) {
+    while (gameState == nextGameState && T1TC < availableIdleTime - 12500) {
 
         // boardRow/boardCol are the only pieces of this that genuinely need
         // to survive across frames (this loop yields when its time budget
@@ -221,6 +215,7 @@ void processBoardSquares() {
         cur.col = boardCol;
         cur.me = RAM + _BOARD + cur.row * _BOARD_COLS + cur.col;
 
+#ifdef DEBUG_TIMES
         // Close the previous cell's timing window right where the next one
         // opens -- one T1TC read serves as both, so this doesn't cost an
         // extra volatile register read on top of the one it's timing.
@@ -230,13 +225,12 @@ void processBoardSquares() {
             if ((int)elapsed > debug[chIndex])
                 debug[chIndex] = elapsed;
         }
+#endif
 
         unsigned char creature = *cur.me;
 
         chStart = now;
-        chIndex = GET(creature);    // strip FLAG_THISFRAME so a flagged and
-                                    // unflagged pass of the same character
-                                    // land in the same debug[] slot
+        chIndex = GET(creature);
 
         if (creature < FLAG_THISFRAME) {
 
@@ -299,12 +293,16 @@ void processBoardSquares() {
                 boardCol = cur.col;
                 setSchedule(SCHEDULE_START_SCAN);
 
+
+#ifdef DEBUG_TIMES
+
                 // Early exit -- no "next fetch" is coming to close this
                 // cell's window, so close it here instead.
                 unsigned int elapsed = T1TC - chStart;
                 if ((int)elapsed > debug[chIndex])
                     debug[chIndex] = elapsed;
 
+#endif
                 return;
             }
             // }
@@ -314,6 +312,7 @@ void processBoardSquares() {
         boardCol = cur.col;
     }
 
+#ifdef DEBUG_TIMES
     // Loop exited via its own condition (gameState changed, or this frame's
     // time budget ran out) rather than the early return above -- close
     // whatever cell was mid-flight when that happened. Guarded because
@@ -323,6 +322,7 @@ void processBoardSquares() {
         if ((int)elapsed > debug[chIndex])
             debug[chIndex] = elapsed;
     }
+#endif
 }
 
 

@@ -100,8 +100,6 @@ extern unsigned int sparkleTimer;
 extern bool playerDead;
 extern int gameFrame;
 
-extern const int xInc[];
-extern const int yInc[];
 extern unsigned int availableIdleTime;
 
 extern int pulsePlayerColour;
@@ -111,31 +109,34 @@ extern int shakeX, shakeY, shakeTime;
 #endif
 
 
+#define DEBUG_TIMES
+#ifdef DEBUG_TIMES
+
 // Sized CH_MAX (attribute.h) and indexed by raw character number -- see
 // processBoardSquares() in board.c, which tracks the worst-case T1TC ticks
-// spent per character number, one array slot per chName value. Declared
-// incomplete here (size lives with the definition in main.c) so this header
-// doesn't have to pull in attribute.h just for CH_MAX.
+// spent per character number, one array slot per chName value.
 // unsigned short: ticks for a single board cell never approach 64K, and
 // this way the full usable range is available instead of losing half of it
 // to a sign bit.
 //
-// Deliberately NOT volatile and no attributes -- tried volatile +
-// __attribute__((used, externally_visible)) first (theory: LTO treats the
-// writes as dead stores since nothing reads debug[] back except the
-// debugger, and eliminates the array). That theory didn't hold up: checked
-// gameState (definitely live, read all over the codebase) and it has the
-// *exact* same DWARF/symbol-table shape debug did (LOCAL binding, no
-// DW_AT_location) and shows up fine in the globals view regardless -- so
-// that's just how this LTO build normally represents globals, not a sign
-// of anything being eliminated. Meanwhile the plain, unqualified
-// `int debug[10]` this started as (no volatile, no attributes) was known
-// to work and stay visible. volatile is the most likely thing that
-// actually broke visibility: embedded debuggers commonly treat a volatile
-// array as a hardware-register-style symbol and exclude it from the
-// normal globals list. Matching the shape of the version that's known to
-// work, just with the new size/type.
-extern unsigned short debug[];
+// Size given explicitly (133, i.e. CH_MAX -- hardcoded rather than pulling
+// in attribute.h just for the one constant; checked against CH_MAX by a
+// _Static_assert next to the real definition in main.c). Root cause of
+// debug going missing from the debugger's globals view was tracked down to
+// the Gopher2600 DWARF parser (coprocessor/developer/dwarf/dwarf_builder.go
+// in gopher2600, not this codebase): a variable declared via an unsized
+// `extern T foo[];` gets an incomplete array type at the declaration site,
+// and the parser's abstract-origin/specification resolution never falls
+// back to the complete type carried by the definition, so the variable's
+// type resolves to nil and it's silently dropped. Not a volatile/attribute
+// issue, not an LTO dead-store elimination issue, not a Go map ordering
+// issue -- those were all considered and ruled out first. Fixed on the
+// gopher2600 side but broke something else there and got reverted, so
+// working around it here instead: giving the declaration an explicit size
+// means it never has an incomplete type to begin with.
+extern unsigned short debug[133];
+
+#endif
 
 
 void ClearChannel(void *ptr);

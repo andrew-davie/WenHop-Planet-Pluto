@@ -18,17 +18,26 @@
 #include "sound.h"
 #include "swipe.h"
 
+#ifdef DEBUG_TIMES
+
+
 // Per-character worst-case T1TC timing, one slot per chName value (see
 // processBoardSquares() in board.c). 0 = never timed yet.
 //
-// No volatile, no attributes -- see main.h for why (tried both, neither
-// was the actual cause of debug vanishing from the globals view; gameState
-// has the identical LOCAL/no-DW_AT_location shape and shows up fine, so
-// that wasn't it, and volatile is the more likely culprit: it's the one
-// thing that's different from the plain int debug[10] that's known to
-// have worked). Explicit initialiser kept -- makes this a definite
-// definition rather than a tentative one, cheap to keep either way.
+// No volatile, no attributes -- neither was the actual cause of debug
+// vanishing from the globals view (see main.h for the real cause, in the
+// Gopher2600 DWARF parser). Explicit initialiser kept -- makes this a
+// definite definition rather than a tentative one, cheap to keep either
+// way.
 unsigned short debug[CH_MAX] = {[0 ... CH_MAX - 1] = 0};
+
+// keeps the hardcoded size in the main.h extern declaration honest if
+// CH_MAX ever changes
+_Static_assert(
+    CH_MAX == 133,
+    "debug[] extern declaration in main.h is hardcoded to size 133 (CH_MAX) -- update both if CH_MAX changes");
+
+#endif
 
 
 #if ENABLE_SHAKE
@@ -41,8 +50,6 @@ int shakeTime;
 
 
 void setShake(int time) {
-    debug[0] = 200;
-
     shakeTime = time;
 }
 
@@ -90,49 +97,6 @@ unsigned int sparkleTimer;
 unsigned int idleTimer;
 unsigned int availableIdleTime;
 int pulsePlayerColour;
-
-
-const int xInc[] = {
-
-    // RLDU
-    0,     // 0000
-    0,     // 0001
-    0,     // 0010
-    0,     // 0011
-    -1,    // 0100
-    -1,    // 0101
-    -1,    // 0110
-    0,     // 0111
-    1,     // 1000
-    1,     // 1001
-    1,     // 1010
-    0,     // 1011
-    0,     // 1100
-    0,     // 1101
-    0,     // 1110
-    0,     // 1111
-};
-
-const int yInc[] = {
-
-    // RLDU
-    0,     // 0000
-    -1,    // 0001
-    1,     // 0010
-    0,     // 0011
-    0,     // 0100
-    -1,    // 0101
-    1,     // 0110
-    0,     // 0111
-    0,     // 1000
-    -1,    // 1001
-    1,     // 1010
-    0,     // 1011
-    0,     // 1100
-    0,     // 1101
-    0,     // 1110
-    0,     // 1111
-};
 
 
 const signed char dirOffset[] = {-_BOARD_COLS, 1, _BOARD_COLS, -1, 0};

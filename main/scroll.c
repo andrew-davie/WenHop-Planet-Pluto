@@ -38,6 +38,50 @@ int approach(int current, int target, int speed) {
 
 void scroll() {
 
+
+    const signed char xInc[16] = {
+
+        // RLDU
+        0,     // 0000
+        0,     // 0001
+        0,     // 0010
+        0,     // 0011
+        -1,    // 0100
+        -1,    // 0101
+        -1,    // 0110
+        0,     // 0111
+        1,     // 1000
+        1,     // 1001
+        1,     // 1010
+        0,     // 1011
+        0,     // 1100
+        0,     // 1101
+        0,     // 1110
+        0,     // 1111
+    };
+
+    const signed char yInc[16] = {
+
+        // RLDU
+        0,     // 0000
+        -1,    // 0001
+        1,     // 0010
+        0,     // 0011
+        0,     // 0100
+        -1,    // 0101
+        1,     // 0110
+        0,     // 0111
+        0,     // 1000
+        -1,    // 1001
+        1,     // 1010
+        0,     // 1011
+        0,     // 1100
+        0,     // 1101
+        0,     // 1110
+        0,     // 1111
+    };
+
+
     // The swipe mask is drawn in screen space, centred on wherever
     // scrollX/Y were at the moment the swipe started (see startSwipeClose()'s
     // world-to-screen conversion in board.c). Letting scrollX/Y move while

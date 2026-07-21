@@ -112,9 +112,9 @@ void processWyrms() {
                 unsigned char *segment = RAM + _BOARD + wyrm->y[0] * _BOARD_COLS + wyrm->x[0];
                 *segment = CH_DUST_ROCK_0;
 
-                for (int i = 0; i < WYRM_MAX - 1; i++) {
-                    wyrm->x[i] = wyrm->x[i + 1];
-                    wyrm->y[i] = wyrm->y[i + 1];
+                for (int w = 0; w < WYRM_MAX - 1; w++) {
+                    wyrm->x[w] = wyrm->x[w + 1];
+                    wyrm->y[w] = wyrm->y[w + 1];
                 }
                 wyrm->head--;
                 wyrm->length--;
@@ -124,14 +124,14 @@ void processWyrms() {
             //  reverse wyrm
 
             unsigned char tempX2[WYRM_MAX], tempY2[WYRM_MAX];
-            for (int i = 0; i <= wyrm->head; i++) {
-                tempX2[i] = wyrm->x[i];
-                tempY2[i] = wyrm->y[i];
+            for (int w = 0; w <= wyrm->head; w++) {
+                tempX2[w] = wyrm->x[w];
+                tempY2[w] = wyrm->y[w];
             }
 
-            for (int i = 0; i <= wyrm->head; i++) {
-                wyrm->x[i] = tempX2[wyrm->head - i];
-                wyrm->y[i] = tempY2[wyrm->head - i];
+            for (int w = 0; w <= wyrm->head; w++) {
+                wyrm->x[w] = tempX2[wyrm->head - w];
+                wyrm->y[w] = tempY2[wyrm->head - w];
             }
 
             wyrm->dir = (wyrm->dir + 2) & 3;
