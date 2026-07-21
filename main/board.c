@@ -394,7 +394,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
             exitMode--;
             if (exitMode < 20) {
                 lumTarget = -15;
-                if (lumTarget == luminance && gameState == nextGameState) {
+                if (lumTarget == luminance) {
                     setGameState(GS_MENU);
                     // return;
                 }
@@ -873,7 +873,7 @@ void restartBoardScan() {
         }
 
 
-        if (playerDead && !shakeTime && gameState == nextGameState
+        if (playerDead && !shakeTime
 #if ENABLE_SWIPE
             && checkSwipeFinished()
 #else

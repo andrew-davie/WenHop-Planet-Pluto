@@ -195,6 +195,10 @@ static unsigned short input_target[12];
 
 void setGameState(enum GAME_STATE state) {
 
+    if (gameState != nextGameState)
+        return;    // a transition is already pending -- first request wins, callers don't need
+                   // to guard themselves
+
     nextGameState = state;           // actioned by scheduleInitState(), once a frame has budget for it
     setSchedule(SCHEDULE_INIT_STATE);
 }

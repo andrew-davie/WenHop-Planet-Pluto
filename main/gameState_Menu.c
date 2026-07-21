@@ -131,7 +131,7 @@ void VB_Menu() {
 
     getJoystick();
 
-    if (gameState == nextGameState && !(inpt4 & 0x80))
+    if (!(inpt4 & 0x80))
         setGameState(GS_GLOBE);    // GS_GLOBE);
 }
 

@@ -172,7 +172,7 @@ void VB_Game() {
         shakeX = shakeY = 0;
 #endif
 
-    if (gameState == nextGameState && RAM[_SWCHB] != 0x3F)
+    if (RAM[_SWCHB] != 0x3F)
         setGameState(GS_MENU);
 
     processCharAnimations();
