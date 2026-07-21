@@ -1,8 +1,3 @@
-callARM         stx CALLFN
-                rts
-
-
-
 CartReset
 
                     CLEAN_START
@@ -30,8 +25,7 @@ initJumpCode        lda jumpCode,x
                     stx DSWRITE
 
                     ldx #$FF
-                    jsr callARM
-;                    stx CALLFN          		    ; Initialise via ARM function
+                    jsr callARM          		    ; Initialise via ARM function
 
                     jsr ReadSaveKey                 ; Load savekey to ZP SAVEKEY block (*fast mode OFF)
 
@@ -59,8 +53,7 @@ initJumpCode        lda jumpCode,x
                     stx DSWRITE
 
                     ldx #$FF
-                    jsr callARM
-;                    stx CALLFN          		    ; Initialise via ARM function
+                    jsr callARM   		    ; Initialise via ARM function
 
 .notRealSKData
 

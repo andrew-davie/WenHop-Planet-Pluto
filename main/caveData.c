@@ -153,7 +153,8 @@ const unsigned char caveWyrms[] = {
     //CAVEDEF_LOCK_X|CAVEDEF_LOCK_Y|
     CAVEDEF_BONUS|CAVEDEF_START_WITH_WEAPON, CH_BLANK, CH_BRICKWALL,
 
-    0,
+    1,
+    CH_BRICKWALL,110,110,110,110,110,
 
     DRAW_FILLED_RECT,CH_STEELWALL,1,1,9,8,CH_GEODOGE,
     DRAW_FILLED_RECT,CH_BRICKWALL,4,4,3,3,CH_ROCK,
@@ -161,6 +162,8 @@ const unsigned char caveWyrms[] = {
 
     CH_DOORCLOSED, 5, 4,
     CH_MELLON_HUSK_BIRTH, 5, 5,
+
+    CH_STAR, 5,7,
 
     DRAW_EOF,
 

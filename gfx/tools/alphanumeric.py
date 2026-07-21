@@ -167,7 +167,7 @@ def master_table(spans, empty_flags, start_ascii, prefix):
     name = f"{prefix}_asciiTable"
     lines = [
         f"/* {name}[i] → character for ASCII (i + {start_ascii}), 0 if no glyph */",
-        f"const unsigned char *{name}[{n}] = {{",
+        f"const unsigned char *const {name}[{n}] = {{",
     ]
     entries = []
     for i, (_, empty) in enumerate(zip(spans, empty_flags)):
@@ -194,7 +194,7 @@ def build_header(prefix, basename, image_path, w, h, spans, start_ascii):
         f"#define {prefix.upper()}_FONT_FIRST_CHAR  {start_ascii}",
         f"#define {prefix.upper()}_FONT_CHAR_COUNT  {n}",
         f"",
-        f"extern const unsigned char *{prefix}_asciiTable[{n}];",
+        f"extern const unsigned char *const {prefix}_asciiTable[{n}];",
         f"extern const unsigned char  {prefix}_charWidths[{n}];",
         f"",
     ]

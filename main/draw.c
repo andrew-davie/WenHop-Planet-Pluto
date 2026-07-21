@@ -80,7 +80,7 @@ static enum justify justify;
 const struct FONT {
     enum fontsize size;
     int lineHeight;
-    const unsigned char **asciiTable;
+    const unsigned char *const *asciiTable;
     const unsigned char *charWidths;
 } fonts[] = {
     {FONT_STANDARD, ALPHANUMERIC_FONT_HEIGHT, alphanumeric_asciiTable, alphanumeric_charWidths},

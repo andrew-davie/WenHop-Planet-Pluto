@@ -101,7 +101,7 @@ kernelSkull
 
     ; runVectoredCode[kernel] comes here
 
-_skullLoop                                           ;@3
+_skullLoop                                          ;@3
 
                     lda #_DS_SKULL_PF1_LEFT_DATA
                     sta PF1                         ; 5
@@ -148,5 +148,5 @@ _skullExit          sta WSYNC
 
 
     echo "KERNEL SKULL [", (*-START_SKULL)d,"] bytes"
-; EOF
 
+; EOF

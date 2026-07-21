@@ -6,6 +6,7 @@
 #include "colour.h"
 #include "draw.h"
 #include "drawGridPreview.h"
+#include "drawScreen.h"
 #include "gameState.h"
 #include "joystick.h"
 #include "life.h"
@@ -167,8 +168,9 @@ void OS_Menu() {
     adjustLuminance(1);
 
     setPFColours((unsigned char *)(RAM + _BUF_MENU_COLUPF));
+    drawScreenMirror(_BUF_MENU_PF);
 
-    drawPF(_BUF_MENU_PF, gfx_image_WenHop_png);
+    //    drawPF(_BUF_MENU_PF, gfx_image_WenHop_png);
 }
 
 

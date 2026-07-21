@@ -61,19 +61,31 @@ void drawGridPreview() {
 
     int roll;
 
-    for (int i = 0; i < len; i++) {
+    // Same 3 regions as before (top border / black centre / bottom border),
+    // just as 3 straight-line loops instead of 1 loop re-testing the same
+    // branch on every single iteration -- the region boundaries don't
+    // depend on i, so there's nothing to gain from checking them per-pixel.
+    {
+        int borderEnd = PREVIEW_BORDER < len ? PREVIEW_BORDER : len;
+        int innerEnd = PREVIEW_HEIGHT + PREVIEW_BORDER + 1;
+        if (innerEnd > len)
+            innerEnd = len;
 
-        pL[i] |= 0x80;
-
-        if (i < PREVIEW_BORDER || i > PREVIEW_HEIGHT + PREVIEW_BORDER) {
-
+        int i = 0;
+        for (; i < borderEnd; i++) {
+            pL[i] |= 0x80;
             pM[i] = 255;
             pR[i] |= 0x1F;
-
-        } else {
-
+        }
+        for (; i < innerEnd; i++) {
+            pL[i] |= 0x80;
             pM[i] = 0;
             pR[i] = (pR[i] & ~0x1F) | 0x10;
+        }
+        for (; i < len; i++) {
+            pL[i] |= 0x80;
+            pM[i] = 255;
+            pR[i] |= 0x1F;
         }
     }
 
@@ -84,15 +96,34 @@ void drawGridPreview() {
 
     scanline += PREVIEW_BORDER + 3;
 
-    roll = roller;
+    // If the picture is already entirely below the visible area (e.g. still
+    // mid slide-in -- initGridPreview() starts previewStart at _SCANLINES+50
+    // and slides it down 5/frame towards PREVIEW_Y, so this is true for
+    // roughly the first dozen frames every time the menu opens), every one
+    // of the 90 chLine iterations below would just hit `if (++scanline >=
+    // base) continue;` without ever touching sp/col -- scanline is the only
+    // thing that actually changes across all of them (roll ends up back at
+    // its starting value regardless, since it free-runs mod 3 and 90 is a
+    // multiple of 3; bs and lvl are never read after the loop). So skip
+    // straight to the equivalent scanline value instead of doing all the
+    // (thrown-away) image lookups, bit-packing and colour work to get there.
+    // This does NOT change anything about the partially-visible case --
+    // that still falls through to the exact original loop below, unchanged.
+    if (scanline >= base) {
 
-    bool complete = false;    // isGameCompleted();
+        scanline += 90;    // 10 y-iterations x 9 chLine-iterations, unconditionally
 
-    int bs = 9;
+    } else {
+
+        roll = roller;
+
+        bool complete = false;    // isGameCompleted();
+
+        int bs = 9;
 
 
-    int lvl = 99;
-    for (int y = 90; y >= -10; y -= 10) {
+        int lvl = 99;
+        for (int y = 90; y >= -10; y -= 10) {
 
 #ifdef RESTRICTED_DEMO
 
@@ -153,6 +184,12 @@ void drawGridPreview() {
         unsigned char *p2 = charset[gfx_cars_blip_gif_map[1][bs]].data;
         unsigned char *z = charset[gfx_cars_blip_gif_map[1][0]].data;
 
+        // lvl is fully decremented by the i-loop above before this loop ever
+        // runs, so it's constant for all 9 iterations below -- hoisted out
+        // of the per-iteration check rather than re-testing the same value
+        // 9 times.
+        bool lvlValid = lvl >= -10;
+
         for (int chLine = 0; chLine < 31 - 6; chLine += 3) {
             if (++scanline >= base)
                 continue;
@@ -178,7 +215,7 @@ void drawGridPreview() {
             *(sp + 5 * _BUFFER_SIZE) = gr2;
 
 
-            if (lvl >= -10)
+            if (lvlValid)
                 *sp |= (bs ? (p2[offset] << 3) : 0) | z[offset];
 
             sp++;
@@ -188,6 +225,7 @@ void drawGridPreview() {
         }
 
         bs--;
+        }
     }
 
 

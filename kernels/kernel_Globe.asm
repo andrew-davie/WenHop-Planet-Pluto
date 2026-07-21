@@ -135,5 +135,5 @@ _globeExit          sta WSYNC
 
 
     echo "KERNEL GLOBE [", (*-START_GLOBE)d,"] bytes"
-; EOF
 
+; EOF

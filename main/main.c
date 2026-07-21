@@ -7,6 +7,7 @@
 
 #include "main.h"
 
+#include "attribute.h"
 #include "colour.h"
 #include "gameState.h"
 #include "kernels.h"
@@ -17,7 +18,17 @@
 #include "sound.h"
 #include "swipe.h"
 
-int debug[10] = {[0 ... 9] = -1};
+// Per-character worst-case T1TC timing, one slot per chName value (see
+// processBoardSquares() in board.c). 0 = never timed yet.
+//
+// No volatile, no attributes -- see main.h for why (tried both, neither
+// was the actual cause of debug vanishing from the globals view; gameState
+// has the identical LOCAL/no-DW_AT_location shape and shows up fine, so
+// that wasn't it, and volatile is the more likely culprit: it's the one
+// thing that's different from the plain int debug[10] that's known to
+// have worked). Explicit initialiser kept -- makes this a definite
+// definition rather than a tentative one, cheap to keep either way.
+unsigned short debug[CH_MAX] = {[0 ... CH_MAX - 1] = 0};
 
 
 #if ENABLE_SHAKE
@@ -30,6 +41,7 @@ int shakeTime;
 
 
 void setShake(int time) {
+    debug[0] = 200;
 
     shakeTime = time;
 }

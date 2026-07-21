@@ -5,9 +5,9 @@
 
 #include <stdint.h>
 
-#define FONTCOMPACT_FONT_HEIGHT      11
-#define FONTCOMPACT_FONT_FIRST_CHAR  32
-#define FONTCOMPACT_FONT_CHAR_COUNT  95
+#define FONTCOMPACT_FONT_HEIGHT 11
+#define FONTCOMPACT_FONT_FIRST_CHAR 32
+#define FONTCOMPACT_FONT_CHAR_COUNT 95
 
-extern const unsigned char *fontcompact_asciiTable[95];
-extern const unsigned char  fontcompact_charWidths[95];
+extern const unsigned char *const fontcompact_asciiTable[95];
+extern const unsigned char fontcompact_charWidths[95];

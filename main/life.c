@@ -59,38 +59,86 @@ void initLife() {
 }
 
 
+// Same neighbour-counting rules as before, restructured for the hot path:
+//  - wrapX(x+dx) only ever actually wraps at the two edge columns, but was
+//    being called (with its two branches) for every one of up to 8
+//    neighbours of every cell. x's two horizontal neighbour columns only
+//    depend on x, not on dy, so they're resolved once per cell instead.
+//  - ny*LIFE_SIZE was being recomputed for each of the 3 dx checks within a
+//    given dy, even though it's the same value all 3 times -- hoisted per
+//    dy instead (same for y*LIFE_SIZE, constant for the whole row).
+//  - votes[8] only matters for a *dead* cell's birth-colour vote (an alive
+//    cell only needs the neighbour count for the 2/3-neighbour survival
+//    check) -- alive cells now skip the votes array (zeroing it and the
+//    per-neighbour increments) entirely rather than maintaining it unread.
 static void computeRow(int y) {
+
+    int yBase = y * LIFE_SIZE;
 
     for (int x = 0; x < LIFE_SIZE; x++) {
 
+        int xm1 = x ? x - 1 : LIFE_SIZE - 1;
+        int xp1 = (x == LIFE_SIZE - 1) ? 0 : x + 1;
+
+        unsigned char cell = wcol[yBase + x];
         int aliveCount = 0;
-        unsigned char votes[8] = {0};
 
-        for (int dy = -1; dy <= 1; dy++) {
+        if (cell) {
 
-            int ny = y + dy;
-            if (ny < 0 || ny >= LIFE_SIZE)
-                continue;    // no wrap top/bottom
+            for (int dy = -1; dy <= 1; dy++) {
 
-            for (int dx = -1; dx <= 1; dx++) {
+                int ny = y + dy;
+                if (ny < 0 || ny >= LIFE_SIZE)
+                    continue;    // no wrap top/bottom
 
-                if (dx == 0 && dy == 0)
-                    continue;
+                int rowBase = ny * LIFE_SIZE;
 
-                unsigned char neighbour = wcol[ny * LIFE_SIZE + wrapX(x + dx)];
+                if (wcol[rowBase + xm1])
+                    aliveCount++;
+                if (dy != 0 && wcol[rowBase + x])
+                    aliveCount++;
+                if (wcol[rowBase + xp1])
+                    aliveCount++;
+            }
+
+            nextwcol[yBase + x] = (aliveCount == 2 || aliveCount == 3) ? cell : 0;
+
+        } else {
+
+            unsigned char votes[8] = {0};
+
+            for (int dy = -1; dy <= 1; dy++) {
+
+                int ny = y + dy;
+                if (ny < 0 || ny >= LIFE_SIZE)
+                    continue;    // no wrap top/bottom
+
+                int rowBase = ny * LIFE_SIZE;
+                unsigned char neighbour;
+
+                neighbour = wcol[rowBase + xm1];
+                if (neighbour) {
+                    aliveCount++;
+                    votes[neighbour]++;
+                }
+
+                if (dy != 0) {
+                    neighbour = wcol[rowBase + x];
+                    if (neighbour) {
+                        aliveCount++;
+                        votes[neighbour]++;
+                    }
+                }
+
+                neighbour = wcol[rowBase + xp1];
                 if (neighbour) {
                     aliveCount++;
                     votes[neighbour]++;
                 }
             }
+
+            nextwcol[yBase + x] = (aliveCount == 3) ? birthColour(votes) : 0;
         }
-
-        unsigned char cell = wcol[y * LIFE_SIZE + x];
-
-        if (cell)
-            nextwcol[y * LIFE_SIZE + x] = (aliveCount == 2 || aliveCount == 3) ? cell : 0;
-        else
-            nextwcol[y * LIFE_SIZE + x] = (aliveCount == 3) ? birthColour(votes) : 0;
     }
 }
 

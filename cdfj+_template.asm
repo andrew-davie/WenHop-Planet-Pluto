@@ -128,7 +128,6 @@ CDFJPLUS_DRIVER_SIZE = [* - CDFJPLUS_DRIVER]d
 
 CURRENT_ORG SET CURRENT_ORG + $800
 
-
 ;-------------------------------------------------------------------------------
 ; 4K banks for 6502 code
 

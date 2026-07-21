@@ -5,6 +5,13 @@
 BANK0_START
 
 ;-------------------------------------------------------------------------------
+; vector to ARM code from lowest ROM address possible, to give the maximum
+; 'freewheeling' 6502 EA-wait time possible
+
+callARM             stx CALLFN
+                    rts
+
+;-------------------------------------------------------------------------------
 
     ; bank-0-only code
 

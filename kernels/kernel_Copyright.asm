@@ -72,7 +72,7 @@ VB_kernelCopyright
 
 
                     ldx #%00000001
-                    stx CTRLPF              ; reflect PF
+                    stx CTRLPF                      ; reflect PF
 
                     jsr positionSprites
                     sta WSYNC
@@ -133,5 +133,5 @@ _copyrightExit
 
 
     echo "KERNEL COPYRIGHT [", (*-START_COPYRIGHT)d,"] bytes"
-; EOF
 
+; EOF

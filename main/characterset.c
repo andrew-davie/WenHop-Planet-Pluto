@@ -5,7 +5,6 @@
 
 static unsigned char char_parallaxBlank[CHAR_Y];
 
-#define CH(x) charset_auto[x].data
 
 const unsigned char *const charSet[] = {
 
@@ -42,7 +41,7 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_3_5),      // 024 CH_DUST_0,
     CH(CHAR_MAP_4_5),      // 025 CH_DUST_1,
     CH(CHAR_MAP_5_5),      // 026 CH_DUST_2,
-    CH(CHAR_MAP_0_0),      // 027 CH_GEODOGE,
+    CH(CHAR_MAP_0_7),      // 027 CH_GEODOGE,
     CH(CHAR_MAP_3_5),      // 028 CH_DUST_ROCK_0,
     CH(CHAR_MAP_5_5),      // 029 CH_DUST_ROCK_1,
     CH(CHAR_MAP_5_5),      // 030 CH_DUST_ROCK_2,

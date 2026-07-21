@@ -111,7 +111,31 @@ extern int shakeX, shakeY, shakeTime;
 #endif
 
 
-extern int debug[10];
+// Sized CH_MAX (attribute.h) and indexed by raw character number -- see
+// processBoardSquares() in board.c, which tracks the worst-case T1TC ticks
+// spent per character number, one array slot per chName value. Declared
+// incomplete here (size lives with the definition in main.c) so this header
+// doesn't have to pull in attribute.h just for CH_MAX.
+// unsigned short: ticks for a single board cell never approach 64K, and
+// this way the full usable range is available instead of losing half of it
+// to a sign bit.
+//
+// Deliberately NOT volatile and no attributes -- tried volatile +
+// __attribute__((used, externally_visible)) first (theory: LTO treats the
+// writes as dead stores since nothing reads debug[] back except the
+// debugger, and eliminates the array). That theory didn't hold up: checked
+// gameState (definitely live, read all over the codebase) and it has the
+// *exact* same DWARF/symbol-table shape debug did (LOCAL binding, no
+// DW_AT_location) and shows up fine in the globals view regardless -- so
+// that's just how this LTO build normally represents globals, not a sign
+// of anything being eliminated. Meanwhile the plain, unqualified
+// `int debug[10]` this started as (no volatile, no attributes) was known
+// to work and stay visible. volatile is the most likely thing that
+// actually broke visibility: embedded debuggers commonly treat a volatile
+// array as a hardware-register-style symbol and exclude it from the
+// normal globals list. Matching the shape of the version that's known to
+// work, just with the new size/type.
+extern unsigned short debug[];
 
 
 void ClearChannel(void *ptr);

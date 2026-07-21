@@ -66,7 +66,7 @@ mainGameLoop
                 	stx DSWRITE			    ; all Atari inputs to ARM
 
                 	ldx call_fn
-                	jsr callARM; stx CALLFN              ; --> runARM_Overscan()
+                	jsr callARM             ; --> runARM_Overscan()
 
     ; retrieve ARM 'system' variables
 
@@ -126,12 +126,10 @@ mainGameLoop
                     stx DSWRITE
 
                 	lda INTIM
-                    ; sec
-                    ; sbc #5
                 	sta DSWRITE
 
                     ldx call_fn
-                    jsr callARM ;stx CALLFN                  ; call VerticalBlank in ARM
+                    jsr callARM                   ; call VerticalBlank in ARM
 
 
 .waitVB             lda INTIM

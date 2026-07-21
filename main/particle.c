@@ -388,7 +388,7 @@ struct Particle particle[PARTICLE_COUNT];
 static int particleStack[PARTICLE_COUNT];
 static int particleStackPointer;
 
-int pushParticle(int prt) {
+void pushParticle(int prt) {
     particleStack[particleStackPointer++] = prt;
 }
 

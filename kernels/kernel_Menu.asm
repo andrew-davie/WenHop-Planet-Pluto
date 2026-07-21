@@ -112,7 +112,7 @@ VB_kernelMenu
                     jsr positionSpritesMenu
 
                     ldx #%00000001
-                    stx CTRLPF              ; reflect PF
+                    stx CTRLPF                      ; reflect PF
 
                     lda #_DS_MENU_COLUPF
                     sta COLUPF
