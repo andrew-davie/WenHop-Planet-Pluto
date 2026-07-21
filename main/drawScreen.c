@@ -197,9 +197,12 @@ void drawScreen() {
     int shift = CHAR_TRIX_X - (sXpix - characterX * CHAR_TRIX_X);
 
     unsigned char leftMaskLeft = theCave->flags & CAVEDEF_MASK_LEFT_PIXEL ? 0b11100000 : 0b11110000;
-    const unsigned char leftMaskRight = 0b11110000;
 
     int scanline = 0;
+    unsigned char *pfL = RAM + arenas[0] + scanline;
+    unsigned char *pfR = RAM + arenas[1] + scanline;
+
+
     for (int row = startRow; scanline < _SCANLINES; row++) {
 
         const int height = _SCANLINES - scanline < CHAR_Y ? _SCANLINES - scanline : CHAR_Y;
@@ -208,8 +211,6 @@ void drawScreen() {
 
         grabCharacters(charSet, 9);
 
-        unsigned char *pfL = RAM + arenas[0] + scanline;
-        unsigned char *pfR = RAM + arenas[1] + scanline;
 
         for (int y = -lcount; y < height; y++) {
 
@@ -229,15 +230,41 @@ void drawScreen() {
                 ((unsigned long long)(img[7][lineColour] | corner[7][lineColour]) & 0x1F) << 5 |
                 ((unsigned long long)(img[8][lineColour] | corner[8][lineColour]) & 0x1F);
 
-            unsigned long long shifted = packed >> shift;
+            // shift is loop-invariant (fixed for this whole call) but its
+            // VALUE isn't known until runtime, so a plain "packed >>= shift"
+            // forces gcc to emit the generic 64-bit variable-shift sequence
+            // (separate runtime-computed lo/hi combine) on every one of these
+            // ~66 iterations. shift only ever takes 5 values (1..CHAR_TRIX_X,
+            // see its computation above), so switching on it once per
+            // iteration turns each shift back into a compile-time-constant
+            // immediate shift -- one barrel-shifter instruction per 32-bit
+            // half instead of a general-purpose routine.
+            //
+            // Measured on hardware: hoisting this switch out to wrap the
+            // whole row loop (5 full copies of the loop body, one dispatch
+            // per drawScreen() call instead of one per iteration) was tried
+            // and was SLOWER on real hardware (70K vs 67K) despite being
+            // "obviously" fewer dispatches -- the 5x code-size growth costs
+            // more in instruction-fetch than the per-iteration branch saves.
+            // Keep the dispatch here, inside the loop, at this size.
+            // switch (shift) {
+            // case 1: packed >>= 1; break;
+            // case 2: packed >>= 2; break;
+            // case 3: packed >>= 3; break;
+            // case 4: packed >>= 4; break;
+            // default: packed >>= 5; break;
+            // }
 
-            *(pfL + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)(shifted >> 20)];    // PF2_LEFT
-            *(pfL + _BUFFER_SIZE) = (unsigned char)(shifted >> 28);                        // PF1_LEFT
-            *pfL++ = reverseBits[(unsigned char)(shifted >> 36)] & leftMaskLeft;           // PF0_LEFT
 
-            *(pfR + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)shifted];      // PF2_RIGHT
-            *(pfR + _BUFFER_SIZE) = (unsigned char)(shifted >> 8);                   // PF1_RIGHT
-            *pfR++ = reverseBits[(unsigned char)(shifted >> 16)] & leftMaskRight;    // PF0_RIGHT
+            packed >>= shift;
+
+            *(pfL + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)(packed >> 20)];    // PF2_LEFT
+            *(pfL + _BUFFER_SIZE) = (unsigned char)(packed >> 28);                        // PF1_LEFT
+            *pfL++ = reverseBits[(unsigned char)(packed >> 36)] & leftMaskLeft;           // PF0_LEFT
+
+            *(pfR + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)packed];    // PF2_RIGHT
+            *(pfR + _BUFFER_SIZE) = (unsigned char)(packed >> 8);                 // PF1_RIGHT
+            *pfR++ = reverseBits[(unsigned char)(packed >> 16)];                  // PF0_RIGHT
         }
 
         scanline += height + lcount;

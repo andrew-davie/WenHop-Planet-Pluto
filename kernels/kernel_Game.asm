@@ -76,11 +76,13 @@ _gameLoop ; @3
 
                     jmp 0                           ; 3
 
-_gameExit           sta WSYNC
+_gameExit
                     lda #0
-                    sta PF0
-                    sta PF1
-                    sta PF2
+                    sta COLUPF
+                    ; sta PF0
+                    ; sta PF1
+                    ; sta PF2
+                    sta WSYNC
                     rts
 
 ;-------------------------------------------------------------------------------

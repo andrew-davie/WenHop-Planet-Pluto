@@ -96,13 +96,14 @@ _menuLoop                                           ;@3
                     jmp 0                           ; @3 --> start of line again
 
 
-_menuExit           sta WSYNC
+_menuExit          
 
                     lda #0
                     sta COLUPF
                     sta COLUP0
                     sta COLUP1
-                    rts
+                    sta WSYNC
+                     rts
 
 
 
