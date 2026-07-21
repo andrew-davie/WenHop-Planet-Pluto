@@ -191,9 +191,13 @@ void setupBoardScanner() {
 
         calculateVisibleMasks();
 
-        setSchedule(SCHEDULE_PROCESS_BOARD);
-
-        processBoardSquares();
+        // restartBoardScan() above may have just called setGameState() (e.g. on player death),
+        // which arms SCHEDULE_INIT_STATE -- don't stomp that back to SCHEDULE_PROCESS_BOARD, or
+        // scheduleInitState() never gets another turn and the transition deadlocks forever.
+        if (gameState == nextGameState) {
+            setSchedule(SCHEDULE_PROCESS_BOARD);
+            processBoardSquares();
+        }
     }
 }
 
