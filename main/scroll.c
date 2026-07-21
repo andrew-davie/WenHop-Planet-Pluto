@@ -38,7 +38,19 @@ int approach(int current, int target, int speed) {
 
 void scroll() {
 
-    if (!maskNeeded && playerDead && !waitRelease) {    // && *playerAnimation == FRAME_BLANK) {
+    // The swipe mask is drawn in screen space, centred on wherever
+    // scrollX/Y were at the moment the swipe started (see startSwipeClose()'s
+    // world-to-screen conversion in board.c). Letting scrollX/Y move while
+    // maskNeeded is true would drag the level out from under the
+    // screen-locked mask/border, so hold the camera dead still until the
+    // swipe fully clears. Zeroing the speeds (not just skipping the move)
+    // keeps isScrolling() honest for anything waiting on it.
+    if (maskNeeded) {
+        scrollSpeedX = scrollSpeedY = 0;
+        return;
+    }
+
+    if (playerDead && !waitRelease) {    // && *playerAnimation == FRAME_BLANK) {
 
         // Manual look-around
 
