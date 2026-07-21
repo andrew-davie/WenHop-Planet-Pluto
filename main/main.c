@@ -110,6 +110,16 @@ enum GAME_STATE gameState, nextGameState;
 unsigned char kernel;    // use _KERNEL_* values from 6502
 unsigned char colubk;
 
+// scheduleInitState() must only ever complete a transition during runARM_Overscan(), never
+// runARM_VerticalBlank(): the 6507 latches its kernel variable from the DS31 stream right after
+// Overscan returns, before VerticalBlank even runs that frame (see _mainLoop.asm -- Overscan,
+// then VSYNC, then VerticalBlank, then the visible kernel). A flip completed mid-VerticalBlank
+// would miss that frame's RAM[_kernel] sync entirely, landing one frame later than the ARM-side
+// gameState change -- confirmed as the actual cause of the CouchCompliant/RasterBleed blackscreen
+// (VB_DetectConsole() calls setGameState() from inside VerticalBlank, so that transition's first
+// opportunity to complete was always exactly this unsafe case). Set true/false at the top of each.
+bool inOverscanPhase;
+
 void Null();    // empty function, for any use
 
 void runARM_SystemReset();
@@ -199,7 +209,7 @@ void setGameState(enum GAME_STATE state) {
         return;    // a transition is already pending -- first request wins, callers don't need
                    // to guard themselves
 
-    nextGameState = state;           // actioned by scheduleInitState(), once a frame has budget for it
+    nextGameState = state;    // actioned by scheduleInitState(), once a frame has budget for it
     setSchedule(SCHEDULE_INIT_STATE);
 }
 
@@ -321,11 +331,23 @@ void (*const verticalBlank[GS_MAX])() = {
 
 void runARM_VerticalBlank() {
 
+    inOverscanPhase = false;
+
     // Fresh per-phase idle-time stopwatch -- shared by scheduleInitState() and Game's own
     // cave-unpack/board-scan pipeline (see schedule.c). GS_DETECT_CONSOLE is the one exception:
     // it runs its OWN multi-frame T1TC stopwatch to measure real TV refresh timing (see
     // gameState_DetectConsole.c), and would have that measurement wrecked by a reset every frame.
-    if (gameState != GS_DETECT_CONSOLE) {
+    //
+    // Gated on nextGameState, not gameState: once VB_DetectConsole() calls setGameState() at the
+    // end of its calibration, nextGameState changes immediately but gameState doesn't -- not until
+    // scheduleInitState() completes the handoff. Gating on gameState here would keep suppressing
+    // the reset until that handoff happens, except the handoff can't happen without a freshly-reset,
+    // single-phase-scale T1TC to check the budget against -- T1TC would just free-run for as many
+    // extra frames as the transition takes, ending up on a completely different scale than
+    // availableIdleTime and permanently failing scheduleInitState()'s budget check regardless of
+    // margin. Checking nextGameState instead means the reset resumes the instant a transition out
+    // of DetectConsole is requested, not once it's already finished.
+    if (nextGameState != GS_DETECT_CONSOLE) {
         T1TC = 0;
         T1TCR = 1;
     }
@@ -355,7 +377,8 @@ void (*const overscan[GS_MAX])() = {
     OS_RasterBleed,       // 8 GS_RASTER_BLEED
 };
 
-const unsigned char whichKernel[GS_MAX] = {    // matches kernel's own type -- all _KERNEL_* values are tiny, never written
+const unsigned char whichKernel[GS_MAX] = {
+    // matches kernel's own type -- all _KERNEL_* values are tiny, never written
 
     0,                         // 0
     _KERNEL_DETECT_CONSOLE,    // 1 GS_DETECT_CONSOLE
@@ -377,6 +400,12 @@ const unsigned char whichKernel[GS_MAX] = {    // matches kernel's own type -- a
 
 void scheduleInitState() {
 
+    // Only ever complete a transition from the Overscan call -- see the comment on
+    // inOverscanPhase. If this fires mid-VerticalBlank, just wait; runARM_Overscan() will call
+    // scheduledTasks() again shortly, same frame's turnaround or next.
+    if (!inOverscanPhase)
+        return;
+
     if (T1TC >= availableIdleTime - SCHEDULE_INIT_MARGIN)
         return;    // not enough of this phase's budget left -- old kernel/state keeps running
                    // completely unchanged, try again next VB/OS
@@ -396,8 +425,10 @@ void scheduleInitState() {
 
 void runARM_Overscan() {
 
-    // See runARM_VerticalBlank() for why GS_DETECT_CONSOLE is excluded.
-    if (gameState != GS_DETECT_CONSOLE) {
+    inOverscanPhase = true;
+
+    // See runARM_VerticalBlank() for why this is gated on nextGameState, not gameState.
+    if (nextGameState != GS_DETECT_CONSOLE) {
         T1TC = 0;
         T1TCR = 1;
     }
