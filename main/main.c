@@ -154,7 +154,7 @@ bool input_flag[15] = {false};
 // for each control user can assign a number of frames in between
 // the first press acknowledge and the second, default 14
 // use 0 to bypass the wait timer
-unsigned char input_wait[12] = {14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14};
+const unsigned char input_wait[12] = {14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14};
 #define p1_u_wait input_wait[0]
 #define p1_d_wait input_wait[1]
 #define p1_l_wait input_wait[2]
@@ -171,7 +171,7 @@ unsigned char input_wait[12] = {14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14};
 // for each control user can assign a number of frames in between
 // the second acknowledge and any after, default 7
 // use 0 to bypass the repeat timer
-unsigned char input_repeat[12] = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
+const unsigned char input_repeat[12] = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
 #define p1_u_repeat input_repeat[0]
 #define p1_d_repeat input_repeat[1]
 #define p1_l_repeat input_repeat[2]
@@ -339,7 +339,7 @@ void (*const overscan[GS_MAX])() = {
     OS_RasterBleed,       // 8 GS_RASTER_BLEED
 };
 
-unsigned char whichKernel[GS_MAX] = {    // matches kernel's own type -- all _KERNEL_* values are tiny
+const unsigned char whichKernel[GS_MAX] = {    // matches kernel's own type -- all _KERNEL_* values are tiny, never written
 
     0,                         // 0
     _KERNEL_DETECT_CONSOLE,    // 1 GS_DETECT_CONSOLE

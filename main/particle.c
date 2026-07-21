@@ -310,7 +310,7 @@ void drawGun() {
     int x = (playerX * CHAR_TRIX_X + CHAR_CENTER_X + ((faceDirection * autoMoveX) >> 2)) << 8;
     int y = ((playerY * CHAR_TRIX_Y + 6) << 8) + (autoMoveY * (256 / 3)) - (2 << 8);
 
-    static char angle[16] = {
+    static const char angle[16] = {
 
         0,      // 00
         128,    // 01 UP

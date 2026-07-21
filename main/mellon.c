@@ -544,8 +544,8 @@ bool checkLowPriorityMove(BoardCursor *cur, int dir) {
         if (pushCounter > 8) {
 
 
-            static signed char xOffset[] = {0, CHAR_TRIX_X, 0, -CHAR_TRIX_X};
-            static signed char yOffset[] = {-(CHAR_CENTER_Y >> 1), 0, CHAR_CENTER_Y >> 1, 0};
+            static const signed char xOffset[] = {0, CHAR_TRIX_X, 0, -CHAR_TRIX_X};
+            static const signed char yOffset[] = {-(CHAR_CENTER_Y >> 1), 0, CHAR_CENTER_Y >> 1, 0};
 
             if (Attribute[destType] & ATT_MINE) {
 
