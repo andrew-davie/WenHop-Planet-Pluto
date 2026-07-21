@@ -133,7 +133,7 @@ const unsigned char rollDirect[3][CHAR_Y] = {
 };
 
 
-const unsigned int arenas[] = {
+const unsigned short arenas[] = {
 
     _BUF_GAME_PF0_LEFT,
     _BUF_GAME_PF0_RIGHT,
@@ -382,7 +382,7 @@ bool drawBit(int x, int y, unsigned char colour) {
 
     base += ((col + 4) >> 3) * _BUFFER_SIZE;
 
-    static const unsigned int sh[] = {4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5, 6, 7};
+    static const unsigned char sh[] = {4, 5, 6, 7, 7, 6, 5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5, 6, 7};
 
     int shift = sh[col];
     int mask = ~(1 << shift);

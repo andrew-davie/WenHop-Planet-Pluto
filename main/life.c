@@ -14,7 +14,7 @@ static unsigned char nextwcol[LIFE_CELLS];
 // settling, which keeps the board livelier than a handful of random cells.
 #define RESEED_INTERVAL 10
 
-static const int R_PENTOMINO[5][2] = {
+static const unsigned char R_PENTOMINO[5][2] = {
     {0, 1}, {0, 2}, {1, 0}, {1, 1}, {2, 1},
 };
 

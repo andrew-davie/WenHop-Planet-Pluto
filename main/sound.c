@@ -602,7 +602,7 @@ void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int
     music[best].baseSpeed = dur;
 }
 
-const int multiplier[] = {0, 0x100, 0x200, 0x400};
+const unsigned short multiplier[] = {0, 0x100, 0x200, 0x400};
 const unsigned char RENOTE[] = {1, 4, 6, 12};
 
 

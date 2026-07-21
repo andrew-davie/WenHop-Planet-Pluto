@@ -157,7 +157,7 @@ const unsigned short pix85[] = {
 // Array name [line85]:
 // Mapping - (s)pherical or (l)inear [s]:
 
-const short int line85[] = {
+const signed char line85[] = {
     0,      // 0
     9,      // 1
     15,     // 2

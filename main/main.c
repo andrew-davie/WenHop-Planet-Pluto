@@ -339,7 +339,7 @@ void (*const overscan[GS_MAX])() = {
     OS_RasterBleed,       // 8 GS_RASTER_BLEED
 };
 
-int whichKernel[GS_MAX] = {
+unsigned char whichKernel[GS_MAX] = {    // matches kernel's own type -- all _KERNEL_* values are tiny
 
     0,                         // 0
     _KERNEL_DETECT_CONSOLE,    // 1 GS_DETECT_CONSOLE

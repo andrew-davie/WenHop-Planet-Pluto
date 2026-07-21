@@ -27,7 +27,7 @@ void rasterBleed(int image, int y) {
         || y < -127 || y >= _SCANLINES)
         return;
 
-    static int f[MAX_RASTERBLEED_FRAME] = {0};
+    static unsigned char f[MAX_RASTERBLEED_FRAME] = {0};
 
 
     if (++f[image] >= frame_set[image].count)

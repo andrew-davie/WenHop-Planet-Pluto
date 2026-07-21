@@ -38,7 +38,6 @@ extern int autoMoveDeltaY;
 extern int autoMoveFrameCount;
 
 extern const signed char *const AnimationVector[];    // animJames[];
-extern const int AnimationIndex[];
 
 extern enum AnimationIdent playerAnimationID;
 extern const signed char *playerAnimation;

@@ -37,7 +37,7 @@ struct TOOL tool[TOOL_MAX];
 int weapon;
 
 
-const int sin_cos[32] = {
+const short sin_cos[32] = {
     // clang-format off
     // Combined sin/cos table
        0,   50,   98,  142,  181,  213,  237,  251,     //   0° (D) to <  90° (R)
@@ -385,7 +385,7 @@ void drawRope() {
 }
 
 struct Particle particle[PARTICLE_COUNT];
-static int particleStack[PARTICLE_COUNT];
+static unsigned char particleStack[PARTICLE_COUNT];    // PARTICLE_COUNT (42) < 256 -- holds particle indices only
 static int particleStackPointer;
 
 void pushParticle(int prt) {

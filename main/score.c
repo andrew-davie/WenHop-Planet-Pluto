@@ -61,7 +61,7 @@ const bool mirror[] = {
     1, 1, 0, 0, 1, 1, 1, 0, 0, 1,
 };
 
-const int base[] = {
+const unsigned short base[] = {
     _BUF_GAME_PF2_RIGHT, _BUF_GAME_PF2_RIGHT, _BUF_GAME_PF1_RIGHT, _BUF_GAME_PF1_RIGHT, _BUF_GAME_PF0_RIGHT,
     _BUF_GAME_PF2_LEFT,  _BUF_GAME_PF2_LEFT,  _BUF_GAME_PF1_LEFT,  _BUF_GAME_PF1_LEFT,  _BUF_GAME_PF0_LEFT,
 };
