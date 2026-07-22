@@ -134,7 +134,7 @@ extern int shakeX, shakeY, shakeTime;
 // gopher2600 side but broke something else there and got reverted, so
 // working around it here instead: giving the declaration an explicit size
 // means it never has an incomplete type to begin with.
-extern unsigned short debug[133];
+extern unsigned short debug[];
 
 #endif
 

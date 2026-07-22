@@ -300,17 +300,17 @@ void setJustifyX(const char *str) {
 }
 
 
-void doLetter(int ci, int cx, int cy, char colour) {
+void doLetter(int ci, int chx, int chy, char colour) {
 
-    int column = cx >> 3;
-    int bit = 7 - (cx & 7);
+    int column = chx >> 3;
+    int bit = 7 - (chx & 7);
 
     const unsigned char *charShape = fonts[font].asciiTable[ci];
     if (charShape) {
 
         for (int i = 0; i < fonts[font].lineHeight; i++) {
 
-            int vertPos = cy + i;
+            int vertPos = chy + i;
             if (vertPos >= 0 && vertPos < _SCANLINES) {
 
                 int shape = charShape[i] << (8 - fonts[font].charWidths[ci]);

@@ -95,6 +95,7 @@ void initGameState_Copyright() {
 void VB_Copyright() {
 
     initDataStreams_Copyright();
+    adjustLuminance(1);
 
 
     if (frame < DURATION_COPYRIGHT) {
@@ -128,24 +129,23 @@ void VB_Copyright() {
             // (tvSystem was never actually used to pick a different colour).
             // Collapsed to a single statement; if PAL/SECAM was meant to use
             // different hex constants here, those need to be supplied.
-            *c++ = convertColour(sl < TOP + BAND ? 0xC4 : 0x16);
+            *c++ = convertColour(0x85);    // sl < TOP + BAND ? 0xC4 : 0x16);
         }
 
-        drawString(FONT_LARGE, 0xC2, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=Grumpy", 66);
-        while (drawNextChar())
-            ;
+        // drawString(FONT_LARGE, 0x16, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=Andrew", 70);
+        // while (drawNextChar())
+        //     ;
 
-
-        drawString(FONT_LARGE, 0x14, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=Wizard", 82);
-        while (drawNextChar())
-            ;
+        // drawString(FONT_LARGE, 0x16, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=Dr Boo's", 66);
+        // while (drawNextChar())
+        //     ;
 
         if (frame > 60) {
-            if (presentsColour < (PRESENTS_LUM << FADE_SHIFT))
-                presentsColour += FADE_SPEED;
+            // if (presentsColour < (PRESENTS_LUM << FADE_SHIFT))
+            //     presentsColour += FADE_SPEED;
 
 
-            drawString(FONT_COMPACT, 0x14, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=PRODUCT", 95);
+            drawString(FONT_COMPACT, 0x16, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=presents", 120);
             while (drawNextChar())
                 ;
         }
@@ -176,7 +176,17 @@ void VB_Copyright() {
 }
 
 void OS_Copyright() {
-    adjustLuminance(1);
+
+    drawString(FONT_STANDARD, 0x16, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=Dr Boo's", 45);
+    while (drawNextChar())
+        ;
+
+    drawString(FONT_STANDARD, 0x16, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=INCREDIBLE", 70);
+    while (drawNextChar())
+        ;
+    drawString(FONT_STANDARD, 0x16, 10, _BUF_COPYRIGHT_GRP, _BUF_COPYRIGHT_COLUP0, "=TECHNOLOGY", 84);
+    while (drawNextChar())
+        ;
 }
 
 // EOF

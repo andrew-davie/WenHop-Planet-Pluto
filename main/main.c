@@ -50,8 +50,8 @@ int shakeY;
 int shakeTime;
 
 
-void setShake(int time) {
-    shakeTime = time;
+void setShake(int stime) {
+    shakeTime = stime;
 }
 
 

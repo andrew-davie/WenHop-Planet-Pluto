@@ -158,9 +158,9 @@ void processWyrms() {
 
                     *tailPos = CH_BLANK;    // CH_DUST_ROCK_0;
 
-                    for (int i = 0; i < WYRM_MAX - 1; i++) {
-                        wyrm->x[i] = wyrm->x[i + 1];
-                        wyrm->y[i] = wyrm->y[i + 1];
+                    for (int j = 0; j < WYRM_MAX - 1; j++) {
+                        wyrm->x[j] = wyrm->x[j + 1];
+                        wyrm->y[j] = wyrm->y[j + 1];
                     }
 
                     headPos--;

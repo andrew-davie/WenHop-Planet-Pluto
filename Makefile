@@ -45,10 +45,10 @@ OUTPUT = output
 DASM_TO_C = defines_dasm.h
 
 CFLAGS = -g3 -gdwarf-4 -gstrict-dwarf -mcpu=arm7tdmi -march=armv4t -mthumb \
-         -Wall -Wextra -Wshadow -Wno-unused-function -ffunction-sections -Os \
-        -Wl,--print-memory-usage,--build-id=none -flto -fno-builtin \
+         -Wall -Wextra -Wshadow -Wno-unused-function -flto -ffunction-sections -Os \
+        -Wl,--print-memory-usage,--build-id=none -fno-builtin \
 		-mno-thumb-interwork -fextended-identifiers \
-        -MMD -MP
+        -MMD -MP -Werror
 
 # ARM/C output
 CUSTOMNAME    = WenHopPlanetPluto
@@ -208,7 +208,8 @@ ifneq ($(EMULATOR),)
 	pkill -f $(GOPHERNAME) || true
 
 ifeq ($(EMULATOR), gopher)
-	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv NTSC -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
+#	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv NTSC -right savekey -dwarf $(CUSTOMELF) $(OUTPUT)/$(CUSTOMNAME).bin
+	tmux new-session -d -s $(EMULATOR) $(GOPHER)/$(GOPHERNAME) -tv NTSC -right savekey $(OUTPUT)/$(CUSTOMNAME).bin
 endif
 
 ifeq ($(EMULATOR), stella)

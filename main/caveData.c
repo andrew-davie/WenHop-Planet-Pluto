@@ -981,7 +981,7 @@ void empty() {
 
 const struct caveHandler caveList[] = {
 
-    {caveNew, none},
+    // {caveNew, none},
 
     // cave definition, condition handler
     {caveUseWall, none},

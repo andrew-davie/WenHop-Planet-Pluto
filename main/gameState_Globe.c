@@ -314,7 +314,7 @@ void VB_Globe() {
     drawPaletteGlobe(thePalette);
 
     drawPlanet(5);
-    drawStars();
+    //    drawStars();
 
     static int nsv = VOLUME_PLAYING;
 
@@ -324,7 +324,7 @@ void VB_Globe() {
     sound_max_volume = approach(sound_max_volume, nsv, 1);
 
     getJoystick();
-    if (!(inpt4 & 0x80) || finished)
+    if (finished)    //!(inpt4 & 0x80) || finished)
         setGameState(GS_GAME);
 }
 
@@ -425,7 +425,7 @@ void OS_Globe() {
 
 
         case INFO_PLANETADVISOR:
-            drawString(FONT_COMPACT, 0x8, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, "=_Planet@Visor", pa_lines);
+            // drawString(FONT_COMPACT, 0x8, 3, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, "=_Planet@Visor", pa_lines);
             pa_lines += TITLE_HEIGHT + INFO_GAP;
             wait = 25;
             break;

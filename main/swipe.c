@@ -169,7 +169,7 @@ enum PHASE {
     PHASE_END = 5
 };
 
-static enum PHASE exitPhase;
+// static enum PHASE exitPhase;
 
 
 // buffer is the left column (PF0_LEFT) of whichever kernel's six PF0/PF1/PF2

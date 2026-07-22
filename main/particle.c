@@ -286,7 +286,7 @@ void drawGun() {
                         if ((Attribute[type] & (ATT_EXPLODABLE | ATT_HARD))) {
                             ADDAUDIO(SFX_ROCK);
 
-                            for (int i = 0; i < 12; i++)
+                            for (int j = 0; j < 12; j++)
                                 nDotsAtTrixel(1, x, y, 12, PT_ONE, 120, 7);
                             tool[i].age = 0;
 

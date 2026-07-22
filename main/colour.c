@@ -92,9 +92,9 @@ unsigned char convertColour(unsigned char colour) {
     return adjustBrightness(colour);
 }
 
-void pulseBackgroundColour(unsigned char colour, int time) {
+void pulseBackgroundColour(unsigned char colour, int ftime) {
     colubk = convertColour(colour);
-    flashTime = time;
+    flashTime = ftime;
 }
 
 

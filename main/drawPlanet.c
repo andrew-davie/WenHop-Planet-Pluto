@@ -303,7 +303,7 @@ void drawPlanet(int half) {
     const unsigned char *image[6];
 
 
-    int trixLine = armFrequency == 70000000 ? 6 : 6 + 7;    // start globe y @
+    int trixLine = 10;    // armFrequency == 70000000 ? 6 : 6 + 7;    // start globe y @
 
     unsigned char *pf0 = trixLine * 3 + RAM + _BUF_GLOBE_PF + (half ? 0 : (3 * _BUFFER_SIZE));
     unsigned char *pf1 = pf0 + _BUFFER_SIZE;
@@ -318,7 +318,7 @@ void drawPlanet(int half) {
 #undef PUT2
 #undef GRAB
 
-#define GRAB(i) image[i] = charset[*xchar++] + (line85[equiv] & 31);
+#define GRAB(i) image[i] = charset[*xchar++] + lineOffset;
 
 #define BLK(i)                                                                                                         \
     if (mask & (1 << i))                                                                                               \
@@ -355,6 +355,8 @@ void drawPlanet(int half) {
 
             xchar = basex + map[0] * (line85[equiv] >> 5);
 
+            int lineOffset = line85[equiv] & 31;    // same for all 6 GRABs below -- equiv doesn't
+                                                    // change until the end of this outer iteration
             GRAB(0)
             GRAB(1)
             GRAB(2)
@@ -427,6 +429,8 @@ void drawPlanet(int half) {
 
             xchar = basex + map[0] * (line85[equiv] >> 5);
 
+            int lineOffset = line85[equiv] & 31;    // same for all 6 GRABs below -- equiv doesn't
+                                                    // change until the end of this outer iteration
             GRAB(0)
             GRAB(1)
             GRAB(2)
@@ -495,9 +499,17 @@ void drawPlanet(int half) {
         }
     }
 
-    while (trixLine++ < _SCANLINES / 3)
-        for (int i = 0; i < 3; i++)
-            *pf1++ = *pf2++ = 0;
+    // Was a nested "while(trixLine++ < N) for(i<3) *pf1++ = *pf2++ = 0" -- same total bytes
+    // zeroed, but paying per-byte loop overhead (compare/increment/branch) on two interleaved
+    // pointers instead of one straight-line fill per buffer. pf1/pf2 are each independently
+    // contiguous over this remaining span, so two flat myMemset() calls cover the identical
+    // range. Not myMemsetInt: pf1/pf2's starting offset depends on trixLine's initial value, so
+    // 4-byte alignment isn't guaranteed here.
+    int remaining = (_SCANLINES / 3) - trixLine;
+    if (remaining > 0) {
+        myMemset(pf1, 0, remaining * 3);
+        myMemset(pf2, 0, remaining * 3);
+    }
 
 #undef BLK
 #undef BLK2

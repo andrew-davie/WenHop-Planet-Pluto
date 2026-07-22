@@ -16,11 +16,11 @@
 void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument);
 void processMusic();
 
-static const unsigned char trackGridLockBase2[];
-static const unsigned char trackGridLockMelodyIntro[];
-static const unsigned char trackGridLockBase[];
-static const unsigned char trackTrophy1[];
-static const unsigned char trackTrophy2[];
+// static const unsigned char trackGridLockBase2[];
+// static const unsigned char trackGridLockMelodyIntro[];
+// static const unsigned char trackGridLockBase[];
+// static const unsigned char trackTrophy1[];
+// static const unsigned char trackTrophy2[];
 
 int sound_volume = 128;
 int sound_max_volume = 768;
@@ -459,39 +459,39 @@ void playAudio() {
 // clang-format off
 
 
-static const unsigned char trackTrophy1[] = {
+// static const unsigned char trackTrophy1[] = {
 
-    HALFNOTE
-    c5  e5  g5
-    d5  f5  a5
-    e5  g5  b5
-    g5  a5  c6
+//     HALFNOTE
+//     c5  e5  g5
+//     d5  f5  a5
+//     e5  g5  b5
+//     g5  a5  c6
 
-    b5  g5  e5
-    a5  f5  d5
-    g5  e5  c5
-    c5  g4  c5
+//     b5  g5  e5
+//     a5  f5  d5
+//     g5  e5  c5
+//     c5  g4  c5
 
-    FULLNOTE c5 c5 c5 c5
-    TRACK_END
-};
+//     FULLNOTE c5 c5 c5 c5
+//     TRACK_END
+// };
 
 
-static const unsigned char trackTrophy2[] = {
+// static const unsigned char trackTrophy2[] = {
 
-    FULLNOTE
+//     FULLNOTE
 
-    c4  g3 
-    d4  a3 
-    e4  b3 
-    g4  c4 
-    e4  c4 
-    d4  a3 
-    c4  g3 
-    c4  c4 
+//     c4  g3 
+//     d4  a3 
+//     e4  b3 
+//     g4  c4 
+//     e4  c4 
+//     d4  a3 
+//     c4  g3 
+//     c4  c4 
 
-    TRACK_END
-};
+//     TRACK_END
+// };
 
 
 
@@ -508,41 +508,41 @@ const unsigned char trackGridLockMelody2[] = {
     TRACK_LOOP
 };
 
-static const unsigned char trackGridLockBase2[] = {
-    FULLNOTE
-    c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
-    c2 c2 e3 e3 g3 g3 c3 c3
-    c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
-    d3 d3 b2 b2 g3 g3 c3 c3
-    // HALFNOTE
-    c3 b2 a2_SHARP g3 f2 e3 d3 c2
-    // FULLNOTE
-    c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
-    c2 c2 g3 g3 d3 d3 a2_SHARP a2_SHARP
-    e3 e3 c3 c3 g3 g3 c2 c2
-    f2 f2 c3 c3 g3 g3 c2 c2
+// static const unsigned char trackGridLockBase2[] = {
+//     FULLNOTE
+//     c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
+//     c2 c2 e3 e3 g3 g3 c3 c3
+//     c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
+//     d3 d3 b2 b2 g3 g3 c3 c3
+//     // HALFNOTE
+//     c3 b2 a2_SHARP g3 f2 e3 d3 c2
+//     // FULLNOTE
+//     c2 c2 e3 e3 a2_SHARP a2_SHARP f2 f2
+//     c2 c2 g3 g3 d3 d3 a2_SHARP a2_SHARP
+//     e3 e3 c3 c3 g3 g3 c2 c2
+//     f2 f2 c3 c3 g3 g3 c2 c2
 
-    TRACK_LOOP
-};
+//     TRACK_LOOP
+// };
 
-static const unsigned char trackGridLockMelodyIntro[] = {
-    FULLNOTE
-    c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4 g3 b3
-    d4 a3 c4 e4 b3 d4 f4 c3 e3 g3 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4
+// static const unsigned char trackGridLockMelodyIntro[] = {
+//     FULLNOTE
+//     c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4 g3 b3
+//     d4 a3 c4 e4 b3 d4 f4 c3 e3 g3 c3 e3 g3 c3 e3 g3 f3 a3 c4 g3 b3 d4 c3 e3 g3 f3 a3 c4 g3 b3 d4
 
-    TRACK_LOOP
-};
+//     TRACK_LOOP
+// };
 
-static const unsigned char trackGridLockBase[] = {
-    FULLNOTE
-    c2 c2 g3 g3 a2_SHARP a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 c2 c2 g3 g3 a2_SHARP
-    a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 f2 f2 c3 c3 g3 g3 d3 d3 a2_SHARP a2_SHARP
-    e3 e3 c2 c2 c2 c2 g3 g3 d3 d3 a2_SHARP a2_SHARP e3 e3 b2 b2 f3 f3 c2 c2 c2 c2 c2 c2 g3
-    g3 a2_SHARP a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 f2 f2 c3 c3 g3 g3 d3
-    d3 a2_SHARP a2_SHARP e3 e3 c2 c2 c2 c2
+// static const unsigned char trackGridLockBase[] = {
+//     FULLNOTE
+//     c2 c2 g3 g3 a2_SHARP a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 c2 c2 g3 g3 a2_SHARP
+//     a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 f2 f2 c3 c3 g3 g3 d3 d3 a2_SHARP a2_SHARP
+//     e3 e3 c2 c2 c2 c2 g3 g3 d3 d3 a2_SHARP a2_SHARP e3 e3 b2 b2 f3 f3 c2 c2 c2 c2 c2 c2 g3
+//     g3 a2_SHARP a2_SHARP f2 f2 d2_SHARP d2_SHARP g3 g3 c2 c2 c2 c2 f2 f2 c3 c3 g3 g3 d3
+//     d3 a2_SHARP a2_SHARP e3 e3 c2 c2 c2 c2
 
-    TRACK_LOOP
-};
+//     TRACK_LOOP
+// };
 
 
 // Instrument envelopes have 16 bytes defining the volume multipliers for each "audio tick"
@@ -577,7 +577,7 @@ const unsigned char *const instrument[] = {
 
 // clang-format on
 
-void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int instrument) {
+void loadTrack(int priority, const unsigned char *tune, int vol, int dur, int inst) {
 
     int best = -1;
 
@@ -596,8 +596,8 @@ void loadTrack(int priority, const unsigned char *tune, int volume, int dur, int
     music[best].tune = tune;
     music[best].index = -1;
     music[best].progress = TRIGGER_NEXT_NOTE;
-    music[best].instrument = instrument;
-    music[best].volume = volume;
+    music[best].instrument = inst;
+    music[best].volume = vol;
     music[best].noteDurationMultiplier = dur;    // 0x80 = single note, 0x40 = half-note, etc
     music[best].baseSpeed = dur;
 }

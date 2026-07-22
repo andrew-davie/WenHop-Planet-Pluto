@@ -48,9 +48,9 @@ static int decodeFlasher;
 static int last_prng_a;
 static int last_prng_b;
 
-void decodeCave(int cave) {
+void decodeCave(int newCave) {
 
-    theCave = (struct CAVE_DEFINITION *)caveList[cave].cave;
+    theCave = (struct CAVE_DEFINITION *)caveList[newCave].cave;
 
     decodeState = DECODE_NONE;
 
@@ -78,8 +78,22 @@ void decodeCave(int cave) {
         weapon = theCave->weapon[level];
 }
 
-unsigned char cmd;
-unsigned char x, y, c, d, e, f;
+// Persistent across calls -- decodeExplicitData() is a state machine resumed on
+// every call (possibly many per frame, across many frames -- see schedule.c's
+// budgeted unpack), so these can't be locals. Bundled into one struct rather
+// than left as bare single-letter globals: StoreObject/DrawLine/DrawRect/
+// DrawFilledRect below all take x/y (and DrawLine/DrawFilledRect take c/d/e/f-ish
+// params too) as perfectly ordinary parameter names, and a bare global with the
+// same name as a parameter is exactly the kind of thing -Wshadow warns about --
+// and warns about for good reason: a rename that misses one usage silently falls
+// back to the global instead of erroring, which is precisely what happened here
+// once already (DrawLine's row guard silently reading this decode state instead
+// of its own parameter). Scoping them under "decode." means no function's own
+// x/y/c/d/e/f can ever collide with these again, by construction.
+static struct {
+    unsigned char cmd;
+    unsigned char col, row, c, d, e, f;
+} decode;
 static unsigned char theCode;
 static unsigned char theObject;
 
@@ -125,7 +139,7 @@ int decodeExplicitData() {
         else {
 
 
-            d = e = 0;
+            decode.d = decode.e = 0;
             decodeState = DECODE_STOP;
             processedLevel = false;
         }
@@ -134,7 +148,7 @@ int decodeExplicitData() {
 
     case DECODE_STOP: {
 
-        if (d == e) {
+        if (decode.d == decode.e) {
 
             theCode = *theCaveData++;
 
@@ -162,30 +176,30 @@ int decodeExplicitData() {
 
             if (theCode <= DRAW_OBJ) {
                 theObject = theCode;
-                cmd = 0;
+                decode.cmd = 0;
             }
 
             else {
-                cmd = theCode;
+                decode.cmd = theCode;
                 theObject = *theCaveData++;
             }
 
-            x = *theCaveData++;
-            y = *theCaveData++;
+            decode.col = *theCaveData++;
+            decode.row = *theCaveData++;
 
-            if (!cmd) {
+            if (!decode.cmd) {
 
-                StoreObject(x, y, theObject);
+                StoreObject(decode.col, decode.row, theObject);
 
                 if (theObject == CH_DOORCLOSED || theObject == CH_DOOROPEN_0) {
-                    doorX = x;
-                    doorY = y;
+                    doorX = decode.col;
+                    doorY = decode.row;
                 }
 
                 else if (theObject == CH_MELLON_HUSK_BIRTH) {
 
-                    playerX = x;
-                    playerY = y;
+                    playerX = decode.col;
+                    playerY = decode.row;
 
                     // Snap the camera onto the player as soon as we know
                     // where they are -- but do NOT start the star swipe here.
@@ -209,16 +223,16 @@ int decodeExplicitData() {
 
             else {
 
-                d = 0;
+                decode.d = 0;
 
-                c = *theCaveData++;
-                e = *theCaveData++;
+                decode.c = *theCaveData++;
+                decode.e = *theCaveData++;
 
-                if (cmd == DRAW_FILLED_RECT) {
-                    f = *theCaveData++;
-                    if (e & 0x80) {    // instant
-                        e &= 0x7F;
-                        d = e - 1;
+                if (decode.cmd == DRAW_FILLED_RECT) {
+                    decode.f = *theCaveData++;
+                    if (decode.e & 0x80) {    // instant
+                        decode.e &= 0x7F;
+                        decode.d = decode.e - 1;
                     }
                 }
             }
@@ -226,21 +240,21 @@ int decodeExplicitData() {
 
         else {
 
-            d++;
+            decode.d++;
 
-            switch (cmd) {
+            switch (decode.cmd) {
 
             case DRAW_LINE:
-                DrawLine(theObject, x, y, d, c);
+                DrawLine(theObject, decode.col, decode.row, decode.d, decode.c);
                 break;
 
             case DRAW_FILLED_RECT:
-                DrawFilledRect(theObject, x, y, c, d, f);
+                DrawFilledRect(theObject, decode.col, decode.row, decode.c, decode.d, decode.f);
                 break;
 
             case DRAW_RECT:
-                d = e;
-                DrawRect(theObject, x, y, c, d);
+                decode.d = decode.e;
+                DrawRect(theObject, decode.col, decode.row, decode.c, decode.d);
                 break;
 
             default:
