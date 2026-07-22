@@ -282,7 +282,11 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
                     faceDirection = faceDirectionDef[dir];
 
-                    attachment = GET(pickup);
+                    attachment = pickup;
+
+                    extern const unsigned char AnimateBomb[];
+                    if (pickup == CH_BOMB)
+                        startCharAnimation(TYPE_BOMB, AnimateBomb);
 
                     if (dir == 1 || dir == 2)
                         attachment |= FLAG_THISFRAME;
@@ -613,11 +617,19 @@ void movePlayer(BoardCursor *cur) {
 
     if (drop) {
 
+
+        if (GET(attachment) == CH_BOMB) {
+            extern const unsigned char AnimateBomb[];
+            startCharAnimation(TYPE_BOMB, AnimateBomb + 2);
+        }
+
         attachmentOffset = 0;
         *meAtt = attachment;
         drop = false;
         waitRelease = true;
         attachment = 0;
+
+
         return;
     }
 

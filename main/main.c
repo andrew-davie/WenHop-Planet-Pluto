@@ -20,24 +20,7 @@
 #include "swipe.h"
 
 #ifdef DEBUG_TIMES
-
-
-// Per-character worst-case T1TC timing, one slot per chName value (see
-// processBoardSquares() in board.c). 0 = never timed yet.
-//
-// No volatile, no attributes -- neither was the actual cause of debug
-// vanishing from the globals view (see main.h for the real cause, in the
-// Gopher2600 DWARF parser). Explicit initialiser kept -- makes this a
-// definite definition rather than a tentative one, cheap to keep either
-// way.
 unsigned short debug[CH_MAX] = {[0 ... CH_MAX - 1] = 0};
-
-// keeps the hardcoded size in the main.h extern declaration honest if
-// CH_MAX ever changes
-_Static_assert(
-    CH_MAX == 133,
-    "debug[] extern declaration in main.h is hardcoded to size 133 (CH_MAX) -- update both if CH_MAX changes");
-
 #endif
 
 

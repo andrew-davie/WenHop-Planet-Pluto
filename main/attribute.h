@@ -56,6 +56,10 @@ enum ObjectType {
     TYPE_STAR_EXPLODE,             // 46
     TYPE_ROCK_BONUS,               // 47
     TYPE_MOUNT,                    // 48
+    TYPE_PIT_L,                    // 49
+    TYPE_PIT_R,                    // 50
+    TYPE_BOMB,                     // 51
+    TYPE_CRACKED_BRICK,            // 52
 
     TYPE_MAX
 };
@@ -181,18 +185,40 @@ enum ChName {
     CH_MOUNT_D,                   // 109
     CH_MOUNT_L,                   // 110
     CH_MOUNT_R,                   // 111
+    CH_PIT_L0,                    // 112
+    CH_PIT_R0,                    // 113
+    CH_BOMB,                      // 114
+    CH_CRACKED_BRICK,             // 115
 
     // 127 is limit of board-resident character numbers
 
     // 128 onward are virtual characters from animations
-    // these can't go on board but can be displayed
+    // these can't go on board but can be displayed via realtime animation
 
-    CH_DOGE_01 = 128,    // 128
-    CH_DOGE_02,          // 129
-    CH_DOGE_03,          // 130
-    CH_DOGE_04,          // 131
-    CH_DOGE_05,          // 132
-
+    CH_DOGE_01 = 128,      // 128
+    CH_DOGE_02,            // 129
+    CH_DOGE_03,            // 130
+    CH_DOGE_04,            // 131
+    CH_DOGE_05,            // 132
+                           //
+    CH_PIT_L1,             // 133
+    CH_PIT_R1,             // 134
+    CH_PIT_L2,             // 135
+    CH_PIT_R2,             // 136
+    CH_PIT_L3,             // 137
+    CH_PIT_R3,             // 138
+    CH_PIT_L4,             // 139
+    CH_PIT_R4,             // 140
+                           //
+    CH_BOMB_FLASH,         // 141
+                           //
+    CH_CRACKED_BRICK_1,    // 142
+    CH_CRACKED_BRICK_2,    // 143
+    CH_CRACKED_BRICK_3,    // 144
+    CH_CRACKED_BRICK_4,    // 145
+    CH_CRACKED_BRICK_5,    // 146
+    CH_CRACKED_BRICK_6,    // 147
+    CH_CRACKED_BRICK_7,    // 148
 
     CH_MAX
 };

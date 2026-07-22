@@ -19,5 +19,6 @@ void toggleGears(bool active);
 extern const unsigned char AnimateRockBonus[];
 extern const unsigned char AnimateStar[];
 extern const unsigned char AnimateStarExplode[];
+extern const unsigned char AnimateCrackedBrick[];
 
 // EOF

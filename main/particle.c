@@ -506,9 +506,10 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
 }
 
 
-void nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed,
-           unsigned char colour) {
+int nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed,
+          unsigned char colour) {
 
+    int lastIdx = -1;
     if (gravity < 0)
         offsetY = CHAR_TRIX_Y - offsetY;
 
@@ -520,9 +521,12 @@ void nDots(int count, int dripX, int dripY, int type, unsigned char age, int off
                 particle[idx].distance = rangeRandom(200) + 50;
                 particle[idx].dir = getRandom32();
             }
+            lastIdx = idx;
         } else
             break;
     }
+
+    return lastIdx;
 }
 
 void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,

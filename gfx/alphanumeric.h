@@ -5,9 +5,9 @@
 
 #include <stdint.h>
 
-#define ALPHANUMERIC_FONT_HEIGHT 12
-#define ALPHANUMERIC_FONT_FIRST_CHAR 32
-#define ALPHANUMERIC_FONT_CHAR_COUNT 95
+#define ALPHANUMERIC_FONT_HEIGHT      12
+#define ALPHANUMERIC_FONT_FIRST_CHAR  32
+#define ALPHANUMERIC_FONT_CHAR_COUNT  95
 
 extern const unsigned char *const alphanumeric_asciiTable[95];
-extern const unsigned char alphanumeric_charWidths[95];
+extern const unsigned char  alphanumeric_charWidths[95];

@@ -114,6 +114,10 @@ void initBoard() {
 }
 
 
+int lastRockCount;
+int rockCount;
+
+
 void setupBoardScanner() {
 
     // After board scan complete, throttles until we're at correct FPS
@@ -174,6 +178,11 @@ void setupBoardScanner() {
                     bubbles(1, posX, deep, 2240, 0x8000);
             }
         }
+
+        if (rockCount > lastRockCount)
+            lastRockCount = rockCount;
+        rockCount = 0;
+
 
         // gameFrame++;
         gravity = nextGravity;
@@ -334,6 +343,67 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
     switch (type) {
 
+    case TYPE_BOMB:
+
+        if (*Animate[type] == CH_BLANK) {
+            *cur->me = CH_BLANK;
+
+            shakeTime = 50;
+            FLASH(0x48, 30);
+            ADDAUDIO(SFX_EXPLODE);
+            explode(cur->me, CH_ROCK);
+
+
+        } else
+
+
+            nDots(2, cur->col, cur->row, PT_SPIRAL, 10, 4, 1, rangeRandom(50) + 20, 1 + (getRandom32() & 2));
+        break;
+
+
+    case TYPE_CRACKED_BRICK: {
+
+        //    case TYPE_PIT_L:
+        //    case TYPE_PIT_R: {
+
+        int rchar = lastRockCount;
+        if (rchar > 7)
+            rchar = 7;
+
+        startCharAnimation(TYPE_CRACKED_BRICK, AnimateCrackedBrick + rchar * 2);
+
+
+        if (lastRockCount > 7) {
+            if (!rangeRandom(5)) {
+                FLASH(0x16, 4);
+                ADDAUDIO(SFX_EXPLODE_QUIET);
+                nDots(10, cur->col, cur->row, PT_SPIRAL, 40, CHAR_CENTER_X, CHAR_CENTER_Y, 40, 3);
+                *cur->me = FLAG(CH_DUST_ROCK_0);
+            }
+        }
+
+        else {
+
+            // int dots = rchar;
+            if (lastRockCount != 0) {
+                for (int i = 0; i < lastRockCount; i++) {
+                    if (!rangeRandom(10)) {
+                        int idx = nDots(1, cur->col, cur->row, PT_TWO, rangeRandom(30) + 20, rangeRandom(CHAR_TRIX_X),
+                                        2, 30, 7);
+                        if (idx >= 0)
+                            particle[idx].dir = 0;
+                    }
+                }
+            }
+
+            unsigned char *column = cur->me - _BOARD_COLS;
+            while (CharToType[GET(*column)] == TYPE_ROCK || CharToType[GET(*column)] == TYPE_GEODOGE) {
+                rockCount++;
+                column -= _BOARD_COLS;
+            }
+        }
+        break;
+    }
 
     case TYPE_STAR_EXPLODE: {
 
@@ -1307,6 +1377,9 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 
             *cell = shape[i];
         }
+
+        else if (cellType == TYPE_OUTBOX_PRE)
+            *cell = CH_DOOROPEN_0;
     }
 
     FLASH(4, 4);

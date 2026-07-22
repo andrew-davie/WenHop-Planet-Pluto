@@ -7,6 +7,55 @@ static char AnimCount[TYPE_MAX];
 
 // clang-format off
 
+
+const unsigned char AnimateCrackedBrick[] = {
+
+    CH_CRACKED_BRICK, 0,
+    CH_CRACKED_BRICK_1, 0,
+    CH_CRACKED_BRICK_2, 0,
+    CH_CRACKED_BRICK_3, 0,
+    CH_CRACKED_BRICK_4, 0,
+    CH_CRACKED_BRICK_5, 0,
+    CH_CRACKED_BRICK_6, 0,
+    CH_CRACKED_BRICK_7, 0,
+};
+
+
+
+const unsigned char AnimateBomb[] = {
+
+    CH_BOMB, 0,
+
+    CH_BOMB, 10,
+    CH_BOMB_FLASH, 10,
+    CH_BOMB, 9,
+    CH_BOMB_FLASH, 9,
+    CH_BOMB, 8,
+    CH_BOMB_FLASH, 8,
+    CH_BOMB, 7,
+    CH_BOMB_FLASH, 7,
+    CH_BOMB, 6,
+    CH_BOMB_FLASH, 6,
+    CH_BOMB, 5,
+    CH_BOMB_FLASH, 5,
+    CH_BOMB, 4,
+    CH_BOMB_FLASH, 4,
+    CH_BOMB, 3,
+    CH_BOMB_FLASH, 3,
+    CH_BOMB, 2,
+    CH_BOMB_FLASH, 2,
+    CH_BOMB, 1,
+    CH_BOMB_FLASH, 1,
+
+    CH_BLANK, 0,
+
+    ANIM_LOOP,
+
+};
+
+
+
+
 const unsigned char AnimateStar[] = {
 
     CH_STAR, 21,
@@ -15,6 +64,26 @@ const unsigned char AnimateStar[] = {
     ANIM_LOOP,
 
     CH_STAR,0,
+};
+
+const unsigned char AnimatePitL[] = {
+    CH_PIT_L0,3,
+    CH_PIT_L1,3,
+    CH_PIT_L2,3,
+    CH_PIT_L3,3,
+    CH_PIT_L4,3,
+
+    ANIM_LOOP
+};
+
+const unsigned char AnimatePitR[] = {
+    CH_PIT_R0,3,
+    CH_PIT_R1,3,
+    CH_PIT_R2,3,
+    CH_PIT_R3,3,
+    CH_PIT_R4,3,
+
+    ANIM_LOOP
 };
 
 
@@ -226,55 +295,59 @@ const unsigned char *const AnimateBase[] = {
     // Note that the type number is an ID, not ordinal. That's because the continuity may
     // be compromised by the conditional compilation. Beware.
 
-    0,                     // 00 TYPE_BLANK
-    0,                     // 01 TYPE_PLACEHOLDER
-    0,                     // 02 TYPE_DIRT
-    0,                     // 03 TYPE_BRICKWALL
-    0,                     // 04 TYPE_OUTBOX_PRE
-    AnimFlashOut,          // 05 TYPE_OUTBOX
-    0,                     // 06 TYPE_STEELWALL
-    0,                     // 07 TYPE_ROCK
-    AnimPulseDoge,         // 08 TYPE_DOGE
-    0,                     // 09 TYPE_MELLON_HUSK_PRE
-    AnimMellonHusk,        // 10 TYPE_MELLON_HUSK
-    0,                     // 11 TYPE_PEBBLE1
-    0,                     // 12 TYPE_DUST_0
-    0,                     // 13 TYPE_DOGE_FALLING
-    0,                     // 14 TYPE_ROCK_FALLING
-    0,                     // 15 TYPE_DUST_ROCK
-    0,                     // 16 TYPE_CONVERT_GEODE_TO_DOGE
-    0,                     // 17 TYPE_PUSHER
-    0,                     // 18 TYPE_PUSHER_VERT
-    0,                     // 19 TYPE_WYRM
-    0,                     // 20 TYPE_GEODOGE
-    0,                     // 21 TYPE_GEODOGE_FALLING
-    0,                     // 22 TYPE_LAVA
-    0,                     // 23 TYPE_PEBBLE_ROCK    (pebble to geodoge)
-    AnimateGravity,        // 24 TYPE_FLIP_GRAVITY
-    0,                     // 25 TYPE_BLOCK
-    AnimateGrinder,        // 26 TYPE_GRINDER
-    0,                     // 27 TYPE_HUB
-    0,                     // 28 TYPE_WATER
-    AnimateWaterFlow0,     // 29 TYPE_WATERFLOW0
-    AnimateWaterFlow1,     // 30 TYPE_WATERFLOW1
-    AnimateWaterFlow2,     // 31 TYPE_WATERFLOW2
-    AnimateWaterFlow3,     // 32 TYPE_WATERFLOW3
-    AnimateWaterFlow4,     // 33 TYPE_WATERFLOW4
-    0,                     // 34 TYPE_TAP
-    0,                     // 35 TYPE_OUTLET
-    AnimateGrinder1,       // 36 TYPE_GRINDER1
-    AnimateBelt,           // 37 TYPE_BELT
-    AnimateBelt1,          // 38 TYPE_BELT1
-    0,                     // 39 TYPE_CONVERT_PIPE
-    0,                     // 40 TYPE_DOGE_FALLING2
-    AnimateRockPebble,     // 41 TYPE_ROCK_PEBBLE (geodoge disintegrating)
-    0,                     // 42 TYPE_ELECTRIC_0
-    0,                     // 43 TYPE_INSULATOR
-    AnimateStar,           // 44 TYPE_STAR
-    0,                     // 45 TYPE_STAR_FALLING
-    AnimateStarExplode,    // 46 TYPE_STAR_EXPLODE
-    AnimateRockBonus,      // 47 TYPE_ROCK_BONUS
-    0,                     // 48 TYPE_MOUNT
+    0,                      // 00 TYPE_BLANK
+    0,                      // 01 TYPE_PLACEHOLDER
+    0,                      // 02 TYPE_DIRT
+    0,                      // 03 TYPE_BRICKWALL
+    0,                      // 04 TYPE_OUTBOX_PRE
+    AnimFlashOut,           // 05 TYPE_OUTBOX
+    0,                      // 06 TYPE_STEELWALL
+    0,                      // 07 TYPE_ROCK
+    AnimPulseDoge,          // 08 TYPE_DOGE
+    0,                      // 09 TYPE_MELLON_HUSK_PRE
+    AnimMellonHusk,         // 10 TYPE_MELLON_HUSK
+    0,                      // 11 TYPE_PEBBLE1
+    0,                      // 12 TYPE_DUST_0
+    0,                      // 13 TYPE_DOGE_FALLING
+    0,                      // 14 TYPE_ROCK_FALLING
+    0,                      // 15 TYPE_DUST_ROCK
+    0,                      // 16 TYPE_CONVERT_GEODE_TO_DOGE
+    0,                      // 17 TYPE_PUSHER
+    0,                      // 18 TYPE_PUSHER_VERT
+    0,                      // 19 TYPE_WYRM
+    0,                      // 20 TYPE_GEODOGE
+    0,                      // 21 TYPE_GEODOGE_FALLING
+    0,                      // 22 TYPE_LAVA
+    0,                      // 23 TYPE_PEBBLE_ROCK    (pebble to geodoge)
+    AnimateGravity,         // 24 TYPE_FLIP_GRAVITY
+    0,                      // 25 TYPE_BLOCK
+    AnimateGrinder,         // 26 TYPE_GRINDER
+    0,                      // 27 TYPE_HUB
+    0,                      // 28 TYPE_WATER
+    AnimateWaterFlow0,      // 29 TYPE_WATERFLOW0
+    AnimateWaterFlow1,      // 30 TYPE_WATERFLOW1
+    AnimateWaterFlow2,      // 31 TYPE_WATERFLOW2
+    AnimateWaterFlow3,      // 32 TYPE_WATERFLOW3
+    AnimateWaterFlow4,      // 33 TYPE_WATERFLOW4
+    0,                      // 34 TYPE_TAP
+    0,                      // 35 TYPE_OUTLET
+    AnimateGrinder1,        // 36 TYPE_GRINDER1
+    AnimateBelt,            // 37 TYPE_BELT
+    AnimateBelt1,           // 38 TYPE_BELT1
+    0,                      // 39 TYPE_CONVERT_PIPE
+    0,                      // 40 TYPE_DOGE_FALLING2
+    AnimateRockPebble,      // 41 TYPE_ROCK_PEBBLE (geodoge disintegrating)
+    0,                      // 42 TYPE_ELECTRIC_0
+    0,                      // 43 TYPE_INSULATOR
+    AnimateStar,            // 44 TYPE_STAR
+    0,                      // 45 TYPE_STAR_FALLING
+    AnimateStarExplode,     // 46 TYPE_STAR_EXPLODE
+    AnimateRockBonus,       // 47 TYPE_ROCK_BONUS
+    0,                      // 48 TYPE_MOUNT
+    AnimatePitL,            // 49 TYPE_PIT_L
+    AnimatePitR,            // 50 TYPE_PIT_R
+    AnimateBomb,            // 51 TYPE_BOMB
+    AnimateCrackedBrick,    // 52 TYPE_CRACKED_BRICK
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
@@ -330,6 +403,10 @@ const unsigned char PickupCharacter[] = {
     0,                // 46 TYPE_STAR_EXPLODE
     CH_ROCK_BONUS,    // 47 TYPE_ROCK_BONUS
     0,                // 48 TYPE_MOUNT
+    0,                // 49 TYPE_PIT_L
+    0,                // 50 TYPE_PIT_R
+    CH_BOMB,          // 51 TYPE_BOMB
+    0,                // 52 TYPE_CRACKED_BRICK
 
 };
 
@@ -351,6 +428,13 @@ void startCharAnimation(int type, const unsigned char *idx) {
 
         Animate[type] = idx++;
         AnimCount[type] = *idx;
+
+        // extern int lastRockCount;
+        // int speed = 8 - lastRockCount + 1;
+        // if (speed < 1)
+        //     speed = 1;
+        // if (type == TYPE_PIT_L || type == TYPE_PIT_R)
+        //     AnimCount[type] = speed;
     }
 }
 

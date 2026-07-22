@@ -126,10 +126,10 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_14_2),     // 109 CH_MOUNT_D
     CH(CHAR_MAP_14_1),     // 110 CH_MOUNT_L
     CH(CHAR_MAP_13_1),     // 111 CH_MOUNT_R
-    0,                     // 112
-    0,                     // 113
-    0,                     // 114
-    0,                     // 115
+    CH(CHAR_MAP_0_9),      // 112 CH_PIT_L0
+    CH(CHAR_MAP_1_9),      // 113 CH_PIT_R0
+    CH(CHAR_MAP_4_4),      // 114 CH_BOMB
+    CH(CHAR_MAP_8_4),      // 115 CH_CRACKED_BRICK
     0,                     // 116
     0,                     // 117
     0,                     // 118
@@ -147,11 +147,30 @@ const unsigned char *const charSet[] = {
     // "Animated" chars that do not appear on the board but are displayed
     // We do not need these to be < 128
 
-    CH(CHAR_MAP_7_12),    // 128 CH_DOGE_01,
-    CH(CHAR_MAP_8_12),    // 129 CH_DOGE_02,
-    CH(CHAR_MAP_9_5),     // 130 CH_DOGE_03,
-    CH(CHAR_MAP_10_5),    // 131 CH_DOGE_04,
-    CH(CHAR_MAP_14_5),    // 132 CH_DOGE_05,
+    CH(CHAR_MAP_7_12),    // 128 CH_DOGE_01
+    CH(CHAR_MAP_8_12),    // 129 CH_DOGE_02
+    CH(CHAR_MAP_9_5),     // 130 CH_DOGE_03
+    CH(CHAR_MAP_10_5),    // 131 CH_DOGE_04
+    CH(CHAR_MAP_14_5),    // 132 CH_DOGE_05
+                          //
+    CH(CHAR_MAP_3_9),     // 133 CH_PIT_L1
+    CH(CHAR_MAP_4_9),     // 134 CH_PIT_R1
+    CH(CHAR_MAP_6_9),     // 135 CH_PIT_L2
+    CH(CHAR_MAP_7_9),     // 136 CH_PIT_R2
+    CH(CHAR_MAP_9_9),     // 137 CH_PIT_L3
+    CH(CHAR_MAP_10_9),    // 138 CH_PIT_R3
+    CH(CHAR_MAP_12_9),    // 139 CH_PIT_L4
+    CH(CHAR_MAP_13_9),    // 140 CH_PIT_R4
+                          //
+    CH(CHAR_MAP_5_4),     // 141 CH_BOMB_FLASH
+                          //
+    CH(CHAR_MAP_9_4),     // 142 CH_CRACKED_BRICK_1
+    CH(CHAR_MAP_10_4),    // 143 CH_CRACKED_BRICK_2
+    CH(CHAR_MAP_11_4),    // 144 CH_CRACKED_BRICK_3
+    CH(CHAR_MAP_12_4),    // 145 CH_CRACKED_BRICK_4
+    CH(CHAR_MAP_13_4),    // 146 CH_CRACKED_BRICK_5
+    CH(CHAR_MAP_14_4),    // 147 CH_CRACKED_BRICK_6
+    CH(CHAR_MAP_15_4),    // 148 CH_CRACKED_BRICK_7
 
 };
 

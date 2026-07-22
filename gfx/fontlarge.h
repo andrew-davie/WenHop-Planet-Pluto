@@ -5,9 +5,9 @@
 
 #include <stdint.h>
 
-#define FONTLARGE_FONT_HEIGHT 16
-#define FONTLARGE_FONT_FIRST_CHAR 32
-#define FONTLARGE_FONT_CHAR_COUNT 95
+#define FONTLARGE_FONT_HEIGHT      16
+#define FONTLARGE_FONT_FIRST_CHAR  32
+#define FONTLARGE_FONT_CHAR_COUNT  95
 
 extern const unsigned char *const fontlarge_asciiTable[95];
-extern const unsigned char fontlarge_charWidths[95];
+extern const unsigned char  fontlarge_charWidths[95];

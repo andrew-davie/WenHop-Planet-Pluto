@@ -132,9 +132,10 @@ const unsigned char caveUseWall[] = {
 const unsigned char caveNew[] = {
     // clang-format off
 
-    // scroll bounds (TL(x,y), BR(x,y) in trixels)
-    0,0,
-    BOARD_TRIX_X-SCREEN_TRIX_X,BOARD_TRIX_Y - SCREEN_TRIX_Y,
+    // // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    // 0,0,
+    // BOARD_TRIX_X-SCREEN_TRIX_X,BOARD_TRIX_Y - SCREEN_TRIX_Y,
+    7,17,7,17,
 
     20,                             // milling
     10, 15,                         // doge $
@@ -151,7 +152,7 @@ const unsigned char caveNew[] = {
     WEAPON_MACE,                    // 4
 
 //    CAVEDEF_LOCK_Y,
-    0, CH_STEELWALL, CH_BLANK,           // flags, border, fill
+    0, CH_BRICKWALL, CH_BRICKWALL,           // flags, border, fill
 
     // Random objects
 
@@ -208,15 +209,28 @@ const unsigned char caveNew[] = {
     // CH_INSULATOR_TOP, 32,5,
     // CH_INSULATOR_BOTTOM, 32,7,
 
+
+    DRAW_FILLED_RECT, CH_STEELWALL, 1,1,9,8, CH_ROCK,
+
     DRAW_FILLED_RECT, CH_GEODOGE, 30, 2, 10, 5, CH_GEODOGE,
 
-    CH_DOORCLOSED, 38, 5,
-    CH_MELLON_HUSK_BIRTH, 2, 3,
 
-    CH_WYRM_HEAD_U, 38, 2,
+    DRAW_FILLED_RECT, CH_BLANK, 3, 2, 5, 4, CH_BLANK,
+    DRAW_FILLED_RECT, CH_BRICKWALL, 3, 5, 5, 4, CH_STAR,
 
-    CH_INSULATOR_L, 9,5,
-    CH_INSULATOR_R, 18,5,
+    CH_CRACKED_BRICK, 4,5,
+    CH_CRACKED_BRICK, 5,5,
+    CH_CRACKED_BRICK, 6,5,
+
+    // CH_PIT_R0, 4,5,
+    // CH_PIT_L0, 5,5,
+    // CH_PIT_R0, 6,5,
+ 
+    CH_DOOROPEN_0, 5, 6,
+    CH_MELLON_HUSK_BIRTH, 5, 2,
+
+    CH_BOMB,2,7,
+
 
     DRAW_EOF,
 
@@ -241,6 +255,117 @@ const unsigned char caveNew[] = {
     // clang-format on
 };
 
+
+const unsigned char caveNew2[] = {
+    // clang-format off
+
+    // // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    // 0,0,
+    // BOARD_TRIX_X-SCREEN_TRIX_X,BOARD_TRIX_Y - SCREEN_TRIX_Y,
+    7,17,7,17,
+
+    20,                             // milling
+    10, 15,                         // doge $
+    0,                              // shake
+
+     17,  11,  50,  56,  8,         // randomiser[level]
+     30,  12,  12,  12,  12,        // doge req
+    200, 200, 200, 200, 200,
+
+    WEAPON_MACE,                    // 0
+    WEAPON_MACE,                    // 1
+    WEAPON_MACE,                    // 2
+    WEAPON_MACE,                    // 3
+    WEAPON_MACE,                    // 4
+
+//    CAVEDEF_LOCK_Y,
+    0, CH_BRICKWALL, CH_DIRT,           // flags, border, fill
+
+    // Random objects
+
+    3,
+    CH_DIRT,10,20,20,20,20,
+    CH_GEODOGE, 80,40,40,40,40,
+    CH_ROCK, 50,40,40,40,40,
+
+
+    // CH_INSULATOR_L, 4,4,
+    // CH_INSULATOR_R, 8,4,
+    // Start of cave draw
+
+
+    // CH_ROCK_BONUS, 7,3,
+
+    // DRAW_RECT,CH_BRICKWALL, 0,1,40,8,
+
+    // CH_INSULATOR_TOP, 6,2,
+    // CH_INSULATOR_BOTTOM, 6,7,
+
+
+    // CH_INSULATOR_TOP, 11,2,
+    // CH_INSULATOR_BOTTOM, 11,7,
+
+    // CH_BRICKWALL, 14,2,
+    // CH_INSULATOR_TOP, 14,3,
+    // CH_INSULATOR_BOTTOM, 14,6,
+    // CH_BRICKWALL, 14,7,
+
+
+    // CH_INSULATOR_TOP, 17,2,
+    // CH_INSULATOR_BOTTOM, 17,7,
+
+    // CH_BRICKWALL, 20,2,
+    // CH_INSULATOR_TOP, 20,3,
+    // CH_INSULATOR_BOTTOM, 20,6,
+    // CH_BRICKWALL, 20,7,
+
+    // CH_INSULATOR_TOP, 23,2,
+    // CH_INSULATOR_BOTTOM, 23,7,
+
+    // CH_BRICKWALL, 26,2,
+    // CH_INSULATOR_TOP, 26,3,
+    // CH_INSULATOR_BOTTOM, 26,6,
+    // CH_BRICKWALL, 26,7,
+
+    // CH_INSULATOR_TOP, 29,2,
+    // CH_INSULATOR_BOTTOM, 29,7,
+    
+    // CH_BRICKWALL, 32,2,
+    // CH_BRICKWALL, 32,3,
+    // CH_BRICKWALL, 32,4,
+    // CH_INSULATOR_TOP, 32,5,
+    // CH_INSULATOR_BOTTOM, 32,7,
+
+
+    DRAW_RECT, CH_STEELWALL, 1,1,9,8,
+
+    CH_BOMB,5,5,
+    
+    CH_DOOROPEN_0, 5, 6,
+    CH_MELLON_HUSK_BIRTH, 5, 2,
+
+    DRAW_EOF,
+
+    // EXTRAS
+    // LEVEL 0 HERE
+
+    DRAW_EOF,
+
+     // LEVEL 1
+    DRAW_EOF,
+
+    // LEVEL 2
+    DRAW_EOF,
+
+    // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+
+    DRAW_EOF,
+
+    'T', 'E', 'S', 'T', END_STRING
+
+    // clang-format on
+};
 
 const unsigned char caveWyrms[] = {
     // clang-format off
@@ -981,7 +1106,9 @@ void empty() {
 
 const struct caveHandler caveList[] = {
 
-    // {caveNew, none},
+    //    {caveNew2, none},    // GOOD puzzle screen
+
+    {caveNew, none},    // GOOD puzzle screen
 
     // cave definition, condition handler
     {caveUseWall, none},
