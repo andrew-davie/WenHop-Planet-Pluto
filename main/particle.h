@@ -12,6 +12,7 @@ enum ParticleType {
     PT_SPIRAL2,
     PT_BUBBLE,
     PT_STATIC,
+    PT_CHARACTER,
 };
 
 struct Particle {

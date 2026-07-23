@@ -650,7 +650,8 @@ void OS_Skull() {
     interleaveChronoColour(&roller);
     adjustLuminance(1);
 
-    setPFColours((unsigned char *)(RAM + _BUF_SKULL_COLUPF));
+    const unsigned char skullPalette[] = {0x14, 0x16, 0x18};
+    setPFColours(skullPalette, (unsigned char *)(RAM + _BUF_SKULL_COLUPF));
     setPalette(_BUF_SKULL_COLUBK);
 
 

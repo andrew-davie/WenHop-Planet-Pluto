@@ -16,6 +16,7 @@ void draw6Bitmap(unsigned int grpOffset, unsigned int colup0Offset, const unsign
 void drawString(int fontNumber, int colour, int delay, int buffer, int colbuf, const char *string, int y);
 bool drawNextChar();
 
+void drawBitmapChar(int ch, int charX, int charY);
 void drawAttachedChar(int ch);
 
 // EOF

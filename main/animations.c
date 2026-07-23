@@ -348,6 +348,7 @@ const unsigned char *const AnimateBase[] = {
     AnimatePitR,            // 50 TYPE_PIT_R
     AnimateBomb,            // 51 TYPE_BOMB
     AnimateCrackedBrick,    // 52 TYPE_CRACKED_BRICK
+    0,                      // 53 TYPE_CONCRETE
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
@@ -407,6 +408,7 @@ const unsigned char PickupCharacter[] = {
     0,                // 50 TYPE_PIT_R
     CH_BOMB,          // 51 TYPE_BOMB
     0,                // 52 TYPE_CRACKED_BRICK
+    0,                // 53 TYPE_CONCRETE
 
 };
 

@@ -533,6 +533,19 @@ void blitShape(int ch, int shift, int y, int offset) {
     }
 }
 
+
+void drawBitmapChar(int ch, int x, int y) {
+
+    if (y + CHAR_Y >= 0 && y < _SCANLINES && x > -8 && x < 40) {
+        if (x > -8 && x < 20)
+            blitShape(ch, x, y, _BUF_GAME_PF0_LEFT);
+
+        if (x > 12 && x < 40)
+            blitShape(ch, x - 20, y, _BUF_GAME_PF0_RIGHT);
+    }
+}
+
+
 void drawAttachedChar(int ch) {
 
     ch = GET(ch);

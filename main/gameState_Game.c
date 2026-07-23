@@ -209,13 +209,14 @@ void OS_Game() {
 
     (*caveList[cave].handler)();
 
-    if (gameSchedule != SCHEDULE_UNPACK_CAVE)
+    if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
         drawScreen();
+        setPFColours(theCave->palette, (unsigned char *)(RAM + _BUF_GAME_COLUPF));
+    }
 
     getJoystick();
     bufferedSWCHA &= swcha;    // | inhibitSWCHA;
 
-    setPFColours((unsigned char *)(RAM + _BUF_GAME_COLUPF));
 
     // scheduledTasks() used to be called here -- gets the LEAST time of the two calls, because
     // drawScreen() above has already used ~78K of this phase's budget. Now dispatched generically by

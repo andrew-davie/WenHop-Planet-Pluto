@@ -14,12 +14,13 @@
 #define LINER(char, x, y, length, direction) DRAW_LINE, char, x, y, direction, length,
 
 
-const unsigned char caveUseWall[] = {
+const unsigned char P1_caveUseWall[] = {
     // clang-format off
 
     // scroll bounds (TL(x,y), BR(x,y) in trixels)
     3,17,
     BOARD_TRIX_X-SCREEN_TRIX_X-3,17,
+    0x46, 0xE8, 0xEA,               // palette
 
     20,                             // milling
     10, 15,                         // doge $
@@ -44,6 +45,7 @@ const unsigned char caveUseWall[] = {
     CH_DIRT,10,20,20,20,20,
     CH_GEODOGE, 80,40,40,40,40,
     CH_ROCK, 50,40,40,40,40,
+
 
 
     CH_INSULATOR_L, 4,4,
@@ -103,6 +105,9 @@ const unsigned char caveUseWall[] = {
     CH_INSULATOR_L, 9,5,
     CH_INSULATOR_R, 18,5,
 
+
+    DRAW_RECT, CH_CONCRETE, 1,1,1,12,
+
     DRAW_EOF,
 
     // EXTRAS
@@ -129,13 +134,12 @@ const unsigned char caveUseWall[] = {
 
 //------------------------------------------------------------------------------
 
-const unsigned char caveNew[] = {
+const unsigned char P0_caveNew[] = {
     // clang-format off
 
-    // // scroll bounds (TL(x,y), BR(x,y) in trixels)
-    // 0,0,
-    // BOARD_TRIX_X-SCREEN_TRIX_X,BOARD_TRIX_Y - SCREEN_TRIX_Y,
     7,17,7,17,
+
+    0x98, 0x26, 0xC6,               // palette
 
     20,                             // milling
     10, 15,                         // doge $
@@ -367,11 +371,12 @@ const unsigned char caveNew2[] = {
     // clang-format on
 };
 
-const unsigned char caveWyrms[] = {
+const unsigned char P2_caveWyrms[] = {
     // clang-format off
 
     // scroll bounds (TL(x,y), BR(x,y) in trixels)
     7,17,7,17,
+    0xD6, 0x44, 0x76,               // palette
 
 
     20,     // milling
@@ -896,11 +901,12 @@ const unsigned char caveA3[] = {
 };
 
 
-const unsigned char starsAndStripes[] = {
+const unsigned char P3_starsAndStripes[] = {
     // clang-format off
 
     // scroll bounds (TL(x,y), BR(x,y) in trixels)
     7,17,7,17,
+    0x26, 0xB6, 0x54,               // palette
 
     20,                             // milling
     1, 15,                          // doge $
@@ -1006,11 +1012,12 @@ const unsigned char starsAndStripes[] = {
 };
 
 
-const unsigned char caveA4[] = {
+const unsigned char P4_caveA4[] = {
     // clang-format off
 
     // scroll bounds (TL(x,y), BR(x,y) in trixels)
     43,17,BOARD_TRIX_X-SCREEN_TRIX_X-53,17,
+    0xA6, 0x16, 0xD6,               // palette
 
     20,    // milling
     1, 15, // doge $
@@ -1106,15 +1113,31 @@ void empty() {
 
 const struct caveHandler caveList[] = {
 
+
+    // PLANET 0
+    {P0_caveNew, none},    // GOOD puzzle screen
+
+    // PLANET 1
+    {P1_caveUseWall, none},    //
+
+    // PLANET 2
+    {P2_caveWyrms, empty},    //
+
+    // PLANET 3
+    {P3_starsAndStripes, spec},    //
+    // PLANET 4
+    // PLANET 5
+    // PLANET 6
+    // PLANET 7
+    // PLANET 8
+    // PLANET 9
+
+
     //    {caveNew2, none},    // GOOD puzzle screen
 
-    {caveNew, none},    // GOOD puzzle screen
 
     // cave definition, condition handler
-    {caveUseWall, none},
-    {caveWyrms, empty},
-    {starsAndStripes, spec},
-    {caveA4, none},
+    {P4_caveA4, none},
 };
 
 const int caveCount = sizeof(caveList) / sizeof(caveList[0]);

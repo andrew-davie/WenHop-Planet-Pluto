@@ -617,6 +617,11 @@ void movePlayer(BoardCursor *cur) {
 
     if (drop) {
 
+        if (GET(attachment) == CH_ROCK)
+            attachment = CH_ROCK_FALLING;
+        if (GET(attachment) == CH_GEODOGE)
+            attachment = CH_GEODOGE_FALLING;
+
 
         if (GET(attachment) == CH_BOMB) {
             extern const unsigned char AnimateBomb[];
@@ -629,10 +634,11 @@ void movePlayer(BoardCursor *cur) {
         waitRelease = true;
         attachment = 0;
 
-
         return;
     }
 
+    if (rockShaker)
+        rockShaker--;
 
     if (pulsePlayerColour) {
         nDots(2, playerX, playerY, PT_ONE, 25, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 100, 7);

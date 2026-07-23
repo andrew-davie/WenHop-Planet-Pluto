@@ -48,7 +48,13 @@ static int decodeFlasher;
 static int last_prng_a;
 static int last_prng_b;
 
+static unsigned int savedTruePrngA;
+static unsigned int savedTruePrngB;
+
 void decodeCave(int newCave) {
+
+    savedTruePrngA = prng_a;
+    savedTruePrngB = prng_b;
 
     theCave = (struct CAVE_DEFINITION *)caveList[newCave].cave;
 
@@ -282,6 +288,11 @@ int decodeExplicitData() {
     last_prng_b = prng_b;
 
     return decodeFlasher;
+}
+
+void restoreTrueRandom() {
+    prng_a = savedTruePrngA;
+    prng_b = savedTruePrngB;
 }
 
 void StoreObject(int x, int y, objectType anObject) {

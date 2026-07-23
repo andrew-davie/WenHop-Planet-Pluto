@@ -114,19 +114,19 @@ void fadeBackgroundColour() {
     }
 }
 
-const unsigned char pfColour[] = {0xA8, 0x28, 0xC8, 0xC8};    //{0x88, 0x28, 0xD8, 0xD8};
+// const unsigned char pfColour[] = {0xA8, 0x28, 0xC8, 0xC8};    //{0x88, 0x28, 0xD8, 0xD8};
 
-void setPFColours(unsigned char *colours) {
+void setPFColours(const unsigned char *palette, unsigned char *colourBuffer) {
 
     unsigned char pfConvertedColour[3];
     for (int i = 0; i < 3; i++)
-        pfConvertedColour[i] = convertColour(pfColour[i]);
+        pfConvertedColour[i] = convertColour(palette[i]);
 
 
     for (int i = 0; i < _SCANLINES; i++) {
         if (++roller > 2)
             roller = 0;
-        colours[i] = pfConvertedColour[roller];
+        colourBuffer[i] = pfConvertedColour[roller];
     }
 }
 

@@ -14,7 +14,7 @@ enum WEAPON {
 struct CAVE_DEFINITION {
 
     unsigned char bounds_l, bounds_t, bounds_r, bounds_b;
-
+    unsigned char palette[3];
 
     unsigned char millingTime;
     unsigned char dogeValue;
@@ -39,6 +39,7 @@ extern struct CAVE_DEFINITION *theCave;
 
 void decodeCave(int cave);
 int decodeExplicitData();
+void restoreTrueRandom();
 
 enum DECODE_STATE {
     DECODE_NONE,

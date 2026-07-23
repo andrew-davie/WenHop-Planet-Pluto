@@ -30,6 +30,9 @@ static int selectorCounter;
 static int waterDir;
 static int explodeCount;
 static int explodeRadius;
+static int lastRockCount;
+static int rockCount;
+
 
 // init'd locally
 static int conveyorDirection;
@@ -104,6 +107,7 @@ static const int isActive[] = {
 
 void initBoard() {
 
+    rockCount = lastRockCount = 0;
     selectorCounter = 0;
     waterDir = 0;
     explodeCount = 0;
@@ -112,10 +116,6 @@ void initBoard() {
     activeStar = lastActiveStar = 0;
     single = false;
 }
-
-
-int lastRockCount;
-int rockCount;
 
 
 void setupBoardScanner() {
@@ -351,10 +351,13 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
             shakeTime = 50;
             FLASH(0x48, 30);
             ADDAUDIO(SFX_EXPLODE);
-            explode(cur->me, CH_ROCK);
+            explode(cur->me, CH_DUST_ROCK_0);
 
 
         } else
+
+            // if (!rangeRandom(30))
+            // nDots(1, cur->col, cur->row, PT_CHARACTER, 30, CHAR_CENTER_X, CHAR_CENTER_Y, 2500, CH_RUBBLE);
 
 
             nDots(2, cur->col, cur->row, PT_SPIRAL, 10, 4, 1, rangeRandom(50) + 20, 1 + (getRandom32() & 2));
@@ -365,6 +368,11 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
         //    case TYPE_PIT_L:
         //    case TYPE_PIT_R: {
+
+        if (rockShaker) {
+            shakeTime++;
+        }
+
 
         int rchar = lastRockCount;
         if (rchar > 7)
@@ -385,14 +393,12 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         else {
 
             // int dots = rchar;
-            if (lastRockCount != 0) {
-                for (int i = 0; i < lastRockCount; i++) {
-                    if (!rangeRandom(10)) {
-                        int idx = nDots(1, cur->col, cur->row, PT_TWO, rangeRandom(30) + 20, rangeRandom(CHAR_TRIX_X),
-                                        2, 30, 7);
-                        if (idx >= 0)
-                            particle[idx].dir = 0;
-                    }
+            if (rockShaker && lastRockCount != 0) {
+                for (int i = 0; i < 3; i++) {
+                    int idx = nDots(1, cur->col, cur->row, PT_TWO, rangeRandom(20) + 20, rangeRandom(CHAR_TRIX_X), 2,
+                                    15 + rangeRandom(5), (getRandom32() & 1) ? 1 : 7);
+                    if (idx >= 0)
+                        particle[idx].dir = 0;
                 }
             }
 
@@ -1163,6 +1169,20 @@ void processFallingThings(unsigned char *me, int row, int col, unsigned char cre
         }
     } else {
 
+        // TODO: inefficient -fix
+        unsigned char *ratt = me;
+        int type = CharToType[(GET(*ratt))];
+        while (type == TYPE_ROCK || type == TYPE_GEODOGE || type == TYPE_ROCK_FALLING ||
+               type == TYPE_GEODOGE_FALLING) {    // todo: use attribute
+            ratt += _BOARD_COLS;
+            if (CharToType[GET(*ratt)] == TYPE_CRACKED_BRICK) {
+                rockShaker = 2;
+                break;
+            }
+            type = CharToType[GET(*ratt)];
+        }
+
+
         // stop falling
         unsigned char sfx = 0;
         int att = ATTRIBUTE(*next);
@@ -1357,8 +1377,8 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 
     int offset[] = {-_BOARD_COLS - 1, -_BOARD_COLS, -_BOARD_COLS + 1, -1, 1,
                     _BOARD_COLS - 1,  _BOARD_COLS,  _BOARD_COLS + 1,  0};
-    int shape[] = {CH_BLANK, explosionShape, CH_BLANK, explosionShape, explosionShape,
-                   CH_BLANK, explosionShape, CH_BLANK, explosionShape};
+    int shape[] = {explosionShape, explosionShape, explosionShape, explosionShape, explosionShape,
+                   explosionShape, explosionShape, explosionShape, explosionShape};
 
 
     for (int i = 0; i < (int)(sizeof(offset) / sizeof(offset[0])); i++) {

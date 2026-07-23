@@ -127,7 +127,7 @@ const enum ObjectType CharToType[] = {
     TYPE_PIT_R,                    // 112 CH_PIT_R0
     TYPE_BOMB,                     // 114 CH_BOMB
     TYPE_CRACKED_BRICK,            // 115 CH_CRACKED_BRICK
-    0,                             // 116
+    TYPE_CONCRETE,                 // 116 CH_CONCRETE
     0,                             // 117
     0,                             // 118
     0,                             // 119
@@ -143,34 +143,36 @@ const enum ObjectType CharToType[] = {
     // chars 128 onwards are virtual
     // THESE SHOULD NOT BE CALLING CharToType !!!!
 
-    TYPE_DOGE,             // 128 CH_DOGE_01
-    TYPE_DOGE,             // 129 CH_DOGE_02
-    TYPE_DOGE,             // 130 CH_DOGE_03
-    TYPE_DOGE,             // 131 CH_DOGE_04
-    TYPE_DOGE,             // 132 CH_DOGE_05
-                           //
-    TYPE_PIT_L,            // 133 CH_PIT_L1
-    TYPE_PIT_R,            // 134 CH_PIT_R1
-    TYPE_PIT_L,            // 135 CH_PIT_L2
-    TYPE_PIT_R,            // 136 CH_PIT_R2
-    TYPE_PIT_L,            // 137 CH_PIT_L3
-    TYPE_PIT_R,            // 138 CH_PIT_R3
-    TYPE_PIT_L,            // 139 CH_PIT_L4
-    TYPE_PIT_R,            // 140 CH_PIT_R4
-                           //
-    TYPE_BOMB,             // 141 CH_BOMB_FLASH
-                           //
-    TYPE_CRACKED_BRICK,    // 142 CH_CRACKED_BRICK_1
-    TYPE_CRACKED_BRICK,    // 143 CH_CRACKED_BRICK_1
-    TYPE_CRACKED_BRICK,    // 144 CH_CRACKED_BRICK_1
-    TYPE_CRACKED_BRICK,    // 145 CH_CRACKED_BRICK_1
-    TYPE_CRACKED_BRICK,    // 146 CH_CRACKED_BRICK_1
-    TYPE_CRACKED_BRICK,    // 147 CH_CRACKED_BRICK_1
-    TYPE_CRACKED_BRICK,    // 148 CH_CRACKED_BRICK_1
+    // TYPE_DOGE,             // 128 CH_DOGE_01
+    // TYPE_DOGE,             // 129 CH_DOGE_02
+    // TYPE_DOGE,             // 130 CH_DOGE_03
+    // TYPE_DOGE,             // 131 CH_DOGE_04
+    // TYPE_DOGE,             // 132 CH_DOGE_05
+    //                        //
+    // TYPE_PIT_L,            // 133 CH_PIT_L1
+    // TYPE_PIT_R,            // 134 CH_PIT_R1
+    // TYPE_PIT_L,            // 135 CH_PIT_L2
+    // TYPE_PIT_R,            // 136 CH_PIT_R2
+    // TYPE_PIT_L,            // 137 CH_PIT_L3
+    // TYPE_PIT_R,            // 138 CH_PIT_R3
+    // TYPE_PIT_L,            // 139 CH_PIT_L4
+    // TYPE_PIT_R,            // 140 CH_PIT_R4
+    //                        //
+    // TYPE_BOMB,             // 141 CH_BOMB_FLASH
+    //                        //
+    // TYPE_CRACKED_BRICK,    // 142 CH_CRACKED_BRICK_1
+    // TYPE_CRACKED_BRICK,    // 143 CH_CRACKED_BRICK_1
+    // TYPE_CRACKED_BRICK,    // 144 CH_CRACKED_BRICK_1
+    // TYPE_CRACKED_BRICK,    // 145 CH_CRACKED_BRICK_1
+    // TYPE_CRACKED_BRICK,    // 146 CH_CRACKED_BRICK_1
+    // TYPE_CRACKED_BRICK,    // 147 CH_CRACKED_BRICK_1
+    // TYPE_CRACKED_BRICK,    // 148 CH_CRACKED_BRICK_1
+    //                        //
+    // TYPE_BLANK,            // null 149 CH_RUBBLE
 
 };
 
-_Static_assert(sizeof(CharToType) / sizeof(CharToType[0]) == CH_MAX, "CharToType table wrong size");
+//_Static_assert(sizeof(CharToType) / sizeof(CharToType[0]) == CH_MAX, "CharToType table wrong size");
 
 
 enum AttributeAlias {
@@ -269,6 +271,7 @@ const unsigned int Attribute[] = {
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _ | _  , // 49 TYPE_PIT_R
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 49 TYPE_BOMB
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _ | _  , // 49 TYPE_CRACKED_BRICK
+    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ |XPD| _ | _ |ROL| _  , // 03 TYPE_CONCRETE
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|----+
 
     // clang-format on

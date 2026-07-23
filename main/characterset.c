@@ -130,7 +130,7 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_1_9),      // 113 CH_PIT_R0
     CH(CHAR_MAP_4_4),      // 114 CH_BOMB
     CH(CHAR_MAP_8_4),      // 115 CH_CRACKED_BRICK
-    0,                     // 116
+    CH(CHAR_MAP_0_3),      // 116 CH_CONCRETE
     0,                     // 117
     0,                     // 118
     0,                     // 119
@@ -171,6 +171,14 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_13_4),    // 146 CH_CRACKED_BRICK_5
     CH(CHAR_MAP_14_4),    // 147 CH_CRACKED_BRICK_6
     CH(CHAR_MAP_15_4),    // 148 CH_CRACKED_BRICK_7
+                          //
+    CH(CHAR_MAP_3_11),    // 149 CH_RUBBLE
+
+    CH(CHAR_MAP_0_16),    // 150 CH_A
+    CH(CHAR_MAP_1_16),    // 151 CH_B
+    CH(CHAR_MAP_2_16),    // 152 CH_C
+    CH(CHAR_MAP_3_16),    // 153 CH_D
+    CH(CHAR_MAP_4_16),    // 154 CH_E
 
 };
 

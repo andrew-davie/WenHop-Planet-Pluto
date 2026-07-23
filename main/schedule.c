@@ -31,6 +31,8 @@ void scheduleUnpackCave() {
 
             setSchedule(SCHEDULE_START_SCAN);
 
+            restoreTrueRandom();
+
 #if ENABLE_SWIPE
             // Decode is genuinely finished now (not just "this object's
             // done, more to come" -- decodeExplicitData() returned false,

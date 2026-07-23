@@ -101,7 +101,7 @@ extern bool playerDead;
 extern int gameFrame;
 
 extern unsigned int availableIdleTime;
-
+extern int rockShaker;
 extern int pulsePlayerColour;
 
 #if ENABLE_SHAKE

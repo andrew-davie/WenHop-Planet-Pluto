@@ -169,7 +169,8 @@ void VB_Copyright() {
         lumTarget = -15;
 
         if (luminance == lumTarget)
-            setGameState(GS_COUCH_COMPLIANT);
+            // setGameState(GS_COUCH_COMPLIANT);
+            setGameState(GS_GAME);
 
         RAM[_SK_RESET] = 0;    // superfluous when singleton
     }

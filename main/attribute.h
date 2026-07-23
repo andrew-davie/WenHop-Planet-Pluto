@@ -60,6 +60,8 @@ enum ObjectType {
     TYPE_PIT_R,                    // 50
     TYPE_BOMB,                     // 51
     TYPE_CRACKED_BRICK,            // 52
+    TYPE_CONCRETE,                 // 53
+
 
     TYPE_MAX
 };
@@ -189,6 +191,7 @@ enum ChName {
     CH_PIT_R0,                    // 113
     CH_BOMB,                      // 114
     CH_CRACKED_BRICK,             // 115
+    CH_CONCRETE,                  // 116
 
     // 127 is limit of board-resident character numbers
 
@@ -219,6 +222,15 @@ enum ChName {
     CH_CRACKED_BRICK_5,    // 146
     CH_CRACKED_BRICK_6,    // 147
     CH_CRACKED_BRICK_7,    // 148
+                           //
+    CH_RUBBLE,             // 149
+
+
+    CH_A,    // 150
+    CH_B,    // 151
+    CH_C,    // 152
+    CH_D,    // 153
+    CH_E,    // 154
 
     CH_MAX
 };

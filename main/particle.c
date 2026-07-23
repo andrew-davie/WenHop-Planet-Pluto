@@ -8,6 +8,7 @@
 #include "T1TC.h"
 #include "attribute.h"
 #include "decodeCaves.h"
+#include "draw.h"
 #include "drawScreen.h"
 #include "main.h"
 #include "mellon.h"
@@ -221,7 +222,7 @@ void drawMace() {
 
     } else {
         if (tool[0].dir == wantedDirection)
-            wantedDirection = getRandom32();
+            wantedDirection += rangeRandom(7) - 3;    // getRandom32();
         tool[0].dir = turn_toward(tool[0].dir, wantedDirection, 4);
     }
 
@@ -372,7 +373,7 @@ void drawRope() {
     static int wantedDirection = 0;
 
     if (tool[0].dir == wantedDirection)
-        wantedDirection = rangeRandom(256);
+        wantedDirection += rangeRandom(256);
 
     else if (wantedDirection > tool[0].dir)
         tool[0].dir += ((wantedDirection - tool[0].dir) >> 2) + 1;
@@ -423,14 +424,27 @@ void drawParticles() {
 
             switch (particle[i].type) {
 
-            case PT_TWO: {
+            case PT_CHARACTER:
+                x = (particle[i].x + 2 * xOffset) >> 8;
+                x -= (scrollX >> 16) + CHAR_TRIX_X;
+                y -= (scrollY >> 16) - CHAR_CENTER_Y;
+                y -= CHAR_CENTER_Y;
 
+                drawBitmapChar(particle[i].colour, x, y * 3);
+
+                if (!--particle[i].age)
+                    pushParticle(i);
+                else
+                    particle[i].distance += particle[i].speed;
+                continue;
+
+
+            case PT_TWO: {
                 break;
             }
 
             case PT_SPIRAL2:
             case PT_SPIRAL: {
-
                 particle[i].dir += PARTICLE_SPIRAL_ANGULAR_SPEED;
 
                 if (!rangeRandom(250))
@@ -439,7 +453,6 @@ void drawParticles() {
             }
 
             case PT_BUBBLE: {
-
                 if (y < lavaSurfaceTrixel) {
                     particle[i].age = 0;
                     continue;
@@ -509,9 +522,11 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
 int nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed,
           unsigned char colour) {
 
+    // Note: if type == PT_CHARACTER, then colour = CH_* name
+
     int lastIdx = -1;
-    if (gravity < 0)
-        offsetY = CHAR_TRIX_Y - offsetY;
+    // if (gravity < 0)
+    //     offsetY = CHAR_TRIX_Y - offsetY;
 
     for (int i = 0; i < count; i++) {
         int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, colour);

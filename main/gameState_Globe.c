@@ -324,7 +324,7 @@ void VB_Globe() {
     sound_max_volume = approach(sound_max_volume, nsv, 1);
 
     getJoystick();
-    if (finished)    //!(inpt4 & 0x80) || finished)
+    if (finished | !(inpt4 & 0x80))
         setGameState(GS_GAME);
 }
 

@@ -77,7 +77,7 @@ void initKernel_Menu() {
         showCave = 0;
 
     cave = showCave;
-    level = 4;    // tmp;
+    level = 0;
 
     colubk = 0;
 
@@ -167,7 +167,8 @@ void OS_Menu() {
     interleaveChronoColour(&roller);
     adjustLuminance(1);
 
-    setPFColours((unsigned char *)(RAM + _BUF_MENU_COLUPF));
+    const unsigned char pfColour[] = {0xA8, 0x28, 0xC8, 0xC8};    //{0x88, 0x28, 0xD8, 0xD8};
+    setPFColours(pfColour, (unsigned char *)(RAM + _BUF_MENU_COLUPF));
     //    drawScreenMirror(_BUF_MENU_PF);
 
     drawPF(_BUF_MENU_PF, gfx_image_WenHop_png);

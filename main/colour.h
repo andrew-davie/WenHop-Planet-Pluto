@@ -12,7 +12,7 @@ void pulseBackgroundColour(unsigned char colour, int time);
 
 void interleaveChronoColour(int *r);
 unsigned char convertColour(unsigned char colour);
-void setPFColours(unsigned char *colours);
+void setPFColours(const unsigned char *palette, unsigned char *colourBuffer);
 void setPalette(int buf);
 void loadPalette();
 void adjustLuminance(int speed);
