@@ -41,7 +41,16 @@ unsigned int getRandom32() {
 }
 
 unsigned int rangeRandom(int range) {
-    return ((getRandom32() >> 16) * range) >> 16;
+
+    // getRandom32() is (prng_b << 16) + prng_a -- reading ">> 16" alone
+    // means every draw depends almost entirely on prng_b, and barely at all
+    // on prng_a (only via the rare add-carry crossing bit 16). Confirmed on
+    // hardware: prng_a's half visibly varies across resets, prng_b's half
+    // doesn't. XOR-folding the low half into the high half before reading it
+    // means a draw varies whenever EITHER half varies, not just prng_b's.
+    unsigned int v = getRandom32();
+    v ^= v << 16;
+    return ((v >> 16) * range) >> 16;
 }
 
 // EOF
