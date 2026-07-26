@@ -135,7 +135,8 @@ const unsigned char P1_caveUseWall[] = {
 const unsigned char cavetest[] = {
     // clang-format off
 
-    0,0,_BOARD_COLS,_BOARD_ROWS,
+    // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,
 
     0x98, 0x26, 0xC6,               // palette
 
