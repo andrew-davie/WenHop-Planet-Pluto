@@ -298,6 +298,8 @@ void initGameState_Globe() {
     lumTarget = 0;
     frame = 0;
 
+    waitRelease = true;
+
     for (unsigned int i = 0; i < PHRASE_COUNT; i++)
         seen[i] = false;
 
@@ -324,7 +326,11 @@ void VB_Globe() {
     sound_max_volume = approach(sound_max_volume, nsv, 1);
 
     getJoystick();
-    if (finished | !(inpt4 & 0x80))
+
+    if (inpt4 & 0x80)
+        waitRelease = false;
+
+    if (finished | (!waitRelease && !(inpt4 & 0x80)))
         setGameState(GS_GAME);
 }
 

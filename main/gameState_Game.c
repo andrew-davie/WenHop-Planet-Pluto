@@ -88,7 +88,7 @@ void initGameState_Game() {
 
     decodeCave(cave);    // TODO: in initNextLife instead
 
-    displayFloatingString(5, 52, 100, "PLANETX");
+    displayFloatingString(5, 52, 100, "PlanetX");
 
 
     luminance = -15;
@@ -188,8 +188,8 @@ void VB_Game() {
 
         if (!maskNeeded) {
             drawMace();
-            drawRope();
-            drawGun();
+            // drawRope();
+            // drawGun();
 
             drawFloatingChars();
             drawParticles();

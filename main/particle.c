@@ -391,6 +391,7 @@ static unsigned char particleStack[PARTICLE_COUNT];    // PARTICLE_COUNT (42) < 
 static int particleStackPointer;
 
 void pushParticle(int prt) {
+    particle[prt].age = 0;
     particleStack[particleStackPointer++] = prt;
 }
 
@@ -403,7 +404,7 @@ void initParticles() {
 
     particleStackPointer = 0;
     for (int i = 0; i < PARTICLE_COUNT; i++) {
-        particle[i].age = 0;
+        //        particle[i].age = 0;
         pushParticle(i);
     }
 }
@@ -414,7 +415,7 @@ void removeFloatingChars() {
     for (int i = 0; i < PARTICLE_COUNT; i++) {
         if (particle[i].type == PT_CHARACTER)
             pushParticle(i);
-        particle[i].age = 0;
+        //        particle[i].age = 0;
     }
 }
 
@@ -424,10 +425,7 @@ void drawFloatingChars() {
     for (int i = PARTICLE_COUNT - 1; i >= 0; i--) {
         if (particle[i].type == PT_CHARACTER && particle[i].age) {
 
-            int x = particle[i].x >> 8;
-            int y = particle[i].y >> 8;
-
-            drawBitmapChar(particle[i].colour, x, y * 3);
+            drawBitmapChar(particle[i].colour, (particle[i].x >> 8), (particle[i].y >> 8) * 3);
 
             if (particle[i].age < 255 && !--particle[i].age)
                 pushParticle(i);
@@ -495,7 +493,7 @@ void drawParticles() {
             }
 
             if (!drawBit(x, y, particle[i].colour)) {
-                particle[i].age = 0;
+                // particle[i].age = 0;
                 pushParticle(i);
             }
 

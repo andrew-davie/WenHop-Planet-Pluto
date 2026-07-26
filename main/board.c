@@ -155,17 +155,47 @@ void displayFloatingNumber(int trixX, int trixY, int age, int value) {
 }
 
 
-void displayFloatingString(int x, int y, int age, char *s) {
+int widthOf(char ch) {
 
     const unsigned char charWidth[] = {
 
         4, 4, 4, 4, 4, 4, 4, 4, 2, 5, 5, 2, 6, 4, 4, 4, 5, 4, 4, 3, 4, 4, 6, 4, 4, 4,
     };
 
+    const unsigned char charCapsWidth[] = {
+
+        4, 4, 4, 4, 4, 4, 4, 4, 2, 5, 5, 4, 6, 5, 4, 4, 5, 4, 4, 4, 4, 4, 6, 4, 4, 4,
+    };
+
+    if (ch >= 'A' && ch <= 'Z')
+        return charCapsWidth[ch - 'A'];
+
+    else if (ch >= 'a' && ch <= 'z')
+        return charWidth[ch - 'a'];
+
+    else
+        return 4;
+}
+
+
+char convt(char ch) {
+
+    if (ch >= 'A' && ch <= 'Z')
+        return CH_CAP_A + ch - 'A';
+
+    else if (ch >= 'a' && ch <= 'z')
+        return CH_A + ch - 'a';
+
+    return ch;
+}
+
+void displayFloatingString(int x, int y, int age, char *s) {
+
+
     int len = 0;
     char *w = s;
     while (*w) {
-        len += charWidth[*w - 'A'];
+        len += widthOf(*w);
         w++;
     }
 
@@ -174,9 +204,8 @@ void displayFloatingString(int x, int y, int age, char *s) {
 
 
     while (*s) {
-        int c = *s - 'A';
-        floatingCharacter(x, y, age, CH_A + *s - 'A');
-        x += charWidth[c];
+        floatingCharacter(x, y, age, convt(*s));
+        x += widthOf(*s);
         s++;
     }
 }
@@ -208,7 +237,7 @@ void setupBoardScanner() {
                 int y = playerY * CHAR_TRIX_Y - (scrollY >> 16) - CHAR_TRIX_Y;
                 int x = playerX * CHAR_TRIX_X - (scrollX >> 16) + CHAR_CENTER_X;
 
-                displayFloatingNumber(x, y, 60, convertedGeodoge);
+                displayFloatingNumber(x, y, 40, convertedGeodoge);
             }
 
             convertedGeodoge = 0;

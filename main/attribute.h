@@ -263,6 +263,36 @@ enum ChName {
     CH_Y,    // 184
     CH_Z,    // 185
 
+    CH_CAP_A,    // 186
+    CH_CAP_B,    // 187
+    CH_CAP_C,    // 188
+    CH_CAP_D,    // 189
+    CH_CAP_E,    // 190
+    CH_CAP_F,    // 191
+    CH_CAP_G,    // 192
+    CH_CAP_H,    // 193
+    CH_CAP_I,    // 194
+    CH_CAP_J,    // 195
+    CH_CAP_K,    // 196
+    CH_CAP_L,    // 197
+    CH_CAP_M,    // 198
+    CH_CAP_N,    // 199
+    CH_CAP_O,    // 200
+    CH_CAP_P,    // 201
+    CH_CAP_Q,    // 202
+    CH_CAP_R,    // 203
+    CH_CAP_S,    // 204
+    CH_CAP_T,    // 205
+    CH_CAP_U,    // 206
+    CH_CAP_V,    // 207
+    CH_CAP_W,    // 208
+    CH_CAP_X,    // 209
+    CH_CAP_Y,    // 210
+    CH_CAP_Z,    // 211
+
+    CH_PLUS,    // 212
+
+
     CH_MAX
 };
 

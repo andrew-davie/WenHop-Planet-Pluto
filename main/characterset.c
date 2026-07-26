@@ -191,28 +191,56 @@ const unsigned char *const charSet[] = {
     CH2(CHAR_MAP_0to9_2_3),    // 162 CH_C
     CH2(CHAR_MAP_0to9_3_3),    // 163 CH_D
     CH2(CHAR_MAP_0to9_4_3),    // 164 CH_E
-    CH2(CHAR_MAP_0to9_5_3),    // 160 CH_F
-    CH2(CHAR_MAP_0to9_6_3),    // 161 CH_G
-    CH2(CHAR_MAP_0to9_7_3),    // 162 CH_H
-    CH2(CHAR_MAP_0to9_8_3),    // 163 CH_I
-    CH2(CHAR_MAP_0to9_9_3),    // 164 CH_J
-    CH2(CHAR_MAP_0to9_0_4),    // 160 CH_K
-    CH2(CHAR_MAP_0to9_1_4),    // 161 CH_L
-    CH2(CHAR_MAP_0to9_2_4),    // 162 CH_M
-    CH2(CHAR_MAP_0to9_3_4),    // 163 CH_N
-    CH2(CHAR_MAP_0to9_4_4),    // 164 CH_O
-    CH2(CHAR_MAP_0to9_5_4),    // 160 CH_P
-    CH2(CHAR_MAP_0to9_6_4),    // 161 CH_Q
-    CH2(CHAR_MAP_0to9_7_4),    // 162 CH_R
-    CH2(CHAR_MAP_0to9_8_4),    // 163 CH_S
-    CH2(CHAR_MAP_0to9_9_4),    // 164 CH_T
-    CH2(CHAR_MAP_0to9_0_5),    // 160 CH_U
-    CH2(CHAR_MAP_0to9_1_5),    // 161 CH_V
-    CH2(CHAR_MAP_0to9_2_5),    // 162 CH_W
-    CH2(CHAR_MAP_0to9_3_5),    // 163 CH_X
-    CH2(CHAR_MAP_0to9_4_5),    // 164 CH_Y
-    CH2(CHAR_MAP_0to9_5_5),    // 164 CH_Z
+    CH2(CHAR_MAP_0to9_5_3),    // 165 CH_F
+    CH2(CHAR_MAP_0to9_6_3),    // 166 CH_G
+    CH2(CHAR_MAP_0to9_7_3),    // 167 CH_H
+    CH2(CHAR_MAP_0to9_8_3),    // 168 CH_I
+    CH2(CHAR_MAP_0to9_9_3),    // 169 CH_J
+    CH2(CHAR_MAP_0to9_0_4),    // 170 CH_K
+    CH2(CHAR_MAP_0to9_1_4),    // 171 CH_L
+    CH2(CHAR_MAP_0to9_2_4),    // 172 CH_M
+    CH2(CHAR_MAP_0to9_3_4),    // 173 CH_N
+    CH2(CHAR_MAP_0to9_4_4),    // 174 CH_O
+    CH2(CHAR_MAP_0to9_5_4),    // 175 CH_P
+    CH2(CHAR_MAP_0to9_6_4),    // 176 CH_Q
+    CH2(CHAR_MAP_0to9_7_4),    // 177 CH_R
+    CH2(CHAR_MAP_0to9_8_4),    // 178 CH_S
+    CH2(CHAR_MAP_0to9_9_4),    // 179 CH_T
+    CH2(CHAR_MAP_0to9_0_5),    // 180 CH_U
+    CH2(CHAR_MAP_0to9_1_5),    // 181 CH_V
+    CH2(CHAR_MAP_0to9_2_5),    // 182 CH_W
+    CH2(CHAR_MAP_0to9_3_5),    // 183 CH_X
+    CH2(CHAR_MAP_0to9_4_5),    // 184 CH_Y
+    CH2(CHAR_MAP_0to9_5_5),    // 185 CH_Z
 
+    CH2(CHAR_MAP_0to9_0_7),    // 186 CH_A
+    CH2(CHAR_MAP_0to9_1_7),    // 187 CH_B
+    CH2(CHAR_MAP_0to9_2_7),    // 188 CH_C
+    CH2(CHAR_MAP_0to9_3_7),    // 189 CH_D
+    CH2(CHAR_MAP_0to9_4_7),    // 190 CH_E
+    CH2(CHAR_MAP_0to9_5_7),    // 191 CH_F
+    CH2(CHAR_MAP_0to9_6_7),    // 192 CH_G
+    CH2(CHAR_MAP_0to9_7_7),    // 193 CH_H
+    CH2(CHAR_MAP_0to9_8_7),    // 194 CH_I
+    CH2(CHAR_MAP_0to9_9_7),    // 195 CH_J
+    CH2(CHAR_MAP_0to9_0_8),    // 196 CH_K
+    CH2(CHAR_MAP_0to9_1_8),    // 197 CH_L
+    CH2(CHAR_MAP_0to9_2_8),    // 198 CH_M
+    CH2(CHAR_MAP_0to9_3_8),    // 199 CH_N
+    CH2(CHAR_MAP_0to9_4_8),    // 200 CH_O
+    CH2(CHAR_MAP_0to9_5_8),    // 201 CH_P
+    CH2(CHAR_MAP_0to9_6_8),    // 202 CH_Q
+    CH2(CHAR_MAP_0to9_7_8),    // 203 CH_R
+    CH2(CHAR_MAP_0to9_8_8),    // 204 CH_S
+    CH2(CHAR_MAP_0to9_9_8),    // 205 CH_T
+    CH2(CHAR_MAP_0to9_0_9),    // 206 CH_U
+    CH2(CHAR_MAP_0to9_1_9),    // 207 CH_V
+    CH2(CHAR_MAP_0to9_2_9),    // 208 CH_W
+    CH2(CHAR_MAP_0to9_3_9),    // 209 CH_X
+    CH2(CHAR_MAP_0to9_4_9),    // 210 CH_Y
+    CH2(CHAR_MAP_0to9_5_9),    // 211 CH_Z
+
+    CH2(CHAR_MAP_0to9_0_2),    // 211 CH_PLUS
 };
 
 _Static_assert(sizeof(charSet) / sizeof(charSet[0]) == CH_MAX, "charSet table wrong size");
