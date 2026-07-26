@@ -46,4 +46,9 @@ int nDots(int count, int dripX, int dripY, int type, unsigned char age, int offs
 void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
                    unsigned char colour);
 
+void floatingCharacter(int trixX, int trixY, int age, unsigned char ch);
+void removeFloatingChars();
+void drawFloatingChars();
+
+
 // EOF

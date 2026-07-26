@@ -88,6 +88,9 @@ void initGameState_Game() {
 
     decodeCave(cave);    // TODO: in initNextLife instead
 
+    displayFloatingString(5, 52, 100, "PLANETX");
+
+
     luminance = -15;
     lumTarget = 0;
     loadPalette();
@@ -187,6 +190,8 @@ void VB_Game() {
             drawMace();
             drawRope();
             drawGun();
+
+            drawFloatingChars();
             drawParticles();
 
             drawAttachedChar(attachment);

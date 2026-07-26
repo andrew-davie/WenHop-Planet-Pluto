@@ -120,12 +120,12 @@ def map_varname(filename: str) -> str:
 def write_header(path: Path, name: str, charset: CharSet) -> None:
     lines = [
         "#pragma once\n",
-        f"#define CARS_CHAR_WIDTH {charset.width}",
-        f"#define CARS_CHAR_HEIGHT {charset.depth}\n",
+        f"#define CARS_CHAR_{name}_WIDTH {charset.width}",
+        f"#define CARS_CHAR_{name}_HEIGHT {charset.depth}\n",
         "typedef struct {",
-        "    unsigned char data[CARS_CHAR_HEIGHT * 3]; // RGB",
-        "} character;\n",
-        f"extern const character {name}[{len(charset)}];\n",
+        f"    unsigned char data[CARS_CHAR_{name}_HEIGHT * 3]; // RGB",
+        f"}} character_{name};\n",
+        f"extern const character_{name} {name}[{len(charset)}];\n",
     ]
 
     for filename, grid in charset.grids.items():
@@ -147,7 +147,7 @@ def write_header(path: Path, name: str, charset: CharSet) -> None:
             for x, idx in enumerate(row):
                 if idx == BLANK_ID and (x, y) != (0, 0):
                     continue
-                macro = f"CHAR_MAP_{stem}_{x}_{y}" if multi_file else f"CHAR_MAP_{x}_{y}"
+                macro = f"CHAR_MAP_{name}_{stem}_{x}_{y}" if multi_file else f"CHAR_MAP_{stem}_{x}_{y}"
                 define_lines.append(f"#define {macro} {idx}")
     if define_lines:
         lines.extend(define_lines)
@@ -163,7 +163,7 @@ def write_source(path: Path, include_stem: str, name: str, charset: CharSet) -> 
     occurrences = charset.occurrences()
     multi_file = len(charset.grids) > 1
 
-    lines.append(f"const character {name}[{len(charset)}] = {{")
+    lines.append(f"const character_{name} {name}[{len(charset)}] = {{")
     for pixels, idx in charset.by_id():
         rows = character_rows(pixels, charset.width, charset.depth)
         row_prefixes = ["        " + ", ".join(fields) + ", " for fields, _ in rows]

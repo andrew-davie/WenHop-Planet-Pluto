@@ -35,42 +35,42 @@ void initCharVector() {
 
 const unsigned char *const roundedCorner[16] = {
 
-    CH(CHAR_MAP_0_0),     // 00
-    CH(CHAR_MAP_0_0),     // 01 U
-    CH(CHAR_MAP_0_0),     // 02 R
-    CH(CHAR_MAP_0_14),    // 03 RU
-    CH(CHAR_MAP_0_0),     // 04 D
-    CH(CHAR_MAP_0_0),     // 05 DU
-    CH(CHAR_MAP_1_14),    // 06 RD
-    CH(CHAR_MAP_2_14),    // 07 URD
-    CH(CHAR_MAP_0_0),     // 08 L
-    CH(CHAR_MAP_3_14),    // 09 LU
-    CH(CHAR_MAP_0_0),     // 10 LR
-    CH(CHAR_MAP_4_14),    // 11 LUR
-    CH(CHAR_MAP_5_14),    // 12 LD
-    CH(CHAR_MAP_6_14),    // 13 LDU
-    CH(CHAR_MAP_7_14),    // 14 LRD
-    CH(CHAR_MAP_8_14),    // 15 LURD
+    CH(CHAR_MAP_characterset_0_0),     // 00
+    CH(CHAR_MAP_characterset_0_0),     // 01 U
+    CH(CHAR_MAP_characterset_0_0),     // 02 R
+    CH(CHAR_MAP_characterset_0_14),    // 03 RU
+    CH(CHAR_MAP_characterset_0_0),     // 04 D
+    CH(CHAR_MAP_characterset_0_0),     // 05 DU
+    CH(CHAR_MAP_characterset_1_14),    // 06 RD
+    CH(CHAR_MAP_characterset_2_14),    // 07 URD
+    CH(CHAR_MAP_characterset_0_0),     // 08 L
+    CH(CHAR_MAP_characterset_3_14),    // 09 LU
+    CH(CHAR_MAP_characterset_0_0),     // 10 LR
+    CH(CHAR_MAP_characterset_4_14),    // 11 LUR
+    CH(CHAR_MAP_characterset_5_14),    // 12 LD
+    CH(CHAR_MAP_characterset_6_14),    // 13 LDU
+    CH(CHAR_MAP_characterset_7_14),    // 14 LRD
+    CH(CHAR_MAP_characterset_8_14),    // 15 LURD
 };
 
 const unsigned char *const conglomerate[] = {
 
-    CH(CHAR_MAP_0_7),     // 0
-    CH(CHAR_MAP_1_7),     // 1
-    CH(CHAR_MAP_2_7),     // 2
-    CH(CHAR_MAP_5_7),     // 3
-    CH(CHAR_MAP_3_7),     // 4
-    CH(CHAR_MAP_6_7),     // 5
-    CH(CHAR_MAP_8_7),     // 6
-    CH(CHAR_MAP_11_7),    // 7
-    CH(CHAR_MAP_4_7),     // 8
-    CH(CHAR_MAP_7_7),     // 9
-    CH(CHAR_MAP_9_7),     // 10
-    CH(CHAR_MAP_12_7),    // 11
-    CH(CHAR_MAP_10_7),    // 12
-    CH(CHAR_MAP_13_7),    // 13
-    CH(CHAR_MAP_14_7),    // 14
-    CH(CHAR_MAP_15_7),    // 15
+    CH(CHAR_MAP_characterset_0_7),     // 0
+    CH(CHAR_MAP_characterset_1_7),     // 1
+    CH(CHAR_MAP_characterset_2_7),     // 2
+    CH(CHAR_MAP_characterset_5_7),     // 3
+    CH(CHAR_MAP_characterset_3_7),     // 4
+    CH(CHAR_MAP_characterset_6_7),     // 5
+    CH(CHAR_MAP_characterset_8_7),     // 6
+    CH(CHAR_MAP_characterset_11_7),    // 7
+    CH(CHAR_MAP_characterset_4_7),     // 8
+    CH(CHAR_MAP_characterset_7_7),     // 9
+    CH(CHAR_MAP_characterset_9_7),     // 10
+    CH(CHAR_MAP_characterset_12_7),    // 11
+    CH(CHAR_MAP_characterset_10_7),    // 12
+    CH(CHAR_MAP_characterset_13_7),    // 13
+    CH(CHAR_MAP_characterset_14_7),    // 14
+    CH(CHAR_MAP_characterset_15_7),    // 15
 };
 
 

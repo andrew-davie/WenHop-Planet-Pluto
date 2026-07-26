@@ -33,6 +33,9 @@ static int explodeRadius;
 static int lastRockCount;
 static int rockCount;
 
+static int lastConvertedGeodoge;
+static int convertedGeodoge;
+
 
 // init'd locally
 static int conveyorDirection;
@@ -115,6 +118,67 @@ void initBoard() {
     conveyorDirection = -1;    // ?
     activeStar = lastActiveStar = 0;
     single = false;
+    lastConvertedGeodoge = 0;
+    convertedGeodoge = 0;
+}
+
+
+void displayFloatingNumber(int trixX, int trixY, int age, int value) {
+
+    removeFloatingChars();
+    int temp = value;
+
+    int c = 0;
+    while (temp >= 100) {
+        c++;
+        temp -= 100;
+    }
+
+    if (convertedGeodoge >= 100) {
+        floatingCharacter(trixX, trixY, age, CH_0 + c);
+        trixX += 4;
+    }
+
+    c = 0;
+    while (temp >= 10) {
+        c++;
+        temp -= 10;
+    }
+
+    if (convertedGeodoge >= 10) {
+        floatingCharacter(trixX, trixY, age, CH_0 + c);
+        trixX += 4;
+    }
+
+
+    floatingCharacter(trixX, trixY, age, CH_0 + temp);
+}
+
+
+void displayFloatingString(int x, int y, int age, char *s) {
+
+    const unsigned char charWidth[] = {
+
+        4, 4, 4, 4, 4, 4, 4, 4, 2, 5, 5, 2, 6, 4, 4, 4, 5, 4, 4, 3, 4, 4, 6, 4, 4, 4,
+    };
+
+    int len = 0;
+    char *w = s;
+    while (*w) {
+        len += charWidth[*w - 'A'];
+        w++;
+    }
+
+
+    x = (40 - len) >> 1;
+
+
+    while (*s) {
+        int c = *s - 'A';
+        floatingCharacter(x, y, age, CH_A + *s - 'A');
+        x += charWidth[c];
+        s++;
+    }
 }
 
 
@@ -134,6 +198,24 @@ void setupBoardScanner() {
 
         lastActiveStar = activeStar;
         activeStar = 0;
+
+
+        if (convertedGeodoge && lastConvertedGeodoge == convertedGeodoge) {
+            // nothing happened this scan, so we record the conversion
+
+            if (convertedGeodoge > 2) {
+
+                int y = playerY * CHAR_TRIX_Y - (scrollY >> 16) - CHAR_TRIX_Y;
+                int x = playerX * CHAR_TRIX_X - (scrollX >> 16) + CHAR_CENTER_X;
+
+                displayFloatingNumber(x, y, 60, convertedGeodoge);
+            }
+
+            convertedGeodoge = 0;
+        }
+
+        lastConvertedGeodoge = convertedGeodoge;
+
 
         if (!single && !totalDogePossible) {
             single = true;
@@ -382,7 +464,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
 
         if (lastRockCount > 7) {
-            if (!rangeRandom(5)) {
+            if (!rangeRandom(7)) {
                 FLASH(0x16, 4);
                 ADDAUDIO(SFX_EXPLODE_QUIET);
                 nDots(10, cur->col, cur->row, PT_SPIRAL, 40, CHAR_CENTER_X, CHAR_CENTER_Y, 40, 3);
@@ -394,9 +476,9 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
             // int dots = rchar;
             if (rockShaker && lastRockCount != 0) {
-                for (int i = 0; i < 3; i++) {
-                    int idx = nDots(1, cur->col, cur->row, PT_TWO, rangeRandom(20) + 20, rangeRandom(CHAR_TRIX_X), 2,
-                                    15 + rangeRandom(5), (getRandom32() & 1) ? 1 : 7);
+                for (int i = 0; i < 6; i++) {
+                    int idx = nDots(1, cur->col, cur->row, PT_TWO, rangeRandom(20) + 20, rangeRandom(CHAR_TRIX_X), 1,
+                                    20 + rangeRandom(15), (getRandom32() & 1) ? 1 : 7);
                     if (idx >= 0)
                         particle[idx].dir = 0;
                 }
@@ -764,6 +846,7 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         break;
 
     case CH_CONVERT_GEODE_TO_DOGE:
+        convertedGeodoge++;
         *cur->me = FLAG(CH_DOGE_00);
         chainReact_GeoDogeToDoge(cur->me);
         break;

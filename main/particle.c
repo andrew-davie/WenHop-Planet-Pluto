@@ -7,6 +7,7 @@
 
 #include "T1TC.h"
 #include "attribute.h"
+#include "colour.h"
 #include "decodeCaves.h"
 #include "draw.h"
 #include "drawScreen.h"
@@ -408,6 +409,33 @@ void initParticles() {
 }
 
 
+void removeFloatingChars() {
+
+    for (int i = 0; i < PARTICLE_COUNT; i++) {
+        if (particle[i].type == PT_CHARACTER)
+            pushParticle(i);
+        particle[i].age = 0;
+    }
+}
+
+
+void drawFloatingChars() {
+
+    for (int i = PARTICLE_COUNT - 1; i >= 0; i--) {
+        if (particle[i].type == PT_CHARACTER && particle[i].age) {
+
+            int x = particle[i].x >> 8;
+            int y = particle[i].y >> 8;
+
+            drawBitmapChar(particle[i].colour, x, y * 3);
+
+            if (particle[i].age < 255 && !--particle[i].age)
+                pushParticle(i);
+        }
+    }
+}
+
+
 void drawParticles() {
 
     TIMED(DRAWPARTICLE, 0x4B8);    // 14/7/2026
@@ -424,19 +452,18 @@ void drawParticles() {
 
             switch (particle[i].type) {
 
-            case PT_CHARACTER:
-                x = (particle[i].x + 2 * xOffset) >> 8;
-                x -= (scrollX >> 16) + CHAR_TRIX_X;
-                y -= (scrollY >> 16) - CHAR_CENTER_Y;
-                y -= CHAR_CENTER_Y;
+            case PT_CHARACTER: {
 
-                drawBitmapChar(particle[i].colour, x, y * 3);
+                //     x = particle[i].x >> 8;
+                //     y = particle[i].y >> 8;
 
-                if (!--particle[i].age)
-                    pushParticle(i);
-                else
-                    particle[i].distance += particle[i].speed;
+                //     drawBitmapChar(particle[i].colour, x, y * 3);
+
+                //     // if (!--particle[i].age)
+                //     //     pushParticle(i);
+
                 continue;
+            }
 
 
             case PT_TWO: {
@@ -512,6 +539,10 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
                 particle[whichDrop].dir = getRandom32();    // 16.16 angle
                 particle[whichDrop].distance = 96;          // 16.16 speed
             }
+
+            // else {
+            //     FLASH(0x42, 2);
+            // }
         }
     }
 
@@ -543,6 +574,39 @@ int nDots(int count, int dripX, int dripY, int type, unsigned char age, int offs
 
     return lastIdx;
 }
+
+
+void floatingCharacter(int trixX, int trixY, int age, unsigned char ch) {
+
+
+    int slot = -1;
+
+    int col = trixX;
+    if (col >= 0 && col < 40) {
+
+        int line = trixY;
+        if (line >= 0 && line < (_SCANLINES / 3 - 1)) {
+
+            slot = popParticle();
+
+            if (slot < 0)
+                for (int i = 0; i < PARTICLE_COUNT; i++)
+                    if (particle[i].age && particle[i].type != PT_CHARACTER) {
+                        slot = i;
+                        break;
+                    }
+
+            if (slot >= 0) {
+                particle[slot].type = PT_CHARACTER;
+                particle[slot].x = trixX << 8;
+                particle[slot].y = trixY << 8;
+                particle[slot].age = age;
+                particle[slot].colour = ch;
+            }
+        }
+    }
+}
+
 
 void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
                    unsigned char colour) {

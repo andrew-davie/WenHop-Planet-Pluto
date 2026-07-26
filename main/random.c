@@ -37,7 +37,7 @@ void initRandom() {
 unsigned int getRandom32() {
     prng_b = 36969 * (prng_b & 65535) + (prng_b >> 16);
     prng_a = 18000 * (prng_a & 65535) + (prng_a >> 16);
-    return (prng_b << 16) + prng_a;
+    return prng_b;    //(prng_b << 16) + prng_a;
 }
 
 unsigned int rangeRandom(int range) {

@@ -132,6 +132,53 @@ const unsigned char P1_caveUseWall[] = {
 };
 
 
+const unsigned char cavetest[] = {
+    // clang-format off
+
+    0,0,_BOARD_COLS,_BOARD_ROWS,
+
+    0x98, 0x26, 0xC6,               // palette
+
+    20,                             // milling
+    10, 15,                         // doge $
+    0,                              // shake
+
+     17,  11,  50,  56,  8,         // randomiser[level]
+     30,  12,  12,  12,  12,        // doge req
+    200, 200, 200, 200, 200,
+
+    WEAPON_MACE,                    // 0
+    WEAPON_MACE,                    // 1
+    WEAPON_MACE,                    // 2
+    WEAPON_MACE,                    // 3
+    WEAPON_MACE,                    // 4
+
+    0, CH_BRICKWALL, CH_GEODOGE,           // flags, border, fill
+
+    // Random objects
+
+    3,
+    CH_DIRT,10,20,20,20,20,
+    CH_GEODOGE, 80,40,40,40,40,
+    CH_ROCK, 50,40,40,40,40,
+
+
+    CH_DOOROPEN_0, 5, 6,
+    CH_MELLON_HUSK_BIRTH, 5, 2,
+
+
+    DRAW_EOF,
+    DRAW_EOF,
+    DRAW_EOF,
+    DRAW_EOF,
+    DRAW_EOF,
+    DRAW_EOF,
+
+    'T', 'E', 'S', 'T', END_STRING
+
+    // clang-format on
+};
+
 //------------------------------------------------------------------------------
 
 const unsigned char P0_caveNew[] = {
@@ -1112,6 +1159,9 @@ void empty() {
 
 
 const struct caveHandler caveList[] = {
+
+
+    {cavetest, none},
 
 
     // PLANET 0

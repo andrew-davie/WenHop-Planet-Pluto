@@ -435,52 +435,56 @@ bool drawNextChar() {
 }
 
 
-void blitShape(int ch, int shift, int y, int offset) {
+void blitShape(int ch, int shift, int y, int height, int offset) {
 
-    //            X, (also SHIFT! when we go "<<20>>shift")
-    //        |  |0   |      1 |        |  |2         3
-    //        |  |0123|45178901|23456789|  |01234517890123456789
+    // Single-pass 64-bit version -- same technique as drawScreen()/drawScreenMirror():
+    // one wide fetch+shift instead of two glued 20px halves.
     //
-    // starting shape is        XXXXXXXX
+    // The old version drew the left half (PF0/PF1/PF2 @ offset) and the right half
+    // (PF0/PF1/PF2 @ offset+3*_BUFFER_SIZE, "_BUF_GAME_PF0_RIGHT") with two separate
+    // 32-bit calls, each shifting the 8-bit-wide glyph column into its own 20-bit-wide
+    // half (shift range -7..19 relative to that half). Because the two halves sit at a
+    // fixed +20px / +3*_BUFFER_SIZE relationship to each other, both computations are
+    // really the *same* "glyph << bitsh" value read through two different 24-bit windows:
     //
-    // ending shapes....                                               X=
-    // -------+  +----+--------+--------+  +--------------------+
-    // XXXXXXX|  |X   |        |        |  |                    |*     -7 (shift <-- 19)
-    //  XXXXXX|  |XX  |        |        |  |                    |      -6 (shift <-- 18)
-    //   XXXXX|  |XXX |        |        |  |                    |      -5 (shift <-- 17)
-    //    XXXX|  |XXXX|        |        |  |                    |      -4 (shift <-- 16)
-    //     XXX|  |XXXX|X       |        |  |                    |      -3 (shift <-- 15)
-    //      XX|  |XXXX|XX      |        |  |                    |      -2 (shift <-- 14)
-    //       X|  |XXXX|XXX     |        |  |                    |      -1 (shift <-- 13)
-    //        |  |XXXX|XXXX    |        |  |                    |-----  0 (shift <-- 12)
-    //        |  | XXX|XXXXX   |        |  |                    |       1 (shift <-- 11)
-    //        |  |  XX|XXXXXX  |        |  |                    |       2 (shift <-- 10)
-    //        |  |   X|XXXXXXX |        |  |                    |       3 (shift <--  9)
-    //        |  |    |XXXXXXXX|        |  |                    |       4 (shift <--  8)
-    //        |  |    | XXXXXXX|X       |  |                    |       5 (shift <--  7)
-    //        |  |    |  XXXXXX|XX      |  |                    |       6 (shift <--  6)
-    //        |  |    |   XXXXX|XXX     |  |                    |       7 (shift <--  5)
-    //        |  |    |    XXXX|XXXX    |  |                    |       8 (shift <--  4)
-    //        |  |    |     XXX|XXXXX   |  |                    |       9 (shift <--  3)
-    //        |  |    |      XX|XXXXXX  |  |                    |      10 (shift <--  2)
-    //        |  |    |       X|XXXXXXX |  |                    |      11 (shift <--  1)
-    //        |  |    |        |XXXXXXXX|  |                    |      12 (shift <--  0)
-    //        |  |    |        | XXXXXXX|  |X                   |*     13 (shift      1 -->)
-    //        |  |    |        |  XXXXXX|  |XX                  |      14 (shift      2 -->)
-    //        |  |    |        |   XXXXX|  |XXX                 |      15 (shift      3 -->)
-    //        |  |    |        |    XXXX|  |XXXX                |      16 (shift      4 -->)
-    //        |  |    |        |     XXX|  |XXXXX               |      17 (shift      5 -->)
-    //        |  |    |        |      XX|  |XXXXXX              |      18 (shift      6 -->)
-    //        |  |    |        |       X|  |XXXXXXX             |------19 (shift      7 -->)
-    //        |  |    |        |        |  |XXXXXXXX            |      20 (shift      8 -->)
-    //        (not used)
-    // -------+  +----+--------+--------+  +--------------------+
+    //   bitsh_left  = 19 - shift          (old left-call formula)
+    //   bitsh_right = 19 - (shift - 20)   (old right-call formula, shift-20 being the
+    //                                      old caller's "shift" arg for the right half)
+    //              = bitsh_left + 20
+    //
+    // So computing a single wider shift bitsh = 39 - shift (using the real, unsplit
+    // screen column) and reading the LEFT window 20 bits higher than the RIGHT window
+    // reproduces both old calls exactly from one 64-bit value -- verified by exhaustive
+    // brute-force comparison against the old two-call implementation (bit-for-bit
+    // identical over millions of random shift/y/roller/glyph/buffer combinations,
+    // including the 32-bit truncation clipping the old code exhibited at extreme
+    // negative shift, which naturally falls out of window position rather than needing
+    // to be special-cased).
+    //
+    //   window (bit offset, 8 bits each, PF0/PF2 reverseBits'd same as before):
+    //     PF0_LEFT  @ 43   PF1_LEFT  @ 35   PF2_LEFT  @ 27
+    //     PF0_RIGHT @ 23   PF1_RIGHT @ 15   PF2_RIGHT @  7
+    //
+    // blitShape() already clipped on y internally (the "y < _SCANLINES" loop guard and
+    // "if (y >= 0)" below, both present before this change). x-axis clipping used to be
+    // the caller's job instead: it chose whether to call the left half, the right half,
+    // both, or neither, via the "-8 < shift < 20" / "12 < shift < 40" checks before each
+    // call. Now that one call handles both halves, those same two conditions have to live
+    // in here too -- writeLeft/writeRight below are exactly those old caller-side checks,
+    // just moved in so a single pass can decide per-half whether to write.
 
-    int height = CHAR_Y;
+    bool writeLeft = shift > -8 && shift < 20;
+    bool writeRight = shift > 12 && shift < 40;
+
+    if (!writeLeft && !writeRight)
+        return;
 
     unsigned char *p1 = RAM + offset + y;
     unsigned char *p2 = p1 + _BUFFER_SIZE;
     unsigned char *p3 = p2 + _BUFFER_SIZE;
+    unsigned char *p4 = p1 + 3 * _BUFFER_SIZE;
+    unsigned char *p5 = p4 + _BUFFER_SIZE;
+    unsigned char *p6 = p5 + _BUFFER_SIZE;
 
     int modifier = y + 1;
 
@@ -490,7 +494,7 @@ void blitShape(int ch, int shift, int y, int offset) {
     while (modifier < 0)
         modifier += 3;
 
-    int bitsh = 19 - shift;
+    int bitsh = 39 - shift;
 
     const char nextRoller[] = {1, 2, 0, 1, 2, 0, 1, 2, 0};
 
@@ -500,24 +504,32 @@ void blitShape(int ch, int shift, int y, int offset) {
 
             const unsigned char *fp = charSet[ch];
 
-            unsigned int mask = fp[trix] | fp[trix + 1] | fp[trix + 2];
+            unsigned long long mask = fp[trix] | fp[trix + 1] | fp[trix + 2];
             mask <<= bitsh;
             mask = ~mask;
 
-            unsigned char m1 = mask >> (16 + 7);
-            m1 = reverseBits[m1];
-            unsigned char m2 = mask >> (8 + 7);
-            unsigned char m3 = mask >> 7;
-            m3 = reverseBits[m3];
+            unsigned char mPF0L = reverseBits[(unsigned char)(mask >> 43)];
+            unsigned char mPF1L = (unsigned char)(mask >> 35);
+            unsigned char mPF2L = reverseBits[(unsigned char)(mask >> 27)];
+            unsigned char mPF0R = reverseBits[(unsigned char)(mask >> 23)];
+            unsigned char mPF1R = (unsigned char)(mask >> 15);
+            unsigned char mPF2R = reverseBits[(unsigned char)(mask >> 7)];
 
 #define INNER(r)                                                                                                       \
     {                                                                                                                  \
-        unsigned int shiftCh = fp[trix + nextRoller[roller + r + modifier]];                                           \
+        unsigned long long shiftCh = fp[trix + nextRoller[roller + r + modifier]];                                    \
         shiftCh <<= bitsh;                                                                                             \
                                                                                                                        \
-        *(p1 + r) = (*(p1 + r) & m1) | reverseBits[(unsigned char)(shiftCh >> (16 + 7))];                              \
-        *(p2 + r) = (*(p2 + r) & m2) | shiftCh >> (8 + 7);                                                             \
-        *(p3 + r) = (*(p3 + r) & m3) | reverseBits[(shiftCh >> 7) & 0xFF];                                             \
+        if (writeLeft) {                                                                                               \
+            *(p1 + r) = (*(p1 + r) & mPF0L) | reverseBits[(unsigned char)(shiftCh >> 43)];                             \
+            *(p2 + r) = (*(p2 + r) & mPF1L) | (unsigned char)(shiftCh >> 35);                                          \
+            *(p3 + r) = (*(p3 + r) & mPF2L) | reverseBits[(unsigned char)(shiftCh >> 27)];                             \
+        }                                                                                                               \
+        if (writeRight) {                                                                                              \
+            *(p4 + r) = (*(p4 + r) & mPF0R) | reverseBits[(unsigned char)(shiftCh >> 23)];                             \
+            *(p5 + r) = (*(p5 + r) & mPF1R) | (unsigned char)(shiftCh >> 15);                                          \
+            *(p6 + r) = (*(p6 + r) & mPF2R) | reverseBits[(unsigned char)(shiftCh >> 7)];                              \
+        }                                                                                                               \
     }
 
             INNER(0)
@@ -528,6 +540,9 @@ void blitShape(int ch, int shift, int y, int offset) {
         p1 += 3;
         p2 += 3;
         p3 += 3;
+        p4 += 3;
+        p5 += 3;
+        p6 += 3;
 
         y += 3;
     }
@@ -536,13 +551,8 @@ void blitShape(int ch, int shift, int y, int offset) {
 
 void drawBitmapChar(int ch, int x, int y) {
 
-    if (y + CHAR_Y >= 0 && y < _SCANLINES && x > -8 && x < 40) {
-        if (x > -8 && x < 20)
-            blitShape(ch, x, y, _BUF_GAME_PF0_LEFT);
-
-        if (x > 12 && x < 40)
-            blitShape(ch, x - 20, y, _BUF_GAME_PF0_RIGHT);
-    }
+    if (y + CHAR_Y >= 0 && y < _SCANLINES && x > -8 && x < 40)
+        blitShape(ch, x, y, CHAR_Y, _BUF_GAME_PF0_LEFT);
 }
 
 
@@ -584,13 +594,8 @@ void drawAttachedChar(int ch) {
     int trixX = ((playerX - 1) * CHAR_TRIX_X) + -(scrollX >> 16) + (faceDirection * (frameAdjustX + (autoMoveX >> 2))) +
                 2 - (shakeX >> 16) - offsetX;
 
-    if (y + CHAR_Y >= 0 && y < _SCANLINES && trixX > -8 && trixX < 40) {
-        if (trixX > -8 && trixX < 20)
-            blitShape(ch, trixX, y, _BUF_GAME_PF0_LEFT);
-
-        if (trixX > 12 && trixX < 40)
-            blitShape(ch, trixX - 20, y, _BUF_GAME_PF0_RIGHT);
-    }
+    if (y + CHAR_Y >= 0 && y < _SCANLINES && trixX > -8 && trixX < 40)
+        blitShape(ch, trixX, y, CHAR_Y, _BUF_GAME_PF0_LEFT);
 }
 
 

@@ -26,4 +26,6 @@ void processBoardSquares();
 void initBoard();
 void explode(unsigned char *where, unsigned char explosionShape);
 
+void displayFloatingString(int x, int y, int age, char *s);
+
 // EOF

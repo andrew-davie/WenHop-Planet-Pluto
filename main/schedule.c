@@ -80,8 +80,8 @@ void scheduleUnpackCave() {
             // trix/lap) -- swipe.c's ease-in (see STAR_GROW_RAMP_LAPS)
             // now slows the first few laps down, so the overall grow
             // is faster to make up for it once past the ease-in.
-            setSwipe(playerX * CHAR_TRIX_X + CHAR_CENTER_X - (scrollX >> 16),
-                     playerY * CHAR_TRIX_Y - (scrollY >> 16), 0, 1024, SWIPE_GROW);
+            setSwipe(playerX * CHAR_TRIX_X + CHAR_CENTER_X - (scrollX >> 16), playerY * CHAR_TRIX_Y - (scrollY >> 16),
+                     0, 1024, SWIPE_GROW);
 #endif
             break;
         }

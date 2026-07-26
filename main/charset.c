@@ -1,6 +1,6 @@
 #include "charset.h"
 
-const character charset_auto[149] = {
+const character_charset_auto charset_auto[149] = {
     { {                            //     0
         0b00000, 0b00000, 0b00000, //  0  ⬛⬛⬛⬛⬛
         0b00000, 0b00000, 0b00000, //  1  ⬛⬛⬛⬛⬛

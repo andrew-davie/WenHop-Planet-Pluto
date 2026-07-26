@@ -154,6 +154,7 @@ SRCS = \
  tools/pirate.c \
  \
  charset.c \
+ charset2.c \
 
 
 OBJS = $(SRCS:.c=.o)
@@ -370,10 +371,13 @@ IMG:
 SKULL: main/skull/gfx/iCC_skull.gif
 	$(MAKE) -C main/skull/gfx
 
-AUTO_CSET: gfx/characterset.png
+AUTO_CSET: gfx/characterset.png gfx/0to9.png
 	(python3 tools/cset.py -o charset --name charset_auto --width 5 --depth 10 gfx/characterset.png)
+	(python3 tools/cset.py -o charset2 --name charset2_auto --width 8 --depth 10 gfx/0to9.png)
 	mv charset.c main
 	mv charset.h main
+	mv charset2.c main
+	mv charset2.h main
 
 CHARSET: gfx/cars/*.gif
 	(python3 tools/cset.py -o cset --name charset --width 5 --depth 11 gfx/cars/blank.gif gfx/cars/numbers.gif gfx/cars/blip.gif )

@@ -1,6 +1,6 @@
 #include "cset.h"
 
-const character charset[49] = {
+const character_charset charset[49] = {
     { {                            //     0
         0b00000, 0b00000, 0b00000, //  0  ⬛⬛⬛⬛⬛
         0b00000, 0b00000, 0b00000, //  1  ⬛⬛⬛⬛⬛
