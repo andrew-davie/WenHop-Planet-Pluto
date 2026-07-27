@@ -241,6 +241,19 @@ void initPlanet(int planet) {
 
     body = planet;
 
+    // Text (name/physics/info) is plotted with an OR-only blitter (doLetter() in draw.c) that
+    // can only turn bits on, never off -- it depends entirely on the destination buffer being
+    // zeroed before a *different* string reuses the same bytes. initGameState_Globe() does that
+    // zero once per GS_GLOBE state entry, which covers the normal single-planet visit. But this
+    // function is also called from nextPlanet() to advance to a new planet *within* the same
+    // visit, and that path had no clear of its own -- so the new name got OR'd straight on top
+    // of the previous planet's leftover glyph bits (and its colrx colour bytes), showing up as
+    // stray columns of the old name until a later full clear (INFO_CLEAR1/INFO_CLEAR) papered
+    // over it. Mirror initGameState_Globe()'s clear here so every entry into a planet -- first
+    // or subsequent -- starts from a blank text buffer.
+    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
+    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_COLUP0), 0x58585858, _BUFFER_SIZE / 4);
+
     initStars();
 
     rotationAccel = 10;
