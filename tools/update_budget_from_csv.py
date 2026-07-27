@@ -15,6 +15,10 @@ For each CSV not already recorded in tools/.budget_csv_manifest.txt:
       - if it's already a real number and the CSV value is strictly
         larger, replace it with the CSV value
       - otherwise leave it alone
+  - whenever an entry's value is actually changed, its own trailing
+    comment gets a " -- updated YYYY-MM-DD HH:MM TZ" stamp appended (any
+    previous per-line stamp is replaced, not stacked); untouched lines
+    keep whatever stamp (or lack of one) they already had
   - the '// Last updated: ...' stamp above budget[128] is refreshed
     whenever a new CSV is processed, whether or not it actually changed
     any budget[] values -- it is not touched on runs with no new CSVs
@@ -48,6 +52,7 @@ BUDGET_START_RE = re.compile(r"^static const unsigned short budget\[128\] = \{")
 BUDGET_END_RE = re.compile(r"^\};")
 ENTRY_RE = re.compile(r"^(\s*)(\S+),(\s*)//\s*(\d+)\s+(.*)$")
 STAMP_RE = re.compile(r"^// Last updated: .*$")
+LINE_STAMP_RE = re.compile(r"\s*--\s*updated\s+.*$")
 UNTIMED_TOKEN = "_untimed_"
 
 DEBUG_NAME_RE = re.compile(r"^debug\[(\d+)\]$")
@@ -113,8 +118,10 @@ def merge(board_lines, csv_values):
                     new_token = str(csv_val)
 
             if new_token is not None:
-                changes.append((idx, name, token, new_token))
-                out.append(format_entry(new_token, idx, name) + "\n")
+                base_name = LINE_STAMP_RE.sub("", name)
+                stamped_name = f"{base_name} -- updated {stamp_now()}"
+                changes.append((idx, base_name, token, new_token))
+                out.append(format_entry(new_token, idx, stamped_name) + "\n")
             else:
                 out.append(line)
             continue
