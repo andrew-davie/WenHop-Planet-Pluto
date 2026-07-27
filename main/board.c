@@ -437,9 +437,9 @@ void setupBoardScanner() {
 // Global safety margin added to every timed budget[] entry below (each
 // written as `_B + <measured value>`) -- bump this one number to pad
 // every character's budget at once, rather than hand-editing 128 lines.
-#define _B 30
+#define _B 100
 
-// Last updated: 2026-07-27 23:40 AEST
+// Last updated: 2026-07-27 23:48 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -454,13 +454,13 @@ static const unsigned short budget[128] = {
     _B + 422,     //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
     _B + 3360,    //  11 CH_ROCK_FALLING -- updated 2026-07-27 23:40 AEST
     _B + 2023,    //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
-    _B + 2454,    //  13 CH_DOGE_FALLING -- updated 2026-07-27 23:40 AEST
+    _B + 2455,    //  13 CH_DOGE_FALLING -- updated 2026-07-27 23:48 AEST
     _B + 276,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
     _untimed_,    //  18 CH_LAVA_LARGE
-    _B + 7276,    //  19 CH_MELLON_HUSK
+    _B + 9587,    //  19 CH_MELLON_HUSK -- updated 2026-07-27 23:48 AEST
     _untimed_,    //  20 CH_DOGE_STATIC
     _untimed_,    //  21 CH_PEBBLE_ROCK
     _untimed_,    //  22 CH_ROCK_PEBBLE
