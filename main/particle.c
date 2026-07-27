@@ -59,8 +59,6 @@ void initTool() {
 
 void modifyCharAtTip(int x, int y) {
 
-    unsigned char colour = 0;
-
     int xchar = (x * (256 / CHAR_TRIX_X)) >> 16;
     int ychar = (y * (256 / CHAR_TRIX_Y)) >> 16;
 
@@ -68,58 +66,50 @@ void modifyCharAtTip(int x, int y) {
         return;
 
     unsigned char *b = RAM + _BOARD + ychar * _BOARD_COLS + xchar;
-    enum ObjectType type = CharToType[GET(*b)];
+    unsigned char ch = *b;
 
+    if (ch < FLAG_THISFRAME) {
 
-    if (Attribute[type] & ATT_EXPLODABLE) {
+        enum ObjectType type = CharToType[ch];
+        if (Attribute[type] & ATT_EXPLODABLE) {
 
-        if (type == TYPE_DOGE) {
-            doges--;
-            *b = CH_BLANK | FLAG_THISFRAME;
-            colour = rangeRandom(7) + 1;
-        }
+            unsigned char colour = 0;
 
-        else if (type == TYPE_ROCK) {
-            *b = CH_GEODOGE | FLAG_THISFRAME;
-            colour = 1;
-        }
+            switch (type) {
 
-        else if (type == TYPE_ROCK_BONUS) {
-            *b = FLAG(CH_STAR);
-            colour = 7;
+            case TYPE_DOGE:
+                doges--;
+                *b = FLAG(CH_BLANK);
+                colour = rangeRandom(7) + 1;
+                break;
 
-        }
+            case TYPE_ROCK:
+                *b = FLAG(CH_GEODOGE);
+                colour = 1;
+                break;
 
+            case TYPE_ROCK_BONUS:
+                *b = FLAG(CH_STAR);
+                colour = 7;
+                break;
 
-        else if (type == TYPE_GEODOGE) {
-            *b = CH_DOGE_00 | FLAG_THISFRAME;
-            colour = 3;
-        }
+            case TYPE_GEODOGE:
+                *b = FLAG(CH_DOGE_00);
+                colour = 3;
+                break;
 
-        else if (type == TYPE_DIRT) {
-            *b = CH_DUST_0 | FLAG_THISFRAME;
-            colour = 2;
-        }
+            case TYPE_DIRT:
+                *b = FLAG(CH_DUST_0);
+                colour = 2;
+                break;
 
-        else {
-
-            if (xchar > 0 && xchar < _BOARD_COLS && ychar > 0 && ychar < _BOARD_ROWS) {
-
-                if (type == TYPE_BRICKWALL) {
-
-                    *b = CH_DUST_0 | FLAG_THISFRAME;
-                    colour = 7;
-                }
-
-                else if (type == TYPE_STEELWALL) {
-                    *b = CH_DUST_0 | FLAG_THISFRAME;
-                    colour = 7;
-                }
+            default:
+                break;
             }
-        }
 
-        if (*b >= FLAG_THISFRAME)
-            nDotsAtTrixel(5, (x >> 8) + CHAR_CENTER_Y, (y >> 8) + CHAR_CENTER_Y, 30, PT_SPIRAL, 50, colour);
+            if (*b >= FLAG_THISFRAME)
+                nDotsAtTrixel(5, (x >> 8) + CHAR_CENTER_Y, (y >> 8) + CHAR_CENTER_Y, 30, PT_SPIRAL, 50, colour);
+        }
     }
 }
 
@@ -403,20 +393,16 @@ int popParticle() {
 void initParticles() {
 
     particleStackPointer = 0;
-    for (int i = 0; i < PARTICLE_COUNT; i++) {
-        //        particle[i].age = 0;
+    for (int i = 0; i < PARTICLE_COUNT; i++)
         pushParticle(i);
-    }
 }
 
 
 void removeFloatingChars() {
 
-    for (int i = 0; i < PARTICLE_COUNT; i++) {
+    for (int i = 0; i < PARTICLE_COUNT; i++)
         if (particle[i].type == PT_CHARACTER)
             pushParticle(i);
-        //        particle[i].age = 0;
-    }
 }
 
 
@@ -425,8 +411,13 @@ void drawFloatingChars() {
     for (int i = PARTICLE_COUNT - 1; i >= 0; i--) {
         if (particle[i].type == PT_CHARACTER && particle[i].age) {
 
-            drawBitmapChar(particle[i].colour, (particle[i].x >> 8), (particle[i].y >> 8) * 3);
+            if (i == PARTICLE_COUNT - 1)
+                debug[199] = T1TC;
 
+            blitShape(particle[i].colour, particle[i].trixX_8 >> 8, (particle[i].trixY_8 >> 8) * 3, CHAR_Y,
+                      _BUF_GAME_PF0_LEFT);
+
+            debug[199] = T1TC - debug[199];
             if (particle[i].age < 255 && !--particle[i].age)
                 pushParticle(i);
         }
@@ -438,35 +429,16 @@ void drawParticles() {
 
     TIMED(DRAWPARTICLE, 0x4B8);    // 14/7/2026
 
-    for (int i = 0; i < PARTICLE_COUNT && TIME_OK(DRAWPARTICLE); i++) {
-
-        if (particle[i].age) {
+    for (int i = 0; i < PARTICLE_COUNT && TIME_OK(DRAWPARTICLE); i++)
+        if (particle[i].age && particle[i].type != PT_CHARACTER) {
 
             int xOffset = (sin_cos[particle[i].dir >> 3] * particle[i].distance) >> 8;
             int yOffset = (sin_cos[((particle[i].dir + 64) & 0xFF) >> 3] * particle[i].distance * 3) >> 8;
 
-            int y = (particle[i].y + yOffset) >> 8;
-            int x = (particle[i].x + xOffset) >> 8;
+            int y = (particle[i].trixY_8 + yOffset) >> 8;
+            int x = (particle[i].trixX_8 + xOffset) >> 8;
 
             switch (particle[i].type) {
-
-            case PT_CHARACTER: {
-
-                //     x = particle[i].x >> 8;
-                //     y = particle[i].y >> 8;
-
-                //     drawBitmapChar(particle[i].colour, x, y * 3);
-
-                //     // if (!--particle[i].age)
-                //     //     pushParticle(i);
-
-                continue;
-            }
-
-
-            case PT_TWO: {
-                break;
-            }
 
             case PT_SPIRAL2:
             case PT_SPIRAL: {
@@ -483,7 +455,7 @@ void drawParticles() {
                     continue;
                 }
 
-                particle[i].y -= particle[i].speed;
+                particle[i].trixY_8 -= particle[i].speed;
                 x += rangeRandom(3) - 1;    // wobble
                 break;
             }
@@ -492,31 +464,22 @@ void drawParticles() {
                 break;
             }
 
-            if (!drawBit(x, y, particle[i].colour)) {
-                // particle[i].age = 0;
+            particle[i].distance += particle[i].speed;
+
+            if (!--particle[i].age || !drawBit(x, y, particle[i].colour))
                 pushParticle(i);
-            }
-
-            else {
-
-                if (!--particle[i].age)
-                    pushParticle(i);
-                else
-                    particle[i].distance += particle[i].speed;
-            }
         }
-    }
 }
 
-int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char colour) {
+int sphereDot(int trixX, int trixY, int type, unsigned char age, unsigned char colour) {
 
 
     int whichDrop = -1;
 
-    int col = dotX - ((scrollX) >> 16);
+    int col = trixX - ((scrollX) >> 16);
     if (col >= 0 && col < 40 /*pixels*/) {
 
-        int line = dotY - (scrollY >> 16);
+        int line = trixY - (scrollY >> 16);
         if (line >= 0 && line < (_SCANLINES / 3 - 1)) {
 
 
@@ -527,9 +490,9 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
             if (whichDrop >= 0) {
 
                 particle[whichDrop].type = type;
-                particle[whichDrop].x = dotX << 8;
+                particle[whichDrop].trixX_8 = trixX << 8;
 
-                particle[whichDrop].y = dotY << 8;
+                particle[whichDrop].trixY_8 = trixY << 8;
                 particle[whichDrop].speed = 0;
                 particle[whichDrop].age = age;
                 particle[whichDrop].colour = colour;
@@ -548,7 +511,7 @@ int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char col
 }
 
 
-int nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed,
+int nDots(int count, int trixX, int trixY, int type, unsigned char age, int offsetX, int offsetY, int speed,
           unsigned char colour) {
 
     // Note: if type == PT_CHARACTER, then colour = CH_* name
@@ -558,7 +521,7 @@ int nDots(int count, int dripX, int dripY, int type, unsigned char age, int offs
     //     offsetY = CHAR_TRIX_Y - offsetY;
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX * CHAR_TRIX_X + offsetX, dripY * CHAR_TRIX_Y + offsetY, type, age, colour);
+        int idx = sphereDot(trixX * CHAR_TRIX_X + offsetX, trixY * CHAR_TRIX_Y + offsetY, type, age, colour);
         if (idx >= 0) {
             particle[idx].speed = rangeRandom(speed);
             if (type == PT_SPIRAL2) {
@@ -576,41 +539,30 @@ int nDots(int count, int dripX, int dripY, int type, unsigned char age, int offs
 
 void floatingCharacter(int trixX, int trixY, int age, unsigned char ch) {
 
+    int slot = popParticle();
 
-    int slot = -1;
-
-    int col = trixX;
-    if (col >= 0 && col < 40) {
-
-        int line = trixY;
-        if (line >= 0 && line < (_SCANLINES / 3 - 1)) {
-
-            slot = popParticle();
-
-            if (slot < 0)
-                for (int i = 0; i < PARTICLE_COUNT; i++)
-                    if (particle[i].age && particle[i].type != PT_CHARACTER) {
-                        slot = i;
-                        break;
-                    }
-
-            if (slot >= 0) {
-                particle[slot].type = PT_CHARACTER;
-                particle[slot].x = trixX << 8;
-                particle[slot].y = trixY << 8;
-                particle[slot].age = age;
-                particle[slot].colour = ch;
+    if (slot < 0)
+        for (int i = 0; i < PARTICLE_COUNT; i++)
+            if (particle[i].age && particle[i].type != PT_CHARACTER) {
+                slot = i;
+                break;
             }
-        }
+
+    if (slot >= 0) {
+        particle[slot].type = PT_CHARACTER;
+        particle[slot].trixX_8 = trixX << 8;
+        particle[slot].trixY_8 = trixY << 8;
+        particle[slot].age = age;
+        particle[slot].colour = ch;    // letter
     }
 }
 
 
-void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
-                   unsigned char colour) {
+void nDotsAtTrixel(int count, int trixX, int trixY, unsigned char age,    //
+                   enum ParticleType type, int speed, unsigned char colour) {
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX, dripY, type, age, colour);
+        int idx = sphereDot(trixX, trixY, type, age, colour);
         if (idx >= 0)
             particle[idx].speed = speed;
     }

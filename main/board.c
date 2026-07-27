@@ -43,18 +43,21 @@ static int activeStar;
 static int lastActiveStar;
 static bool single;
 
+static BoardCursor cursor;
+// cur.row = boardRow;
+// cur.col = boardCol;
+
 
 bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature);
 void processCreatures(BoardCursor *cur, unsigned char creature);
 void restartBoardScan();
 
-void processDoge(unsigned char *me, int row, int col);
 void processPebble(unsigned char *me, int row, int col);
 void processWater(unsigned char *me, int row);
 void processWaterFlow(unsigned char *me, int row, int col);
 void processCharBeltAndGrinder(unsigned char *me, unsigned char creature);
 void processFallingThings(unsigned char *me, int row, int col, unsigned char creature);
-void processCharGeoDogeAndRock(unsigned char *me);
+void processCharRock(unsigned char *me);
 
 void genericPush(unsigned char *me, int row, int col, int offsetX, int offsetY);
 void genericPushReverse(unsigned char *me, int offsetX, int offsetY);
@@ -134,9 +137,10 @@ void displayFloatingNumber(int trixX, int trixY, int age, int value) {
         temp -= 100;
     }
 
+
     if (convertedGeodoge >= 100) {
         floatingCharacter(trixX, trixY, age, CH_0 + c);
-        trixX += 4;
+        trixX += c == 1 ? 2 : 4;
     }
 
     c = 0;
@@ -147,7 +151,7 @@ void displayFloatingNumber(int trixX, int trixY, int age, int value) {
 
     if (convertedGeodoge >= 10) {
         floatingCharacter(trixX, trixY, age, CH_0 + c);
-        trixX += 4;
+        trixX += c == 1 ? 2 : 4;
     }
 
 
@@ -155,26 +159,116 @@ void displayFloatingNumber(int trixX, int trixY, int age, int value) {
 }
 
 
+/*
+ * ascii_widths.h
+ *
+ * Per-character display width table for printable ASCII.
+ * Range: ' ' (32) through 'z' (122). All widths default to 4.
+ *
+ * Index with: ascii_width[c - ASCII_WIDTH_BASE]
+ * (bounds-check c against ASCII_WIDTH_BASE/ASCII_WIDTH_MAX first)
+ */
+
+#define ASCII_WIDTH_BASE 32 /* ' ' */
+#define ASCII_WIDTH_MAX 122 /* 'z' */
+
+static const unsigned char ascii_width[] = {
+    4,    //  32  SPACE
+    4,    //  33  !
+    4,    //  34  "
+    4,    //  35  #
+    4,    //  36  $
+    4,    //  37  %
+    4,    //  38  &
+    4,    //  39  '
+    4,    //  40  (
+    4,    //  41  )
+    4,    //  42  *
+    4,    //  43  +
+    4,    //  44  ,
+    4,    //  45  -
+    4,    //  46  .
+    4,    //  47  /
+    4,    //  48  0
+    4,    //  49  1
+    4,    //  50  2
+    4,    //  51  3
+    4,    //  52  4
+    4,    //  53  5
+    4,    //  54  6
+    4,    //  55  7
+    4,    //  56  8
+    4,    //  57  9
+    4,    //  58  :
+    4,    //  59  ;
+    4,    //  60  <
+    4,    //  61  =
+    4,    //  62  >
+    4,    //  63  ?
+    4,    //  64  @
+    4,    //  65  A
+    4,    //  66  B
+    4,    //  67  C
+    4,    //  68  D
+    4,    //  69  E
+    4,    //  70  F
+    4,    //  71  G
+    4,    //  72  H
+    2,    //  73  I
+    4,    //  74  J
+    4,    //  75  K
+    4,    //  76  L
+    6,    //  77  M
+    4,    //  78  N
+    4,    //  79  O
+    4,    //  80  P
+    4,    //  81  Q
+    4,    //  82  R
+    4,    //  83  S
+    4,    //  84  T
+    4,    //  85  U
+    4,    //  86  V
+    6,    //  87  W
+    4,    //  88  X
+    4,    //  89  Y
+    4,    //  90  Z
+    4,    //  91  [
+    4,    //  92  BACKSLASH
+    4,    //  93  ]
+    4,    //  94  ^
+    4,    //  95  _
+    4,    //  96  `
+    4,    //  97  a
+    4,    //  98  b
+    4,    //  99  c
+    4,    // 100  d
+    4,    // 101  e
+    4,    // 102  f
+    4,    // 103  g
+    4,    // 104  h
+    2,    // 105  i
+    4,    // 106  j
+    4,    // 107  k
+    2,    // 108  l
+    6,    // 109  m
+    4,    // 110  n
+    4,    // 111  o
+    4,    // 112  p
+    4,    // 113  q
+    4,    // 114  r
+    4,    // 115  s
+    3,    // 116  t
+    4,    // 117  u
+    4,    // 118  v
+    6,    // 119  w
+    4,    // 120  x
+    4,    // 121  y
+    4,    // 122  z
+};
+
+
 int widthOf(char ch) {
-
-    const unsigned char charWidth[] = {
-
-        4, 4, 4, 4, 4, 4, 4, 4, 2, 5, 5, 2, 6, 4, 4, 4, 5, 4, 4, 3, 4, 4, 6, 4, 4, 4,
-    };
-
-    const unsigned char charCapsWidth[] = {
-
-        4, 4, 4, 4, 4, 4, 4, 4, 2, 5, 5, 4, 6, 5, 4, 4, 5, 4, 4, 4, 4, 4, 6, 4, 4, 4,
-    };
-
-    if (ch >= 'A' && ch <= 'Z')
-        return charCapsWidth[ch - 'A'];
-
-    else if (ch >= 'a' && ch <= 'z')
-        return charWidth[ch - 'a'];
-
-    else
-        return 4;
+    return ascii_width[ch - ASCII_WIDTH_BASE];
 }
 
 
@@ -189,7 +283,7 @@ char convt(char ch) {
     return ch;
 }
 
-void displayFloatingString(int x, int y, int age, char *s) {
+void displayFloatingString(int trixX, int trixY, int age, char *s) {
 
 
     int len = 0;
@@ -199,13 +293,11 @@ void displayFloatingString(int x, int y, int age, char *s) {
         w++;
     }
 
-
-    x = (40 - len) >> 1;
-
+    trixX = (40 - len) >> 1;
 
     while (*s) {
-        floatingCharacter(x, y, age, convt(*s));
-        x += widthOf(*s);
+        floatingCharacter(trixX, trixY, age, convt(*s));
+        trixX += widthOf(*s);
         s++;
     }
 }
@@ -305,8 +397,10 @@ void setupBoardScanner() {
         //     boardRow = _BOARD_ROWS - 1;
         //     boardCol = _BOARD_COLS - 1;
         // } else {
-        boardCol = 0;
-        boardRow = 0;
+        cursor.col = 0;
+        cursor.row = 0;
+        cursor.me = RAM + _BOARD;
+
         // }
 
         calculateVisibleMasks();
@@ -324,129 +418,84 @@ void setupBoardScanner() {
 
 void processBoardSquares() {
 
-    int chIndex = -1;
-    unsigned int chStart = 0;
 
-    while (gameState == nextGameState && T1TC < availableIdleTime - 12500) {
+    if (T1TC > availableIdleTime - 12500) {
+        // FLASH(0x16, 10);
+        return;
+    }
 
-        // boardRow/boardCol are the only pieces of this that genuinely need
-        // to survive across frames (this loop yields when its time budget
-        // runs out and resumes here next frame). Everything else is
-        // per-cell context, so from here down it's threaded explicitly via
-        // 'cur' instead of leaning on implicit globals.
-        BoardCursor cur;
-        cur.row = boardRow;
-        cur.col = boardCol;
-        cur.me = RAM + _BOARD + cur.row * _BOARD_COLS + cur.col;
+
+    unsigned char creature = 0;
+
 
 #ifdef DEBUG_TIMES
-        // Close the previous cell's timing window right where the next one
-        // opens -- one T1TC read serves as both, so this doesn't cost an
-        // extra volatile register read on top of the one it's timing.
-        unsigned int now = T1TC;
-        if (chIndex >= 0) {
-            unsigned int elapsed = now - chStart;
-            if ((int)elapsed > debug[chIndex])
-                debug[chIndex] = elapsed;
-        }
+    int chIndex = -1;
+    unsigned int chStart = 0;
 #endif
 
-        unsigned char creature = *cur.me;
+    int select = isActive[selectorCounter & 3];
 
-        chStart = now;
-        chIndex = GET(creature);
+    while (T1TC < availableIdleTime - 12500) {
 
+#ifdef DEBUG_TIMES
+        if (chIndex >= 0) {
+            unsigned int elapsed = T1TC - chStart;
+            if ((int)elapsed > debug[chIndex])
+                debug[chIndex] = elapsed;
+            chIndex = -1;
+        }
+#endif
+        creature = *cursor.me;
         if (creature < FLAG_THISFRAME) {
 
             enum ObjectType type = CharToType[creature];
 
-            // Any blanks/dissolves underwater/lava gets transformed to water/lava chars
-            if (isVisible(cur.col, cur.row))
-                if (cur.row * CHAR_TRIX_Y >= lavaSurfaceTrixel && Attribute[type] & ATT_CONVERT)
-                    *cur.me = showLava ? CH_LAVA_BLANK : CH_WATER;
 
-            if (Attribute[type] & isActive[selectorCounter & 3]) {
-                if (!processTypes(&cur, type, creature))
-                    processCreatures(&cur, creature);
+            if (Attribute[type] & select) {
+
+#ifdef DEBUG_TIMES
+                chStart = T1TC;
+                chIndex = GET(creature);
+#endif
+
+                if (!processTypes(&cursor, type, creature))
+                    processCreatures(&cursor, creature);
             }
         }
-
 
         // Clear any "scanned this frame" objects on the previous line
         // note: we need to also do the last row ... or do we? if it's steel wall, no
-
-        // if (gravity > 0) {
-        if (cur.row > 1) {
-            unsigned char *prev = cur.me - _BOARD_COLS;
+        if (cursor.row) {
+            unsigned char *prev = cursor.me - _BOARD_COLS;
             *prev &= ~FLAG_THISFRAME;
         }
-        // }
 
-        // else {
-        //     if (cur.row < _BOARD_ROWS - 1) {
-        //         unsigned char *prev = cur.me + _BOARD_COLS;
-        //         *prev &= ~FLAG_THISFRAME;
-        //     }
-        // }
-
-        cur.me += gravity;
-        cur.col += gravity;
-
-        // if (gravity < 0) {
-        //     if (cur.col < 0) {
-        //         cur.col = _BOARD_COLS - 1;
-
-        //         if (!--cur.row) {
-        //             // Leave boardRow negative so setupBoardScanner's
-        //             // "if (boardRow < 0)" restart branch actually triggers;
-        //             // otherwise the next scan wrongly restarts at (0,0)
-        //             // instead of the bottom row whenever gravity is negative.
-        //             boardRow = -1;
-        //             boardCol = cur.col;
-        //             setSchedule(SCHEDULE_START_SCAN);
-        //             return;
-        //         }
-        //     }
-        // }
-
-        // else {
-        if (cur.col > (_BOARD_COLS - 1)) {
-            cur.col = 0;
-            if (++cur.row > _BOARD_ROWS - 1) {
-                boardRow = cur.row;
-                boardCol = cur.col;
+        if (++cursor.col > (_BOARD_COLS - 1)) {
+            cursor.col = 0;
+            if (++cursor.row > _BOARD_ROWS - 1) {
                 setSchedule(SCHEDULE_START_SCAN);
-
-
-#ifdef DEBUG_TIMES
-
-                // Early exit -- no "next fetch" is coming to close this
-                // cell's window, so close it here instead.
-                unsigned int elapsed = T1TC - chStart;
-                if ((int)elapsed > debug[chIndex])
-                    debug[chIndex] = elapsed;
-
-#endif
                 return;
             }
-            // }
         }
 
-        boardRow = cur.row;
-        boardCol = cur.col;
+        cursor.me++;
     }
 
 #ifdef DEBUG_TIMES
-    // Loop exited via its own condition (gameState changed, or this frame's
-    // time budget ran out) rather than the early return above -- close
-    // whatever cell was mid-flight when that happened. Guarded because
-    // chIndex is still -1 if the loop body never ran at all this call.
     if (chIndex >= 0) {
         unsigned int elapsed = T1TC - chStart;
         if ((int)elapsed > debug[chIndex])
             debug[chIndex] = elapsed;
+        chIndex = -1;
     }
 #endif
+
+
+    if (availableIdleTime && T1TC > availableIdleTime) {
+        debug[200] = T1TC - availableIdleTime;
+        debug[201] = creature;
+        FLASH(0x42, 2);
+    }
 }
 
 
@@ -564,9 +613,21 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         nDots(10, cur->col, cur->row, PT_SPIRAL, 40, 2, 5, 0x40, 7);    // untested speed
         break;
 
-    case TYPE_DOGE:
-        processDoge(cur->me, cur->row, cur->col);
+    case TYPE_DOGE: {
+
+        unsigned char *next = cur->me + _BOARD_COLS;    // * gravity;
+        const unsigned int attrNext = Attribute[CharToType[GET(*next)]];
+
+        if (attrNext & ATT_BLANK) {
+            *cur->me = FLAG(CH_DOGE_FALLING_TOP);
+            *next = FLAG(CH_DOGE_FALLING_BOTTOM);
+        }
+
+        else if (attrNext & ATT_ROLL)
+            doRoll(cur->me, cur->row, cur->col);
+
         break;
+    }
 
     case TYPE_PEBBLE1:
         processPebble(cur->me, cur->row, cur->col);
@@ -614,9 +675,14 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         processCharBeltAndGrinder(cur->me, creature);
         break;
 
-    case TYPE_GEODOGE:
-        processCharGeoDogeAndRock(cur->me);
+    case TYPE_GEODOGE: {
+        unsigned char *next = cur->me + _BOARD_COLS;
+        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+            *next = FLAG(CH_GEODOGE_FALLING_BOTTOM);
+            *cur->me = FLAG(CH_GEODOGE_FALLING_TOP);
+        }
         break;
+    }
 
     default:
         return false;
@@ -917,7 +983,7 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
 
     case CH_ROCK:
-        processCharGeoDogeAndRock(cur->me);
+        processCharRock(cur->me);
         break;
 
     case CH_ROCK_FALLING_TOP:
@@ -1092,21 +1158,6 @@ void restartBoardScan() {
 }
 
 
-void processDoge(unsigned char *me, int row, int col) {
-
-    unsigned char *next = me + _BOARD_COLS * gravity;
-    const unsigned int attrNext = Attribute[CharToType[GET(*next)]];
-
-    if (attrNext & ATT_BLANK) {
-        *me = FLAG(CH_DOGE_FALLING_TOP);
-        *next = FLAG(CH_DOGE_FALLING_BOTTOM);
-    }
-
-    else if (attrNext & ATT_ROLL)
-        doRoll(me, row, col);
-}
-
-
 void processPebble(unsigned char *me, int row, int col) {
 
     // don't form way above player (but DO form 1 above)
@@ -1193,22 +1244,16 @@ void processCharBeltAndGrinder(unsigned char *me, unsigned char creature) {
     }
 }
 
-void processCharGeoDogeAndRock(unsigned char *me) {
 
-    unsigned char *next = me + _BOARD_COLS * gravity;
-    enum ObjectType typeDown = CharToType[GET(*next)];
+void processCharRock(unsigned char *me) {
 
-    if (Attribute[typeDown] & ATT_BLANK) {
-
-        if (ATTRIBUTE_BIT(*me, ATT_GEODOGE)) {
-            *next = FLAG(CH_GEODOGE_FALLING_BOTTOM);
-            *me = FLAG(CH_GEODOGE_FALLING_TOP);
-        } else {
-            *next = FLAG(CH_ROCK_FALLING_BOTTOM);
-            *me = FLAG(CH_ROCK_FALLING_TOP);
-        }
+    unsigned char *next = me + _BOARD_COLS;
+    if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+        *next = FLAG(CH_ROCK_FALLING_BOTTOM);
+        *me = FLAG(CH_ROCK_FALLING_TOP);
     }
 }
+
 
 void processFallingThings(unsigned char *me, int row, int col, unsigned char creature) {
 
@@ -1448,35 +1493,32 @@ void doRoll(unsigned char *me, int row, int col) {
     for (int offset = -1; offset < 2; offset += 2) {
 
         unsigned char *side = me + offset;
-        if (*side < FLAG_THISFRAME) {
+        unsigned char sc = *side;
+        if (sc < FLAG_THISFRAME && (Attribute[CharToType[sc]] & ATT_BLANK)) {
 
-            enum ObjectType sideType = CharToType[GET(*side)];
-            if (Attribute[sideType] & ATT_BLANK) {
+            unsigned char *sideDown = side + _BOARD_COLS;
+            unsigned char sd = *sideDown;
+            if (sd < FLAG_THISFRAME && (Attribute[CharToType[sd]] & ATT_BLANK)) {
 
-                unsigned char *sideDown = side + gravity * _BOARD_COLS;
-                enum ObjectType sideDownType = CharToType[GET(*sideDown)];
-                if (Attribute[sideDownType] & ATT_BLANK) {
+                if (offset > 0) {
+                    *me = FLAG(CH_DOGE_SIDE_1);
+                    *(me + offset) = FLAG(CH_DOGE_SIDE_3);
 
-                    if (offset > 0) {
-                        *me = FLAG(CH_DOGE_SIDE_1);
-                        *(me + offset) = FLAG(CH_DOGE_SIDE_3);
-
-                    } else {
-                        *me = FLAG(CH_DOGE_SIDE_2);
-                        *(me + offset) = FLAG(CH_DOGE_SIDE_4);
-                    }
-
-                    *(sideDown) = FLAG(CH_BLANK);
-
-                    int off = offset < 0 ? 4 : 0;
-
-                    nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4 * gravity, 0, 1);
-                    nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4 * gravity, 0, 1);
-                    nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7 * gravity, 0, 1);
-                    nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10 * gravity, 0, 1);
-
-                    return;
+                } else {
+                    *me = FLAG(CH_DOGE_SIDE_2);
+                    *(me + offset) = FLAG(CH_DOGE_SIDE_4);
                 }
+
+                *(sideDown) = FLAG(CH_BLANK);
+
+                int off = offset < 0 ? 4 : 0;
+
+                nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
+                nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
+                nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
+                nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+
+                return;
             }
         }
     }
@@ -1500,6 +1542,8 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 
             bool wasDoge = (cellType == TYPE_DOGE);
             bool becomesDoge = (shape[i] == CH_DOGE_00);
+
+            // nDots(5, , y, PT_SPIRAL, 30, CHAR_CENTER_X, CHAR_CENTER_Y, 50, 7);
 
             if (wasDoge && !becomesDoge)
                 totalDogePossible--;    // a doge sitting here is being destroyed

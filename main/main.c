@@ -194,6 +194,7 @@ void setGameState(enum GAME_STATE state) {
                    // to guard themselves
 
     nextGameState = state;    // actioned by scheduleInitState(), once a frame has budget for it
+    availableIdleTime = 0;    // no time for anything else!
     setSchedule(SCHEDULE_INIT_STATE);
 }
 

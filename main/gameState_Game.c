@@ -88,8 +88,6 @@ void initGameState_Game() {
 
     decodeCave(cave);    // TODO: in initNextLife instead
 
-    displayFloatingString(5, 52, 100, "PlanetX");
-
 
     luminance = -15;
     lumTarget = 0;
@@ -97,7 +95,7 @@ void initGameState_Game() {
 
     setSchedule(SCHEDULE_UNPACK_CAVE);
 
-    myMemsetInt((unsigned int *)(RAM + _GAME_BUFFERS_START), 0, _GAME_BUFFERS_SIZE / 4);
+    //    myMemsetInt((unsigned int *)(RAM + _GAME_BUFFERS_START), 0, _GAME_BUFFERS_SIZE / 4);
 
     gameSpeed = SPEED_BASE;
     gameFrame = gameSpeed;    // force rollover
@@ -187,14 +185,14 @@ void VB_Game() {
             drawPlayerSprite();
 
         if (!maskNeeded) {
+
+            drawFloatingChars();
+            drawAttachedChar(attachment);
+
             drawMace();
             // drawRope();
             // drawGun();
-
-            drawFloatingChars();
             drawParticles();
-
-            drawAttachedChar(attachment);
         }
     }
 

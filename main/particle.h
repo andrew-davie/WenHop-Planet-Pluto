@@ -21,8 +21,8 @@ struct Particle {
     unsigned char age;
     unsigned char speed;
     unsigned char colour;
-    int x;
-    int y;
+    int trixX_8;
+    int trixY_8;
     unsigned char dir;
     unsigned short distance;
 };
@@ -40,10 +40,10 @@ void drawMace();
 void drawGun();
 
 
-int sphereDot(int dotX, int dotY, int type, unsigned char age, unsigned char colour);
-int nDots(int count, int dripX, int dripY, int type, unsigned char age, int offsetX, int offsetY, int speed,
+int sphereDot(int trixX, int trixY, int type, unsigned char age, unsigned char colour);
+int nDots(int count, int trixX, int trixY, int type, unsigned char age, int offsetX, int offsetY, int speed,
           unsigned char colour);
-void nDotsAtTrixel(int count, int dripX, int dripY, unsigned char age, enum ParticleType type, int speed,
+void nDotsAtTrixel(int count, int trixX, int trixY, unsigned char age, enum ParticleType type, int speed,
                    unsigned char colour);
 
 void floatingCharacter(int trixX, int trixY, int age, unsigned char ch);

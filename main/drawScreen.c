@@ -247,16 +247,17 @@ void drawScreen() {
             // "obviously" fewer dispatches -- the 5x code-size growth costs
             // more in instruction-fetch than the per-iteration branch saves.
             // Keep the dispatch here, inside the loop, at this size.
-            // switch (shift) {
-            // case 1: packed >>= 1; break;
-            // case 2: packed >>= 2; break;
-            // case 3: packed >>= 3; break;
-            // case 4: packed >>= 4; break;
-            // default: packed >>= 5; break;
-            // }
-
-
-            packed >>= shift;
+            //
+            // This had been left disabled (falling through to the plain
+            // variable shift below, the exact thing this comment argues
+            // against) -- re-enabled to match what was actually measured.
+            switch (shift) {
+            case 1: packed >>= 1; break;
+            case 2: packed >>= 2; break;
+            case 3: packed >>= 3; break;
+            case 4: packed >>= 4; break;
+            default: packed >>= 5; break;
+            }
 
             *(pfL + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)(packed >> 20)];    // PF2_LEFT
             *(pfL + _BUFFER_SIZE) = (unsigned char)(packed >> 28);                        // PF1_LEFT
@@ -372,7 +373,22 @@ void drawScreenMirror(int buffer) {
                 ((unsigned long long)(img[6][lineColour] | corner[6][lineColour]) & 0x1F) << 5 |
                 ((unsigned long long)(img[7][lineColour] | corner[7][lineColour]) & 0x1F);
 
-            unsigned int px32 = (unsigned int)(packed >> shift);
+            // Same fix as drawScreen(): shift is loop-invariant but its value
+            // isn't known until runtime, so "packed >> shift" on this
+            // unsigned long long forces the generic 64-bit variable-shift
+            // path on every scanline. shift only takes 5 values
+            // (1..CHAR_TRIX_X), so dispatch on it to turn each shift back
+            // into a compile-time-constant immediate. Unlike drawScreen()'s
+            // version of this switch, this one hasn't itself been measured
+            // on hardware -- PENDING HARDWARE MEASUREMENT.
+            unsigned int px32;
+            switch (shift) {
+            case 1: px32 = (unsigned int)(packed >> 1); break;
+            case 2: px32 = (unsigned int)(packed >> 2); break;
+            case 3: px32 = (unsigned int)(packed >> 3); break;
+            case 4: px32 = (unsigned int)(packed >> 4); break;
+            default: px32 = (unsigned int)(packed >> 5); break;
+            }
 
             pf[0] = px32 >> 24;                                             // PF1_LEFT  (direct)
             pf[_BUFFER_SIZE] = reverseBits[(unsigned char)(px32 >> 16)];    // PF2_LEFT  (reversed)
