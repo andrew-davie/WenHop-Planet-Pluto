@@ -19,7 +19,7 @@ const unsigned char P1_caveUseWall[] = {
 
     // scroll bounds (TL(x,y), BR(x,y) in trixels)
     3,17,
-    BOARD_TRIX_X-SCREEN_TRIX_X-3,17,
+    BOARD_TRIX_X-3,17,
     0x46, 0xE8, 0xEA,               // palette
 
     20,                             // milling
@@ -1064,7 +1064,7 @@ const unsigned char P4_caveA4[] = {
     // clang-format off
 
     // scroll bounds (TL(x,y), BR(x,y) in trixels)
-    43,17,BOARD_TRIX_X-SCREEN_TRIX_X-53,17,
+    43,17,BOARD_TRIX_X-53,17,
     0xA6, 0x16, 0xD6,               // palette
 
     20,    // milling

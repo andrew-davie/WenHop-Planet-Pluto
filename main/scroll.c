@@ -36,6 +36,33 @@ int approach(int current, int target, int speed) {
 }
 
 
+// theCave->bounds_l/t/r/b describe the cave's actual extent -- its real
+// size/position on the board -- not the scroll range. scrollX/Y is the
+// top-left corner of the on-screen viewport, so the viewport only stays
+// fully inside the extent if the far (right/bottom) edge of the scroll
+// range is pulled in by one screen's width/height; the near (left/top)
+// edge needs no adjustment since the viewport can legally start flush
+// with the extent's own edge. Deriving that here means caveData.c only
+// ever has to state the level's true size.
+//
+// If an axis's extent is already no wider/taller than one screen (e.g. a
+// locked axis, where bounds_l==bounds_r or bounds_t==bounds_b pins the
+// camera to a single fixed position), subtracting the screen size would
+// push max below min and invert the range -- pin to min instead so the
+// axis stays locked rather than clamping to a nonsensical inverted range.
+static int scrollMaxX() {
+    int max = (theCave->bounds_r - SCREEN_TRIX_X) << 16;
+    int min = theCave->bounds_l << 16;
+    return max < min ? min : max;
+}
+
+static int scrollMaxY() {
+    int max = (theCave->bounds_b - SCREEN_TRIX_Y) << 16;
+    int min = theCave->bounds_t << 16;
+    return max < min ? min : max;
+}
+
+
 void scroll() {
 
 
@@ -144,9 +171,9 @@ void scroll() {
 
 
     int bounds_l = (theCave->bounds_l) << 16;
-    int bounds_r = (theCave->bounds_r) << 16;
+    int bounds_r = scrollMaxX();
     int bounds_t = (theCave->bounds_t) << 16;
-    int bounds_b = (theCave->bounds_b) << 16;
+    int bounds_b = scrollMaxY();
 
     if (scrollX > bounds_r) {
         scrollX = bounds_r;
@@ -172,8 +199,9 @@ void scroll() {
 
 void resetTracking() {
 
-    // Clamp against theCave->bounds_l/r/t/b -- the SAME per-cave range
-    // scroll()'s own hard clamp (above) enforces every frame -- not against
+    // Clamp against scrollMaxX()/scrollMaxY() (derived from theCave's
+    // extent) -- the SAME per-cave range scroll()'s own hard clamp (above)
+    // enforces every frame -- not against
     // SCROLL_MIN/MAX_X/Y (the absolute board-wide range, used only as
     // drawScreen()'s last-ditch renderer safety clamp; see scroll.h). Those
     // two ranges normally coincide for an ordinary cave, but a cave that
@@ -190,10 +218,10 @@ void resetTracking() {
     // Matching scroll()'s own clamp here removes that race entirely: this
     // is now the same value scroll() would settle on immediately anyway.
     scrollX = ((playerX * CHAR_TRIX_X - (SCREEN_TRIX_X >> 1)) << 16) + (CHAR_TRIX_X << 15);
-    clamp(&scrollX, theCave->bounds_l << 16, theCave->bounds_r << 16);
+    clamp(&scrollX, theCave->bounds_l << 16, scrollMaxX());
 
     scrollY = ((playerY * CHAR_TRIX_Y - (SCREEN_TRIX_Y >> 1)) << 16);    // + (CHAR_TRIX_Y << 16);
-    clamp(&scrollY, theCave->bounds_t << 16, theCave->bounds_b << 16);
+    clamp(&scrollY, theCave->bounds_t << 16, scrollMaxY());
 
     scrollSpeedX = scrollSpeedY = 0;
 }

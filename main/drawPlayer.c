@@ -96,8 +96,20 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
     }
 
 #if ENABLE_SHAKE
-    int x = (scrollX + shakeX) >> 16;
-    int y = (scrollY + shakeY) >> 16;
+    int sX = scrollX + shakeX;
+    if (sX < SCROLL_MIN_X)
+        sX = SCROLL_MIN_X;
+    if (sX > SCROLL_MAX_X)
+        sX = SCROLL_MAX_X;
+
+    int sY = scrollY + shakeY;
+    if (sY < SCROLL_MIN_Y)
+        sY = SCROLL_MIN_Y;
+    if (sY > SCROLL_MAX_Y)
+        sY = SCROLL_MAX_Y;
+
+    int x = sX >> 16;
+    int y = sY >> 16;
 #else
     int x = scrollX >> 16;
     int y = scrollY >> 16;
