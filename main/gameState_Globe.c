@@ -357,6 +357,18 @@ void OS_Globe() {
 
         case INFO_NAME:
 
+            // Belt-and-braces: doLetter() (draw.c) only ORs glyph bits in, never clears them,
+            // so this buffer MUST be zero before the first letter of a new name is typed.
+            // initGameState_Globe() clears it once per GS_GLOBE state entry, and INFO_CLEAR/
+            // INFO_CLEAR1 clear it again at the end of a normal visit -- but VB_Globe() can jump
+            // straight to GS_GAME the moment the player presses-then-releases fire
+            // (`!waitRelease && !(inpt4 & 0x80)`), regardless of infoPhase, which skips past
+            // INFO_CLEAR/INFO_CLEAR1 entirely. That leaves this planet's own name/physics/info
+            // pixels sitting in the buffer for the *next* visit to inherit. Clearing right here,
+            // at the point the name is actually about to be drawn, doesn't depend on any of
+            // those other paths having run.
+            myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
+
             drawString(FONT_LARGE, 0x8, 10, _BUF_GLOBE_GRP, _BUF_GLOBE_COLUP0, planets[planet].name,
                        _SCANLINES - 2 - 2 * FONTCOMPACT_FONT_HEIGHT - FONTLARGE_FONT_HEIGHT - 25);
             wait = 10;
