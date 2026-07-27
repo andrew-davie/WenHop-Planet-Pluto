@@ -440,17 +440,17 @@ static const unsigned short budget[128] = {
     _untimed_,    //   1 CH_PLACEHOLDER
     _untimed_,    //   2 CH_DIRT
     _untimed_,    //   3 CH_BRICKWALL
-    181,          //   4 CH_DOORCLOSED
+    194,          //   4 CH_DOORCLOSED -- updated 2026-07-27 23:24 AEST
     _untimed_,    //   5 CH_DOOROPEN_0
     _untimed_,    //   6 CH_EXITBLANK
     _untimed_,    //   7 CH_STEELWALL
     _untimed_,    //   8 CH_PEBBLE1
     _untimed_,    //   9 CH_PEBBLE2
-    247,          //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
+    273,          //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
     3331,         //  11 CH_ROCK_FALLING
     2001,         //  12 CH_DOGE_00
     2433,         //  13 CH_DOGE_FALLING
-    238,          //  14 CH_MELLON_HUSK_BIRTH
+    263,          //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
@@ -467,7 +467,7 @@ static const unsigned short budget[128] = {
     232,          //  28 CH_DUST_ROCK_0
     232,          //  29 CH_DUST_ROCK_1
     230,          //  30 CH_DUST_ROCK_2
-    625,          //  31 CH_CONVERT_GEODE_TO_DOGE
+    643,          //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  32 CH_HORIZONTAL_BAR
     _untimed_,    //  33 CH_PUSH_LEFT
     _untimed_,    //  34 CH_PUSH_LEFT_REVERSE
@@ -513,10 +513,10 @@ static const unsigned short budget[128] = {
     _untimed_,    //  74 CH_WYRM_TAIL_R
     _untimed_,    //  75 CH_WYRM_TAIL_D
     _untimed_,    //  76 CH_WYRM_TAIL_L
-    209,          //  77 CH_DOGE_FALLING_TOP
-    209,          //  78 CH_DOGE_FALLING_BOTTOM
-    215,          //  79 CH_ROCK_FALLING_TOP
-    209,          //  80 CH_ROCK_FALLING_BOTTOM
+    221,          //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    222,          //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
+    221,          //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    221,          //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     1443,         //  81 CH_GEODOGE_FALLING_TOP
     209,          //  82 CH_GEODOGE_FALLING_BOTTOM
     _untimed_,    //  83 CH_DOGE_FALLING_TOP2
