@@ -440,17 +440,17 @@ static const unsigned short budget[128] = {
     _untimed_,    //   1 CH_PLACEHOLDER
     _untimed_,    //   2 CH_DIRT
     _untimed_,    //   3 CH_BRICKWALL
-    194,          //   4 CH_DOORCLOSED -- updated 2026-07-27 23:24 AEST
+    206,          //   4 CH_DOORCLOSED -- updated 2026-07-27 23:24 AEST
     _untimed_,    //   5 CH_DOOROPEN_0
     _untimed_,    //   6 CH_EXITBLANK
     _untimed_,    //   7 CH_STEELWALL
     _untimed_,    //   8 CH_PEBBLE1
     _untimed_,    //   9 CH_PEBBLE2
-    273,          //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
-    3331,         //  11 CH_ROCK_FALLING
-    2001,         //  12 CH_DOGE_00
-    2433,         //  13 CH_DOGE_FALLING
-    264,          //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
+    286,          //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
+    3358,         //  11 CH_ROCK_FALLING -- updated 2026-07-27 23:24 AEST
+    2023,         //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
+    2449,         //  13 CH_DOGE_FALLING -- updated 2026-07-27 23:24 AEST
+    275,          //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
@@ -460,14 +460,14 @@ static const unsigned short budget[128] = {
     _untimed_,    //  21 CH_PEBBLE_ROCK
     _untimed_,    //  22 CH_ROCK_PEBBLE
     _untimed_,    //  23 CH_ROCK_PEBBLE_1
-    231,          //  24 CH_DUST_0
-    232,          //  25 CH_DUST_1
-    230,          //  26 CH_DUST_2
-    228,          //  27 CH_GEODOGE
-    232,          //  28 CH_DUST_ROCK_0
-    232,          //  29 CH_DUST_ROCK_1
-    230,          //  30 CH_DUST_ROCK_2
-    643,          //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
+    236,          //  24 CH_DUST_0 -- updated 2026-07-27 23:24 AEST
+    236,          //  25 CH_DUST_1 -- updated 2026-07-27 23:24 AEST
+    234,          //  26 CH_DUST_2 -- updated 2026-07-27 23:24 AEST
+    240,          //  27 CH_GEODOGE -- updated 2026-07-27 23:24 AEST
+    236,          //  28 CH_DUST_ROCK_0 -- updated 2026-07-27 23:24 AEST
+    236,          //  29 CH_DUST_ROCK_1 -- updated 2026-07-27 23:24 AEST
+    234,          //  30 CH_DUST_ROCK_2 -- updated 2026-07-27 23:24 AEST
+    655,          //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  32 CH_HORIZONTAL_BAR
     _untimed_,    //  33 CH_PUSH_LEFT
     _untimed_,    //  34 CH_PUSH_LEFT_REVERSE
@@ -484,11 +484,11 @@ static const unsigned short budget[128] = {
     _untimed_,    //  45 CH_WYRM_CORNER_RD
     _untimed_,    //  46 CH_WYRM_CORNER_LU
     _untimed_,    //  47 CH_WYRM_CORNER_RU
-    208,          //  48 CH_WYRM_HEAD_U
+    221,          //  48 CH_WYRM_HEAD_U -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  49 CH_WYRM_HEAD_R
     _untimed_,    //  50 CH_WYRM_HEAD_D
     _untimed_,    //  51 CH_WYRM_HEAD_L
-    605,          //  52 CH_GEODOGE_FALLING
+    626,          //  52 CH_GEODOGE_FALLING -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  53 CH_FLIP_GRAVITY_0
     _untimed_,    //  54 CH_FLIP_GRAVITY_1
     _untimed_,    //  55 CH_FLIP_GRAVITY_2
@@ -513,37 +513,37 @@ static const unsigned short budget[128] = {
     _untimed_,    //  74 CH_WYRM_TAIL_R
     _untimed_,    //  75 CH_WYRM_TAIL_D
     _untimed_,    //  76 CH_WYRM_TAIL_L
-    221,          //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
-    222,          //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
-    221,          //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-27 23:24 AEST
-    221,          //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
-    1443,         //  81 CH_GEODOGE_FALLING_TOP
-    209,          //  82 CH_GEODOGE_FALLING_BOTTOM
+    234,          //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    234,          //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
+    234,          //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    234,          //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
+    1480,         //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    234,          //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  83 CH_DOGE_FALLING_TOP2
     _untimed_,    //  84 CH_DOGE_FALLING_BOTTOM2
-    230,          //  85 CH_DOGE_SIDE_1
-    229,          //  86 CH_DOGE_SIDE_3
-    229,          //  87 CH_DOGE_SIDE_2
-    229,          //  88 CH_DOGE_SIDE_4
-    454,          //  89 CH_ELECTRIC_0
-    369,          //  90 CH_ELECTRIC_1
-    368,          //  91 CH_ELECTRIC_2
-    361,          //  92 CH_ELECTRIC_3
+    239,          //  85 CH_DOGE_SIDE_1 -- updated 2026-07-27 23:24 AEST
+    251,          //  86 CH_DOGE_SIDE_3 -- updated 2026-07-27 23:24 AEST
+    239,          //  87 CH_DOGE_SIDE_2 -- updated 2026-07-27 23:24 AEST
+    251,          //  88 CH_DOGE_SIDE_4 -- updated 2026-07-27 23:24 AEST
+    467,          //  89 CH_ELECTRIC_0 -- updated 2026-07-27 23:24 AEST
+    382,          //  90 CH_ELECTRIC_1 -- updated 2026-07-27 23:24 AEST
+    382,          //  91 CH_ELECTRIC_2 -- updated 2026-07-27 23:24 AEST
+    383,          //  92 CH_ELECTRIC_3 -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  93 CH_BROKEN_DIRT
-    3829,         //  94 CH_INSULATOR_TOP
-    208,          //  95 CH_INSULATOR_BOTTOM
+    3916,         //  94 CH_INSULATOR_TOP -- updated 2026-07-27 23:24 AEST
+    221,          //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-27 23:24 AEST
     1660,         //  96 CH_STAR -- updated 2026-07-27 23:24 AEST
     165,          //  97 CH_STAR_FALLING_TOP -- updated 2026-07-27 23:24 AEST
     164,          //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  99 CH_ROCK_BONUS
     _untimed_,    // 100 CH_STAR_EXPLODE
     3155,         // 101 CH_INSULATOR_L -- updated 2026-07-27 23:24 AEST
-    208,          // 102 CH_INSULATOR_R
-    463,          // 103 CH_ELECTRIC_H0
-    378,          // 104 CH_ELECTRIC_H1
-    378,          // 105 CH_ELECTRIC_H2
-    380,          // 106 CH_ELECTRIC_H3
-    171,          // 107 CH_CROSSED_STREAMS
+    221,          // 102 CH_INSULATOR_R -- updated 2026-07-27 23:24 AEST
+    467,          // 103 CH_ELECTRIC_H0 -- updated 2026-07-27 23:24 AEST
+    382,          // 104 CH_ELECTRIC_H1 -- updated 2026-07-27 23:24 AEST
+    382,          // 105 CH_ELECTRIC_H2 -- updated 2026-07-27 23:24 AEST
+    383,          // 106 CH_ELECTRIC_H3 -- updated 2026-07-27 23:24 AEST
+    190,          // 107 CH_CROSSED_STREAMS -- updated 2026-07-27 23:24 AEST
     _untimed_,    // 108 CH_MOUNT_U
     _untimed_,    // 109 CH_MOUNT_D
     _untimed_,    // 110 CH_MOUNT_L
