@@ -50,8 +50,8 @@ mainGameLoop
                 	stx DSWRITE
 
                 	lda INTIM
-                    ; sec
-                    ; sbc #5
+                    sec
+                    sbc #3
                 	sta DSWRITE
 
     ; send controllers to ARM
@@ -126,6 +126,8 @@ mainGameLoop
                     stx DSWRITE
 
                 	lda INTIM
+                    sec
+                    sbc #1
                 	sta DSWRITE
 
                     ldx call_fn

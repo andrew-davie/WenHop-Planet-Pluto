@@ -337,7 +337,7 @@ void runARM_VerticalBlank() {
         T1TCR = 1;
     }
 
-    availableIdleTime = RAM[_INTIM] * armCycles - 5000;
+    availableIdleTime = RAM[_INTIM] * armCycles;
 
     // Always dispatch on the CURRENTLY active state, even while a transition is pending --
     // nextGameState only takes effect once scheduleInitState() finishes and flips gameState itself.

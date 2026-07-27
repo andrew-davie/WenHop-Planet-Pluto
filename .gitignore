@@ -47,3 +47,5 @@ main/spinningGlobe/textures/neptune.png
 main/spinningGlobe/textures/pluto.png
 main/spinningGlobe/textures/sun.png
 main/spinningGlobe/textures/venus.png
+*.csv
+

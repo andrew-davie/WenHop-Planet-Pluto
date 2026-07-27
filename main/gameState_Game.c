@@ -212,7 +212,12 @@ void OS_Game() {
 
     (*caveList[cave].handler)();
 
-    if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
+    // Also skipped once a transition is pending (gameState != nextGameState) --
+    // drawScreen() alone costs ~78K of this phase's budget (see the comment
+    // below), which can leave scheduleInitState() without the margin it needs
+    // to ever complete. We're leaving this screen anyway once a transition is
+    // armed, so there's nothing lost by not redrawing it that one last frame.
+    if (gameSchedule != SCHEDULE_UNPACK_CAVE && gameState == nextGameState) {
         drawScreen();
         setPFColours(theCave->palette, (unsigned char *)(RAM + _BUF_GAME_COLUPF));
     }
