@@ -434,40 +434,45 @@ void setupBoardScanner() {
 
 #define _untimed_ 12500
 
+// Global safety margin added to every timed budget[] entry below (each
+// written as `_B + <measured value>`) -- bump this one number to pad
+// every character's budget at once, rather than hand-editing 128 lines.
+#define _B 30
+
 // Last updated: 2026-07-27 23:40 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
     _untimed_,    //   2 CH_DIRT
     _untimed_,    //   3 CH_BRICKWALL
-    330,          //   4 CH_DOORCLOSED -- updated 2026-07-27 23:40 AEST
+    _B + 330,     //   4 CH_DOORCLOSED -- updated 2026-07-27 23:40 AEST
     _untimed_,    //   5 CH_DOOROPEN_0
     _untimed_,    //   6 CH_EXITBLANK
     _untimed_,    //   7 CH_STEELWALL
     _untimed_,    //   8 CH_PEBBLE1
     _untimed_,    //   9 CH_PEBBLE2
-    422,          //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
-    3360,         //  11 CH_ROCK_FALLING -- updated 2026-07-27 23:40 AEST
-    2023,         //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
-    2454,         //  13 CH_DOGE_FALLING -- updated 2026-07-27 23:40 AEST
-    276,          //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
+    _B + 422,     //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
+    _B + 3360,    //  11 CH_ROCK_FALLING -- updated 2026-07-27 23:40 AEST
+    _B + 2023,    //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
+    _B + 2454,    //  13 CH_DOGE_FALLING -- updated 2026-07-27 23:40 AEST
+    _B + 276,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
     _untimed_,    //  18 CH_LAVA_LARGE
-    7276,         //  19 CH_MELLON_HUSK
+    _B + 7276,    //  19 CH_MELLON_HUSK
     _untimed_,    //  20 CH_DOGE_STATIC
     _untimed_,    //  21 CH_PEBBLE_ROCK
     _untimed_,    //  22 CH_ROCK_PEBBLE
     _untimed_,    //  23 CH_ROCK_PEBBLE_1
-    236,          //  24 CH_DUST_0 -- updated 2026-07-27 23:24 AEST
-    236,          //  25 CH_DUST_1 -- updated 2026-07-27 23:24 AEST
-    234,          //  26 CH_DUST_2 -- updated 2026-07-27 23:24 AEST
-    240,          //  27 CH_GEODOGE -- updated 2026-07-27 23:24 AEST
-    236,          //  28 CH_DUST_ROCK_0 -- updated 2026-07-27 23:24 AEST
-    236,          //  29 CH_DUST_ROCK_1 -- updated 2026-07-27 23:24 AEST
-    234,          //  30 CH_DUST_ROCK_2 -- updated 2026-07-27 23:24 AEST
-    655,          //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
+    _B + 236,     //  24 CH_DUST_0 -- updated 2026-07-27 23:24 AEST
+    _B + 236,     //  25 CH_DUST_1 -- updated 2026-07-27 23:24 AEST
+    _B + 234,     //  26 CH_DUST_2 -- updated 2026-07-27 23:24 AEST
+    _B + 240,     //  27 CH_GEODOGE -- updated 2026-07-27 23:24 AEST
+    _B + 236,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-27 23:24 AEST
+    _B + 236,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-27 23:24 AEST
+    _B + 234,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-27 23:24 AEST
+    _B + 655,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  32 CH_HORIZONTAL_BAR
     _untimed_,    //  33 CH_PUSH_LEFT
     _untimed_,    //  34 CH_PUSH_LEFT_REVERSE
@@ -484,11 +489,11 @@ static const unsigned short budget[128] = {
     _untimed_,    //  45 CH_WYRM_CORNER_RD
     _untimed_,    //  46 CH_WYRM_CORNER_LU
     _untimed_,    //  47 CH_WYRM_CORNER_RU
-    221,          //  48 CH_WYRM_HEAD_U -- updated 2026-07-27 23:24 AEST
+    _B + 221,     //  48 CH_WYRM_HEAD_U -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  49 CH_WYRM_HEAD_R
     _untimed_,    //  50 CH_WYRM_HEAD_D
     _untimed_,    //  51 CH_WYRM_HEAD_L
-    3360,         //  52 CH_GEODOGE_FALLING -- updated 2026-07-27 23:24 AEST
+    _B + 3360,    //  52 CH_GEODOGE_FALLING -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  53 CH_FLIP_GRAVITY_0
     _untimed_,    //  54 CH_FLIP_GRAVITY_1
     _untimed_,    //  55 CH_FLIP_GRAVITY_2
@@ -513,45 +518,45 @@ static const unsigned short budget[128] = {
     _untimed_,    //  74 CH_WYRM_TAIL_R
     _untimed_,    //  75 CH_WYRM_TAIL_D
     _untimed_,    //  76 CH_WYRM_TAIL_L
-    234,          //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
-    234,          //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
-    234,          //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-27 23:24 AEST
-    234,          //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
-    1480,         //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
-    234,          //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
+    _B + 234,     //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    _B + 234,     //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
+    _B + 234,     //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    _B + 234,     //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
+    _B + 1480,    //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    _B + 234,     //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  83 CH_DOGE_FALLING_TOP2
     _untimed_,    //  84 CH_DOGE_FALLING_BOTTOM2
-    239,          //  85 CH_DOGE_SIDE_1 -- updated 2026-07-27 23:24 AEST
-    251,          //  86 CH_DOGE_SIDE_3 -- updated 2026-07-27 23:24 AEST
-    239,          //  87 CH_DOGE_SIDE_2 -- updated 2026-07-27 23:24 AEST
-    251,          //  88 CH_DOGE_SIDE_4 -- updated 2026-07-27 23:24 AEST
-    467,          //  89 CH_ELECTRIC_0 -- updated 2026-07-27 23:24 AEST
-    382,          //  90 CH_ELECTRIC_1 -- updated 2026-07-27 23:24 AEST
-    382,          //  91 CH_ELECTRIC_2 -- updated 2026-07-27 23:24 AEST
-    384,          //  92 CH_ELECTRIC_3 -- updated 2026-07-27 23:24 AEST
+    _B + 239,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-27 23:24 AEST
+    _B + 251,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-27 23:24 AEST
+    _B + 239,     //  87 CH_DOGE_SIDE_2 -- updated 2026-07-27 23:24 AEST
+    _B + 251,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-27 23:24 AEST
+    _B + 467,     //  89 CH_ELECTRIC_0 -- updated 2026-07-27 23:24 AEST
+    _B + 382,     //  90 CH_ELECTRIC_1 -- updated 2026-07-27 23:24 AEST
+    _B + 382,     //  91 CH_ELECTRIC_2 -- updated 2026-07-27 23:24 AEST
+    _B + 384,     //  92 CH_ELECTRIC_3 -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  93 CH_BROKEN_DIRT
-    3946,         //  94 CH_INSULATOR_TOP -- updated 2026-07-27 23:24 AEST
-    221,          //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-27 23:24 AEST
-    1937,         //  96 CH_STAR -- updated 2026-07-27 23:29 AEST
-    215,          //  97 CH_STAR_FALLING_TOP -- updated 2026-07-27 23:29 AEST
-    215,          //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-27 23:29 AEST
+    _B + 3946,    //  94 CH_INSULATOR_TOP -- updated 2026-07-27 23:24 AEST
+    _B + 221,     //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-27 23:24 AEST
+    _B + 1937,    //  96 CH_STAR -- updated 2026-07-27 23:29 AEST
+    _B + 215,     //  97 CH_STAR_FALLING_TOP -- updated 2026-07-27 23:29 AEST
+    _B + 215,     //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-27 23:29 AEST
     _untimed_,    //  99 CH_ROCK_BONUS
     _untimed_,    // 100 CH_STAR_EXPLODE
-    3731,         // 101 CH_INSULATOR_L -- updated 2026-07-27 23:34 AEST
-    221,          // 102 CH_INSULATOR_R -- updated 2026-07-27 23:24 AEST
-    467,          // 103 CH_ELECTRIC_H0 -- updated 2026-07-27 23:24 AEST
-    382,          // 104 CH_ELECTRIC_H1 -- updated 2026-07-27 23:24 AEST
-    382,          // 105 CH_ELECTRIC_H2 -- updated 2026-07-27 23:24 AEST
-    384,          // 106 CH_ELECTRIC_H3 -- updated 2026-07-27 23:24 AEST
-    190,          // 107 CH_CROSSED_STREAMS -- updated 2026-07-27 23:24 AEST
+    _B + 3731,    // 101 CH_INSULATOR_L -- updated 2026-07-27 23:34 AEST
+    _B + 221,     // 102 CH_INSULATOR_R -- updated 2026-07-27 23:24 AEST
+    _B + 467,     // 103 CH_ELECTRIC_H0 -- updated 2026-07-27 23:24 AEST
+    _B + 382,     // 104 CH_ELECTRIC_H1 -- updated 2026-07-27 23:24 AEST
+    _B + 382,     // 105 CH_ELECTRIC_H2 -- updated 2026-07-27 23:24 AEST
+    _B + 384,     // 106 CH_ELECTRIC_H3 -- updated 2026-07-27 23:24 AEST
+    _B + 190,     // 107 CH_CROSSED_STREAMS -- updated 2026-07-27 23:24 AEST
     _untimed_,    // 108 CH_MOUNT_U
     _untimed_,    // 109 CH_MOUNT_D
     _untimed_,    // 110 CH_MOUNT_L
     _untimed_,    // 111 CH_MOUNT_R
     _untimed_,    // 112 CH_PIT_L0
     _untimed_,    // 113 CH_PIT_R0
-    1334,         // 114 CH_BOMB
-    5386,         // 115 CH_CRACKED_BRICK
+    _B + 1334,    // 114 CH_BOMB
+    _B + 5386,    // 115 CH_CRACKED_BRICK
     _untimed_,    // 116 CH_CONCRETE
     _untimed_,    // 117 (unused)
     _untimed_,    // 118 (unused)
