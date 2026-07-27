@@ -15,9 +15,13 @@ For each CSV not already recorded in tools/.budget_csv_manifest.txt:
       - if it's already a real number and the CSV value is strictly
         larger, replace it with the CSV value
       - otherwise leave it alone
-  - if board.c changed, git add + commit (main/board.c and the manifest
-    only -- never a blanket `git add .`, since other unrelated files in
-    this tree may have their own in-progress uncommitted changes)
+  - the '// Last updated: ...' stamp above budget[128] is refreshed on
+    every processing attempt, whether or not any values actually changed
+    -- it records when an update was last *attempted*, not just when it
+    last had an effect
+  - git add + commit main/board.c and the manifest every run (never a
+    blanket `git add .`, since other unrelated files in this tree may
+    have their own in-progress uncommitted changes)
   - record the CSV filename in the manifest either way, so it's never
     reprocessed
 
@@ -177,6 +181,7 @@ def main():
             board_lines = f.readlines()
 
         new_lines, changes = merge(board_lines, csv_values)
+        new_lines = update_stamp(new_lines)  # always stamp the attempt, changed or not
 
         if changes:
             print(f"  {len(changes)} budget[] entries updated:")
@@ -188,21 +193,18 @@ def main():
         if dry_run:
             continue
 
-        if changes:
-            new_lines = update_stamp(new_lines)
-            with open(BOARD_C, "w") as f:
-                f.writelines(new_lines)
+        with open(BOARD_C, "w") as f:
+            f.writelines(new_lines)
 
         append_manifest(fname)
 
+        git(["add", "main/board.c", "tools/.budget_csv_manifest.txt"])
         if changes:
-            git(["add", "main/board.c", "tools/.budget_csv_manifest.txt"])
             msg = f"budget[]: merge {len(changes)} timing update(s) from {fname}"
-            r = git(["commit", "-m", msg])
-            print("  " + r.stdout.strip().splitlines()[0] if r.stdout.strip() else "  git commit produced no output")
         else:
-            git(["add", "tools/.budget_csv_manifest.txt"])
-            git(["commit", "-m", f"budget[]: record {fname} as processed (no changes)"])
+            msg = f"budget[]: record {fname} as processed (no changes)"
+        r = git(["commit", "-m", msg])
+        print("  " + r.stdout.strip().splitlines()[0] if r.stdout.strip() else "  git commit produced no output")
 
 
 if __name__ == "__main__":
