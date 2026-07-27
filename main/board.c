@@ -450,7 +450,7 @@ static const unsigned short budget[128] = {
     3331,         //  11 CH_ROCK_FALLING
     2001,         //  12 CH_DOGE_00
     2433,         //  13 CH_DOGE_FALLING
-    263,          //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
+    264,          //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
