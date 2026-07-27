@@ -424,7 +424,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 00:07 AEST
+// Last updated: 2026-07-28 00:10 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -511,7 +511,7 @@ static const unsigned short budget[128] = {
     _B + 234,     //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  83 CH_DOGE_FALLING_TOP2
     _untimed_,    //  84 CH_DOGE_FALLING_BOTTOM2
-    _B + 239,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-27 23:24 AEST
+    _B + 233,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 00:10 AEST (was 2)
     _B + 251,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-27 23:24 AEST
     _B + 239,     //  87 CH_DOGE_SIDE_2 -- updated 2026-07-27 23:24 AEST
     _B + 251,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-27 23:24 AEST
