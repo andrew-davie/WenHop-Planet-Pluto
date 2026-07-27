@@ -424,13 +424,13 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-27 23:48 AEST
+// Last updated: 2026-07-28 00:07 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
     _untimed_,    //   2 CH_DIRT
     _untimed_,    //   3 CH_BRICKWALL
-    _B + 330,     //   4 CH_DOORCLOSED -- updated 2026-07-27 23:40 AEST
+    _B + 341,     //   4 CH_DOORCLOSED -- updated 2026-07-28 00:07 AEST
     _untimed_,    //   5 CH_DOOROPEN_0
     _untimed_,    //   6 CH_EXITBLANK
     _untimed_,    //   7 CH_STEELWALL
@@ -439,7 +439,7 @@ static const unsigned short budget[128] = {
     _B + 422,     //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
     _B + 3360,    //  11 CH_ROCK_FALLING -- updated 2026-07-27 23:40 AEST
     _B + 2023,    //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
-    _B + 2455,    //  13 CH_DOGE_FALLING -- updated 2026-07-27 23:48 AEST
+    _B + 2474,    //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
     _B + 276,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
@@ -450,12 +450,12 @@ static const unsigned short budget[128] = {
     _untimed_,    //  21 CH_PEBBLE_ROCK
     _untimed_,    //  22 CH_ROCK_PEBBLE
     _untimed_,    //  23 CH_ROCK_PEBBLE_1
-    _B + 236,     //  24 CH_DUST_0 -- updated 2026-07-27 23:24 AEST
-    _B + 236,     //  25 CH_DUST_1 -- updated 2026-07-27 23:24 AEST
+    _B + 242,     //  24 CH_DUST_0 -- updated 2026-07-28 00:07 AEST
+    _B + 242,     //  25 CH_DUST_1 -- updated 2026-07-28 00:07 AEST
     _B + 234,     //  26 CH_DUST_2 -- updated 2026-07-27 23:24 AEST
     _B + 240,     //  27 CH_GEODOGE -- updated 2026-07-27 23:24 AEST
-    _B + 236,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-27 23:24 AEST
-    _B + 236,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-27 23:24 AEST
+    _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
+    _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
     _B + 234,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-27 23:24 AEST
     _B + 655,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  32 CH_HORIZONTAL_BAR
@@ -503,11 +503,11 @@ static const unsigned short budget[128] = {
     _untimed_,    //  74 CH_WYRM_TAIL_R
     _untimed_,    //  75 CH_WYRM_TAIL_D
     _untimed_,    //  76 CH_WYRM_TAIL_L
-    _B + 234,     //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    _B + 240,     //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-28 00:07 AEST
     _B + 234,     //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     _B + 234,     //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-27 23:24 AEST
-    _B + 234,     //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
-    _B + 1480,    //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    _B + 240,     //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-28 00:07 AEST
+    _B + 1487,    //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-07-28 00:07 AEST
     _B + 234,     //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  83 CH_DOGE_FALLING_TOP2
     _untimed_,    //  84 CH_DOGE_FALLING_BOTTOM2
