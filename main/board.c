@@ -416,16 +416,158 @@ void setupBoardScanner() {
 }
 
 
+// Worst-case T1TC ticks to process one board square, per raw character
+// number -- same indexing as debug[] (main.c/main.h, GET(creature), i.e.
+// 0..127, the board-resident character range; see attribute.h's "127 is
+// limit of board-resident character numbers", CH_ names 128+ are
+// animation-only and never appear as a board.me value so they're never
+// looked up here). Intended to throttle processBoardSquares()'s while loop
+// per-square instead of (or alongside) its current flat 12500-tick margin.
+//
+// Values are the first 128 entries of debug[] captured from a DEBUG_TIMES
+// run, i.e. the worst case
+// actually observed during that run, not a theoretical bound -- a
+// character type that's never hit an expensive code path yet will read 0
+// here even if it's capable of costing more. Re-run with DEBUG_TIMES and
+// re-export to refresh if per-character costs change (new code paths,
+// timing-sensitive fixes, etc.).
+
+#define _untimed_ 12500
+
+// Last updated: 2026-07-27 21:45 AEST
+static const unsigned short budget[128] = {
+    _untimed_,    //   0 CH_BLANK
+    _untimed_,    //   1 CH_PLACEHOLDER
+    _untimed_,    //   2 CH_DIRT
+    _untimed_,    //   3 CH_BRICKWALL
+    181,          //   4 CH_DOORCLOSED
+    _untimed_,    //   5 CH_DOOROPEN_0
+    _untimed_,    //   6 CH_EXITBLANK
+    _untimed_,    //   7 CH_STEELWALL
+    _untimed_,    //   8 CH_PEBBLE1
+    _untimed_,    //   9 CH_PEBBLE2
+    247,          //  10 CH_ROCK
+    3331,         //  11 CH_ROCK_FALLING
+    2001,         //  12 CH_DOGE_00
+    2433,         //  13 CH_DOGE_FALLING
+    238,          //  14 CH_MELLON_HUSK_BIRTH
+    _untimed_,    //  15 CH_LAVA_BLANK
+    _untimed_,    //  16 CH_LAVA_SMALL
+    _untimed_,    //  17 CH_LAVA_MEDIUM
+    _untimed_,    //  18 CH_LAVA_LARGE
+    7276,         //  19 CH_MELLON_HUSK
+    _untimed_,    //  20 CH_DOGE_STATIC
+    _untimed_,    //  21 CH_PEBBLE_ROCK
+    _untimed_,    //  22 CH_ROCK_PEBBLE
+    _untimed_,    //  23 CH_ROCK_PEBBLE_1
+    231,          //  24 CH_DUST_0
+    232,          //  25 CH_DUST_1
+    230,          //  26 CH_DUST_2
+    228,          //  27 CH_GEODOGE
+    232,          //  28 CH_DUST_ROCK_0
+    232,          //  29 CH_DUST_ROCK_1
+    230,          //  30 CH_DUST_ROCK_2
+    625,          //  31 CH_CONVERT_GEODE_TO_DOGE
+    _untimed_,    //  32 CH_HORIZONTAL_BAR
+    _untimed_,    //  33 CH_PUSH_LEFT
+    _untimed_,    //  34 CH_PUSH_LEFT_REVERSE
+    _untimed_,    //  35 CH_PUSH_RIGHT
+    _untimed_,    //  36 CH_PUSH_RIGHT_REVERSE
+    _untimed_,    //  37 CH_VERTICAL_BAR
+    _untimed_,    //  38 CH_PUSH_UP
+    _untimed_,    //  39 CH_PUSH_UP_REVERSE
+    _untimed_,    //  40 CH_PUSH_DOWN
+    _untimed_,    //  41 CH_PUSH_DOWN_REVERSE
+    _untimed_,    //  42 CH_WYRM_BODY
+    _untimed_,    //  43 CH_WYRM_VERT_BODY
+    _untimed_,    //  44 CH_WYRM_CORNER_LD
+    _untimed_,    //  45 CH_WYRM_CORNER_RD
+    _untimed_,    //  46 CH_WYRM_CORNER_LU
+    _untimed_,    //  47 CH_WYRM_CORNER_RU
+    208,          //  48 CH_WYRM_HEAD_U
+    _untimed_,    //  49 CH_WYRM_HEAD_R
+    _untimed_,    //  50 CH_WYRM_HEAD_D
+    _untimed_,    //  51 CH_WYRM_HEAD_L
+    605,          //  52 CH_GEODOGE_FALLING
+    _untimed_,    //  53 CH_FLIP_GRAVITY_0
+    _untimed_,    //  54 CH_FLIP_GRAVITY_1
+    _untimed_,    //  55 CH_FLIP_GRAVITY_2
+    _untimed_,    //  56 CH_BLOCK
+    _untimed_,    //  57 CH_GRINDER_0
+    _untimed_,    //  58 CH_GRINDER_1
+    _untimed_,    //  59 CH_HUB
+    _untimed_,    //  60 CH_WATER
+    _untimed_,    //  61 CH_WATERFLOW_0
+    _untimed_,    //  62 CH_WATERFLOW_1
+    _untimed_,    //  63 CH_WATERFLOW_2
+    _untimed_,    //  64 CH_WATERFLOW_3
+    _untimed_,    //  65 CH_WATERFLOW_4
+    _untimed_,    //  66 CH_HUB_1
+    _untimed_,    //  67 CH_OUTLET
+    _untimed_,    //  68 CH_BELT_0
+    _untimed_,    //  69 CH_BELT_1
+    _untimed_,    //  70 CH_PUSH_DOWN2
+    _untimed_,    //  71 CH_GEODOGE_CONVERT
+    _untimed_,    //  72 CH_CONVERT_PIPE
+    _untimed_,    //  73 CH_WYRM_TAIL_U
+    _untimed_,    //  74 CH_WYRM_TAIL_R
+    _untimed_,    //  75 CH_WYRM_TAIL_D
+    _untimed_,    //  76 CH_WYRM_TAIL_L
+    209,          //  77 CH_DOGE_FALLING_TOP
+    209,          //  78 CH_DOGE_FALLING_BOTTOM
+    215,          //  79 CH_ROCK_FALLING_TOP
+    209,          //  80 CH_ROCK_FALLING_BOTTOM
+    1443,         //  81 CH_GEODOGE_FALLING_TOP
+    209,          //  82 CH_GEODOGE_FALLING_BOTTOM
+    _untimed_,    //  83 CH_DOGE_FALLING_TOP2
+    _untimed_,    //  84 CH_DOGE_FALLING_BOTTOM2
+    230,          //  85 CH_DOGE_SIDE_1
+    229,          //  86 CH_DOGE_SIDE_3
+    229,          //  87 CH_DOGE_SIDE_2
+    229,          //  88 CH_DOGE_SIDE_4
+    454,          //  89 CH_ELECTRIC_0
+    369,          //  90 CH_ELECTRIC_1
+    368,          //  91 CH_ELECTRIC_2
+    361,          //  92 CH_ELECTRIC_3
+    _untimed_,    //  93 CH_BROKEN_DIRT
+    3829,         //  94 CH_INSULATOR_TOP
+    208,          //  95 CH_INSULATOR_BOTTOM
+    259,          //  96 CH_STAR
+    _untimed_,    //  97 CH_STAR_FALLING_TOP
+    _untimed_,    //  98 CH_STAR_FALLING_BOTTOM
+    _untimed_,    //  99 CH_ROCK_BONUS
+    _untimed_,    // 100 CH_STAR_EXPLODE
+    3088,         // 101 CH_INSULATOR_L
+    208,          // 102 CH_INSULATOR_R
+    463,          // 103 CH_ELECTRIC_H0
+    378,          // 104 CH_ELECTRIC_H1
+    378,          // 105 CH_ELECTRIC_H2
+    380,          // 106 CH_ELECTRIC_H3
+    171,          // 107 CH_CROSSED_STREAMS
+    _untimed_,    // 108 CH_MOUNT_U
+    _untimed_,    // 109 CH_MOUNT_D
+    _untimed_,    // 110 CH_MOUNT_L
+    _untimed_,    // 111 CH_MOUNT_R
+    _untimed_,    // 112 CH_PIT_L0
+    _untimed_,    // 113 CH_PIT_R0
+    1334,         // 114 CH_BOMB
+    5386,         // 115 CH_CRACKED_BRICK
+    _untimed_,    // 116 CH_CONCRETE
+    _untimed_,    // 117 (unused)
+    _untimed_,    // 118 (unused)
+    _untimed_,    // 119 (unused)
+    _untimed_,    // 120 (unused)
+    _untimed_,    // 121 (unused)
+    _untimed_,    // 122 (unused)
+    _untimed_,    // 123 (unused)
+    _untimed_,    // 124 (unused)
+    _untimed_,    // 125 (unused)
+    _untimed_,    // 126 (unused)
+    _untimed_,    // 127 (unused)
+};
+
+
 void processBoardSquares() {
-
-
-    if (T1TC > availableIdleTime - 12500) {
-        // FLASH(0x16, 10);
-        return;
-    }
-
-
-    unsigned char creature = 0;
 
 
 #ifdef DEBUG_TIMES
@@ -435,7 +577,7 @@ void processBoardSquares() {
 
     int select = isActive[selectorCounter & 3];
 
-    while (T1TC < availableIdleTime - 12500) {
+    while (T1TC < availableIdleTime) {
 
 #ifdef DEBUG_TIMES
         if (chIndex >= 0) {
@@ -445,13 +587,14 @@ void processBoardSquares() {
             chIndex = -1;
         }
 #endif
-        creature = *cursor.me;
+        unsigned char creature = *cursor.me;
         if (creature < FLAG_THISFRAME) {
 
             enum ObjectType type = CharToType[creature];
-
-
             if (Attribute[type] & select) {
+
+                if (T1TC + budget[creature] > availableIdleTime)
+                    break;
 
 #ifdef DEBUG_TIMES
                 chStart = T1TC;
@@ -460,6 +603,12 @@ void processBoardSquares() {
 
                 if (!processTypes(&cursor, type, creature))
                     processCreatures(&cursor, creature);
+
+                if (T1TC > availableIdleTime) {
+                    debug[200] = T1TC - availableIdleTime;
+                    debug[201] = creature;
+                    FLASH(0x46, 12);
+                }
             }
         }
 
@@ -489,13 +638,6 @@ void processBoardSquares() {
         chIndex = -1;
     }
 #endif
-
-
-    if (availableIdleTime && T1TC > availableIdleTime) {
-        debug[200] = T1TC - availableIdleTime;
-        debug[201] = creature;
-        FLASH(0x42, 2);
-    }
 }
 
 
