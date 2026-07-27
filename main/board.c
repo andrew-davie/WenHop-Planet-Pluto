@@ -446,7 +446,7 @@ static const unsigned short budget[128] = {
     _untimed_,    //   7 CH_STEELWALL
     _untimed_,    //   8 CH_PEBBLE1
     _untimed_,    //   9 CH_PEBBLE2
-    286,          //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
+    422,          //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
     3358,         //  11 CH_ROCK_FALLING -- updated 2026-07-27 23:24 AEST
     2023,         //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
     2449,         //  13 CH_DOGE_FALLING -- updated 2026-07-27 23:24 AEST
@@ -488,7 +488,7 @@ static const unsigned short budget[128] = {
     _untimed_,    //  49 CH_WYRM_HEAD_R
     _untimed_,    //  50 CH_WYRM_HEAD_D
     _untimed_,    //  51 CH_WYRM_HEAD_L
-    626,          //  52 CH_GEODOGE_FALLING -- updated 2026-07-27 23:24 AEST
+    3360,         //  52 CH_GEODOGE_FALLING -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  53 CH_FLIP_GRAVITY_0
     _untimed_,    //  54 CH_FLIP_GRAVITY_1
     _untimed_,    //  55 CH_FLIP_GRAVITY_2
