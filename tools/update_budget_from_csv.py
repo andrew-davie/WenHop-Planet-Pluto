@@ -21,9 +21,10 @@ For each CSV not already recorded in tools/.budget_csv_manifest.txt:
         than N, replace N with the CSV value
       - otherwise leave it alone
   - whenever an entry's value is actually changed, its own trailing
-    comment gets a " -- updated YYYY-MM-DD HH:MM TZ" stamp appended (any
-    previous per-line stamp is replaced, not stacked); untouched lines
-    keep whatever stamp (or lack of one) they already had
+    comment gets a " -- updated YYYY-MM-DD HH:MM TZ (was <old N>)" stamp
+    appended (old N is "untimed" if it was _untimed_ before); any previous
+    per-line stamp is replaced, not stacked -- untouched lines keep
+    whatever stamp (or lack of one) they already had
   - the '// Last updated: ...' stamp above budget[128] is refreshed
     whenever a new CSV is processed, whether or not it actually changed
     any budget[] values -- it is not touched on runs with no new CSVs
@@ -155,7 +156,8 @@ def merge(board_lines, csv_values):
             if new_value is not None:
                 new_token = format_value_token(new_value)
                 base_name = LINE_STAMP_RE.sub("", name)
-                stamped_name = f"{base_name} -- updated {stamp_now()}"
+                old_display = "untimed" if current is None else str(current)
+                stamped_name = f"{base_name} -- updated {stamp_now()} (was {old_display})"
                 changes.append((idx, base_name, token, new_token))
                 out.append(format_entry(new_token, idx, stamped_name) + "\n")
             else:
