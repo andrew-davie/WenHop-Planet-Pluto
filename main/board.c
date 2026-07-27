@@ -532,12 +532,12 @@ static const unsigned short budget[128] = {
     _untimed_,    //  93 CH_BROKEN_DIRT
     3829,         //  94 CH_INSULATOR_TOP
     208,          //  95 CH_INSULATOR_BOTTOM
-    259,          //  96 CH_STAR
-    _untimed_,    //  97 CH_STAR_FALLING_TOP
-    _untimed_,    //  98 CH_STAR_FALLING_BOTTOM
+    1660,         //  96 CH_STAR -- updated 2026-07-27 23:24 AEST
+    165,          //  97 CH_STAR_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    164,          //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  99 CH_ROCK_BONUS
     _untimed_,    // 100 CH_STAR_EXPLODE
-    3088,         // 101 CH_INSULATOR_L
+    3155,         // 101 CH_INSULATOR_L -- updated 2026-07-27 23:24 AEST
     208,          // 102 CH_INSULATOR_R
     463,          // 103 CH_ELECTRIC_H0
     378,          // 104 CH_ELECTRIC_H1
