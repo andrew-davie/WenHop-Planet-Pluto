@@ -434,13 +434,13 @@ void setupBoardScanner() {
 
 #define _untimed_ 12500
 
-// Last updated: 2026-07-27 23:29 AEST
+// Last updated: 2026-07-27 23:34 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
     _untimed_,    //   2 CH_DIRT
     _untimed_,    //   3 CH_BRICKWALL
-    206,          //   4 CH_DOORCLOSED -- updated 2026-07-27 23:24 AEST
+    329,          //   4 CH_DOORCLOSED -- updated 2026-07-27 23:34 AEST
     _untimed_,    //   5 CH_DOOROPEN_0
     _untimed_,    //   6 CH_EXITBLANK
     _untimed_,    //   7 CH_STEELWALL
@@ -537,7 +537,7 @@ static const unsigned short budget[128] = {
     215,          //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-27 23:29 AEST
     _untimed_,    //  99 CH_ROCK_BONUS
     _untimed_,    // 100 CH_STAR_EXPLODE
-    3730,         // 101 CH_INSULATOR_L -- updated 2026-07-27 23:29 AEST
+    3731,         // 101 CH_INSULATOR_L -- updated 2026-07-27 23:34 AEST
     221,          // 102 CH_INSULATOR_R -- updated 2026-07-27 23:24 AEST
     467,          // 103 CH_ELECTRIC_H0 -- updated 2026-07-27 23:24 AEST
     382,          // 104 CH_ELECTRIC_H1 -- updated 2026-07-27 23:24 AEST
