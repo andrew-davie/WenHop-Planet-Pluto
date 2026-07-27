@@ -450,7 +450,7 @@ static const unsigned short budget[128] = {
     3358,         //  11 CH_ROCK_FALLING -- updated 2026-07-27 23:24 AEST
     2023,         //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
     2449,         //  13 CH_DOGE_FALLING -- updated 2026-07-27 23:24 AEST
-    275,          //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
+    276,          //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
@@ -528,7 +528,7 @@ static const unsigned short budget[128] = {
     467,          //  89 CH_ELECTRIC_0 -- updated 2026-07-27 23:24 AEST
     382,          //  90 CH_ELECTRIC_1 -- updated 2026-07-27 23:24 AEST
     382,          //  91 CH_ELECTRIC_2 -- updated 2026-07-27 23:24 AEST
-    383,          //  92 CH_ELECTRIC_3 -- updated 2026-07-27 23:24 AEST
+    384,          //  92 CH_ELECTRIC_3 -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  93 CH_BROKEN_DIRT
     3916,         //  94 CH_INSULATOR_TOP -- updated 2026-07-27 23:24 AEST
     221,          //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-27 23:24 AEST
@@ -537,12 +537,12 @@ static const unsigned short budget[128] = {
     164,          //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  99 CH_ROCK_BONUS
     _untimed_,    // 100 CH_STAR_EXPLODE
-    3155,         // 101 CH_INSULATOR_L -- updated 2026-07-27 23:24 AEST
+    3688,         // 101 CH_INSULATOR_L -- updated 2026-07-27 23:24 AEST
     221,          // 102 CH_INSULATOR_R -- updated 2026-07-27 23:24 AEST
     467,          // 103 CH_ELECTRIC_H0 -- updated 2026-07-27 23:24 AEST
     382,          // 104 CH_ELECTRIC_H1 -- updated 2026-07-27 23:24 AEST
     382,          // 105 CH_ELECTRIC_H2 -- updated 2026-07-27 23:24 AEST
-    383,          // 106 CH_ELECTRIC_H3 -- updated 2026-07-27 23:24 AEST
+    384,          // 106 CH_ELECTRIC_H3 -- updated 2026-07-27 23:24 AEST
     190,          // 107 CH_CROSSED_STREAMS -- updated 2026-07-27 23:24 AEST
     _untimed_,    // 108 CH_MOUNT_U
     _untimed_,    // 109 CH_MOUNT_D
