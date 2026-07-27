@@ -416,27 +416,12 @@ void setupBoardScanner() {
 }
 
 
-// Worst-case T1TC ticks to process one board square, per raw character
-// number -- same indexing as debug[] (main.c/main.h, GET(creature), i.e.
-// 0..127, the board-resident character range; see attribute.h's "127 is
-// limit of board-resident character numbers", CH_ names 128+ are
-// animation-only and never appear as a board.me value so they're never
-// looked up here). Intended to throttle processBoardSquares()'s while loop
-// per-square instead of (or alongside) its current flat 12500-tick margin.
-//
-// Values are the first 128 entries of debug[] captured from a DEBUG_TIMES
-// run, i.e. the worst case
-// actually observed during that run, not a theoretical bound -- a
-// character type that's never hit an expensive code path yet will read 0
-// here even if it's capable of costing more. Re-run with DEBUG_TIMES and
-// re-export to refresh if per-character costs change (new code paths,
-// timing-sensitive fixes, etc.).
+// Worst-case T1TC ticks per board character, indexed by raw char number
+// (0-127, matches debug[]). Throttles processBoardSquares()'s loop.
+// _untimed_ = no measurement yet. _B = global margin added to all.
+// Auto-updated from DEBUG_TIMES CSV exports -- see tools/update_budget_from_csv.py.
 
 #define _untimed_ 12500
-
-// Global safety margin added to every timed budget[] entry below (each
-// written as `_B + <measured value>`) -- bump this one number to pad
-// every character's budget at once, rather than hand-editing 128 lines.
 #define _B 100
 
 // Last updated: 2026-07-27 23:48 AEST
