@@ -530,7 +530,7 @@ static const unsigned short budget[128] = {
     382,          //  91 CH_ELECTRIC_2 -- updated 2026-07-27 23:24 AEST
     384,          //  92 CH_ELECTRIC_3 -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  93 CH_BROKEN_DIRT
-    3916,         //  94 CH_INSULATOR_TOP -- updated 2026-07-27 23:24 AEST
+    3946,         //  94 CH_INSULATOR_TOP -- updated 2026-07-27 23:24 AEST
     221,          //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-27 23:24 AEST
     1660,         //  96 CH_STAR -- updated 2026-07-27 23:24 AEST
     165,          //  97 CH_STAR_FALLING_TOP -- updated 2026-07-27 23:24 AEST
