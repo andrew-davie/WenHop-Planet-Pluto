@@ -434,7 +434,7 @@ void setupBoardScanner() {
 
 #define _untimed_ 12500
 
-// Last updated: 2026-07-27 22:50 AEST
+// Last updated: 2026-07-27 23:07 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -622,7 +622,10 @@ void processBoardSquares() {
         if (++cursor.col > (_BOARD_COLS - 1)) {
             cursor.col = 0;
             if (++cursor.row > _BOARD_ROWS - 1) {
-                setSchedule(SCHEDULE_START_SCAN);
+                // Same guard as setupBoardScanner() -- a cell processed earlier
+                // this pass may have just called setGameState().
+                if (gameState == nextGameState)
+                    setSchedule(SCHEDULE_START_SCAN);
                 return;
             }
         }
@@ -790,7 +793,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
                 lumTarget = -15;
                 if (lumTarget == luminance) {
                     setGameState(GS_MENU);
-                    // return;
+                    return true;
                 }
             }
         }
