@@ -68,38 +68,38 @@ void setInsulator(unsigned char *p, int row, int col);
 
 //------------------------------------------------------------------------------
 
-#define isVisible(x, y) (onScreenX[x] && onScreenY[y])
+// #define isVisible(x, y) (onScreenX[x] && onScreenY[y])
 
-#define W4 ((_BOARD_COLS + 3) & ~3)
-#define H4 ((_BOARD_ROWS + 3) & ~3)
+// #define W4 ((_BOARD_COLS + 3) & ~3)
+// #define H4 ((_BOARD_ROWS + 3) & ~3)
 
-bool onScreenX[W4] __attribute__((aligned(4)));
-bool onScreenY[H4] __attribute__((aligned(4)));
+// bool onScreenX[W4] __attribute__((aligned(4)));
+// bool onScreenY[H4] __attribute__((aligned(4)));
 
-void calculateVisibleMasks() {
+// void calculateVisibleMasks() {
 
-    myMemsetInt((unsigned int *)onScreenX, 0, sizeof(onScreenX) / 4);
-    myMemsetInt((unsigned int *)onScreenY, 0, sizeof(onScreenY) / 4);
+//     myMemsetInt((unsigned int *)onScreenX, 0, sizeof(onScreenX) / 4);
+//     myMemsetInt((unsigned int *)onScreenY, 0, sizeof(onScreenY) / 4);
 
-    int sX = scrollX >> 16;
-    int eX = sX + 40 + CHAR_TRIX_X;
-    int x = (sX * (0x10000 / CHAR_TRIX_X)) >> 16;
+//     int sX = scrollX >> 16;
+//     int eX = sX + 40 + CHAR_TRIX_X;
+//     int x = (sX * (0x10000 / CHAR_TRIX_X)) >> 16;
 
-    // Bounded by the board's actual trixel width (BOARD_TRIX_X) rather than
-    // SCREEN_TRIX_X/_BOARD_COLS (a different unit that happens to share the
-    // value 40) -- otherwise this stops marking columns visible as soon as
-    // scrollX passes ~1/4 of the way across the level. Also cap the array
-    // index directly so a scroll near the right edge can't overrun onScreenX.
-    for (int i = sX; i <= eX && i < BOARD_TRIX_X && x < _BOARD_COLS; i += CHAR_TRIX_X)
-        onScreenX[x++] = true;
+//     // Bounded by the board's actual trixel width (BOARD_TRIX_X) rather than
+//     // SCREEN_TRIX_X/_BOARD_COLS (a different unit that happens to share the
+//     // value 40) -- otherwise this stops marking columns visible as soon as
+//     // scrollX passes ~1/4 of the way across the level. Also cap the array
+//     // index directly so a scroll near the right edge can't overrun onScreenX.
+//     for (int i = sX; i <= eX && i < BOARD_TRIX_X && x < _BOARD_COLS; i += CHAR_TRIX_X)
+//         onScreenX[x++] = true;
 
-    int sY = scrollY >> 16;
-    int eY = sY + _SCANLINES / 3;
-    int y = (sY * (0x10000 / CHAR_TRIX_Y)) >> 16;
+//     int sY = scrollY >> 16;
+//     int eY = sY + _SCANLINES / 3;
+//     int y = (sY * (0x10000 / CHAR_TRIX_Y)) >> 16;
 
-    for (int i = sY; i < eY && y < _BOARD_ROWS; i += CHAR_TRIX_Y)
-        onScreenY[y++] = true;
-}
+//     for (int i = sY; i < eY && y < _BOARD_ROWS; i += CHAR_TRIX_Y)
+//         onScreenY[y++] = true;
+// }
 
 //------------------------------------------------------------------------------
 
@@ -403,7 +403,7 @@ void setupBoardScanner() {
 
         // }
 
-        calculateVisibleMasks();
+        // calculateVisibleMasks();
 
         // restartBoardScan() above may have just called setGameState() (e.g. on player death),
         // which arms SCHEDULE_INIT_STATE -- don't stomp that back to SCHEDULE_PROCESS_BOARD, or
