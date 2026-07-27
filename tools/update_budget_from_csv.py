@@ -63,6 +63,8 @@ def parse_csv(path):
     values = {}
     with open(path, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
+        if reader.fieldnames:
+            reader.fieldnames = [n.strip() for n in reader.fieldnames]
         for row in reader:
             name = (row.get("Name") or "").strip()
             m = DEBUG_NAME_RE.match(name)
@@ -71,11 +73,17 @@ def parse_csv(path):
             idx = int(m.group(1))
             if idx > 127:
                 continue
-            raw = (row.get("Value") or "").strip()
+            raw = (row.get("Value") or "").strip().lower()
             if not raw:
                 continue
+            if raw.startswith("0x"):
+                raw = raw[2:]
             try:
-                val = int(raw, 16) if raw.lower().startswith("0x") else int(raw)
+                # exporter always writes Value as plain hex (fixed-width,
+                # zero-padded to the type size), never prefixed with "0x"
+                # and never decimal -- confirmed against debug[4] (0x00b5
+                # = 181 = CH_DOORCLOSED's known-correct budget[] value)
+                val = int(raw, 16)
             except ValueError:
                 continue
             values[idx] = val
