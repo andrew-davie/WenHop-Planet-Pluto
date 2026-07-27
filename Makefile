@@ -192,9 +192,18 @@ spinningGlobe/%.o: $(BASE)/spinningGlobe/%.c $(BASE)/$(DASM_TO_C)
 # Default target (first in file) will build with 'make'
 
 .PHONY: all
-all: tools make_rom run_emulator
+all: budget_csv tools make_rom run_emulator
 	mkdir -p screenshots
 	mv *.jpg screenshots/ 2>/dev/null || true
+
+###############################################################################
+# Pull in any new Gopher2600 debug[] CSV export and merge timings into
+# board.c's budget[128] table before anything else builds. Idempotent --
+# already-processed CSVs are skipped (tracked in tools/.budget_csv_manifest.txt).
+
+.PHONY: budget_csv
+budget_csv:
+	python3 tools/update_budget_from_csv.py
 
 ###############################################################################
 # EMULATOR = gopher|stella  -- or can be absent
