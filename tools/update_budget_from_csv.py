@@ -15,13 +15,12 @@ For each CSV not already recorded in tools/.budget_csv_manifest.txt:
       - if it's already a real number and the CSV value is strictly
         larger, replace it with the CSV value
       - otherwise leave it alone
-  - the '// Last updated: ...' stamp above budget[128] is refreshed on
-    every processing attempt, whether or not any values actually changed
-    -- it records when an update was last *attempted*, not just when it
-    last had an effect
-  - git add + commit main/board.c and the manifest every run (never a
-    blanket `git add .`, since other unrelated files in this tree may
-    have their own in-progress uncommitted changes)
+  - the '// Last updated: ...' stamp above budget[128] is refreshed
+    whenever a new CSV is processed, whether or not it actually changed
+    any budget[] values -- it is not touched on runs with no new CSVs
+  - git add + commit main/board.c and the manifest for each CSV processed
+    (never a blanket `git add .`, since other unrelated files in this
+    tree may have their own in-progress uncommitted changes)
   - record the CSV filename in the manifest either way, so it's never
     reprocessed
 
