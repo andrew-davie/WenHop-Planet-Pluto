@@ -424,13 +424,13 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 17:17 AEST
+// Last updated: 2026-07-28 17:27 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
     _untimed_,    //   2 CH_DIRT
     _untimed_,    //   3 CH_BRICKWALL
-    _B + 360,     //   4 CH_DOORCLOSED -- updated 2026-07-28 16:26 AEST (was 342)
+    _B + 201,     //   4 CH_DOORCLOSED -- updated 2026-07-28 17:27 AEST (was untimed)
     _untimed_,    //   5 CH_DOOROPEN_0
     _untimed_,    //   6 CH_EXITBLANK
     _untimed_,    //   7 CH_STEELWALL
@@ -523,8 +523,8 @@ static const unsigned short budget[128] = {
     _B + 4047,    //  94 CH_INSULATOR_TOP -- updated 2026-07-28 00:45 AEST (was 3946)
     _B + 221,     //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-27 23:24 AEST
     _B + 1985,    //  96 CH_STAR -- updated 2026-07-28 00:45 AEST (was 1937)
-    _B + 234,     //  97 CH_STAR_FALLING_TOP -- updated 2026-07-28 00:45 AEST (was 215)
-    _B + 234,     //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-28 00:45 AEST (was 215)
+    _B + 249,     //  97 CH_STAR_FALLING_TOP -- updated 2026-07-28 17:27 AEST (was 234)
+    _B + 248,     //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-28 17:27 AEST (was 234)
     _untimed_,    //  99 CH_ROCK_BONUS
     _untimed_,    // 100 CH_STAR_EXPLODE
     _B + 3755,    // 101 CH_INSULATOR_L -- updated 2026-07-28 00:45 AEST (was 3731)
@@ -540,7 +540,7 @@ static const unsigned short budget[128] = {
     _untimed_,    // 111 CH_MOUNT_R
     _untimed_,    // 112 CH_PIT_L0
     _untimed_,    // 113 CH_PIT_R0
-    _B + 1336,    // 114 CH_BOMB -- updated 2026-07-28 00:45 AEST (was 1334)
+    _B + 1351,    // 114 CH_BOMB -- updated 2026-07-28 17:27 AEST (was 1336)
     _B + 5386,    // 115 CH_CRACKED_BRICK
     _untimed_,    // 116 CH_CONCRETE
     _untimed_,    // 117 (unused)
@@ -1201,7 +1201,7 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     case CH_DOORCLOSED:
         if (!doges) {
-            *cur->me = CH_DOOROPEN_0;
+            *cursor.me = CH_DOOROPEN_0;
             FLASH(0x28, 10);
         }
         break;
