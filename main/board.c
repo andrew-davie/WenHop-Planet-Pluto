@@ -424,7 +424,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 17:27 AEST
+// Last updated: 2026-07-28 17:51 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -437,7 +437,7 @@ static const unsigned short budget[128] = {
     _untimed_,    //   8 CH_PEBBLE1
     _untimed_,    //   9 CH_PEBBLE2
     _B + 292,     //  10 CH_ROCK -- updated 2026-07-28 16:26 AEST (was 291)
-    _B + 3384,    //  11 CH_ROCK_FALLING -- updated 2026-07-28 00:45 AEST (was 3360)
+    _B + 3294,    //  11 CH_ROCK_FALLING -- updated 2026-07-28 17:51 AEST (was untimed)
     _B + 2026,    //  12 CH_DOGE_00 -- updated 2026-07-28 17:17 AEST (was 2023)
     _B + 2474,    //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
     _B + 282,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-28 16:26 AEST (was 281)
@@ -1192,10 +1192,85 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         break;
 
     case CH_DOGE_FALLING:
-    case CH_ROCK_FALLING:
     case CH_GEODOGE_FALLING: {
 
         processFallingThings(cur->me, cur->row, cur->col, creature);
+        break;
+    }
+
+
+    case CH_ROCK_FALLING: {
+
+        unsigned char *next = cursor.me + _BOARD_COLS;
+        enum ObjectType typeDown = CharToType[GET(*next)];
+        if (Attribute[typeDown] & ATT_BLANK) {
+
+            *cursor.me = FLAG(CH_ROCK_FALLING_TOP);
+            *next = FLAG(CH_ROCK_FALLING_BOTTOM);
+
+            unsigned char *nextNext = next + _BOARD_COLS;
+            enum ChName downCh = GET(*nextNext);
+            typeDown = CharToType[downCh];
+            const unsigned int attNextNext = Attribute[typeDown];
+
+            if (downCh != CH_ROCK_FALLING && downCh != CH_DOGE_FALLING && downCh != CH_GEODOGE_FALLING) {
+
+                int sfx = 0;
+
+                if (attNextNext & ATT_HARD) {
+                    if (creature == CH_ROCK_FALLING || creature == CH_GEODOGE_FALLING) {
+
+                        sfx = SFX_ROCK;
+
+                        unsigned char *dL = cursor.me + _BOARD_COLS - 1;
+                        unsigned char *dR = dL + 2;
+
+                        if (!CharToType[GET(*dR)]) {
+                            nDots(4, cursor.col, cursor.row + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
+                        }
+
+                        if (!CharToType[GET(*dL)]) {
+                            nDots(4, cursor.col, cursor.row + 1, PT_SPIRAL, 10, 3, 7, 100, 2);
+                        }
+                    }
+                }
+
+                if (sfx)
+                    ADDAUDIO(sfx);
+            }
+        }
+
+        else if (Attribute[typeDown] & ATT_SQUASHABLE_TO_BLANKS) {
+            explode(next, FLAG(CH_DUST_0));
+            initParticles();    //??
+        } else {
+
+            // TODO: inefficient -fix
+            unsigned char *ratt = cursor.me;
+            int type = CharToType[(GET(*ratt))];
+            while (type == TYPE_ROCK || type == TYPE_GEODOGE || type == TYPE_ROCK_FALLING ||
+                   type == TYPE_GEODOGE_FALLING) {    // todo: use attribute
+                ratt += _BOARD_COLS;
+                if (CharToType[GET(*ratt)] == TYPE_CRACKED_BRICK) {
+                    rockShaker = 2;
+                    break;
+                }
+                type = CharToType[GET(*ratt)];
+            }
+
+
+            // stop falling
+            unsigned char sfx = 0;
+            int att = ATTRIBUTE(*next);
+
+            *cursor.me = CH_ROCK;
+            sfx = att & ATT_HARD ? SFX_ROCK : SFX_ROCK2;
+
+
+            nDots(6, cursor.col, cursor.row, PT_TWO, 20, 2, 10, 60, 7);
+
+            ADDAUDIO(sfx);
+        }
         break;
     }
 
@@ -1403,7 +1478,7 @@ void processCharBeltAndGrinder(unsigned char *me, unsigned char creature) {
 
 void processFallingThings(unsigned char *me, int row, int col, unsigned char creature) {
 
-    unsigned char *next = me + _BOARD_COLS * gravity;
+    unsigned char *next = me + _BOARD_COLS;
     enum ObjectType typeDown = CharToType[GET(*next)];
     if (Attribute[typeDown] & ATT_BLANK) {
 
@@ -1425,7 +1500,7 @@ void processFallingThings(unsigned char *me, int row, int col, unsigned char cre
             break;
         }
 
-        unsigned char *nextNext = next + _BOARD_COLS * gravity;
+        unsigned char *nextNext = next + _BOARD_COLS;
         enum ChName downCh = GET(*nextNext);
         typeDown = CharToType[downCh];
         const unsigned int attNextNext = Attribute[typeDown];
