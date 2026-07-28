@@ -17,6 +17,7 @@
 #include "playerAnimation.h"
 #include "random.h"
 #include "schedule.h"
+#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 #include "swipe.h"
@@ -127,7 +128,7 @@ void initBoard() {
 
 void displayFloatingNumber(int trixX, int trixY, int age, int value) {
 
-    removeFloatingChars();
+    //    removeFloatingChars();
     int temp = value;
 
     int c = 0;
@@ -138,23 +139,23 @@ void displayFloatingNumber(int trixX, int trixY, int age, int value) {
 
 
     if (convertedGeodoge >= 100) {
-        floatingCharacter(trixX, trixY, age, CH_0 + c);
+        floatingCharacter(trixX, trixY, age, CH_A);    // + c);
         trixX += c == 1 ? 2 : 4;
     }
 
-    c = 0;
-    while (temp >= 10) {
-        c++;
-        temp -= 10;
-    }
+    // c = 0;
+    // while (temp >= 10) {
+    //     c++;
+    //     temp -= 10;
+    // }
 
-    if (convertedGeodoge >= 10) {
-        floatingCharacter(trixX, trixY, age, CH_0 + c);
-        trixX += c == 1 ? 2 : 4;
-    }
+    // if (convertedGeodoge >= 10) {
+    //     floatingCharacter(trixX, trixY, age, CH_0 + c);
+    //     trixX += c == 1 ? 2 : 4;
+    // }
 
 
-    floatingCharacter(trixX, trixY, age, CH_0 + temp);
+    // floatingCharacter(trixX, trixY, age, CH_0 + temp);
 }
 
 
@@ -173,31 +174,31 @@ void displayFloatingNumber(int trixX, int trixY, int age, int value) {
 
 static const unsigned char ascii_width[] = {
     4,    //  32  SPACE
-    4,    //  33  !
-    4,    //  34  "
-    4,    //  35  #
-    4,    //  36  $
-    4,    //  37  %
-    4,    //  38  &
-    4,    //  39  '
-    4,    //  40  (
-    4,    //  41  )
-    4,    //  42  *
+    4,    //  33  !   alt 0
+    4,    //  34  "   alt 1
+    4,    //  35  #   alt 2
+    4,    //  36  $   alt 3
+    4,    //  37  %   alt 4
+    4,    //  38  &   alt 5
+    4,    //  39  '   alt 6
+    4,    //  40  (   alt 7
+    4,    //  41  )   alt 8
+    4,    //  42  *   alt 9
     4,    //  43  +
     4,    //  44  ,
     4,    //  45  -
     4,    //  46  .
     4,    //  47  /
-    4,    //  48  0
-    4,    //  49  1
-    4,    //  50  2
-    4,    //  51  3
-    4,    //  52  4
-    4,    //  53  5
-    4,    //  54  6
-    4,    //  55  7
-    4,    //  56  8
-    4,    //  57  9
+    5,    //  48  0
+    3,    //  49  1
+    5,    //  50  2
+    5,    //  51  3
+    5,    //  52  4
+    5,    //  53  5
+    5,    //  54  6
+    5,    //  55  7
+    5,    //  56  8
+    5,    //  57  9
     4,    //  58  :
     4,    //  59  ;
     4,    //  60  <
@@ -279,11 +280,16 @@ char convt(char ch) {
     else if (ch >= 'a' && ch <= 'z')
         return CH_A + ch - 'a';
 
+    else if (ch >= '0' && ch <= '9')
+        return CH_BIG_0 + ch - '0';
+
+    else if (ch >= '!' && ch <= '*')    // alernate small numbers
+        return CH_0 + ch - '!';
+
     return ch;
 }
 
 void displayFloatingString(int trixX, int trixY, int age, char *s) {
-
 
     int len = 0;
     char *w = s;
@@ -292,7 +298,8 @@ void displayFloatingString(int trixX, int trixY, int age, char *s) {
         w++;
     }
 
-    trixX = (40 - len) >> 1;
+    // if (center)
+    //     trixX = (40 - len) >> 1;
 
     while (*s) {
         floatingCharacter(trixX, trixY, age, convt(*s));
@@ -328,7 +335,9 @@ void setupBoardScanner() {
                 int y = playerY * CHAR_TRIX_Y - (scrollY >> 16) - CHAR_TRIX_Y;
                 int x = playerX * CHAR_TRIX_X - (scrollX >> 16) + CHAR_CENTER_X;
 
-                displayFloatingNumber(x, y, 40, convertedGeodoge);
+                char str[6];
+                drawDecimalToString(str, '!', convertedGeodoge);
+                displayFloatingString(x, y, 40, str);
             }
 
             killAudio(SFX_UNCOVER);
@@ -382,8 +391,10 @@ void setupBoardScanner() {
             }
         }
 
-        if (rockCount > lastRockCount)
+        if (rockCount > lastRockCount) {
+            rockShaker = 2;
             lastRockCount = rockCount;
+        }
         rockCount = 0;
 
 
@@ -424,7 +435,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 19:22 AEST
+// Last updated: 2026-07-29 01:10 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -437,15 +448,15 @@ static const unsigned short budget[128] = {
     _untimed_,    //   8 CH_PEBBLE1
     _untimed_,    //   9 CH_PEBBLE2
     _B + 292,     //  10 CH_ROCK -- updated 2026-07-28 16:26 AEST (was 291)
-    _B + 2276,    //  11 CH_ROCK_FALLING -- updated 2026-07-28 18:21 AEST (was untimed)
-    _B + 2026,    //  12 CH_DOGE_00 -- updated 2026-07-28 17:17 AEST (was 2023)
+    _B + 4065,    //  11 CH_ROCK_FALLING -- updated 2026-07-29 00:48 AEST (was 3965)
+    _B + 2032,    //  12 CH_DOGE_00 -- updated 2026-07-29 00:41 AEST (was 2031)
     _B + 2474,    //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
     _B + 282,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-28 16:26 AEST (was 281)
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
     _untimed_,    //  18 CH_LAVA_LARGE
-    _B + 9587,    //  19 CH_MELLON_HUSK -- updated 2026-07-27 23:48 AEST
+    _B + 9600,    //  19 CH_MELLON_HUSK -- updated 2026-07-29 00:45 AEST (was 9587)
     _untimed_,    //  20 CH_DOGE_STATIC
     _untimed_,    //  21 CH_PEBBLE_ROCK
     _untimed_,    //  22 CH_ROCK_PEBBLE
@@ -457,7 +468,7 @@ static const unsigned short budget[128] = {
     _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
     _B + 207,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:35 AEST (was untimed)
-    _B + 422,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-28 17:15 AEST (was untimed)
+    _B + 434,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-29 00:41 AEST (was 433)
     _untimed_,    //  32 CH_HORIZONTAL_BAR
     _untimed_,    //  33 CH_PUSH_LEFT
     _untimed_,    //  34 CH_PUSH_LEFT_REVERSE
@@ -515,25 +526,25 @@ static const unsigned short budget[128] = {
     _B + 272,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:30 AEST (was 263)
     _B + 249,     //  87 CH_DOGE_SIDE_2 -- updated 2026-07-28 16:30 AEST (was 240)
     _B + 272,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:30 AEST (was 263)
-    _B + 467,     //  89 CH_ELECTRIC_0 -- updated 2026-07-27 23:24 AEST
-    _B + 382,     //  90 CH_ELECTRIC_1 -- updated 2026-07-27 23:24 AEST
-    _B + 382,     //  91 CH_ELECTRIC_2 -- updated 2026-07-27 23:24 AEST
-    _B + 384,     //  92 CH_ELECTRIC_3 -- updated 2026-07-27 23:24 AEST
+    _B + 476,     //  89 CH_ELECTRIC_0 -- updated 2026-07-29 00:37 AEST (was 467)
+    _B + 391,     //  90 CH_ELECTRIC_1 -- updated 2026-07-29 00:37 AEST (was 382)
+    _B + 391,     //  91 CH_ELECTRIC_2 -- updated 2026-07-29 00:37 AEST (was 382)
+    _B + 393,     //  92 CH_ELECTRIC_3 -- updated 2026-07-29 00:37 AEST (was 384)
     _untimed_,    //  93 CH_BROKEN_DIRT
-    _B + 4047,    //  94 CH_INSULATOR_TOP -- updated 2026-07-28 00:45 AEST (was 3946)
-    _B + 221,     //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-27 23:24 AEST
-    _B + 1985,    //  96 CH_STAR -- updated 2026-07-28 00:45 AEST (was 1937)
+    _B + 4085,    //  94 CH_INSULATOR_TOP -- updated 2026-07-29 00:45 AEST (was 4047)
+    _B + 230,     //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-29 00:37 AEST (was 221)
+    _B + 2003,    //  96 CH_STAR -- updated 2026-07-29 00:37 AEST (was 1985)
     _B + 249,     //  97 CH_STAR_FALLING_TOP -- updated 2026-07-28 17:27 AEST (was 234)
     _B + 248,     //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-28 17:27 AEST (was 234)
     _untimed_,    //  99 CH_ROCK_BONUS
     _untimed_,    // 100 CH_STAR_EXPLODE
-    _B + 3755,    // 101 CH_INSULATOR_L -- updated 2026-07-28 00:45 AEST (was 3731)
-    _B + 221,     // 102 CH_INSULATOR_R -- updated 2026-07-27 23:24 AEST
-    _B + 467,     // 103 CH_ELECTRIC_H0 -- updated 2026-07-27 23:24 AEST
-    _B + 382,     // 104 CH_ELECTRIC_H1 -- updated 2026-07-27 23:24 AEST
-    _B + 382,     // 105 CH_ELECTRIC_H2 -- updated 2026-07-27 23:24 AEST
-    _B + 384,     // 106 CH_ELECTRIC_H3 -- updated 2026-07-27 23:24 AEST
-    _B + 190,     // 107 CH_CROSSED_STREAMS -- updated 2026-07-27 23:24 AEST
+    _B + 6736,    // 101 CH_INSULATOR_L -- updated 2026-07-29 00:45 AEST (was 3771)
+    _B + 230,     // 102 CH_INSULATOR_R -- updated 2026-07-29 00:37 AEST (was 221)
+    _B + 476,     // 103 CH_ELECTRIC_H0 -- updated 2026-07-29 00:37 AEST (was 467)
+    _B + 391,     // 104 CH_ELECTRIC_H1 -- updated 2026-07-29 00:37 AEST (was 382)
+    _B + 391,     // 105 CH_ELECTRIC_H2 -- updated 2026-07-29 00:37 AEST (was 382)
+    _B + 393,     // 106 CH_ELECTRIC_H3 -- updated 2026-07-29 00:37 AEST (was 384)
+    _B + 192,     // 107 CH_CROSSED_STREAMS -- updated 2026-07-29 00:37 AEST (was 190)
     _untimed_,    // 108 CH_MOUNT_U
     _untimed_,    // 109 CH_MOUNT_D
     _untimed_,    // 110 CH_MOUNT_L
@@ -541,7 +552,7 @@ static const unsigned short budget[128] = {
     _untimed_,    // 112 CH_PIT_L0
     _untimed_,    // 113 CH_PIT_R0
     _B + 1351,    // 114 CH_BOMB -- updated 2026-07-28 17:27 AEST (was 1336)
-    _B + 5386,    // 115 CH_CRACKED_BRICK
+    _B + 5456,    // 115 CH_CRACKED_BRICK -- updated 2026-07-29 00:37 AEST (was 5386)
     _untimed_,    // 116 CH_CONCRETE
     _untimed_,    // 117 (unused)
     _untimed_,    // 118 (unused)
@@ -597,7 +608,7 @@ void processBoardSquares() {
                 if (T1TC > availableIdleTime) {
                     debug[200] = T1TC - availableIdleTime;
                     debug[201] = creature;
-                    FLASH(0x46, 12);
+                    FLASH(0xD6, 12);
                 }
             }
         }
