@@ -61,7 +61,6 @@ void processCharRock(unsigned char *me);
 
 void genericPush(unsigned char *me, int row, int col, int offsetX, int offsetY);
 void genericPushReverse(unsigned char *me, int offsetX, int offsetY);
-void chainReact_GeoDogeToDoge(unsigned char *me);
 void chainReact_Pipe(unsigned char *me);
 void doRoll(unsigned char *me, int row, int col);
 void setInsulator(unsigned char *p, int row, int col);
@@ -332,6 +331,7 @@ void setupBoardScanner() {
                 displayFloatingNumber(x, y, 40, convertedGeodoge);
             }
 
+            killAudio(SFX_UNCOVER);
             convertedGeodoge = 0;
         }
 
@@ -424,7 +424,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 16:35 AEST
+// Last updated: 2026-07-28 16:46 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -457,7 +457,7 @@ static const unsigned short budget[128] = {
     _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
     _B + 207,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:35 AEST (was untimed)
-    _B + 655,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
+    _B + 611,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-28 16:46 AEST (was untimed)
     _untimed_,    //  32 CH_HORIZONTAL_BAR
     _untimed_,    //  33 CH_PUSH_LEFT
     _untimed_,    //  34 CH_PUSH_LEFT_REVERSE
@@ -981,6 +981,8 @@ int pickDifferent(int current) {
     return current;
 }
 
+const unsigned char thisFrame[] = {0, FLAG_THISFRAME, FLAG_THISFRAME, 0};
+
 void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     switch (creature) {
@@ -1066,11 +1068,21 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         (*cursor.me)++;
         break;
 
-    case CH_CONVERT_GEODE_TO_DOGE:
+    case CH_CONVERT_GEODE_TO_DOGE: {
+
         convertedGeodoge++;
-        *cur->me = FLAG(CH_DOGE_00);
-        chainReact_GeoDogeToDoge(cur->me);
+        *cursor.me = CH_DOGE_00;
+
+        for (int i = 0; i < 4; i++) {
+            unsigned char *newDogeCandidate = cursor.me + dirOffset[i];
+            if (Attribute[CharToType[GET(*newDogeCandidate)]] & ATT_GEODOGE) {
+                *newDogeCandidate = CH_CONVERT_GEODE_TO_DOGE | thisFrame[i];
+                ADDAUDIO(SFX_UNCOVER);
+            }
+        }
+
         break;
+    }
 
     case CH_CONVERT_PIPE:
         chainReact_Pipe(cur->me);
@@ -1567,30 +1579,6 @@ void genericPushReverse(unsigned char *me, int offsetX, int offsetY) {
         *me = (*me) - 1;
 }
 
-
-const unsigned char thisFrame[] = {0, FLAG_THISFRAME, FLAG_THISFRAME, 0};
-
-void chainReact_GeoDogeToDoge(unsigned char *me) {
-
-
-    bool ongoing = false;
-    *me = FLAG(CH_DOGE_00);
-
-    for (int i = 0; i < 4; i++) {
-
-        unsigned char *newDogeCandidate = me + dirOffset[i];
-
-        if (Attribute[CharToType[GET(*newDogeCandidate)]] & ATT_GEODOGE) {
-
-            *newDogeCandidate = CH_CONVERT_GEODE_TO_DOGE | thisFrame[i];
-            ADDAUDIO(SFX_UNCOVER);
-            ongoing = true;
-        }
-    }
-
-    if (!ongoing)
-        killAudio(SFX_UNCOVER);
-}
 
 void chainReact_Pipe(unsigned char *me) {
 
