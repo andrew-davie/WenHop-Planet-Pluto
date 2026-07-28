@@ -424,7 +424,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 17:16 AEST
+// Last updated: 2026-07-28 17:17 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -438,7 +438,7 @@ static const unsigned short budget[128] = {
     _untimed_,    //   9 CH_PEBBLE2
     _B + 292,     //  10 CH_ROCK -- updated 2026-07-28 16:26 AEST (was 291)
     _B + 3384,    //  11 CH_ROCK_FALLING -- updated 2026-07-28 00:45 AEST (was 3360)
-    _B + 2023,    //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
+    _B + 2026,    //  12 CH_DOGE_00 -- updated 2026-07-28 17:17 AEST (was 2023)
     _B + 2474,    //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
     _B + 282,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-28 16:26 AEST (was 281)
     _untimed_,    //  15 CH_LAVA_BLANK
@@ -452,7 +452,7 @@ static const unsigned short budget[128] = {
     _untimed_,    //  23 CH_ROCK_PEBBLE_1
     _B + 209,     //  24 CH_DUST_0 -- updated 2026-07-28 16:35 AEST (was untimed)
     _B + 209,     //  25 CH_DUST_1 -- updated 2026-07-28 16:35 AEST (was untimed)
-    _B + 206,     //  26 CH_DUST_2 -- updated 2026-07-28 16:35 AEST (was untimed)
+    _B + 207,     //  26 CH_DUST_2 -- updated 2026-07-28 17:17 AEST (was 206)
     _B + 265,     //  27 CH_GEODOGE -- updated 2026-07-28 16:30 AEST (was untimed)
     _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
