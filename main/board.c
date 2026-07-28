@@ -424,7 +424,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 18:21 AEST
+// Last updated: 2026-07-28 19:22 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -1238,8 +1238,9 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
             initParticles();    //??
 
         } else {
-            // TODO: cracked wall should look up rather than rocks
-            // // see if affecting a crackable brick wall below
+
+
+            // see if affecting a crackable brick wall below
             // do {
             //     if (CharToType[GET(*next)] == TYPE_CRACKED_BRICK) {
             //         rockShaker = 2;
@@ -1477,10 +1478,10 @@ void processFallingThings(unsigned char *me, int row, int col, unsigned char cre
             *next = FLAG(CH_DOGE_FALLING_BOTTOM);
             break;
 
-        case CH_ROCK_FALLING:
-            *me = FLAG(CH_ROCK_FALLING_TOP);
-            *next = FLAG(CH_ROCK_FALLING_BOTTOM);
-            break;
+            // case CH_ROCK_FALLING:
+            //     *me = FLAG(CH_ROCK_FALLING_TOP);
+            //     *next = FLAG(CH_ROCK_FALLING_BOTTOM);
+            //     break;
         }
 
         unsigned char *nextNext = next + _BOARD_COLS;
@@ -1550,11 +1551,11 @@ void processFallingThings(unsigned char *me, int row, int col, unsigned char cre
 
         switch (creature) {
 
-        case CH_ROCK_FALLING: {
-            *me = CH_ROCK;
-            sfx = att & ATT_HARD ? SFX_ROCK : SFX_ROCK2;
-            break;
-        }
+            // case CH_ROCK_FALLING: {
+            //     *me = CH_ROCK;
+            //     sfx = att & ATT_HARD ? SFX_ROCK : SFX_ROCK2;
+            //     break;
+            // }
 
         case CH_GEODOGE_FALLING: {
             *me = CH_GEODOGE;
