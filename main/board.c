@@ -405,9 +405,9 @@ void setupBoardScanner() {
 
         // calculateVisibleMasks();
 
-        // restartBoardScan() above may have just called setGameState() (e.g. on player death),
-        // which arms SCHEDULE_INIT_STATE -- don't stomp that back to SCHEDULE_PROCESS_BOARD, or
-        // scheduleInitState() never gets another turn and the transition deadlocks forever.
+        // restartBoardScan() may have called setGameState() (e.g. player death), arming
+        // SCHEDULE_INIT_STATE -- don't overwrite that back to SCHEDULE_PROCESS_BOARD or the
+        // transition deadlocks.
         if (gameState == nextGameState) {
             setSchedule(SCHEDULE_PROCESS_BOARD);
             processBoardSquares();
@@ -424,7 +424,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 00:45 AEST
+// Last updated: 2026-07-28 16:25 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -436,11 +436,11 @@ static const unsigned short budget[128] = {
     _untimed_,    //   7 CH_STEELWALL
     _untimed_,    //   8 CH_PEBBLE1
     _untimed_,    //   9 CH_PEBBLE2
-    _B + 422,     //  10 CH_ROCK -- updated 2026-07-27 23:24 AEST
+    _B + 291,     //  10 CH_ROCK -- updated 2026-07-28 16:25 AEST (was untimed)
     _B + 3384,    //  11 CH_ROCK_FALLING -- updated 2026-07-28 00:45 AEST (was 3360)
     _B + 2023,    //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
     _B + 2474,    //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
-    _B + 276,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-27 23:24 AEST
+    _B + 281,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-28 16:25 AEST (was 276)
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
@@ -456,7 +456,7 @@ static const unsigned short budget[128] = {
     _B + 240,     //  27 CH_GEODOGE -- updated 2026-07-27 23:24 AEST
     _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
-    _B + 234,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-27 23:24 AEST
+    _B + 239,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:25 AEST (was 234)
     _B + 655,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  32 CH_HORIZONTAL_BAR
     _untimed_,    //  33 CH_PUSH_LEFT
@@ -504,17 +504,17 @@ static const unsigned short budget[128] = {
     _untimed_,    //  75 CH_WYRM_TAIL_D
     _untimed_,    //  76 CH_WYRM_TAIL_L
     _B + 240,     //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-28 00:07 AEST
-    _B + 234,     //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
-    _B + 234,     //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-27 23:24 AEST
+    _B + 240,     //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-28 16:25 AEST (was 234)
+    _B + 239,     //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-28 16:25 AEST (was 234)
     _B + 240,     //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-28 00:07 AEST
     _B + 1487,    //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-07-28 00:07 AEST
     _B + 234,     //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  83 CH_DOGE_FALLING_TOP2
     _untimed_,    //  84 CH_DOGE_FALLING_BOTTOM2
-    _B + 234,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 00:45 AEST (was 233)
-    _B + 251,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-27 23:24 AEST
+    _B + 239,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 16:25 AEST (was 234)
+    _B + 262,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:25 AEST (was 251)
     _B + 239,     //  87 CH_DOGE_SIDE_2 -- updated 2026-07-27 23:24 AEST
-    _B + 251,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-27 23:24 AEST
+    _B + 262,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:25 AEST (was 251)
     _B + 467,     //  89 CH_ELECTRIC_0 -- updated 2026-07-27 23:24 AEST
     _B + 382,     //  90 CH_ELECTRIC_1 -- updated 2026-07-27 23:24 AEST
     _B + 382,     //  91 CH_ELECTRIC_2 -- updated 2026-07-27 23:24 AEST
@@ -602,8 +602,7 @@ void processBoardSquares() {
             }
         }
 
-        // Clear any "scanned this frame" objects on the previous line
-        // note: we need to also do the last row ... or do we? if it's steel wall, no
+        // Clears "scanned this frame" flags on the previous row (last row is not cleared here).
         if (cursor.row) {
             unsigned char *prev = cursor.me - _BOARD_COLS;
             *prev &= ~FLAG_THISFRAME;
@@ -1117,9 +1116,16 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         break;
 
 
-    case CH_ROCK:
-        processCharRock(cur->me);
+    case CH_ROCK: {
+
+        unsigned char *next = cursor.me + _BOARD_COLS;
+        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+            *next = FLAG(CH_ROCK_FALLING_BOTTOM);
+            *cursor.me = FLAG(CH_ROCK_FALLING_TOP);
+        }
+
         break;
+    }
 
     case CH_ROCK_FALLING_TOP:
         *cur->me = FLAG(CH_DUST_ROCK_0);
@@ -1250,15 +1256,10 @@ void restartBoardScan() {
 #if ENABLE_SWIPE
             if (playerDead) {
                 setSwipeType(SWIPE_CIRCLE);
-                // Same world-to-screen math decodeCaves.c uses to centre the
-                // grow -- here it's the player's CURRENT position (death can
-                // happen anywhere on the board), not wherever the level
-                // started. playerX/Y are the character CELL (top-left corner,
-                // in trix), not the player's actual on-screen centre -- a
-                // character is CHAR_TRIX_X x CHAR_TRIX_Y trix, so the middle of
-                // that cell is +CHAR_CENTER_X/+CHAR_CENTER_Y from the corner
-                // (same offset particle.c's baseX/baseY use to centre effects
-                // on the player).
+                // Same world-to-screen math as decodeCaves.c, but centred on the player's
+                // CURRENT position (death can happen anywhere), not the level start.
+                // playerX/Y is the cell's top-left corner in trix, not its centre -- add
+                // CHAR_CENTER_X/Y to get the middle (same offset particle.c uses).
                 startSwipeClose(playerX * CHAR_TRIX_X + CHAR_CENTER_X - (scrollX >> 16),
                                 playerY * CHAR_TRIX_Y + CHAR_CENTER_Y - (scrollY >> 16));
             }
@@ -1376,16 +1377,6 @@ void processCharBeltAndGrinder(unsigned char *me, unsigned char creature) {
     if (ATTRIBUTE_BIT(*up, ATT_CONVEYOR) && (ATTRIBUTE_BIT(*up2, ATT_BLANK | ATT_DISSOLVES)) && *up < FLAG_THISFRAME) {
         *up2 = FLAG(*up);
         *up = CH_DUST_0;
-    }
-}
-
-
-void processCharRock(unsigned char *me) {
-
-    unsigned char *next = me + _BOARD_COLS;
-    if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
-        *next = FLAG(CH_ROCK_FALLING_BOTTOM);
-        *me = FLAG(CH_ROCK_FALLING_TOP);
     }
 }
 
