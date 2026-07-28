@@ -424,23 +424,23 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 16:25 AEST
+// Last updated: 2026-07-28 16:26 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
     _untimed_,    //   2 CH_DIRT
     _untimed_,    //   3 CH_BRICKWALL
-    _B + 342,     //   4 CH_DOORCLOSED -- updated 2026-07-28 00:45 AEST (was 341)
+    _B + 360,     //   4 CH_DOORCLOSED -- updated 2026-07-28 16:26 AEST (was 342)
     _untimed_,    //   5 CH_DOOROPEN_0
     _untimed_,    //   6 CH_EXITBLANK
     _untimed_,    //   7 CH_STEELWALL
     _untimed_,    //   8 CH_PEBBLE1
     _untimed_,    //   9 CH_PEBBLE2
-    _B + 291,     //  10 CH_ROCK -- updated 2026-07-28 16:25 AEST (was untimed)
+    _B + 292,     //  10 CH_ROCK -- updated 2026-07-28 16:26 AEST (was 291)
     _B + 3384,    //  11 CH_ROCK_FALLING -- updated 2026-07-28 00:45 AEST (was 3360)
     _B + 2023,    //  12 CH_DOGE_00 -- updated 2026-07-27 23:24 AEST
     _B + 2474,    //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
-    _B + 281,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-28 16:25 AEST (was 276)
+    _B + 282,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-28 16:26 AEST (was 281)
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
@@ -453,10 +453,10 @@ static const unsigned short budget[128] = {
     _B + 242,     //  24 CH_DUST_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  25 CH_DUST_1 -- updated 2026-07-28 00:07 AEST
     _B + 234,     //  26 CH_DUST_2 -- updated 2026-07-27 23:24 AEST
-    _B + 240,     //  27 CH_GEODOGE -- updated 2026-07-27 23:24 AEST
+    _B + 246,     //  27 CH_GEODOGE -- updated 2026-07-28 16:26 AEST (was 240)
     _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
-    _B + 239,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:25 AEST (was 234)
+    _B + 240,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:26 AEST (was 239)
     _B + 655,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  32 CH_HORIZONTAL_BAR
     _untimed_,    //  33 CH_PUSH_LEFT
@@ -505,16 +505,16 @@ static const unsigned short budget[128] = {
     _untimed_,    //  76 CH_WYRM_TAIL_L
     _B + 240,     //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-28 00:07 AEST
     _B + 240,     //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-28 16:25 AEST (was 234)
-    _B + 239,     //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-28 16:25 AEST (was 234)
+    _B + 240,     //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-28 16:26 AEST (was 239)
     _B + 240,     //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-28 00:07 AEST
     _B + 1487,    //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-07-28 00:07 AEST
-    _B + 234,     //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-27 23:24 AEST
+    _B + 240,     //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-28 16:26 AEST (was 234)
     _untimed_,    //  83 CH_DOGE_FALLING_TOP2
     _untimed_,    //  84 CH_DOGE_FALLING_BOTTOM2
-    _B + 239,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 16:25 AEST (was 234)
-    _B + 262,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:25 AEST (was 251)
-    _B + 239,     //  87 CH_DOGE_SIDE_2 -- updated 2026-07-27 23:24 AEST
-    _B + 262,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:25 AEST (was 251)
+    _B + 240,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 16:26 AEST (was 239)
+    _B + 263,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:26 AEST (was 262)
+    _B + 240,     //  87 CH_DOGE_SIDE_2 -- updated 2026-07-28 16:26 AEST (was 239)
+    _B + 263,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:26 AEST (was 262)
     _B + 467,     //  89 CH_ELECTRIC_0 -- updated 2026-07-27 23:24 AEST
     _B + 382,     //  90 CH_ELECTRIC_1 -- updated 2026-07-27 23:24 AEST
     _B + 382,     //  91 CH_ELECTRIC_2 -- updated 2026-07-27 23:24 AEST
