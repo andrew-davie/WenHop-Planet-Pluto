@@ -240,7 +240,18 @@ const unsigned char *const charSet[] = {
     CH2(CHAR_MAP_0to9_4_9),    // 210 CH_Y
     CH2(CHAR_MAP_0to9_5_9),    // 211 CH_Z
 
-    CH2(CHAR_MAP_0to9_0_2),    // 211 CH_PLUS
+    CH2(CHAR_MAP_0to9_0_2),    // 212 CH_PLUS
+
+    CH2(CHAR_MAP_0to9_0_0),    // 213 CH_BIG_0
+    CH2(CHAR_MAP_0to9_1_0),    // 214 CH_BIG_1
+    CH2(CHAR_MAP_0to9_2_0),    // 215 CH_BIG_2
+    CH2(CHAR_MAP_0to9_3_0),    // 216 CH_BIG_3
+    CH2(CHAR_MAP_0to9_4_0),    // 217 CH_BIG_4
+    CH2(CHAR_MAP_0to9_5_0),    // 218 CH_BIG_5
+    CH2(CHAR_MAP_0to9_6_0),    // 219 CH_BIG_6
+    CH2(CHAR_MAP_0to9_7_0),    // 220 CH_BIG_7
+    CH2(CHAR_MAP_0to9_8_0),    // 221 CH_BIG_8
+    CH2(CHAR_MAP_0to9_9_0),    // 222 CH_BIG_9
 };
 
 _Static_assert(sizeof(charSet) / sizeof(charSet[0]) == CH_MAX, "charSet table wrong size");

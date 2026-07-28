@@ -90,6 +90,10 @@ const struct FONT {
 };
 
 
+void initString() {
+    ps = 0;
+}
+
 void drawString(int fontNumber, int c, int delay, int buffer, int colbuf, const char *string, int y) {
 
     // x: 0..47 pixel pos in GRP array
@@ -489,6 +493,15 @@ void blitShape(int ch, int trixX, int y, int height, int buffer) {
     if (y + height >= _SCANLINES)
         height = _SCANLINES - 1 - y;
 
+    // static int colmod = 0;
+    // if (!(frame & 15)) {
+    //     colmod++;
+    //     if (colmod > 2)
+    //         colmod = 0;
+    // }
+
+    // int modifier = y + colmod;
+
     int modifier = y + 1;
 
     while (modifier > 2)
@@ -515,9 +528,9 @@ void blitShape(int ch, int trixX, int y, int height, int buffer) {
             unsigned char m2 = (unsigned char)(mask >> 15);
             unsigned char m3 = reverseBits[(unsigned char)(mask >> 7)];
 
-#define INNER_L(r)                                                                                                    \
+#define INNER_L(r)                                                                                                     \
     {                                                                                                                  \
-        unsigned int shiftCh = fp[trix + nextRoller[roller + r + modifier]];                                          \
+        unsigned int shiftCh = fp[trix + nextRoller[roller + r + modifier]];                                           \
         shiftCh <<= bitshL;                                                                                            \
                                                                                                                        \
         *(p1 + r) = (*(p1 + r) & m1) | reverseBits[(unsigned char)(shiftCh >> 23)];                                    \
@@ -542,7 +555,7 @@ void blitShape(int ch, int trixX, int y, int height, int buffer) {
 
 #define INNER_R(r)                                                                                                     \
     {                                                                                                                  \
-        unsigned int shiftCh = fp[trix + nextRoller[roller + r + modifier]];                                          \
+        unsigned int shiftCh = fp[trix + nextRoller[roller + r + modifier]];                                           \
         shiftCh <<= bitshR;                                                                                            \
                                                                                                                        \
         *(p4 + r) = (*(p4 + r) & m1) | reverseBits[(unsigned char)(shiftCh >> 23)];                                    \

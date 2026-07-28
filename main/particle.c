@@ -398,26 +398,19 @@ void initParticles() {
 }
 
 
-void removeFloatingChars() {
-
-    for (int i = 0; i < PARTICLE_COUNT; i++)
-        if (particle[i].type == PT_CHARACTER)
-            pushParticle(i);
-}
+// void removeFloatingChars() {
+//     for (int i = 0; i < PARTICLE_COUNT; i++)
+//         if (particle[i].type == PT_CHARACTER)
+//             pushParticle(i);
+// }
 
 
 void drawFloatingChars() {
 
     for (int i = PARTICLE_COUNT - 1; i >= 0; i--) {
         if (particle[i].type == PT_CHARACTER && particle[i].age) {
-
-            if (i == PARTICLE_COUNT - 1)
-                debug[199] = T1TC;
-
             blitShape(particle[i].colour, particle[i].trixX_8 >> 8, (particle[i].trixY_8 >> 8) * 3, CHAR_Y,
                       _BUF_GAME_PF0_LEFT);
-
-            debug[199] = T1TC - debug[199];
             if (particle[i].age < 255 && !--particle[i].age)
                 pushParticle(i);
         }

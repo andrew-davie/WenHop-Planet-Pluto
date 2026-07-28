@@ -42,5 +42,6 @@ void drawTime2(int value);
 void doubleSizeScore(int x, int y, int letter, int col);
 unsigned char *drawDecimal2(unsigned char *buffer, unsigned char *colour_buffer, unsigned int colour, int cvt);
 
+void drawDecimalToString(char *buffer, int chbase, int cvt);
 
 // EOF

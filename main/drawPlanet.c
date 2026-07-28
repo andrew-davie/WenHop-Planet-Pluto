@@ -4,6 +4,7 @@
 #include "cdfjplus.h"
 
 #include "colour.h"
+#include "draw.h"
 #include "drawplanet.h"
 #include "main.h"
 #include "planet.h"
@@ -11,7 +12,6 @@
 #include "reverseBits.h"
 #include "scroll.h"
 #include "sound.h"
-
 
 #define ROTATION_MAX 0x1000
 
@@ -252,8 +252,9 @@ void initPlanet(int planet) {
     // over it. Mirror initGameState_Globe()'s clear here so every entry into a planet -- first
     // or subsequent -- starts from a blank text buffer.
     myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_GRP), 0, 6 * _BUFFER_SIZE / 4);
-    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_COLUP0), 0x58585858, _BUFFER_SIZE / 4);
+    //    myMemsetInt((unsigned int *)(RAM + _BUF_GLOBE_COLUP0), 0x58585858, _BUFFER_SIZE / 4);
 
+    initString();
     initStars();
 
     rotationAccel = 10;

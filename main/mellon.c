@@ -373,13 +373,13 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
         else if (destType == TYPE_STAR) {
 
 
-            int y = playerY * CHAR_TRIX_Y - (scrollY >> 16) - CHAR_TRIX_Y;
-            int x = playerX * CHAR_TRIX_X - (scrollX >> 16) + CHAR_TRIX_X;
+            // int y = playerY * CHAR_TRIX_Y - (scrollY >> 16) - CHAR_TRIX_Y;
+            // int x = playerX * CHAR_TRIX_X - (scrollX >> 16) + CHAR_TRIX_X;
 
-            if (y < 0)
-                y = 0;
-            removeFloatingChars();
-            floatingCharacter(x, y, 30, CH_PLUS);
+            // if (y < 0)
+            //     y = 0;
+            // removeFloatingChars();
+            // floatingCharacter(x, y, 30, CH_PLUS);
 
 
             ADDAUDIO(SFX_ZAP2);

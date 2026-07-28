@@ -5,6 +5,9 @@
 
 #include "cdfjplus.h"
 
+#include "attribute.h"
+#include "board.h"
+#include "colour.h"
 #include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"
@@ -780,58 +783,92 @@ void drawTheScore(int score) {
     }
 }
 
-void drawScore() {
 
-    static int scc = 0;
-    scc++;
+void drawDecimalToString(char *buffer, int chbase, int cvt) {
 
-    if (!--forceScoreDraw) {
-        forceScoreDraw = SCOREVISIBLETIME;
-        if (++scoreCycle >= SCORELINE_END)
-            scoreCycle = playerDead ? SCORELINE_LIVES : SCORELINE_START;
+    int forced = 0;
+    for (int digit = 2; digit >= 0; digit--) {
+
+        int displayDigit = 0;
+        while (cvt >= pwr[digit]) {
+            displayDigit++;
+            cvt -= pwr[digit];
+        }
+
+        forced |= displayDigit;
+
+        if (forced || !digit)
+            *buffer++ = displayDigit + chbase;
     }
 
-    if (!exitMode && !playerDead && time < 0xA00)
-        setScoreCycle(SCORELINE_TIME);
+    *buffer = 0;
+}
 
-    else {
 
-        // occasionally show score when idle
-        if (idleTimer > IDLE_TIME) {
-            idleTimer = 0;
-            setScoreCycle(SCORELINE_SCORE);
+void drawScore() {
+
+    if (millingTime >= 0) {
+        int priorSecs = millingTime >> 16;
+        millingTime -= (0x10000 / 60);
+        if (millingTime >> 16 != priorSecs) {
+            char str[4];
+            drawDecimalToString(str, '0', millingTime >> 16);
+            displayFloatingString(theCave->clockx, theCave->clocky, 60, str);
         }
     }
 
-    for (int i = 0; i < 10; i++)
-        scoreLineNew[i] = DIGIT_SPACE;
+
+    //     static int scc = 0;
+    //     scc++;
+
+    //     if (!--forceScoreDraw) {
+    //         forceScoreDraw = SCOREVISIBLETIME;
+    //         if (++scoreCycle >= SCORELINE_END)
+    //             scoreCycle = playerDead ? SCORELINE_LIVES : SCORELINE_START;
+    //     }
+
+    //     if (!exitMode && !playerDead && time < 0xA00)
+    //         setScoreCycle(SCORELINE_TIME);
+
+    //     else {
+
+    //         // occasionally show score when idle
+    //         if (idleTimer > IDLE_TIME) {
+    //             idleTimer = 0;
+    //             setScoreCycle(SCORELINE_SCORE);
+    //         }
+    //     }
+
+    //     for (int i = 0; i < 10; i++)
+    //         scoreLineNew[i] = DIGIT_SPACE;
 
 
-    switch (scoreCycle) {
-    case SCORELINE_TIME:
-    case SCORELINE_SCORE:
-        drawDoge();
-        break;
-    case SCORELINE_LIVES:
-        drawLives();
-        break;
-    case SCORELINE_CAVELEVEL:
-        drawPlanetName();
-        break;
-    case SCORELINE_SPEEDRUN:
-        if (!theCave->dogeRequired[level] && !playerDead)
-            drawSpeedRun();
-        else
-            setScoreCycle(SCORELINE_LIVES);
-        break;
+    //     switch (scoreCycle) {
+    //     case SCORELINE_TIME:
+    //     case SCORELINE_SCORE:
+    //         drawDoge();
+    //         break;
+    //     case SCORELINE_LIVES:
+    //         drawLives();
+    //         break;
+    //     case SCORELINE_CAVELEVEL:
+    //         drawPlanetName();
+    //         break;
+    //     case SCORELINE_SPEEDRUN:
+    //         if (!theCave->dogeRequired[level] && !playerDead)
+    //             drawSpeedRun();
+    //         else
+    //             setScoreCycle(SCORELINE_LIVES);
+    //         break;
 
-    default:
-        break;
-    }
+    //     default:
+    //         break;
+    //     }
 
-    for (int i = 0; i < 10; i++) {
-        drawBigDigit(scoreLineNew[i], 9 - i, 14, 7, false);
-    }
+    //     for (int i = 0; i < 10; i++) {
+    //         drawBigDigit(scoreLineNew[i], 9 - i, 14, 7, false);
+    //     }
+    // }
 }
 
 // EOF

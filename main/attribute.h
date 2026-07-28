@@ -292,6 +292,16 @@ enum ChName {
 
     CH_PLUS,    // 212
 
+    CH_BIG_0,    // 213
+    CH_BIG_1,    // 214
+    CH_BIG_2,    // 215
+    CH_BIG_3,    // 216
+    CH_BIG_4,    // 217
+    CH_BIG_5,    // 218
+    CH_BIG_6,    // 219
+    CH_BIG_7,    // 220
+    CH_BIG_8,    // 221
+    CH_BIG_9,    // 222
 
     CH_MAX
 };

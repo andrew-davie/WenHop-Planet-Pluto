@@ -22,10 +22,12 @@
 #include "playerAnimation.h"
 #include "random.h"
 #include "schedule.h"
+#include "score.h"
 #include "scroll.h"
 #include "sound.h"
 #include "swipe.h"
 #include "wyrm.h"
+
 
 int attachment = 0;
 const OFFSET *attachmentOffset = 0;
@@ -186,6 +188,7 @@ void VB_Game() {
 
         if (!maskNeeded) {
 
+            drawScore();
             drawFloatingChars();
             drawAttachedChar(attachment);
 

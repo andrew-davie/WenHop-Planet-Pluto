@@ -17,6 +17,8 @@ struct CAVE_DEFINITION {
     unsigned char palette[3];
 
     unsigned char millingTime;
+    unsigned char clockx;
+    unsigned char clocky;
     unsigned char dogeValue;
     unsigned char extraDogeValue;
     unsigned char weather;

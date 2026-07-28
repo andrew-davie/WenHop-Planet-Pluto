@@ -22,7 +22,7 @@ const unsigned char P1_caveUseWall[] = {
     BOARD_TRIX_X-3,17,
     0x46, 0xE8, 0xEA,               // palette
 
-    20,                             // milling
+    20, 4,4,                            // milling
     10, 15,                         // doge $
     0,                              // shake
 
@@ -135,16 +135,15 @@ const unsigned char P1_caveUseWall[] = {
 const unsigned char cavetest[] = {
     // clang-format off
 
-    // scroll bounds (TL(x,y), BR(x,y) in trixels)
-    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,              // scroll bounds (TL(x,y), BR(x,y) in trixels)
 
     0x98, 0x26, 0xC6,               // palette
 
-    20,                             // milling
+    255,  22, 50,                           // milling
     10, 15,                         // doge $
     0,                              // shake
 
-     17,  11,  50,  56,  8,         // randomiser[level]
+     0,  0,  0,  0,  0,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
     200, 200, 200, 200, 200,
 
@@ -189,7 +188,7 @@ const unsigned char P0_caveNew[] = {
 
     0x98, 0x26, 0xC6,               // palette
 
-    20,                             // milling
+    60,  4,4,                           // milling
     10, 15,                         // doge $
     0,                              // shake
 
@@ -197,11 +196,11 @@ const unsigned char P0_caveNew[] = {
      30,  12,  12,  12,  12,        // doge req
     200, 200, 200, 200, 200,
 
-    WEAPON_MACE,                    // 0
-    WEAPON_MACE,                    // 1
-    WEAPON_MACE,                    // 2
-    WEAPON_MACE,                    // 3
-    WEAPON_MACE,                    // 4
+    0, //WEAPON_MACE,                    // 0
+    0, //WEAPON_MACE,                    // 1
+    0, //WEAPON_MACE,                    // 2
+    0, //WEAPON_MACE,                    // 3
+    0, //WEAPON_MACE,                    // 4
 
 //    CAVEDEF_LOCK_Y,
     0, CH_BRICKWALL, CH_BRICKWALL,           // flags, border, fill
@@ -212,55 +211,6 @@ const unsigned char P0_caveNew[] = {
     CH_DIRT,10,20,20,20,20,
     CH_GEODOGE, 80,40,40,40,40,
     CH_ROCK, 50,40,40,40,40,
-
-
-    // CH_INSULATOR_L, 4,4,
-    // CH_INSULATOR_R, 8,4,
-    // Start of cave draw
-
-
-    // CH_ROCK_BONUS, 7,3,
-
-    // DRAW_RECT,CH_BRICKWALL, 0,1,40,8,
-
-    // CH_INSULATOR_TOP, 6,2,
-    // CH_INSULATOR_BOTTOM, 6,7,
-
-
-    // CH_INSULATOR_TOP, 11,2,
-    // CH_INSULATOR_BOTTOM, 11,7,
-
-    // CH_BRICKWALL, 14,2,
-    // CH_INSULATOR_TOP, 14,3,
-    // CH_INSULATOR_BOTTOM, 14,6,
-    // CH_BRICKWALL, 14,7,
-
-
-    // CH_INSULATOR_TOP, 17,2,
-    // CH_INSULATOR_BOTTOM, 17,7,
-
-    // CH_BRICKWALL, 20,2,
-    // CH_INSULATOR_TOP, 20,3,
-    // CH_INSULATOR_BOTTOM, 20,6,
-    // CH_BRICKWALL, 20,7,
-
-    // CH_INSULATOR_TOP, 23,2,
-    // CH_INSULATOR_BOTTOM, 23,7,
-
-    // CH_BRICKWALL, 26,2,
-    // CH_INSULATOR_TOP, 26,3,
-    // CH_INSULATOR_BOTTOM, 26,6,
-    // CH_BRICKWALL, 26,7,
-
-    // CH_INSULATOR_TOP, 29,2,
-    // CH_INSULATOR_BOTTOM, 29,7,
-    
-    // CH_BRICKWALL, 32,2,
-    // CH_BRICKWALL, 32,3,
-    // CH_BRICKWALL, 32,4,
-    // CH_INSULATOR_TOP, 32,5,
-    // CH_INSULATOR_BOTTOM, 32,7,
-
 
     DRAW_FILLED_RECT, CH_STEELWALL, 1,1,9,8, CH_ROCK,
 
@@ -274,10 +224,6 @@ const unsigned char P0_caveNew[] = {
     CH_CRACKED_BRICK, 5,5,
     CH_CRACKED_BRICK, 6,5,
 
-    // CH_PIT_R0, 4,5,
-    // CH_PIT_L0, 5,5,
-    // CH_PIT_R0, 6,5,
- 
     CH_DOOROPEN_0, 5, 6,
     CH_MELLON_HUSK_BIRTH, 5, 2,
 
@@ -427,7 +373,7 @@ const unsigned char P2_caveWyrms[] = {
     0xD6, 0x44, 0x76,               // palette
 
 
-    20,     // milling
+    20,  4,4,   // milling
     10, 15, // doge $
     0,          // weather
 
@@ -956,7 +902,7 @@ const unsigned char P3_starsAndStripes[] = {
     7,17,7,17,
     0x26, 0xB6, 0x54,               // palette
 
-    20,                             // milling
+    20,    4,4,                         // milling
     1, 15,                          // doge $
     0,                              // rain
     
@@ -1067,7 +1013,7 @@ const unsigned char P4_caveA4[] = {
     43,17,BOARD_TRIX_X-53,17,
     0xA6, 0x16, 0xD6,               // palette
 
-    20,    // milling
+    20, 4,4,   // milling
     1, 15, // doge $
     0,     //              ,          // rain
     

@@ -30,7 +30,7 @@ void scheduleUnpackCave() {
                 totalDogePossible = -1;    // indicates "perfect" not possible
 
 
-            displayFloatingString(5, SCREEN_TRIX_Y - CHAR_TRIX_Y - 5, 120, "Mercury");
+            //            displayFloatingString(5, SCREEN_TRIX_Y - CHAR_TRIX_Y - 5, 120, "Mercury");
 
             setSchedule(SCHEDULE_START_SCAN);
 
