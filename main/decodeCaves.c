@@ -45,28 +45,49 @@ struct CAVE_DEFINITION *theCave;
 
 static int decodeFlasher;
 
-static int last_prng_a;
-static int last_prng_b;
 
-static unsigned int savedTruePrngA;
-static unsigned int savedTruePrngB;
+static struct {
+    unsigned char cmd;
+    unsigned char col, row, c, d, e, f;
+} decode;
+
+static unsigned char theCode;
+static unsigned char theObject;
+
+
+// Do NOT use the regular random generator -- otherwise the potentially deterministic
+// init in this code will stop on "true" randomness elsewhere in the code.
+
+static unsigned int decode_prng_a;
+static unsigned int decode_prng_b;
+
+static unsigned int decodeGetRandom32() {
+    decode_prng_b = 36969 * (decode_prng_b & 65535) + (decode_prng_b >> 16);
+    decode_prng_a = 18000 * (decode_prng_a & 65535) + (decode_prng_a >> 16);
+    return decode_prng_b;
+}
+
+
+static unsigned int decodeRangeRandom(int range) {
+    unsigned int v = decodeGetRandom32();
+    v ^= v << 16;
+    return ((v >> 16) * range) >> 16;
+}
+
 
 void decodeCave(int newCave) {
-
-    savedTruePrngA = prng_a;
-    savedTruePrngB = prng_b;
 
     theCave = (struct CAVE_DEFINITION *)caveList[newCave].cave;
 
     decodeState = DECODE_NONE;
 
-    last_prng_a = theCave->randomInit[level];
-    last_prng_b = last_prng_a++;
+    decode_prng_a = theCave->randomInit[level] ? theCave->randomInit[level] : prng_a;
+    decode_prng_b = decode_prng_a++;
 
     doges = theCave->dogeRequired[level];
 
     time = (theCave->timeToComplete[level] << 8) + 60;
-    millingTime = theCave->millingTime * 60;
+    millingTime = theCave->millingTime << 16;
 
     decodingRow = 0;
     decodeFlasher = 1;    // 21;
@@ -84,30 +105,8 @@ void decodeCave(int newCave) {
         weapon = theCave->weapon[level];
 }
 
-// Persistent across calls -- decodeExplicitData() is a state machine resumed on
-// every call (possibly many per frame, across many frames -- see schedule.c's
-// budgeted unpack), so these can't be locals. Bundled into one struct rather
-// than left as bare single-letter globals: StoreObject/DrawLine/DrawRect/
-// DrawFilledRect below all take x/y (and DrawLine/DrawFilledRect take c/d/e/f-ish
-// params too) as perfectly ordinary parameter names, and a bare global with the
-// same name as a parameter is exactly the kind of thing -Wshadow warns about --
-// and warns about for good reason: a rename that misses one usage silently falls
-// back to the global instead of erroring, which is precisely what happened here
-// once already (DrawLine's row guard silently reading this decode state instead
-// of its own parameter). Scoping them under "decode." means no function's own
-// x/y/c/d/e/f can ever collide with these again, by construction.
-static struct {
-    unsigned char cmd;
-    unsigned char col, row, c, d, e, f;
-} decode;
-static unsigned char theCode;
-static unsigned char theObject;
-
 
 int decodeExplicitData() {
-
-    prng_a = last_prng_a;
-    prng_b = last_prng_b;
 
     switch (decodeState) {
     case DECODE_START:
@@ -122,7 +121,7 @@ int decodeExplicitData() {
             for (int x = 0; x < _BOARD_COLS; x++)
                 for (int object = 0; object < theCave->objectCount; object++) {
                     unsigned char *p = (&(theCave->objectData)) + object * 6;
-                    if ((getRandom32() >> 24) < p[level + 1])
+                    if ((decodeGetRandom32() >> 24) < p[level + 1])
                         StoreObject(x, decodingRow, p[0]);
                 }
 
@@ -284,15 +283,7 @@ int decodeExplicitData() {
         break;
     }
 
-    last_prng_a = prng_a;
-    last_prng_b = prng_b;
-
     return decodeFlasher;
-}
-
-void restoreTrueRandom() {
-    prng_a = savedTruePrngA;
-    prng_b = savedTruePrngB;
 }
 
 void StoreObject(int x, int y, objectType anObject) {
@@ -387,7 +378,7 @@ void DrawFilledRect(objectType anObject, int x, int y, int aWidth, int aHeight, 
         for (int i = 0; i < aWidth; i++) {
             for (int j = 0; j < aHeight; j++) {
 
-                if (!rangeRandom(aFillObject))
+                if (!decodeRangeRandom(aFillObject))
                     StoreObject(x + i, y + j, anObject & 0x7F);
             }
         }

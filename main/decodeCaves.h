@@ -21,7 +21,7 @@ struct CAVE_DEFINITION {
     unsigned char extraDogeValue;
     unsigned char weather;
 
-    unsigned char randomInit[5];
+    unsigned char randomInit[5];    // use 0 for non-deterministic (purely random)
     unsigned char dogeRequired[5];
     unsigned char timeToComplete[5];
     enum WEAPON weapon[5];
@@ -39,7 +39,6 @@ extern struct CAVE_DEFINITION *theCave;
 
 void decodeCave(int cave);
 int decodeExplicitData();
-void restoreTrueRandom();
 
 enum DECODE_STATE {
     DECODE_NONE,
