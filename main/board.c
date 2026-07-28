@@ -424,7 +424,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 16:26 AEST
+// Last updated: 2026-07-28 16:30 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -453,7 +453,7 @@ static const unsigned short budget[128] = {
     _B + 242,     //  24 CH_DUST_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  25 CH_DUST_1 -- updated 2026-07-28 00:07 AEST
     _B + 234,     //  26 CH_DUST_2 -- updated 2026-07-27 23:24 AEST
-    _B + 246,     //  27 CH_GEODOGE -- updated 2026-07-28 16:26 AEST (was 240)
+    _B + 265,     //  27 CH_GEODOGE -- updated 2026-07-28 16:30 AEST (was untimed)
     _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
     _B + 240,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:26 AEST (was 239)
@@ -511,10 +511,10 @@ static const unsigned short budget[128] = {
     _B + 240,     //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-28 16:26 AEST (was 234)
     _untimed_,    //  83 CH_DOGE_FALLING_TOP2
     _untimed_,    //  84 CH_DOGE_FALLING_BOTTOM2
-    _B + 240,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 16:26 AEST (was 239)
-    _B + 263,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:26 AEST (was 262)
-    _B + 240,     //  87 CH_DOGE_SIDE_2 -- updated 2026-07-28 16:26 AEST (was 239)
-    _B + 263,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:26 AEST (was 262)
+    _B + 249,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 16:30 AEST (was 240)
+    _B + 272,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:30 AEST (was 263)
+    _B + 249,     //  87 CH_DOGE_SIDE_2 -- updated 2026-07-28 16:30 AEST (was 240)
+    _B + 272,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:30 AEST (was 263)
     _B + 467,     //  89 CH_ELECTRIC_0 -- updated 2026-07-27 23:24 AEST
     _B + 382,     //  90 CH_ELECTRIC_1 -- updated 2026-07-27 23:24 AEST
     _B + 382,     //  91 CH_ELECTRIC_2 -- updated 2026-07-27 23:24 AEST
@@ -809,14 +809,6 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         processCharBeltAndGrinder(cur->me, creature);
         break;
 
-    case TYPE_GEODOGE: {
-        unsigned char *next = cur->me + _BOARD_COLS;
-        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
-            *next = FLAG(CH_GEODOGE_FALLING_BOTTOM);
-            *cur->me = FLAG(CH_GEODOGE_FALLING_TOP);
-        }
-        break;
-    }
 
     default:
         return false;
@@ -1117,15 +1109,23 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
 
     case CH_ROCK: {
-
         unsigned char *next = cursor.me + _BOARD_COLS;
         if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
             *next = FLAG(CH_ROCK_FALLING_BOTTOM);
             *cursor.me = FLAG(CH_ROCK_FALLING_TOP);
         }
-
         break;
     }
+
+    case CH_GEODOGE: {
+        unsigned char *next = cursor.me + _BOARD_COLS;
+        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+            *next = FLAG(CH_GEODOGE_FALLING_BOTTOM);
+            *cursor.me = FLAG(CH_GEODOGE_FALLING_TOP);
+        }
+        break;
+    }
+
 
     case CH_ROCK_FALLING_TOP:
         *cur->me = FLAG(CH_DUST_ROCK_0);
