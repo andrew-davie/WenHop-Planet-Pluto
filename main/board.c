@@ -424,7 +424,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 16:30 AEST
+// Last updated: 2026-07-28 16:35 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -450,13 +450,13 @@ static const unsigned short budget[128] = {
     _untimed_,    //  21 CH_PEBBLE_ROCK
     _untimed_,    //  22 CH_ROCK_PEBBLE
     _untimed_,    //  23 CH_ROCK_PEBBLE_1
-    _B + 242,     //  24 CH_DUST_0 -- updated 2026-07-28 00:07 AEST
-    _B + 242,     //  25 CH_DUST_1 -- updated 2026-07-28 00:07 AEST
-    _B + 234,     //  26 CH_DUST_2 -- updated 2026-07-27 23:24 AEST
+    _B + 209,     //  24 CH_DUST_0 -- updated 2026-07-28 16:35 AEST (was untimed)
+    _B + 209,     //  25 CH_DUST_1 -- updated 2026-07-28 16:35 AEST (was untimed)
+    _B + 206,     //  26 CH_DUST_2 -- updated 2026-07-28 16:35 AEST (was untimed)
     _B + 265,     //  27 CH_GEODOGE -- updated 2026-07-28 16:30 AEST (was untimed)
     _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
-    _B + 240,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:26 AEST (was 239)
+    _B + 207,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:35 AEST (was untimed)
     _B + 655,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  32 CH_HORIZONTAL_BAR
     _untimed_,    //  33 CH_PUSH_LEFT
@@ -1056,14 +1056,14 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     case CH_DUST_2:
     case CH_DUST_ROCK_2:
-        *cur->me = CH_BLANK;
+        *cursor.me = CH_BLANK;
         break;
 
     case CH_DUST_0:
     case CH_DUST_1:
     case CH_DUST_ROCK_0:
     case CH_DUST_ROCK_1:
-        (*cur->me)++;
+        (*cursor.me)++;
         break;
 
     case CH_CONVERT_GEODE_TO_DOGE:
