@@ -175,7 +175,7 @@ void displayFloatingNumber(int trixX, int trixY, int age, int value) {
 static const unsigned char ascii_width[] = {
     4,    //  32  SPACE
     4,    //  33  !   alt 0
-    4,    //  34  "   alt 1
+    2,    //  34  "   alt 1
     4,    //  35  #   alt 2
     4,    //  36  $   alt 3
     4,    //  37  %   alt 4
@@ -435,7 +435,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-29 01:10 AEST
+// Last updated: 2026-07-29 03:27 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
