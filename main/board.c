@@ -424,7 +424,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-28 16:46 AEST
+// Last updated: 2026-07-28 17:15 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -457,7 +457,7 @@ static const unsigned short budget[128] = {
     _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
     _B + 207,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:35 AEST (was untimed)
-    _B + 611,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-28 16:46 AEST (was untimed)
+    _B + 422,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-28 17:15 AEST (was untimed)
     _untimed_,    //  32 CH_HORIZONTAL_BAR
     _untimed_,    //  33 CH_PUSH_LEFT
     _untimed_,    //  34 CH_PUSH_LEFT_REVERSE
@@ -1073,13 +1073,21 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         convertedGeodoge++;
         *cursor.me = CH_DOGE_00;
 
-        for (int i = 0; i < 4; i++) {
-            unsigned char *newDogeCandidate = cursor.me + dirOffset[i];
-            if (Attribute[CharToType[GET(*newDogeCandidate)]] & ATT_GEODOGE) {
-                *newDogeCandidate = CH_CONVERT_GEODE_TO_DOGE | thisFrame[i];
-                ADDAUDIO(SFX_UNCOVER);
-            }
-        }
+        // const unsigned char thisFrame[] = {0, FLAG_THISFRAME, FLAG_THISFRAME, 0};
+
+#define CVTGEO(flag, offset)                                                                                           \
+    newDogeCandidate = cursor.me + offset;                                                                             \
+    if (Attribute[CharToType[GET(*newDogeCandidate)]] & ATT_GEODOGE) {                                                 \
+        *newDogeCandidate = CH_CONVERT_GEODE_TO_DOGE | flag;                                                           \
+        ADDAUDIO(SFX_UNCOVER);                                                                                         \
+    }
+
+        unsigned char *newDogeCandidate;
+
+        CVTGEO(0, -_BOARD_COLS)
+        CVTGEO(FLAG_THISFRAME, 1)
+        CVTGEO(FLAG_THISFRAME, _BOARD_COLS)
+        CVTGEO(0, -1)
 
         break;
     }
