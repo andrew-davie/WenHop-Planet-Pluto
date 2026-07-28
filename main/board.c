@@ -435,7 +435,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-29 03:27 AEST
+// Last updated: 2026-07-29 03:45 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -532,26 +532,26 @@ static const unsigned short budget[128] = {
     _B + 393,     //  92 CH_ELECTRIC_3 -- updated 2026-07-29 00:37 AEST (was 384)
     _untimed_,    //  93 CH_BROKEN_DIRT
     _B + 4085,    //  94 CH_INSULATOR_TOP -- updated 2026-07-29 00:45 AEST (was 4047)
-    _B + 230,     //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-29 00:37 AEST (was 221)
+    _B + 236,     //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-29 03:45 AEST (was 230)
     _B + 2003,    //  96 CH_STAR -- updated 2026-07-29 00:37 AEST (was 1985)
     _B + 249,     //  97 CH_STAR_FALLING_TOP -- updated 2026-07-28 17:27 AEST (was 234)
-    _B + 248,     //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-28 17:27 AEST (was 234)
+    _B + 249,     //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-29 03:45 AEST (was 248)
     _untimed_,    //  99 CH_ROCK_BONUS
     _untimed_,    // 100 CH_STAR_EXPLODE
     _B + 6736,    // 101 CH_INSULATOR_L -- updated 2026-07-29 00:45 AEST (was 3771)
-    _B + 230,     // 102 CH_INSULATOR_R -- updated 2026-07-29 00:37 AEST (was 221)
+    _B + 236,     // 102 CH_INSULATOR_R -- updated 2026-07-29 03:45 AEST (was 230)
     _B + 476,     // 103 CH_ELECTRIC_H0 -- updated 2026-07-29 00:37 AEST (was 467)
     _B + 391,     // 104 CH_ELECTRIC_H1 -- updated 2026-07-29 00:37 AEST (was 382)
     _B + 391,     // 105 CH_ELECTRIC_H2 -- updated 2026-07-29 00:37 AEST (was 382)
     _B + 393,     // 106 CH_ELECTRIC_H3 -- updated 2026-07-29 00:37 AEST (was 384)
-    _B + 192,     // 107 CH_CROSSED_STREAMS -- updated 2026-07-29 00:37 AEST (was 190)
+    _B + 197,     // 107 CH_CROSSED_STREAMS -- updated 2026-07-29 03:45 AEST (was 192)
     _untimed_,    // 108 CH_MOUNT_U
     _untimed_,    // 109 CH_MOUNT_D
     _untimed_,    // 110 CH_MOUNT_L
     _untimed_,    // 111 CH_MOUNT_R
     _untimed_,    // 112 CH_PIT_L0
     _untimed_,    // 113 CH_PIT_R0
-    _B + 1351,    // 114 CH_BOMB -- updated 2026-07-28 17:27 AEST (was 1336)
+    _B + 1366,    // 114 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
     _B + 5456,    // 115 CH_CRACKED_BRICK -- updated 2026-07-29 00:37 AEST (was 5386)
     _untimed_,    // 116 CH_CONCRETE
     _untimed_,    // 117 (unused)
