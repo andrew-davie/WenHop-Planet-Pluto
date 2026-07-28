@@ -660,13 +660,8 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
     case TYPE_CRACKED_BRICK: {
 
-        //    case TYPE_PIT_L:
-        //    case TYPE_PIT_R: {
-
-        if (rockShaker) {
+        if (rockShaker)
             shakeTime++;
-        }
-
 
         int rchar = lastRockCount;
         if (rchar > 7)

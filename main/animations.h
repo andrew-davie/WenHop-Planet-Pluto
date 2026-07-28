@@ -20,5 +20,6 @@ extern const unsigned char AnimateRockBonus[];
 extern const unsigned char AnimateStar[];
 extern const unsigned char AnimateStarExplode[];
 extern const unsigned char AnimateCrackedBrick[];
+extern const unsigned char AnimateBomb[];
 
 // EOF

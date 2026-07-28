@@ -286,14 +286,12 @@ const unsigned char AnimMellonHusk[] = {
 
 const unsigned char *const AnimateBase[] = {
 
-    // indexed by object TYPE (def: ObjectType in attribute.h)
-    // =0 if object does not auto-animate
+    // indexed by ObjectType (attribute.h); 0 = no auto-animation
 
     // SUPER CRITICAL:  *ALL* characters of the given type will animate in unison.
     //  You *CANNOT* use this to animate a just single character onscreen.
 
-    // Note that the type number is an ID, not ordinal. That's because the continuity may
-    // be compromised by the conditional compilation. Beware.
+    // Type numbers are IDs, not sequential — conditional compilation can break continuity.
 
     0,                      // 00 TYPE_BLANK
     0,                      // 01 TYPE_PLACEHOLDER

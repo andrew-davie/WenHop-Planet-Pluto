@@ -565,7 +565,13 @@ bool checkLowPriorityMove(BoardCursor *cur, int dir) {
             if (Attribute[destType] & ATT_MINE) {
 
                 addScore(VALUE_BREAK_GEODE);
-                *meOffset = ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE) ? FLAG(CH_CONVERT_GEODE_TO_DOGE) : CH_DUST_ROCK_0;
+
+                if (ATTRIBUTE_BIT(*meOffset, ATT_GEODOGE)) {
+                    *meOffset = FLAG(CH_CONVERT_GEODE_TO_DOGE);
+                    ADDAUDIO(SFX_UNCOVER);
+                } else
+                    *meOffset = CH_DUST_ROCK_0;
+
 
                 if (destType == TYPE_ROCK) {
 
@@ -628,16 +634,8 @@ void movePlayer(BoardCursor *cur) {
 
     if (drop) {
 
-        if (GET(attachment) == CH_ROCK)
-            attachment = CH_ROCK_FALLING;
-        if (GET(attachment) == CH_GEODOGE)
-            attachment = CH_GEODOGE_FALLING;
-
-
-        if (GET(attachment) == CH_BOMB) {
-            extern const unsigned char AnimateBomb[];
+        if (GET(attachment) == CH_BOMB)
             startCharAnimation(TYPE_BOMB, AnimateBomb + 2);
-        }
 
         attachmentOffset = 0;
         *meAtt = attachment;
