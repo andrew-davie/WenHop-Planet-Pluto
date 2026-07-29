@@ -650,9 +650,21 @@ void drawParticles() {
                 // silently despawning with no splash at all. Same deal if it
                 // scrolls off-screen (drawBit() returning false) while still
                 // mid-fall. Splash here too so a rain drop never just vanishes.
+                //
+                // Deliberately NOT using x/y from the top of this function:
+                // those bake in the generic xOffset/yOffset polar dance
+                // (sin_cos[dir>>3] * distance), which assumes dir is an angle
+                // and distance a radius. Rain repurposes both (dir as a fall-
+                // velocity accumulator, distance as this very roll-frame
+                // counter -- see the PT_RAIN case above), so once a drop has
+                // rolled at all, x/y here are offset by however far the
+                // roll counter happened to be at, not where the drop
+                // actually is. particle[i].trixX_8/trixY_8 are the drop's
+                // real position, same as every other splash site in the
+                // PT_RAIN case already uses.
                 if (particle[i].type == PT_RAIN) {
                     ADDAUDIO(SFX_DRIP2);
-                    nDotsAtTrixel(3, x, y, 12, PT_TWO, 30, 7);
+                    nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                 }
 
                 pushParticle(i);
