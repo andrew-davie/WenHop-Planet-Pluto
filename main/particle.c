@@ -580,8 +580,11 @@ void drawParticles() {
                 // through, the inner three columns splash, at the top of
                 // the cell same as any other solid hit.
                 if (cellCol == playerX && cellRow == playerY && subCol > 0 && subCol < CHAR_TRIX_X - 1) {
+                    // Y pinned to the top of the cell per spec (splash where
+                    // the drop meets the player's head), but X should still
+                    // be the drop's actual column, not the cell's center.
                     ADDAUDIO(SFX_DRIP2);
-                    nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
+                    nDotsAtTrixel(3, particle[i].trixX_8 >> 8, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
                     pushParticle(i);
                     continue;
                 }
@@ -672,8 +675,14 @@ void drawParticles() {
 
                 } else if (pixelSolid) {
 
+                    // Splash at the drop's actual position, not the cell's
+                    // horizontal center -- after rolling off a rock the drop
+                    // is very often sitting in the edge column of whatever
+                    // cell it lands in next, not the middle of it, and
+                    // snapping to cellCol*CHAR_TRIX_X+CHAR_CENTER_X drew the
+                    // splash up to 2 pixels off from where it actually hit.
                     ADDAUDIO(SFX_DRIP2);
-                    nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
+                    nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                     pushParticle(i);
                     continue;
                 }
