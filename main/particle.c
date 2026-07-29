@@ -16,8 +16,14 @@
 #include "particle.h"
 #include "playerAnimation.h"
 #include "random.h"
+#include "score.h"
 #include "scroll.h"
 #include "sound.h"
+
+// TEMPORARY -- set to 0 to silence, see makeRain() below. Prints the raw
+// CH_* index of whatever the DRIP check read directly above each rain spawn,
+// so we can see ground truth instead of guessing from static review.
+#define RAIN_SPAWN_DEBUG 1
 
 static unsigned int weaponLength = 0;
 
@@ -599,6 +605,19 @@ void makeRain() {
     // STEELWALL/PEBBLE1/CONCRETE (see attribute.c)
     if ((Attribute[CharToType[GET(*cell)]] & ATT_BLANK) &&
         (Attribute[CharToType[GET(*(cell - _BOARD_COLS))]] & ATT_DRIP)) {
+
+#if RAIN_SPAWN_DEBUG
+        // TEMPORARY -- prints the raw CH_* index (attribute.h) of the cell this
+        // spawn believed was DRIP-flagged, right above the drop, so we can see
+        // exactly what the check actually read instead of guessing from static
+        // code review. Delete once the mislocated-spawn bug is confirmed/found.
+        {
+            char str[4];
+            drawDecimalToString(str, '0', GET(*(cell - _BOARD_COLS)));
+            displayFloatingString(col * CHAR_TRIX_X - (scrollX >> 16), (row - 1) * CHAR_TRIX_Y - (scrollY >> 16), 90,
+                                  str);
+        }
+#endif
 
         int idx = sphereDot(col * CHAR_TRIX_X + CHAR_CENTER_X, row * CHAR_TRIX_Y, PT_RAIN, 200, 1);
         if (idx >= 0) {
