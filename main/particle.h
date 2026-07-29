@@ -13,6 +13,7 @@ enum ParticleType {
     PT_BUBBLE,
     PT_STATIC,
     PT_CHARACTER,
+    PT_RAIN,
 };
 
 struct Particle {
@@ -33,6 +34,7 @@ extern int weapon;
 
 void initParticles();
 void drawParticles();
+void makeRain();
 
 void initTool();
 void drawRope();

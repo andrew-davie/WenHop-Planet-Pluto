@@ -348,6 +348,7 @@ DEFINE_ENUM_WITH_BIT_VALUES(TypeAttributes,
     ATT(CORNER),                // 26  must match POS_CORNER
     ATT(PICKUP),                // 27
     ATT(MASSIVE),               // 28
+    ATT(DRIP),                  // 29  can have a rain drip form beneath it
 );
 
 #define POS_CORNER 26           /* must match ATT(CORNER) #*/

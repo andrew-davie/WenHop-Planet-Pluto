@@ -453,6 +453,49 @@ void drawParticles() {
                 break;
             }
 
+            case PT_RAIN: {
+
+                // Rain doesn't use the dir/distance polar-offset dance above --
+                // distance is pinned at 0 (see makeRain()) so xOffset/yOffset are
+                // always 0 for this type, and dir is repurposed here as an 8-bit
+                // fall-velocity accumulator instead of an angle. Keeps a straight
+                // vertical drop without fighting the generic "distance +=
+                // speed" advance every other particle type relies on below.
+                if (particle[i].dir < 240)
+                    particle[i].dir += 8;
+
+                particle[i].trixY_8 += particle[i].dir >> 2;
+
+                int cellCol = (particle[i].trixX_8 >> 8) / CHAR_TRIX_X;
+                int cellRow = (particle[i].trixY_8 >> 8) / CHAR_TRIX_Y;
+
+                if (cellRow < 0 || cellRow >= _BOARD_ROWS || cellCol < 0 || cellCol >= _BOARD_COLS) {
+                    pushParticle(i);
+                    continue;
+                }
+
+                unsigned char *cell = RAM + _BOARD + cellRow * _BOARD_COLS + cellCol;
+                enum ObjectType hitType = CharToType[GET(*cell)];
+
+                if (!(Attribute[hitType] & ATT_BLANK)) {
+
+                    if (hitType == TYPE_ROCK || hitType == TYPE_GEODOGE) {
+                        // roll off sideways, same feel doRoll() gives real boulders,
+                        // rather than splashing straight onto them
+                        particle[i].trixX_8 += (rangeRandom(2) ? CHAR_TRIX_X : -CHAR_TRIX_X) << 8;
+                        particle[i].trixY_8 = (cellRow * CHAR_TRIX_Y) << 8;
+                    } else {
+                        ADDAUDIO(SFX_DRIP2);
+                        nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30,
+                                      1);
+                        pushParticle(i);
+                        continue;
+                    }
+                }
+
+                break;
+            }
+
             default:
                 break;
             }
@@ -462,6 +505,47 @@ void drawParticles() {
             if (!--particle[i].age || !drawBit(x, y, particle[i].colour))
                 pushParticle(i);
         }
+}
+
+// Ported from Boulder-Dash-DEMO2025's makeRain() (main.c/drawscreen.c there) --
+// that version drove rain as its own dedicated pair of drops, hand-plotted
+// pixel-by-pixel against the raw character bitmap. This project already has a
+// general particle pool for exactly this kind of thing, so rain is just
+// another particle type (PT_RAIN, see the switch in drawParticles() above)
+// riding the same pool as dust/spirals/bubbles, gated on the per-cave
+// theCave->weather byte (decodeCaves.h) that was sitting there unused.
+void makeRain() {
+
+    if (!theCave->weather)
+        return;
+
+    // atmospheric, not a firehose -- most calls bail out here
+    if (rangeRandom(4))
+        return;
+
+    int col = (scrollX >> 16) / CHAR_TRIX_X + rangeRandom(SCREEN_TRIX_X / CHAR_TRIX_X);
+    int row = (scrollY >> 16) / CHAR_TRIX_Y + rangeRandom(SCREEN_TRIX_Y / CHAR_TRIX_Y);
+
+    if (col < 0 || col >= _BOARD_COLS || row < 1 || row >= _BOARD_ROWS)
+        return;
+
+    unsigned char *cell = RAM + _BOARD + row * _BOARD_COLS + col;
+
+    // only drip from a blank cell directly under something ATT_DRIP-flagged --
+    // same rule DEMO2025 used (its ATT_DRIP), now on WenHop's DIRT/BRICKWALL/
+    // STEELWALL/PEBBLE1/CONCRETE (see attribute.c)
+    if ((Attribute[CharToType[GET(*cell)]] & ATT_BLANK) &&
+        (Attribute[CharToType[GET(*(cell - _BOARD_COLS))]] & ATT_DRIP)) {
+
+        int idx = sphereDot(col * CHAR_TRIX_X + CHAR_CENTER_X, row * CHAR_TRIX_Y, PT_RAIN, 200, 1);
+        if (idx >= 0) {
+            // sphereDot() defaults these for the radiating-burst types --
+            // rain doesn't use them (see the PT_RAIN case), so pin them inert
+            particle[idx].dir = 0;
+            particle[idx].distance = 0;
+            particle[idx].speed = 0;
+        }
+    }
 }
 
 int sphereDot(int trixX, int trixY, int type, unsigned char age, unsigned char colour) {

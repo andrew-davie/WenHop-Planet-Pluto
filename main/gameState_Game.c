@@ -210,6 +210,7 @@ void VB_Game() {
             drawMace();
             // drawRope();
             // drawGun();
+            makeRain();
             drawParticles();
         }
     }

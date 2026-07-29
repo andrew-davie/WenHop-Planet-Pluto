@@ -141,7 +141,7 @@ const unsigned char cavetest[] = {
 
     255,  22, 50,                           // milling
     10, 15,                         // doge $
-    0,                              // shake
+    1,                              // weather (rain -- see particle.c's makeRain())
 
      0,  0,  0,  0,  0,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
