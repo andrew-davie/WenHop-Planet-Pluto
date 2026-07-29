@@ -554,9 +554,9 @@ void drawParticles() {
 // one rate for the whole cave.
 #define WEATHER_WAIT_MAX_FRAMES (30 * 60)    // dry gap between storms: 0-30s, picked fresh each time
 #define WEATHER_RISE_FRAMES (2 * 60)         // build from WEATHER_LIGHT to torrential
-#define WEATHER_PEAK_FRAMES (3 * 60)         // hold at torrential
-#define WEATHER_FALL_FRAMES (2 * 60)         // tail back off to nothing
-#define WEATHER_LIGHT 50                     // intensity divisor at the start/end of a storm
+#define WEATHER_PEAK_FRAMES (12 * 60)        // hold at torrential
+#define WEATHER_FALL_FRAMES (5 * 60)         // tail back off to nothing
+#define WEATHER_LIGHT 12                     // intensity divisor at the start/end of a storm
 #define WEATHER_TORRENTIAL 1                 // intensity divisor at the peak -- heaviest possible
 
 enum WeatherPhase { WEATHER_WAIT, WEATHER_RISE, WEATHER_PEAK, WEATHER_FALL };
@@ -593,9 +593,9 @@ void makeRain() {
             // earlier. WEATHER_RISE_FRAMES being a compile-time constant doesn't
             // save us here; this compiler doesn't strength-reduce it either.
             // Reciprocal-multiply-shift instead, same idiom as getBoardAddress().
-            weatherIntensity = WEATHER_TORRENTIAL + (((WEATHER_LIGHT - WEATHER_TORRENTIAL) * weatherPhaseTimer) *
-                                                      (0x10000 / WEATHER_RISE_FRAMES) >>
-                                                      16);
+            weatherIntensity =
+                WEATHER_TORRENTIAL +
+                (((WEATHER_LIGHT - WEATHER_TORRENTIAL) * weatherPhaseTimer) * (0x10000 / WEATHER_RISE_FRAMES) >> 16);
             if (--weatherPhaseTimer <= 0) {
                 weatherPhase = WEATHER_PEAK;
                 weatherPhaseTimer = WEATHER_PEAK_FRAMES;
@@ -614,7 +614,7 @@ void makeRain() {
             // same reciprocal-multiply-shift reasoning as WEATHER_RISE above
             weatherIntensity = WEATHER_TORRENTIAL +
                                (((WEATHER_LIGHT - WEATHER_TORRENTIAL) * (WEATHER_FALL_FRAMES - weatherPhaseTimer)) *
-                                (0x10000 / WEATHER_FALL_FRAMES) >>
+                                    (0x10000 / WEATHER_FALL_FRAMES) >>
                                 16);
             if (--weatherPhaseTimer <= 0) {
                 weatherPhase = WEATHER_WAIT;
@@ -661,7 +661,13 @@ void makeRain() {
         }
 #endif
 
-        int idx = sphereDot(col * CHAR_TRIX_X + CHAR_CENTER_X, row * CHAR_TRIX_Y, PT_RAIN, 200, 3);
+        // CHAR_CENTER_X pinned every drop to the same sub-pixel column within
+        // its character cell -- randomise across all CHAR_TRIX_X (5) positions
+        // instead so drops don't visibly line up. Doesn't affect the fall/
+        // collision math below (PT_RAIN case): cellCol there is a floor-divide
+        // back to the containing column, independent of where within it the
+        // drop actually sits.
+        int idx = sphereDot(col * CHAR_TRIX_X + rangeRandom(CHAR_TRIX_X), row * CHAR_TRIX_Y, PT_RAIN, 200, 3);
         if (idx >= 0) {
             // sphereDot() defaults these for the radiating-burst types --
             // rain doesn't use them (see the PT_RAIN case), so pin them inert
