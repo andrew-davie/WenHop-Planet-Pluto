@@ -214,7 +214,8 @@ const signed char line85[] = {
     108,    // 53
     111,    // 54
     114,    // 55
-    127,    // 56
+    123,    // 56 (was 127: south-pole sample lands exactly on texture_height, giving an
+            // out-of-range char_row=4 in scale.py; 123 = row 3, last valid sub-line (27))
     -1,  -1, -1, -1, -1, -1, -1,
 };
 
@@ -284,6 +285,16 @@ void drawPlanet(int half) {
 
     planetDir += ((MIDPOINT - scalex) * (0x10000 / DIVISOR)) >> 16;
     scalex += planetDir;
+
+    // Defensive clamp: the oscillator above is unbounded integer integration.  It's
+    // designed to stay within MINSCALE..MAXSCALE, but nothing enforces that -- and if it
+    // ever drifted past MAXSCALE, equiv (below) could advance by more than the 2-per-
+    // iteration step line85[]'s sentinel padding is sized for, walking off the end of
+    // that array.
+    if (scalex > MAXSCALE)
+        scalex = MAXSCALE;
+    else if (scalex < MINSCALE)
+        scalex = MINSCALE;
 
 
     if (rotationAccel < 0 && rotationDelta > 0) {

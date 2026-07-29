@@ -16,9 +16,13 @@ def make_table(n_entries, texture_height, char_height, step=3, name="line85", li
         else:
             theta = math.acos(1.0 - 2.0 * t)        # 0 (north pole) to pi (south pole)
             v = theta / math.pi                      # texture V coordinate
-        tex_row = v * texture_height
-        char_row = int(tex_row) // char_height
-        sub = (round(int(tex_row) % char_height / step)) * step
+        tex_row = min(int(v * texture_height), texture_height - 1)    # v=1.0 (south pole)
+                                                                        # lands exactly on
+                                                                        # texture_height, one
+                                                                        # row past the last
+                                                                        # valid char_row
+        char_row = tex_row // char_height
+        sub = (round(tex_row % char_height / step)) * step
         sub = min(sub, char_height - step)
         print(f"    {(char_row << 5) | sub},\t// {i}")
     # sentinel padding
