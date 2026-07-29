@@ -399,7 +399,7 @@ void setupBoardScanner() {
 
         if (rockCount > lastRockCount) {
             shakeTime += 3;
-            debris = 2;
+            debris = 6;
         }
 
         lastRockCount = rockCount;
@@ -443,7 +443,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-29 14:42 AEST
+// Last updated: 2026-07-29 14:57 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -707,7 +707,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
             if (debris)
                 for (int i = 0; i < 6; i++) {
-                    int idx = nDots(3, cur->col, cur->row, PT_TWO, rangeRandom(20) + 20, rangeRandom(CHAR_TRIX_X), 1,
+                    int idx = nDots(1, cur->col, cur->row, PT_TWO, rangeRandom(20) + 20, rangeRandom(CHAR_TRIX_X), 1,
                                     20 + rangeRandom(15), (getRandom32() & 1) ? 1 : 7);
                     if (idx >= 0)
                         particle[idx].dir = 0;
