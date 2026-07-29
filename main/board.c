@@ -31,7 +31,7 @@ static int selectorCounter;
 static int waterDir;
 static int explodeCount;
 static int explodeRadius;
-static int lastRockCount;
+static int lastRockCount, bestRockCount;
 static int rockCount;
 
 static int lastConvertedGeodoge;
@@ -113,7 +113,7 @@ static const int isActive[] = {
 
 void initBoard() {
 
-    rockCount = lastRockCount = 0;
+    rockCount = bestRockCount = lastRockCount = 0;
     selectorCounter = 0;
     waterDir = 0;
     explodeCount = 0;
@@ -391,10 +391,18 @@ void setupBoardScanner() {
             }
         }
 
+        if (debris)
+            debris--;
+
+        if (rockCount > bestRockCount)
+            bestRockCount = rockCount;
+
         if (rockCount > lastRockCount) {
-            rockShaker = 2;
-            lastRockCount = rockCount;
+            shakeTime += 3;
+            debris = 2;
         }
+
+        lastRockCount = rockCount;
         rockCount = 0;
 
 
@@ -435,7 +443,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-29 03:45 AEST
+// Last updated: 2026-07-29 14:42 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -552,7 +560,7 @@ static const unsigned short budget[128] = {
     _untimed_,    // 112 CH_PIT_L0
     _untimed_,    // 113 CH_PIT_R0
     _B + 1366,    // 114 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
-    _B + 5456,    // 115 CH_CRACKED_BRICK -- updated 2026-07-29 00:37 AEST (was 5386)
+    _B + 7862,    // 115 CH_CRACKED_BRICK -- updated 2026-07-29 14:42 AEST (was 5456)
     _untimed_,    // 116 CH_CONCRETE
     _untimed_,    // 117 (unused)
     _untimed_,    // 118 (unused)
@@ -671,17 +679,21 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
     case TYPE_CRACKED_BRICK: {
 
-        if (rockShaker)
-            shakeTime++;
+        // tally stacked massive objects above
+        unsigned char *above = cur->me - _BOARD_COLS;
+        while (Attribute[CharToType[GET(*above)]] & ATT_MASSIVE) {
+            rockCount++;
+            above -= _BOARD_COLS;
+        }
 
-        int rchar = lastRockCount;
+        int rchar = bestRockCount;
         if (rchar > 7)
             rchar = 7;
 
         startCharAnimation(TYPE_CRACKED_BRICK, AnimateCrackedBrick + rchar * 2);
 
 
-        if (lastRockCount > 7) {
+        if (bestRockCount > 7) {
             if (!rangeRandom(7)) {
                 FLASH(0x16, 4);
                 ADDAUDIO(SFX_EXPLODE_QUIET);
@@ -692,21 +704,14 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
         else {
 
-            // int dots = rchar;
-            if (rockShaker && lastRockCount != 0) {
+
+            if (debris)
                 for (int i = 0; i < 6; i++) {
-                    int idx = nDots(1, cur->col, cur->row, PT_TWO, rangeRandom(20) + 20, rangeRandom(CHAR_TRIX_X), 1,
+                    int idx = nDots(3, cur->col, cur->row, PT_TWO, rangeRandom(20) + 20, rangeRandom(CHAR_TRIX_X), 1,
                                     20 + rangeRandom(15), (getRandom32() & 1) ? 1 : 7);
                     if (idx >= 0)
                         particle[idx].dir = 0;
                 }
-            }
-
-            unsigned char *column = cur->me - _BOARD_COLS;
-            while (CharToType[GET(*column)] == TYPE_ROCK || CharToType[GET(*column)] == TYPE_GEODOGE) {
-                rockCount++;
-                column -= _BOARD_COLS;
-            }
         }
         break;
     }
@@ -1245,17 +1250,6 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
         } else {
 
-
-            // see if affecting a crackable brick wall below
-            // do {
-            //     if (CharToType[GET(*next)] == TYPE_CRACKED_BRICK) {
-            //         rockShaker = 2;
-            //         break;
-            //     }
-            //     next += _BOARD_COLS;
-            // } while (Attribute[CharToType[GET(*next)]] & ATT_MASSIVE);
-
-
             // stop falling
             *cursor.me = FLAG(CH_ROCK);
             ADDAUDIO(att & ATT_HARD ? SFX_ROCK : SFX_ROCK2);
@@ -1536,20 +1530,6 @@ void processFallingThings(unsigned char *me, int row, int col, unsigned char cre
             initParticles();
         }
     } else {
-
-        // TODO: inefficient -fix
-        unsigned char *ratt = me;
-        int type = CharToType[(GET(*ratt))];
-        while (type == TYPE_ROCK || type == TYPE_GEODOGE || type == TYPE_ROCK_FALLING ||
-               type == TYPE_GEODOGE_FALLING) {    // todo: use attribute
-            ratt += _BOARD_COLS;
-            if (CharToType[GET(*ratt)] == TYPE_CRACKED_BRICK) {
-                rockShaker = 2;
-                break;
-            }
-            type = CharToType[GET(*ratt)];
-        }
-
 
         // stop falling
         unsigned char sfx = 0;
