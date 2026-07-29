@@ -517,7 +517,7 @@ void drawParticles() {
                     // anything else solid -- it always terminates exactly where it
                     // was visibly falling.
                     ADDAUDIO(SFX_DRIP2);
-                    nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 1);
+                    nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
                     pushParticle(i);
                     continue;
                 }
@@ -586,7 +586,7 @@ void makeRain() {
         }
 #endif
 
-        int idx = sphereDot(col * CHAR_TRIX_X + CHAR_CENTER_X, row * CHAR_TRIX_Y, PT_RAIN, 200, 1);
+        int idx = sphereDot(col * CHAR_TRIX_X + CHAR_CENTER_X, row * CHAR_TRIX_Y, PT_RAIN, 200, 7);
         if (idx >= 0) {
             // sphereDot() defaults these for the radiating-burst types --
             // rain doesn't use them (see the PT_RAIN case), so pin them inert
