@@ -557,6 +557,7 @@ void drawParticles() {
                 // fixed glyph. ATT_BLANK types skip all of this -- known
                 // passable, no need to look at their (blank) art.
                 bool pixelSolid = false;
+                unsigned char litMask = 0;    // which columns are lit in the glyph row just tested -- see below
 
                 if (!(Attribute[hitType] & ATT_BLANK)) {
 
@@ -586,7 +587,7 @@ void drawParticles() {
                     // ANYTHING is drawn there, not which of the roller's 3
                     // render variants it happens to be this frame.
                     const unsigned char *rowData = fp + subRow * 3;
-                    unsigned char litMask = rowData[0] | rowData[1] | rowData[2];
+                    litMask = rowData[0] | rowData[1] | rowData[2];
                     pixelSolid = (litMask >> (CHAR_TRIX_X - 1 - subCol)) & 1;
                 }
 
@@ -599,30 +600,32 @@ void drawParticles() {
                     int centreX_8 = ((cellCol * CHAR_TRIX_X + CHAR_CENTER_X) << 8) + 128;
                     int rollDir = particle[i].trixX_8 < centreX_8 ? -1 : 1;
 
-                    // Only worth rolling if there's actually somewhere to
-                    // fall TO. dir gets halved every rolling frame below
-                    // (see the comment on that), which converges to a near-
-                    // zero fall rate within a handful of frames regardless
-                    // of whether the drop is genuinely rolling off a curve
-                    // or just stuck sliding along a flat top -- so dir alone
-                    // can't tell those two apart. The real doRoll() (board.c)
-                    // checks both the side AND the cell diagonally below that
-                    // side before committing a real rock to roll that way --
-                    // mirror that here, not just "is the cell directly
-                    // underneath open" (that one's still true for a drop
-                    // sitting on a flat two-rock ledge, since the drop hasn't
-                    // actually reached the gap between them yet -- it's the
-                    // DESTINATION side that needs to be open underneath, not
-                    // where it currently is). If that diagonal is also solid
-                    // (another rock/wall touching this one), sliding further
-                    // that way is never going to lead anywhere -- previously
-                    // this just kept nudging across cell after cell,
-                    // resetting the roll counter each time it happened to
-                    // land on a momentarily-clear pixel, until it finally ran
-                    // long enough uninterrupted to hit RAIN_ROLL_MAX_FRAMES,
-                    // visibly sliding across several characters' tops first.
-                    // Splash immediately instead.
-                    if (!(Attribute[CharToType[GET(*(cell + _BOARD_COLS + rollDir))]] & ATT_BLANK)) {
+                    // Only worth rolling if we're actually touching a curve.
+                    // Checking cell-level neighbours (the board-below, or the
+                    // diagonal below-the-side) never worked: this operates at
+                    // PIXEL resolution, and both of those are testing a
+                    // question at the wrong scale -- the drop's Y is nearly
+                    // frozen while rolling (dir gets halved every rolling
+                    // frame, see below), so it can be many frames before it
+                    // even reaches the row a cell-level check was asking
+                    // about, and in the meantime a board cell a whole
+                    // CHAR_TRIX_Y below is open ground under almost any rock
+                    // regardless of whether THIS row has anywhere to go.
+                    //
+                    // The actual glyph settles it directly: CH_ROCK (see
+                    // charSet's generated source, tools/cset.py) is only
+                    // round at the very top/bottom -- rows 0-2 and 9 are a
+                    // narrow cap with blank pixels either side, but rows 3-8
+                    // are a solid rectangular body, lit across the full
+                    // width, no gap anywhere in the row. Nudging sideways
+                    // through a fully-lit row can never find an opening --
+                    // that's why this was sliding across several characters
+                    // before ever stopping, and why it looked like a coin
+                    // flip whether rolling off the same rock worked: it came
+                    // down to which row the drop happened to first make
+                    // contact at. If every column in this row is lit, there's
+                    // no curve here to roll off -- splash immediately.
+                    if (litMask == (1 << CHAR_TRIX_X) - 1) {
                         ADDAUDIO(SFX_DRIP2);
                         nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                         pushParticle(i);
