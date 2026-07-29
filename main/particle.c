@@ -548,8 +548,14 @@ void makeRain() {
     if (!theCave->weather)
         return;
 
-    // atmospheric, not a firehose -- most calls bail out here
-    if (rangeRandom(4))
+    // theCave->weather doubles as the intensity dial now: 1 in
+    // theCave->weather calls actually attempts a spawn, so lower = heavier
+    // rain (1 = a spawn attempt every single call, as heavy as this gets).
+    // Was a hardcoded rangeRandom(4) -- caves authored before this change
+    // used weather=1 to mean "just on", which under this scheme now means
+    // "torrential"; bumped those caves' values in caveData.c to keep their
+    // old intensity.
+    if (rangeRandom(theCave->weather))
         return;
 
     // SCREEN_TRIX_X/CHAR_TRIX_X and SCREEN_TRIX_Y/CHAR_TRIX_Y are both
@@ -557,10 +563,10 @@ void makeRain() {
     // are runtime values, so those divisions need the same reciprocal-
     // multiply-shift trick as the PT_RAIN case above (ceiling-rounded
     // reciprocal, same reasoning as there) rather than a plain '/'.
-    int col =
-        (((scrollX >> 16) * ((0x10000 + CHAR_TRIX_X - 1) / CHAR_TRIX_X)) >> 16) + rangeRandom(SCREEN_TRIX_X / CHAR_TRIX_X);
-    int row =
-        (((scrollY >> 16) * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16) + rangeRandom(SCREEN_TRIX_Y / CHAR_TRIX_Y);
+    int col = (((scrollX >> 16) * ((0x10000 + CHAR_TRIX_X - 1) / CHAR_TRIX_X)) >> 16) +
+              rangeRandom(SCREEN_TRIX_X / CHAR_TRIX_X);
+    int row = (((scrollY >> 16) * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16) +
+              rangeRandom(SCREEN_TRIX_Y / CHAR_TRIX_Y);
 
     if (col < 0 || col >= _BOARD_COLS || row < 1 || row >= _BOARD_ROWS)
         return;
@@ -586,7 +592,7 @@ void makeRain() {
         }
 #endif
 
-        int idx = sphereDot(col * CHAR_TRIX_X + CHAR_CENTER_X, row * CHAR_TRIX_Y, PT_RAIN, 200, 7);
+        int idx = sphereDot(col * CHAR_TRIX_X + CHAR_CENTER_X, row * CHAR_TRIX_Y, PT_RAIN, 200, 3);
         if (idx >= 0) {
             // sphereDot() defaults these for the radiating-burst types --
             // rain doesn't use them (see the PT_RAIN case), so pin them inert
