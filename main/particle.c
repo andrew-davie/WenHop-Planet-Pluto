@@ -464,7 +464,13 @@ void drawParticles() {
                 if (particle[i].dir < 240)
                     particle[i].dir += 8;
 
-                particle[i].trixY_8 += particle[i].dir >> 2;
+                // dir maxes out at 240 here (fixed-point trix*256 units), so
+                // adding it straight to trixY_8 tops out just under 1 trix/frame
+                // -- crosses a 10-trix character cell in ~11 frames at terminal.
+                // The >>2 this replaced divided that by another 4, so drops were
+                // taking the better part of a second per cell -- looked more like
+                // drizzle sliding down glass than falling rain.
+                particle[i].trixY_8 += particle[i].dir;
 
                 // No hardware divide on this target (ARMv4T/Thumb) and nothing
                 // links a soft-divide routine here -- CHAR_TRIX_X/Y (5/10) aren't
