@@ -588,8 +588,14 @@ void makeRain() {
             return;    // dry -- no spawn attempts at all between storms
 
         case WEATHER_RISE:
-            weatherIntensity =
-                WEATHER_TORRENTIAL + ((WEATHER_LIGHT - WEATHER_TORRENTIAL) * weatherPhaseTimer) / WEATHER_RISE_FRAMES;
+            // No hardware divide on this target and nothing links a soft-divide
+            // routine -- same class of bug as the CHAR_TRIX_X/Y hard fault
+            // earlier. WEATHER_RISE_FRAMES being a compile-time constant doesn't
+            // save us here; this compiler doesn't strength-reduce it either.
+            // Reciprocal-multiply-shift instead, same idiom as getBoardAddress().
+            weatherIntensity = WEATHER_TORRENTIAL + (((WEATHER_LIGHT - WEATHER_TORRENTIAL) * weatherPhaseTimer) *
+                                                      (0x10000 / WEATHER_RISE_FRAMES) >>
+                                                      16);
             if (--weatherPhaseTimer <= 0) {
                 weatherPhase = WEATHER_PEAK;
                 weatherPhaseTimer = WEATHER_PEAK_FRAMES;
@@ -605,9 +611,11 @@ void makeRain() {
             break;
 
         case WEATHER_FALL:
-            weatherIntensity = WEATHER_TORRENTIAL + ((WEATHER_LIGHT - WEATHER_TORRENTIAL) *
-                                                      (WEATHER_FALL_FRAMES - weatherPhaseTimer)) /
-                                                         WEATHER_FALL_FRAMES;
+            // same reciprocal-multiply-shift reasoning as WEATHER_RISE above
+            weatherIntensity = WEATHER_TORRENTIAL +
+                               (((WEATHER_LIGHT - WEATHER_TORRENTIAL) * (WEATHER_FALL_FRAMES - weatherPhaseTimer)) *
+                                (0x10000 / WEATHER_FALL_FRAMES) >>
+                                16);
             if (--weatherPhaseTimer <= 0) {
                 weatherPhase = WEATHER_WAIT;
                 weatherPhaseTimer = rangeRandom(WEATHER_WAIT_MAX_FRAMES);
