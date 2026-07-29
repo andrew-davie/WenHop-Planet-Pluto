@@ -470,9 +470,18 @@ void drawParticles() {
                 // links a soft-divide routine here -- CHAR_TRIX_X/Y (5/10) aren't
                 // powers of two, so a plain '/' silently hard-faults instead of
                 // erroring at build time. Same reciprocal-multiply-shift trick
-                // getBoardAddress() above already uses for this exact conversion.
-                int cellCol = ((particle[i].trixX_8 >> 8) * (0x10000 / CHAR_TRIX_X)) >> 16;
-                int cellRow = ((particle[i].trixY_8 >> 8) * (0x10000 / CHAR_TRIX_Y)) >> 16;
+                // getBoardAddress() above uses for this conversion, but with the
+                // reciprocal rounded UP (ceiling), not truncated down: rain spawns
+                // sitting exactly on a cell boundary (row*CHAR_TRIX_Y, see
+                // makeRain()), and a truncated reciprocal underestimates exactly
+                // at those multiples -- e.g. 0x10000/10 floors to 6553, and
+                // 50*6553>>16 comes out to 4, not 5. That misread the drop's own
+                // spawn cell as the drip source one row up (solid), so it
+                // splashed against itself the instant it was evaluated. Rounding
+                // the reciprocal up instead (6554) keeps exact multiples correct
+                // while still landing in the right cell everywhere in between.
+                int cellCol = ((particle[i].trixX_8 >> 8) * ((0x10000 + CHAR_TRIX_X - 1) / CHAR_TRIX_X)) >> 16;
+                int cellRow = ((particle[i].trixY_8 >> 8) * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16;
 
                 if (cellRow < 0 || cellRow >= _BOARD_ROWS || cellCol < 0 || cellCol >= _BOARD_COLS) {
                     pushParticle(i);
@@ -531,9 +540,12 @@ void makeRain() {
     // SCREEN_TRIX_X/CHAR_TRIX_X and SCREEN_TRIX_Y/CHAR_TRIX_Y are both
     // compile-time constants (folded away, no runtime div) -- but scrollX/Y
     // are runtime values, so those divisions need the same reciprocal-
-    // multiply-shift trick as the PT_RAIN case above, not a plain '/'.
-    int col = (((scrollX >> 16) * (0x10000 / CHAR_TRIX_X)) >> 16) + rangeRandom(SCREEN_TRIX_X / CHAR_TRIX_X);
-    int row = (((scrollY >> 16) * (0x10000 / CHAR_TRIX_Y)) >> 16) + rangeRandom(SCREEN_TRIX_Y / CHAR_TRIX_Y);
+    // multiply-shift trick as the PT_RAIN case above (ceiling-rounded
+    // reciprocal, same reasoning as there) rather than a plain '/'.
+    int col =
+        (((scrollX >> 16) * ((0x10000 + CHAR_TRIX_X - 1) / CHAR_TRIX_X)) >> 16) + rangeRandom(SCREEN_TRIX_X / CHAR_TRIX_X);
+    int row =
+        (((scrollY >> 16) * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16) + rangeRandom(SCREEN_TRIX_Y / CHAR_TRIX_Y);
 
     if (col < 0 || col >= _BOARD_COLS || row < 1 || row >= _BOARD_ROWS)
         return;
