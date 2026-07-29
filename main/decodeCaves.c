@@ -89,6 +89,8 @@ void decodeCave(int newCave) {
     time = (theCave->timeToComplete[level] << 8) + 60;
     millingTime = theCave->millingTime << 16;
 
+    initWeather();    // resets/seeds weatherIntensity from theCave->weather -- see particle.c
+
     decodingRow = 0;
     decodeFlasher = 1;    // 21;
     totalDogePossible = 0;

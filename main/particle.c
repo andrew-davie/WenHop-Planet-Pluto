@@ -543,19 +543,37 @@ void drawParticles() {
 // another particle type (PT_RAIN, see the switch in drawParticles() above)
 // riding the same pool as dust/spirals/bubbles, gated on the per-cave
 // theCave->weather byte (decodeCaves.h) that was sitting there unused.
+
+// weatherIntensity is the frequency divisor makeRain() actually rolls
+// against: 1 in weatherIntensity calls attempts a spawn, so lower = heavier
+// rain, 1 is as heavy as it gets. theCave->weather seeds it (see
+// initWeather()) and is normally just copied straight across -- except 255,
+// which means "storm builds over the level": start slow and let
+// weatherIntensity creep down toward WEATHER_RAMP_MIN on its own as play
+// continues, rather than holding at one fixed rate for the whole cave.
+#define WEATHER_RAMP_START 50       // drizzle: roughly 1 spawn attempt/sec at the start
+#define WEATHER_RAMP_MIN 1          // heaviest -- a spawn attempt every call
+#define WEATHER_RAMP_INTERVAL 300   // frames between each step down (~5s at 60fps)
+
+int weatherIntensity;
+static int weatherRampTimer;
+
+void initWeather() {
+    weatherRampTimer = 0;
+    weatherIntensity = theCave->weather == 255 ? WEATHER_RAMP_START : theCave->weather;
+}
+
 void makeRain() {
 
     if (!theCave->weather)
         return;
 
-    // theCave->weather doubles as the intensity dial now: 1 in
-    // theCave->weather calls actually attempts a spawn, so lower = heavier
-    // rain (1 = a spawn attempt every single call, as heavy as this gets).
-    // Was a hardcoded rangeRandom(4) -- caves authored before this change
-    // used weather=1 to mean "just on", which under this scheme now means
-    // "torrential"; bumped those caves' values in caveData.c to keep their
-    // old intensity.
-    if (rangeRandom(theCave->weather))
+    if (theCave->weather == 255 && weatherIntensity > WEATHER_RAMP_MIN && ++weatherRampTimer >= WEATHER_RAMP_INTERVAL) {
+        weatherRampTimer = 0;
+        weatherIntensity--;
+    }
+
+    if (rangeRandom(weatherIntensity))
         return;
 
     // SCREEN_TRIX_X/CHAR_TRIX_X and SCREEN_TRIX_Y/CHAR_TRIX_Y are both

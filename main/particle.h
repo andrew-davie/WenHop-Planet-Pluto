@@ -35,6 +35,13 @@ extern int weapon;
 void initParticles();
 void drawParticles();
 void makeRain();
+void initWeather();
+
+// theCave->weather == 255 means "storm builds over the level" -- see
+// initWeather()/makeRain() in particle.c. weatherIntensity is the live,
+// ramping frequency divisor makeRain() actually uses; theCave->weather
+// itself never changes at runtime.
+extern int weatherIntensity;
 
 void initTool();
 void drawRope();
