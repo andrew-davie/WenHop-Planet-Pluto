@@ -466,8 +466,13 @@ void drawParticles() {
 
                 particle[i].trixY_8 += particle[i].dir >> 2;
 
-                int cellCol = (particle[i].trixX_8 >> 8) / CHAR_TRIX_X;
-                int cellRow = (particle[i].trixY_8 >> 8) / CHAR_TRIX_Y;
+                // No hardware divide on this target (ARMv4T/Thumb) and nothing
+                // links a soft-divide routine here -- CHAR_TRIX_X/Y (5/10) aren't
+                // powers of two, so a plain '/' silently hard-faults instead of
+                // erroring at build time. Same reciprocal-multiply-shift trick
+                // getBoardAddress() above already uses for this exact conversion.
+                int cellCol = ((particle[i].trixX_8 >> 8) * (0x10000 / CHAR_TRIX_X)) >> 16;
+                int cellRow = ((particle[i].trixY_8 >> 8) * (0x10000 / CHAR_TRIX_Y)) >> 16;
 
                 if (cellRow < 0 || cellRow >= _BOARD_ROWS || cellCol < 0 || cellCol >= _BOARD_COLS) {
                     pushParticle(i);
@@ -523,8 +528,12 @@ void makeRain() {
     if (rangeRandom(4))
         return;
 
-    int col = (scrollX >> 16) / CHAR_TRIX_X + rangeRandom(SCREEN_TRIX_X / CHAR_TRIX_X);
-    int row = (scrollY >> 16) / CHAR_TRIX_Y + rangeRandom(SCREEN_TRIX_Y / CHAR_TRIX_Y);
+    // SCREEN_TRIX_X/CHAR_TRIX_X and SCREEN_TRIX_Y/CHAR_TRIX_Y are both
+    // compile-time constants (folded away, no runtime div) -- but scrollX/Y
+    // are runtime values, so those divisions need the same reciprocal-
+    // multiply-shift trick as the PT_RAIN case above, not a plain '/'.
+    int col = (((scrollX >> 16) * (0x10000 / CHAR_TRIX_X)) >> 16) + rangeRandom(SCREEN_TRIX_X / CHAR_TRIX_X);
+    int row = (((scrollY >> 16) * (0x10000 / CHAR_TRIX_Y)) >> 16) + rangeRandom(SCREEN_TRIX_Y / CHAR_TRIX_Y);
 
     if (col < 0 || col >= _BOARD_COLS || row < 1 || row >= _BOARD_ROWS)
         return;
