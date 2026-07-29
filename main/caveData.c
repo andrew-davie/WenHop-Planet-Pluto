@@ -238,7 +238,7 @@ const unsigned char P0_caveNew[] = {
 
     60,  4,4,                           // milling
     10, 15,                         // doge $
-    1,                              // shake
+    255,                              // weather (255 = storms)
 
      17,  11,  50,  56,  8,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
