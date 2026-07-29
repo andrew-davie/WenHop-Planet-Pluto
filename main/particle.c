@@ -428,9 +428,52 @@ void drawFloatingChars() {
 }
 
 
-// See the roll-off branch inside PT_RAIN, drawParticles() below.
-#define RAIN_ROLL_NUDGE 48         // sideways drift per rolling frame, in trixX_8's 256ths-of-a-trix
-#define RAIN_ROLL_MAX_FRAMES 24    // give up and splash if still stuck against the same curve after this long
+// Is the board pixel at these absolute trix coordinates actually drawn
+// (opaque), as opposed to "this cell's TYPE happens to be solid"? Used by
+// PT_RAIN's roll-off (drawParticles() below) to test a specific candidate
+// landing spot, which is very often in a different cell than the one it
+// just hit -- rolling off the edge of a glyph means "one column over" is
+// frequently a different cell/glyph entirely, not a position within the one
+// that was just tested. Mirrors the inline per-pixel test in PT_RAIN --
+// see the comments there for the bit layout (tools/cset.py) and the
+// Animate[]/ATT_GEODOGE glyph-selection logic (grabCharacters(),
+// drawScreen.c).
+static bool rainPixelSolid(int trixX, int trixY) {
+
+    int col = (trixX * ((0x10000 + CHAR_TRIX_X - 1) / CHAR_TRIX_X)) >> 16;
+    int row = (trixY * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16;
+
+    if (row < 0 || row >= _BOARD_ROWS || col < 0 || col >= _BOARD_COLS)
+        return true;    // nothing to occupy off the edge of the board -- treat as blocked
+
+    unsigned char *testCell = RAM + _BOARD + row * _BOARD_COLS + col;
+    enum ObjectType testType = CharToType[GET(*testCell)];
+
+    if (Attribute[testType] & ATT_BLANK)
+        return false;
+
+    const unsigned char *fp;
+
+    if (Attribute[testType] & ATT_GEODOGE) {
+        unsigned char udlr =
+            ((Attribute[CharToType[GET(*(testCell - _BOARD_COLS))]] & ATT_GEODOGE) >> POS_GEODOGE) |
+            ((Attribute[CharToType[GET(*(testCell + 1))]] & ATT_GEODOGE) >> (POS_GEODOGE - 1)) |
+            ((Attribute[CharToType[GET(*(testCell + _BOARD_COLS))]] & ATT_GEODOGE) >> (POS_GEODOGE - 2)) |
+            ((Attribute[CharToType[GET(*(testCell - 1))]] & ATT_GEODOGE) >> (POS_GEODOGE - 3));
+        fp = conglomerate[udlr];
+    } else if (Animate[testType]) {
+        fp = charSet[*Animate[testType]];
+    } else {
+        fp = charSet[GET(*testCell)];
+    }
+
+    int subC = trixX - col * CHAR_TRIX_X;
+    int subR = trixY - row * CHAR_TRIX_Y;
+
+    const unsigned char *rowData = fp + subR * 3;
+    unsigned char lit = rowData[0] | rowData[1] | rowData[2];
+    return (lit >> (CHAR_TRIX_X - 1 - subC)) & 1;
+}
 
 void drawParticles() {
 
@@ -593,66 +636,36 @@ void drawParticles() {
 
                 if (pixelSolid && (hitType == TYPE_ROCK || hitType == TYPE_GEODOGE)) {
 
-                    // Which way this drop is rolling -- away from the cell's
-                    // centre -- decided once here and reused below for both
-                    // the "is it worth continuing" check and the nudge
-                    // itself, so they always agree on direction.
-                    int centreX_8 = ((cellCol * CHAR_TRIX_X + CHAR_CENTER_X) << 8) + 128;
-                    int rollDir = particle[i].trixX_8 < centreX_8 ? -1 : 1;
+                    // One-shot decision, not a multi-frame nudge -- that was
+                    // the slow part. Which half of the glyph we hit picks a
+                    // side (dead centre has no side to roll toward -- straight
+                    // splash); test one column over and one pixel down for an
+                    // actual place to land, and either jump straight there or
+                    // give up immediately. No repeated re-testing, no easing
+                    // into it over several frames.
+                    int half = CHAR_TRIX_X >> 1;
 
-                    // Only worth rolling if we're actually touching a curve.
-                    // Checking cell-level neighbours (the board-below, or the
-                    // diagonal below-the-side) never worked: this operates at
-                    // PIXEL resolution, and both of those are testing a
-                    // question at the wrong scale -- the drop's Y is nearly
-                    // frozen while rolling (dir gets halved every rolling
-                    // frame, see below), so it can be many frames before it
-                    // even reaches the row a cell-level check was asking
-                    // about, and in the meantime a board cell a whole
-                    // CHAR_TRIX_Y below is open ground under almost any rock
-                    // regardless of whether THIS row has anywhere to go.
-                    //
-                    // The actual glyph settles it directly: CH_ROCK (see
-                    // charSet's generated source, tools/cset.py) is only
-                    // round at the very top/bottom -- rows 0-2 and 9 are a
-                    // narrow cap with blank pixels either side, but rows 3-8
-                    // are a solid rectangular body, lit across the full
-                    // width, no gap anywhere in the row. Nudging sideways
-                    // through a fully-lit row can never find an opening --
-                    // that's why this was sliding across several characters
-                    // before ever stopping, and why it looked like a coin
-                    // flip whether rolling off the same rock worked: it came
-                    // down to which row the drop happened to first make
-                    // contact at. If every column in this row is lit, there's
-                    // no curve here to roll off -- splash immediately.
-                    if (litMask == (1 << CHAR_TRIX_X) - 1) {
+                    if (subCol == half) {
                         ADDAUDIO(SFX_DRIP2);
                         nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                         pushParticle(i);
                         continue;
                     }
 
-                    // Roll off the curve: nudge sideways, away from the
-                    // cell's centre, and keep falling -- next frame re-tests
-                    // the glyph at the new position. Same idea as DEMO2025's
-                    // rainX[i] "diff<2" nudge; that one worked in quarter-
-                    // pixel steps because it only had 2 sub-pixel bits to
-                    // play with, trixX_8 already carries 8, so nudge
-                    // directly in that space instead.
-                    //
-                    // particle[i].distance is otherwise unused by rain
-                    // (pinned to 0 at spawn, see makeRain()) -- repurposed
-                    // here to count consecutive rolling frames, reset to 0
-                    // the moment a frame comes back clear below, so a curve
-                    // we can't actually roll off of still gives up and
-                    // splashes instead of rolling forever.
-                    particle[i].trixX_8 += rollDir * RAIN_ROLL_NUDGE;
-                    particle[i].dir >>= 1;    // hug the curve instead of falling straight through it
+                    int rollDir = subCol < half ? -1 : 1;
+                    int newTrixX = (particle[i].trixX_8 >> 8) + rollDir;
+                    int newTrixY = (particle[i].trixY_8 >> 8) + 1;
 
-                    if (++particle[i].distance > RAIN_ROLL_MAX_FRAMES) {
+                    // Testing the board here, not this glyph -- rolling off
+                    // the glyph's own edge column means "one column over" is
+                    // very often a different cell/glyph entirely, not a
+                    // position that exists within the one just hit.
+                    if (!rainPixelSolid(newTrixX, newTrixY)) {
+                        particle[i].trixX_8 = newTrixX << 8;
+                        particle[i].trixY_8 = newTrixY << 8;
+                    } else {
                         ADDAUDIO(SFX_DRIP2);
-                        nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30,
-                                      7);
+                        nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                         pushParticle(i);
                         continue;
                     }
@@ -663,9 +676,6 @@ void drawParticles() {
                     nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
                     pushParticle(i);
                     continue;
-
-                } else {
-                    particle[i].distance = 0;    // clear -- not (or no longer) rolling
                 }
 
                 break;
@@ -679,27 +689,23 @@ void drawParticles() {
 
             if (!--particle[i].age || !drawBit(x, y, particle[i].colour)) {
 
-                // A rain drop can spend a long stretch of its 200-frame life
-                // bumping along an uneven rock/geodoge surface -- clearing one
-                // bump (resetting the roll counter), falling a hair, catching
-                // the next. Each individual roll properly gives up and
-                // splashes on its own if it runs past RAIN_ROLL_MAX_FRAMES,
-                // but age counts down the whole time regardless, so it can
-                // hit 0 mid-roll, before that roll's own cap is reached --
-                // silently despawning with no splash at all. Same deal if it
-                // scrolls off-screen (drawBit() returning false) while still
-                // mid-fall. Splash here too so a rain drop never just vanishes.
+                // Belt and braces: age (200 frames) counts down every frame
+                // regardless of what the drop is doing, and it's possible
+                // (spawns high above a distant drip source, or off the
+                // bottom/side of the visible screen) for it to run out or
+                // scroll off-screen while still genuinely mid-fall, never
+                // having hit anything. Splash here too so a rain drop never
+                // just vanishes.
                 //
                 // Deliberately NOT using x/y from the top of this function:
                 // those bake in the generic xOffset/yOffset polar dance
                 // (sin_cos[dir>>3] * distance), which assumes dir is an angle
-                // and distance a radius. Rain repurposes both (dir as a fall-
-                // velocity accumulator, distance as this very roll-frame
-                // counter -- see the PT_RAIN case above), so once a drop has
-                // rolled at all, x/y here are offset by however far the
-                // roll counter happened to be at, not where the drop
-                // actually is. particle[i].trixX_8/trixY_8 are the drop's
-                // real position, same as every other splash site in the
+                // and distance a radius. Rain repurposes dir as a fall-
+                // velocity accumulator instead (see the PT_RAIN case above),
+                // so that formula doesn't mean anything for it even though
+                // distance itself stays pinned at 0. particle[i].trixX_8/
+                // trixY_8 are the drop's real position, same as every other
+                // splash site in the
                 // PT_RAIN case already uses.
                 if (particle[i].type == PT_RAIN) {
                     ADDAUDIO(SFX_DRIP2);
