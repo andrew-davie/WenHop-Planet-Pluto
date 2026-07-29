@@ -547,20 +547,28 @@ void drawParticles() {
 // weatherIntensity is the frequency divisor makeRain() actually rolls
 // against: 1 in weatherIntensity calls attempts a spawn, so lower = heavier
 // rain, 1 is as heavy as it gets. theCave->weather seeds it (see
-// initWeather()) and is normally just copied straight across -- except 255,
-// which means "storm builds over the level": start slow and let
-// weatherIntensity creep down toward WEATHER_RAMP_MIN on its own as play
-// continues, rather than holding at one fixed rate for the whole cave.
-#define WEATHER_RAMP_START 50       // drizzle: roughly 1 spawn attempt/sec at the start
-#define WEATHER_RAMP_MIN 1          // heaviest -- a spawn attempt every call
-#define WEATHER_RAMP_INTERVAL 300   // frames between each step down (~5s at 60fps)
+// initWeather()) and is normally just copied straight across as a fixed
+// rate -- except 255, which means "rainstorms": long dry gaps punctuated by
+// a short, self-contained downpour that ramps up, holds at torrential, then
+// tails off again, cycling via weatherPhase below rather than holding at
+// one rate for the whole cave.
+#define WEATHER_WAIT_MAX_FRAMES (30 * 60)    // dry gap between storms: 0-30s, picked fresh each time
+#define WEATHER_RISE_FRAMES (2 * 60)         // build from WEATHER_LIGHT to torrential
+#define WEATHER_PEAK_FRAMES (3 * 60)         // hold at torrential
+#define WEATHER_FALL_FRAMES (2 * 60)         // tail back off to nothing
+#define WEATHER_LIGHT 50                     // intensity divisor at the start/end of a storm
+#define WEATHER_TORRENTIAL 1                 // intensity divisor at the peak -- heaviest possible
+
+enum WeatherPhase { WEATHER_WAIT, WEATHER_RISE, WEATHER_PEAK, WEATHER_FALL };
 
 int weatherIntensity;
-static int weatherRampTimer;
+static enum WeatherPhase weatherPhase;
+static int weatherPhaseTimer;    // counts down frames remaining in the current phase
 
 void initWeather() {
-    weatherRampTimer = 0;
-    weatherIntensity = theCave->weather == 255 ? WEATHER_RAMP_START : theCave->weather;
+    weatherPhase = WEATHER_WAIT;
+    weatherPhaseTimer = rangeRandom(WEATHER_WAIT_MAX_FRAMES);
+    weatherIntensity = theCave->weather;    // only meaningful for the non-255 fixed-rate case
 }
 
 void makeRain() {
@@ -568,9 +576,44 @@ void makeRain() {
     if (!theCave->weather)
         return;
 
-    if (theCave->weather == 255 && weatherIntensity > WEATHER_RAMP_MIN && ++weatherRampTimer >= WEATHER_RAMP_INTERVAL) {
-        weatherRampTimer = 0;
-        weatherIntensity--;
+    if (theCave->weather == 255) {
+
+        switch (weatherPhase) {
+
+        case WEATHER_WAIT:
+            if (--weatherPhaseTimer <= 0) {
+                weatherPhase = WEATHER_RISE;
+                weatherPhaseTimer = WEATHER_RISE_FRAMES;
+            }
+            return;    // dry -- no spawn attempts at all between storms
+
+        case WEATHER_RISE:
+            weatherIntensity =
+                WEATHER_TORRENTIAL + ((WEATHER_LIGHT - WEATHER_TORRENTIAL) * weatherPhaseTimer) / WEATHER_RISE_FRAMES;
+            if (--weatherPhaseTimer <= 0) {
+                weatherPhase = WEATHER_PEAK;
+                weatherPhaseTimer = WEATHER_PEAK_FRAMES;
+            }
+            break;
+
+        case WEATHER_PEAK:
+            weatherIntensity = WEATHER_TORRENTIAL;
+            if (--weatherPhaseTimer <= 0) {
+                weatherPhase = WEATHER_FALL;
+                weatherPhaseTimer = WEATHER_FALL_FRAMES;
+            }
+            break;
+
+        case WEATHER_FALL:
+            weatherIntensity = WEATHER_TORRENTIAL + ((WEATHER_LIGHT - WEATHER_TORRENTIAL) *
+                                                      (WEATHER_FALL_FRAMES - weatherPhaseTimer)) /
+                                                         WEATHER_FALL_FRAMES;
+            if (--weatherPhaseTimer <= 0) {
+                weatherPhase = WEATHER_WAIT;
+                weatherPhaseTimer = rangeRandom(WEATHER_WAIT_MAX_FRAMES);
+            }
+            break;
+        }
     }
 
     if (rangeRandom(weatherIntensity))
