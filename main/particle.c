@@ -886,7 +886,10 @@ int sphereDot(int trixX, int trixY, int type, unsigned char age, unsigned char c
                 particle[whichDrop].colour = colour;
 
                 particle[whichDrop].dir = getRandom32();    // 16.16 angle
-                particle[whichDrop].distance = 96;          // 16.16 speed
+                particle[whichDrop].distance = 0;           // start at the spawn point; radiating-burst
+                                                             // types (nDots/nDotsAtTrixel) grow this via
+                                                             // speed each frame -- PT_SPIRAL2 overrides it
+                                                             // explicitly in nDots() when it wants a head start
             }
 
             // else {

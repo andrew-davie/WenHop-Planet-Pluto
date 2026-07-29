@@ -1155,13 +1155,11 @@ void empty() {
 
 const struct caveHandler caveList[] = {
 
-    {caveraintest, none},
-
-    {cavetest, none},
-
 
     // PLANET 0
     {P0_caveNew, none},    // GOOD puzzle screen
+    {caveraintest, none},
+    {cavetest, none},
 
     // PLANET 1
     {P1_caveUseWall, none},    //

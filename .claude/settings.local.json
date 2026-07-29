@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(code-review)",
+      "Skill(code-review:*)",
+      "Bash(git diff *)",
+      "Bash(sort -t= -k2 -n)",
+      "Bash(make)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(make -n)",
+      "Bash(command -v arm-none-eabi-gcc)",
+      "Bash(ls \"/Users/boo/Documents/software/Atari 2600/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/\" 2>&1 | head -20)",
+      "Read(//Users/boo/Documents/software/Atari 2600/ArmGNUToolchain/15.2.rel1/arm-none-eabi/**)",
+      "Bash(clang -fsyntax-only -std=c11 -Imain main/board.c)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(clang -fsyntax-only -std=c11 -Wall -Wextra -Imain main/board.c)",
+      "Bash(clang -fsyntax-only -std=c11 -Imain main/caveData.c)",
+      "Bash(echo \"caveData EXIT=$?\")",
+      "Bash(clang -std=c11 -O0 -o life_sim life_sim.c)",
+      "Bash(./life_sim)",
+      "Bash(clang -std=c11 -O0 -o life_ref life_ref.c)",
+      "Bash(./life_ref)",
+      "Bash(clang -std=c11 -O0 -DTRACE -o life_sim_trace life_sim.c)",
+      "Bash(./life_sim_trace)",
+      "Bash(sed 's/bool prune = !alive \\\\&\\\\& count == 0;/bool prune = false;/' life_sim.c)",
+      "Bash(clang -std=c11 -O0 -o life_sim_noprune life_sim_noprune.c)",
+      "Bash(./life_sim_noprune)",
+      "Bash(clang -std=c11 -O0 -o life_sim2 life_sim2.c)",
+      "Bash(./life_sim2)",
+      "Bash(sed 's/aliveCount = 5;/aliveCount = 0; \\\\/\\\\/ simulate no seeding, matching real cave decode/' life_sim2.c)",
+      "Bash(clang -std=c11 -O0 -o life_sim3 life_sim3.c)",
+      "Bash(./life_sim3)",
+      "Bash(clang -std=c11 -O0 -o life_wrap_diff life_wrap_diff.c)",
+      "Bash(./life_wrap_diff)"
+    ]
+  }
+}
