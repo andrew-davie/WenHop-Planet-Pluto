@@ -165,10 +165,14 @@ void VB_Game() {
 
 #if ENABLE_SHAKE
 
+
     if (shakeTime) {
+
         shakeTime--;
+
         shakeX = (rangeRandom(3) - 1) << 16;
         shakeY = (rangeRandom(5) - 2) << 16;
+
     }
 
     else

@@ -347,6 +347,7 @@ DEFINE_ENUM_WITH_BIT_VALUES(TypeAttributes,
     ATT(CRUSHES),               // 25
     ATT(CORNER),                // 26  must match POS_CORNER
     ATT(PICKUP),                // 27
+    ATT(MASSIVE),               // 28
 );
 
 #define POS_CORNER 26           /* must match ATT(CORNER) #*/

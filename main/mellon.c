@@ -424,13 +424,13 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                 waitRelease = true;
             }
 
-            else if (destType == TYPE_FLIP_GRAVITY) {
-                nextGravity = -gravity;
-                FLASH(0xC5, 3);
-#if ENABLE_SHAKE
-                setShake(20);
-#endif
-            }
+            //             else if (destType == TYPE_FLIP_GRAVITY) {
+            //                 nextGravity = -gravity;
+            //                 FLASH(0xC5, 3);
+            // #if ENABLE_SHAKE
+            //                 setShake(20);
+            // #endif
+            //             }
 
             if (Attribute[destType] & ATT_GRAB) {
                 grabDoge();
@@ -640,14 +640,17 @@ void movePlayer(BoardCursor *cur) {
         attachmentOffset = 0;
         *meAtt = attachment;
         drop = false;
+
+        if (Attribute[CharToType[GET(attachment)]] & ATT_MASSIVE &&
+            Attribute[CharToType[GET(*(cur->me + _BOARD_COLS))]] & ATT_MASSIVE)
+            shakeTime = 2;
+
+
         waitRelease = true;
         attachment = 0;
 
         return;
     }
-
-    if (rockShaker)
-        rockShaker--;
 
     if (pulsePlayerColour) {
         nDots(2, playerX, playerY, PT_ONE, 25, CHAR_TRIX_X >> 1, CHAR_TRIX_Y >> 1, 100, 7);

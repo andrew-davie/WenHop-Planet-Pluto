@@ -706,7 +706,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
 
             if (debris)
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 3; i++) {
                     int idx = nDots(1, cur->col, cur->row, PT_TWO, rangeRandom(20) + 20, rangeRandom(CHAR_TRIX_X), 1,
                                     20 + rangeRandom(15), (getRandom32() & 1) ? 1 : 7);
                     if (idx >= 0)

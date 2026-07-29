@@ -31,7 +31,7 @@ int shakeY;
 
 
 int shakeTime;
-int rockShaker;
+int debris;
 
 
 void setShake(int stime) {
