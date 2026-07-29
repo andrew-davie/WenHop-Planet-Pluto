@@ -592,6 +592,30 @@ void drawParticles() {
 
                 if (pixelSolid && (hitType == TYPE_ROCK || hitType == TYPE_GEODOGE)) {
 
+                    // Only worth rolling if there's actually somewhere to
+                    // fall TO. dir gets halved every rolling frame below
+                    // (see the comment on that), which converges to a near-
+                    // zero fall rate within a handful of frames regardless
+                    // of whether the drop is genuinely rolling off a curve
+                    // or just stuck sliding along a flat top -- so dir alone
+                    // can't tell those two apart. Whether the cell directly
+                    // underneath is open can: if it's ALSO solid (another
+                    // rock/wall touching this one, a boulder resting on
+                    // something), sliding sideways along this row is never
+                    // going to lead anywhere, and previously it would just
+                    // keep nudging across cell after cell -- clearing this
+                    // pixel, hitting solid again one column over, resetting
+                    // the roll counter each time -- until it happened to run
+                    // long enough uninterrupted to hit RAIN_ROLL_MAX_FRAMES,
+                    // sliding visibly across the tops of several characters
+                    // first. Splash immediately instead.
+                    if (!(Attribute[CharToType[GET(*(cell + _BOARD_COLS))]] & ATT_BLANK)) {
+                        ADDAUDIO(SFX_DRIP2);
+                        nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
+                        pushParticle(i);
+                        continue;
+                    }
+
                     // Roll off the curve: nudge sideways, away from the
                     // cell's centre, and keep falling -- next frame re-tests
                     // the glyph at the new position. Same idea as DEMO2025's
