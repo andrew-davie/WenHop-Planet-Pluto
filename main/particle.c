@@ -592,24 +592,37 @@ void drawParticles() {
 
                 if (pixelSolid && (hitType == TYPE_ROCK || hitType == TYPE_GEODOGE)) {
 
+                    // Which way this drop is rolling -- away from the cell's
+                    // centre -- decided once here and reused below for both
+                    // the "is it worth continuing" check and the nudge
+                    // itself, so they always agree on direction.
+                    int centreX_8 = ((cellCol * CHAR_TRIX_X + CHAR_CENTER_X) << 8) + 128;
+                    int rollDir = particle[i].trixX_8 < centreX_8 ? -1 : 1;
+
                     // Only worth rolling if there's actually somewhere to
                     // fall TO. dir gets halved every rolling frame below
                     // (see the comment on that), which converges to a near-
                     // zero fall rate within a handful of frames regardless
                     // of whether the drop is genuinely rolling off a curve
                     // or just stuck sliding along a flat top -- so dir alone
-                    // can't tell those two apart. Whether the cell directly
-                    // underneath is open can: if it's ALSO solid (another
-                    // rock/wall touching this one, a boulder resting on
-                    // something), sliding sideways along this row is never
-                    // going to lead anywhere, and previously it would just
-                    // keep nudging across cell after cell -- clearing this
-                    // pixel, hitting solid again one column over, resetting
-                    // the roll counter each time -- until it happened to run
+                    // can't tell those two apart. The real doRoll() (board.c)
+                    // checks both the side AND the cell diagonally below that
+                    // side before committing a real rock to roll that way --
+                    // mirror that here, not just "is the cell directly
+                    // underneath open" (that one's still true for a drop
+                    // sitting on a flat two-rock ledge, since the drop hasn't
+                    // actually reached the gap between them yet -- it's the
+                    // DESTINATION side that needs to be open underneath, not
+                    // where it currently is). If that diagonal is also solid
+                    // (another rock/wall touching this one), sliding further
+                    // that way is never going to lead anywhere -- previously
+                    // this just kept nudging across cell after cell,
+                    // resetting the roll counter each time it happened to
+                    // land on a momentarily-clear pixel, until it finally ran
                     // long enough uninterrupted to hit RAIN_ROLL_MAX_FRAMES,
-                    // sliding visibly across the tops of several characters
-                    // first. Splash immediately instead.
-                    if (!(Attribute[CharToType[GET(*(cell + _BOARD_COLS))]] & ATT_BLANK)) {
+                    // visibly sliding across several characters' tops first.
+                    // Splash immediately instead.
+                    if (!(Attribute[CharToType[GET(*(cell + _BOARD_COLS + rollDir))]] & ATT_BLANK)) {
                         ADDAUDIO(SFX_DRIP2);
                         nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                         pushParticle(i);
@@ -630,8 +643,7 @@ void drawParticles() {
                     // the moment a frame comes back clear below, so a curve
                     // we can't actually roll off of still gives up and
                     // splashes instead of rolling forever.
-                    int centreX_8 = ((cellCol * CHAR_TRIX_X + CHAR_CENTER_X) << 8) + 128;
-                    particle[i].trixX_8 += particle[i].trixX_8 < centreX_8 ? -RAIN_ROLL_NUDGE : RAIN_ROLL_NUDGE;
+                    particle[i].trixX_8 += rollDir * RAIN_ROLL_NUDGE;
                     particle[i].dir >>= 1;    // hug the curve instead of falling straight through it
 
                     if (++particle[i].distance > RAIN_ROLL_MAX_FRAMES) {
