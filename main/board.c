@@ -175,7 +175,7 @@ void displayFloatingNumber(int trixX, int trixY, int age, int value) {
 static const unsigned char ascii_width[] = {
     4,    //  32  SPACE
     4,    //  33  !   alt 0
-    2,    //  34  "   alt 1
+    3,    //  34  "   alt 1
     4,    //  35  #   alt 2
     4,    //  36  $   alt 3
     4,    //  37  %   alt 4
@@ -337,7 +337,7 @@ void setupBoardScanner() {
 
                 char str[6];
                 drawDecimalToString(str, '!', convertedGeodoge);
-                displayFloatingString(x, y, 40, str);
+                displayFloatingString(x, y, 50, str);
             }
 
             killAudio(SFX_UNCOVER);
@@ -398,7 +398,7 @@ void setupBoardScanner() {
             bestRockCount = rockCount;
 
         if (rockCount > lastRockCount) {
-            shakeTime += 3;
+            shakeTime += 6;
             debris = 6;
         }
 

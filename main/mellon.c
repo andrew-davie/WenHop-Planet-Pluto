@@ -642,8 +642,8 @@ void movePlayer(BoardCursor *cur) {
         drop = false;
 
         if (Attribute[CharToType[GET(attachment)]] & ATT_MASSIVE &&
-            Attribute[CharToType[GET(*(cur->me + _BOARD_COLS))]] & ATT_MASSIVE)
-            shakeTime = 2;
+            Attribute[CharToType[GET(*(meAtt + _BOARD_COLS))]] & ATT_MASSIVE)
+            shakeTime = 4;
 
 
         waitRelease = true;

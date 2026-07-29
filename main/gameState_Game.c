@@ -170,8 +170,19 @@ void VB_Game() {
 
         shakeTime--;
 
+
+        int lastShakeX = shakeX;
+        int lastShakeY = shakeY;
+
         shakeX = (rangeRandom(3) - 1) << 16;
         shakeY = (rangeRandom(5) - 2) << 16;
+
+        if (shakeX == lastShakeX && shakeY == lastShakeY) {
+            shakeX += (1 << 16);
+            if (shakeX >= 2 << 16)
+                shakeX = -(1 << 16);
+        }
+
 
     }
 
