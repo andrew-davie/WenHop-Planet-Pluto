@@ -504,6 +504,16 @@ void drawParticles() {
                 int cellRow = ((particle[i].trixY_8 >> 8) * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16;
 
                 if (cellRow < 0 || cellRow >= _BOARD_ROWS || cellCol < 0 || cellCol >= _BOARD_COLS) {
+                    // The roll-off below never checks its nudge destination is
+                    // actually passable before committing to it -- it just
+                    // nudges and re-tests next frame. Against a fully-solid
+                    // glyph (a border wall, or a wide rock/geodoge cluster with
+                    // no gap in it) there's never a clear pixel to stop at, so
+                    // it can walk straight off the edge of the board array.
+                    // That used to be a silent despawn -- splash at wherever it
+                    // actually was instead of just vanishing.
+                    ADDAUDIO(SFX_DRIP2);
+                    nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                     pushParticle(i);
                     continue;
                 }
@@ -628,8 +638,25 @@ void drawParticles() {
 
             particle[i].distance += particle[i].speed;
 
-            if (!--particle[i].age || !drawBit(x, y, particle[i].colour))
+            if (!--particle[i].age || !drawBit(x, y, particle[i].colour)) {
+
+                // A rain drop can spend a long stretch of its 200-frame life
+                // bumping along an uneven rock/geodoge surface -- clearing one
+                // bump (resetting the roll counter), falling a hair, catching
+                // the next. Each individual roll properly gives up and
+                // splashes on its own if it runs past RAIN_ROLL_MAX_FRAMES,
+                // but age counts down the whole time regardless, so it can
+                // hit 0 mid-roll, before that roll's own cap is reached --
+                // silently despawning with no splash at all. Same deal if it
+                // scrolls off-screen (drawBit() returning false) while still
+                // mid-fall. Splash here too so a rain drop never just vanishes.
+                if (particle[i].type == PT_RAIN) {
+                    ADDAUDIO(SFX_DRIP2);
+                    nDotsAtTrixel(3, x, y, 12, PT_TWO, 30, 7);
+                }
+
                 pushParticle(i);
+            }
         }
 }
 
