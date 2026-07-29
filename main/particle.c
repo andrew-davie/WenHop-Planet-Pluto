@@ -511,6 +511,28 @@ void drawParticles() {
                 unsigned char *cell = RAM + _BOARD + cellRow * _BOARD_COLS + cellCol;
                 enum ObjectType hitType = CharToType[GET(*cell)];
 
+                // Sub-cell pixel column within the character -- cellCol
+                // above is already a floor-divided cell index, so this is
+                // just the remainder (no second division). Needed for the
+                // player check right below and reused in the glyph test
+                // further down.
+                int subCol = (particle[i].trixX_8 >> 8) - cellCol * CHAR_TRIX_X;
+
+                // The player isn't part of the board array -- tracked
+                // separately via playerX/playerY and drawn as its own
+                // sprite -- so the glyph test below never sees them; this
+                // cell just reads as whatever (blank) ground they're
+                // standing on. Treat their occupied cell as a person-shaped
+                // obstacle instead: the outer column on each side passes
+                // through, the inner three columns splash, at the top of
+                // the cell same as any other solid hit.
+                if (cellCol == playerX && cellRow == playerY && subCol > 0 && subCol < CHAR_TRIX_X - 1) {
+                    ADDAUDIO(SFX_DRIP2);
+                    nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
+                    pushParticle(i);
+                    continue;
+                }
+
                 // Whole-cell "is this type solid" isn't enough -- rocks and
                 // geodoge clusters aren't full squares, and testing the
                 // cell's TYPE rather than its actual drawn shape splashed
@@ -543,10 +565,8 @@ void drawParticles() {
                         fp = charSet[GET(*cell)];
                     }
 
-                    // Sub-cell pixel position within the character. cellCol/
-                    // cellRow above are already floor-divided cell indices,
-                    // so this is just the remainder -- no second division.
-                    int subCol = (particle[i].trixX_8 >> 8) - cellCol * CHAR_TRIX_X;
+                    // subCol computed above (player check); subRow is the
+                    // same idea for the vertical axis.
                     int subRow = (particle[i].trixY_8 >> 8) - cellRow * CHAR_TRIX_Y;
 
                     // tools/cset.py's pack_bits(): each glyph row packs one
