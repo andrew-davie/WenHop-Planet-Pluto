@@ -20,10 +20,12 @@
 #include "scroll.h"
 #include "sound.h"
 
-// TEMPORARY -- set to 0 to silence, see makeRain() below. Prints the raw
-// CH_* index of whatever the DRIP check read directly above each rain spawn,
-// so we can see ground truth instead of guessing from static review.
-#define RAIN_SPAWN_DEBUG 1
+// TEMPORARY -- see makeRain() below. Prints the raw CH_* index of whatever
+// the DRIP check read directly above each rain spawn. Confirmed spawning
+// itself is fine (2026-07-29), turned off now that the actual bug was
+// found to be the rock roll-off relocating drops, not the spawn check --
+// flip back to 1 if spawn placement is ever in doubt again.
+#define RAIN_SPAWN_DEBUG 0
 
 static unsigned int weaponLength = 0;
 
@@ -505,54 +507,19 @@ void drawParticles() {
 
                 if (!(Attribute[hitType] & ATT_BLANK)) {
 
-                    if (hitType == TYPE_ROCK || hitType == TYPE_GEODOGE) {
-                        // roll off sideways, same feel doRoll() gives real boulders --
-                        // but unlike the first version of this, actually check the
-                        // side is blank before committing to it, same as doRoll()
-                        // (board.c) does for real rocks. Without this check a drop
-                        // could get shoved sideways into ANOTHER solid cell (a second
-                        // rock, a wall, the board edge) it never validated, then
-                        // re-collide and splash there next frame -- one column over
-                        // from the real drip source, with nothing above it checked.
-                        // That's what "splash offset one char" and "spawns beside a
-                        // boulder with blank above it" both were: not a math bug, a
-                        // missing blank-check on the roll target.
-                        int firstOffset = rangeRandom(2) ? 1 : -1;
-                        int rolled = 0;
-
-                        for (int n = 0; n < 2; n++) {
-                            int offset = n == 0 ? firstOffset : -firstOffset;
-                            int sideCol = cellCol + offset;
-
-                            if (sideCol < 0 || sideCol >= _BOARD_COLS)
-                                continue;
-
-                            unsigned char *sideCell = cell + offset;
-                            if (Attribute[CharToType[GET(*sideCell)]] & ATT_BLANK) {
-                                particle[i].trixX_8 += (offset * CHAR_TRIX_X) << 8;
-                                particle[i].trixY_8 = (cellRow * CHAR_TRIX_Y) << 8;
-                                rolled = 1;
-                                break;
-                            }
-                        }
-
-                        if (!rolled) {
-                            // hemmed in on both sides -- nowhere to roll, so it
-                            // splashes right where it landed instead of teleporting
-                            // into whatever's beside it
-                            ADDAUDIO(SFX_DRIP2);
-                            nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12,
-                                          PT_TWO, 30, 1);
-                            pushParticle(i);
-                            continue;
-                        }
-                    } else {
-                        ADDAUDIO(SFX_DRIP2);
-                        nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30,
-                                      1);
-                        pushParticle(i);
-                        continue;
-                    }
+                    // Used to roll rock/geodoge hits off sideways, same feel doRoll()
+                    // gives real boulders. Dropped it -- rolling relocates the drop a
+                    // full character sideways with no visible drip source above the
+                    // new column, and it then keeps falling from there. That's what
+                    // every one of the "spawns in the wrong place" reports turned out
+                    // to be: not a spawn bug, this teleport-and-continue reading as
+                    // one. A drop hitting a rock just splashes now, same as hitting
+                    // anything else solid -- it always terminates exactly where it
+                    // was visibly falling.
+                    ADDAUDIO(SFX_DRIP2);
+                    nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 1);
+                    pushParticle(i);
+                    continue;
                 }
 
                 break;
