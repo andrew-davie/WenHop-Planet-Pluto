@@ -141,7 +141,7 @@ const unsigned char caveraintest[] = {
 
     255,  22, 50,                           // milling
     10, 15,                         // doge $
-    4,                              // weather (rain -- see particle.c's makeRain()) -- was 1 under the old hardcoded-frequency scheme; 4 keeps the same intensity now that this value IS the frequency divisor
+    255,                              // weather (rain -- see particle.c's makeRain()) -- was 1 under the old hardcoded-frequency scheme; 4 keeps the same intensity now that this value IS the frequency divisor
 
      0,  0,  0,  0,  0,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
