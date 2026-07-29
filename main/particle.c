@@ -6,7 +6,9 @@
 #include "cdfjplus.h"
 
 #include "T1TC.h"
+#include "animations.h"
 #include "attribute.h"
+#include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
 #include "draw.h"
@@ -426,6 +428,10 @@ void drawFloatingChars() {
 }
 
 
+// See the roll-off branch inside PT_RAIN, drawParticles() below.
+#define RAIN_ROLL_NUDGE 48         // sideways drift per rolling frame, in trixX_8's 256ths-of-a-trix
+#define RAIN_ROLL_MAX_FRAMES 24    // give up and splash if still stuck against the same curve after this long
+
 void drawParticles() {
 
     TIMED(DRAWPARTICLE, 0x4B8);    // 14/7/2026
@@ -505,21 +511,92 @@ void drawParticles() {
                 unsigned char *cell = RAM + _BOARD + cellRow * _BOARD_COLS + cellCol;
                 enum ObjectType hitType = CharToType[GET(*cell)];
 
+                // Whole-cell "is this type solid" isn't enough -- rocks and
+                // geodoge clusters aren't full squares, and testing the
+                // cell's TYPE rather than its actual drawn shape splashed
+                // drops against empty space around a round glyph's corners
+                // (and, before that, made the old roll-off jump a full
+                // character with nothing underneath it to justify why).
+                // Test the real glyph bitmap instead, mirroring how
+                // grabCharacters() (drawScreen.c) picks what's actually on
+                // screen for this cell: Animate[] redirects animated types
+                // to their current frame, ATT_GEODOGE picks one of 16
+                // neighbour-dependent cluster shapes instead of a single
+                // fixed glyph. ATT_BLANK types skip all of this -- known
+                // passable, no need to look at their (blank) art.
+                bool pixelSolid = false;
+
                 if (!(Attribute[hitType] & ATT_BLANK)) {
 
-                    // Used to roll rock/geodoge hits off sideways, same feel doRoll()
-                    // gives real boulders. Dropped it -- rolling relocates the drop a
-                    // full character sideways with no visible drip source above the
-                    // new column, and it then keeps falling from there. That's what
-                    // every one of the "spawns in the wrong place" reports turned out
-                    // to be: not a spawn bug, this teleport-and-continue reading as
-                    // one. A drop hitting a rock just splashes now, same as hitting
-                    // anything else solid -- it always terminates exactly where it
-                    // was visibly falling.
+                    const unsigned char *fp;
+
+                    if (Attribute[hitType] & ATT_GEODOGE) {
+                        unsigned char udlr =
+                            ((Attribute[CharToType[GET(*(cell - _BOARD_COLS))]] & ATT_GEODOGE) >> POS_GEODOGE) |
+                            ((Attribute[CharToType[GET(*(cell + 1))]] & ATT_GEODOGE) >> (POS_GEODOGE - 1)) |
+                            ((Attribute[CharToType[GET(*(cell + _BOARD_COLS))]] & ATT_GEODOGE) >> (POS_GEODOGE - 2)) |
+                            ((Attribute[CharToType[GET(*(cell - 1))]] & ATT_GEODOGE) >> (POS_GEODOGE - 3));
+                        fp = conglomerate[udlr];
+                    } else if (Animate[hitType]) {
+                        fp = charSet[*Animate[hitType]];
+                    } else {
+                        fp = charSet[GET(*cell)];
+                    }
+
+                    // Sub-cell pixel position within the character. cellCol/
+                    // cellRow above are already floor-divided cell indices,
+                    // so this is just the remainder -- no second division.
+                    int subCol = (particle[i].trixX_8 >> 8) - cellCol * CHAR_TRIX_X;
+                    int subRow = (particle[i].trixY_8 >> 8) - cellRow * CHAR_TRIX_Y;
+
+                    // tools/cset.py's pack_bits(): each glyph row packs one
+                    // bit per column across 3 planes, column 0 (leftmost) in
+                    // the highest bit of the CHAR_TRIX_X-wide field. OR the
+                    // 3 planes together -- collision only cares whether
+                    // ANYTHING is drawn there, not which of the roller's 3
+                    // render variants it happens to be this frame.
+                    const unsigned char *rowData = fp + subRow * 3;
+                    unsigned char litMask = rowData[0] | rowData[1] | rowData[2];
+                    pixelSolid = (litMask >> (CHAR_TRIX_X - 1 - subCol)) & 1;
+                }
+
+                if (pixelSolid && (hitType == TYPE_ROCK || hitType == TYPE_GEODOGE)) {
+
+                    // Roll off the curve: nudge sideways, away from the
+                    // cell's centre, and keep falling -- next frame re-tests
+                    // the glyph at the new position. Same idea as DEMO2025's
+                    // rainX[i] "diff<2" nudge; that one worked in quarter-
+                    // pixel steps because it only had 2 sub-pixel bits to
+                    // play with, trixX_8 already carries 8, so nudge
+                    // directly in that space instead.
+                    //
+                    // particle[i].distance is otherwise unused by rain
+                    // (pinned to 0 at spawn, see makeRain()) -- repurposed
+                    // here to count consecutive rolling frames, reset to 0
+                    // the moment a frame comes back clear below, so a curve
+                    // we can't actually roll off of still gives up and
+                    // splashes instead of rolling forever.
+                    int centreX_8 = ((cellCol * CHAR_TRIX_X + CHAR_CENTER_X) << 8) + 128;
+                    particle[i].trixX_8 += particle[i].trixX_8 < centreX_8 ? -RAIN_ROLL_NUDGE : RAIN_ROLL_NUDGE;
+                    particle[i].dir >>= 1;    // hug the curve instead of falling straight through it
+
+                    if (++particle[i].distance > RAIN_ROLL_MAX_FRAMES) {
+                        ADDAUDIO(SFX_DRIP2);
+                        nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30,
+                                      7);
+                        pushParticle(i);
+                        continue;
+                    }
+
+                } else if (pixelSolid) {
+
                     ADDAUDIO(SFX_DRIP2);
                     nDotsAtTrixel(3, cellCol * CHAR_TRIX_X + CHAR_CENTER_X, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
                     pushParticle(i);
                     continue;
+
+                } else {
+                    particle[i].distance = 0;    // clear -- not (or no longer) rolling
                 }
 
                 break;
