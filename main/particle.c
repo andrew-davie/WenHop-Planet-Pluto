@@ -668,12 +668,12 @@ void drawParticles() {
                         particle[i].trixY_8 = newTrixY << 8;
 
                         // Rolling off a rock isn't a free fall -- it's
-                        // shedding most of its momentum onto the rock's
-                        // surface. Knock the fall-speed accumulator back
-                        // down so it re-accelerates from near standstill
-                        // instead of continuing at whatever speed it had
-                        // built up before hitting this rock.
-                        particle[i].dir = 8;
+                        // shedding some of its momentum onto the rock's
+                        // surface. Halve the fall-speed accumulator so it
+                        // keeps accelerating from a reduced speed instead
+                        // of continuing at whatever speed it had built up
+                        // before hitting this rock.
+                        particle[i].dir >>= 1;
                     } else {
                         ADDAUDIO(SFX_DRIP2);
                         nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
