@@ -664,8 +664,11 @@ void drawParticles() {
                     // very often a different cell/glyph entirely, not a
                     // position that exists within the one just hit.
                     if (!rainPixelSolid(newTrixX, newTrixY)) {
+                        // TEMP: horizontal-only commit for a look at the
+                        // roll in isolation -- validation still checks the
+                        // diagonal (newTrixY), but the vertical move itself
+                        // is skipped here for now.
                         particle[i].trixX_8 = newTrixX << 8;
-                        particle[i].trixY_8 = newTrixY << 8;
 
                         // Rolling off a rock isn't a free fall -- it's
                         // shedding some of its momentum onto the rock's
