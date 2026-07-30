@@ -18,16 +18,8 @@
 #include "particle.h"
 #include "playerAnimation.h"
 #include "random.h"
-#include "score.h"
 #include "scroll.h"
 #include "sound.h"
-
-// TEMPORARY -- see makeRain() below. Prints the raw CH_* index of whatever
-// the DRIP check read directly above each rain spawn. Confirmed spawning
-// itself is fine (2026-07-29), turned off now that the actual bug was
-// found to be the rock roll-off relocating drops, not the spawn check --
-// flip back to 1 if spawn placement is ever in doubt again.
-#define RAIN_SPAWN_DEBUG 0
 
 static unsigned int weaponLength = 0;
 
@@ -428,23 +420,17 @@ void drawFloatingChars() {
 }
 
 
-// Is the board pixel at these absolute trix coordinates actually drawn
-// (opaque), as opposed to "this cell's TYPE happens to be solid"? Used by
-// PT_RAIN's roll-off (drawParticles() below) to test a specific candidate
-// landing spot, which is very often in a different cell than the one it
-// just hit -- rolling off the edge of a glyph means "one column over" is
-// frequently a different cell/glyph entirely, not a position within the one
-// that was just tested. Mirrors the inline per-pixel test in PT_RAIN --
-// see the comments there for the bit layout (tools/cset.py) and the
-// Animate[]/ATT_GEODOGE glyph-selection logic (grabCharacters(),
-// drawScreen.c).
+// Is the board pixel at these absolute trix coordinates actually drawn?
+// Used by PT_RAIN's roll-off to test a candidate landing spot, which is
+// often in a different cell than the one it just hit. Mirrors
+// grabCharacters() (drawScreen.c) for glyph selection.
 static bool rainPixelSolid(int trixX, int trixY) {
 
     int col = (trixX * ((0x10000 + CHAR_TRIX_X - 1) / CHAR_TRIX_X)) >> 16;
     int row = (trixY * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16;
 
     if (row < 0 || row >= _BOARD_ROWS || col < 0 || col >= _BOARD_COLS)
-        return true;    // nothing to occupy off the edge of the board -- treat as blocked
+        return true;    // off-board -- treat as blocked
 
     unsigned char *testCell = RAM + _BOARD + row * _BOARD_COLS + col;
     enum ObjectType testType = CharToType[GET(*testCell)];
@@ -512,49 +498,20 @@ void drawParticles() {
 
             case PT_RAIN: {
 
-                // Rain doesn't use the dir/distance polar-offset dance above --
-                // distance is pinned at 0 (see makeRain()) so xOffset/yOffset are
-                // always 0 for this type, and dir is repurposed here as an 8-bit
-                // fall-velocity accumulator instead of an angle. Keeps a straight
-                // vertical drop without fighting the generic "distance +=
-                // speed" advance every other particle type relies on below.
+                // dir is repurposed as an 8-bit fall-velocity accumulator
+                // (distance stays pinned at 0, so the polar offset above is
+                // inert for this type).
                 if (particle[i].dir < 240)
                     particle[i].dir += 8;
-
-                // dir maxes out at 240 here (fixed-point trix*256 units), so
-                // adding it straight to trixY_8 tops out just under 1 trix/frame
-                // -- crosses a 10-trix character cell in ~11 frames at terminal.
-                // The >>2 this replaced divided that by another 4, so drops were
-                // taking the better part of a second per cell -- looked more like
-                // drizzle sliding down glass than falling rain.
                 particle[i].trixY_8 += particle[i].dir;
 
-                // No hardware divide on this target (ARMv4T/Thumb) and nothing
-                // links a soft-divide routine here -- CHAR_TRIX_X/Y (5/10) aren't
-                // powers of two, so a plain '/' silently hard-faults instead of
-                // erroring at build time. Same reciprocal-multiply-shift trick
-                // getBoardAddress() above uses for this conversion, but with the
-                // reciprocal rounded UP (ceiling), not truncated down: rain spawns
-                // sitting exactly on a cell boundary (row*CHAR_TRIX_Y, see
-                // makeRain()), and a truncated reciprocal underestimates exactly
-                // at those multiples -- e.g. 0x10000/10 floors to 6553, and
-                // 50*6553>>16 comes out to 4, not 5. That misread the drop's own
-                // spawn cell as the drip source one row up (solid), so it
-                // splashed against itself the instant it was evaluated. Rounding
-                // the reciprocal up instead (6554) keeps exact multiples correct
-                // while still landing in the right cell everywhere in between.
+                // Reciprocal-multiply-shift: no hardware/soft divide on this
+                // target. Reciprocal rounded up so exact cell-boundary
+                // positions floor-divide correctly.
                 int cellCol = ((particle[i].trixX_8 >> 8) * ((0x10000 + CHAR_TRIX_X - 1) / CHAR_TRIX_X)) >> 16;
                 int cellRow = ((particle[i].trixY_8 >> 8) * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16;
 
                 if (cellRow < 0 || cellRow >= _BOARD_ROWS || cellCol < 0 || cellCol >= _BOARD_COLS) {
-                    // The roll-off below never checks its nudge destination is
-                    // actually passable before committing to it -- it just
-                    // nudges and re-tests next frame. Against a fully-solid
-                    // glyph (a border wall, or a wide rock/geodoge cluster with
-                    // no gap in it) there's never a clear pixel to stop at, so
-                    // it can walk straight off the edge of the board array.
-                    // That used to be a silent despawn -- splash at wherever it
-                    // actually was instead of just vanishing.
                     ADDAUDIO(SFX_DRIP2);
                     nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                     pushParticle(i);
@@ -564,46 +521,23 @@ void drawParticles() {
                 unsigned char *cell = RAM + _BOARD + cellRow * _BOARD_COLS + cellCol;
                 enum ObjectType hitType = CharToType[GET(*cell)];
 
-                // Sub-cell pixel column within the character -- cellCol
-                // above is already a floor-divided cell index, so this is
-                // just the remainder (no second division). Needed for the
-                // player check right below and reused in the glyph test
-                // further down.
                 int subCol = (particle[i].trixX_8 >> 8) - cellCol * CHAR_TRIX_X;
 
-                // The player isn't part of the board array -- tracked
-                // separately via playerX/playerY and drawn as its own
-                // sprite -- so the glyph test below never sees them; this
-                // cell just reads as whatever (blank) ground they're
-                // standing on. Treat their occupied cell as a person-shaped
-                // obstacle instead: the outer column on each side passes
-                // through, the inner three columns splash, at the top of
-                // the cell same as any other solid hit.
+                // Player isn't in the board array -- treat its cell as a
+                // person-shaped obstacle: outer columns pass through, inner
+                // three splash at the top of the cell.
                 if (cellCol == playerX && cellRow == playerY && subCol > 0 && subCol < CHAR_TRIX_X - 1) {
-                    // Y pinned to the top of the cell per spec (splash where
-                    // the drop meets the player's head), but X should still
-                    // be the drop's actual column, not the cell's center.
                     ADDAUDIO(SFX_DRIP2);
                     nDotsAtTrixel(3, particle[i].trixX_8 >> 8, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
                     pushParticle(i);
                     continue;
                 }
 
-                // Whole-cell "is this type solid" isn't enough -- rocks and
-                // geodoge clusters aren't full squares, and testing the
-                // cell's TYPE rather than its actual drawn shape splashed
-                // drops against empty space around a round glyph's corners
-                // (and, before that, made the old roll-off jump a full
-                // character with nothing underneath it to justify why).
-                // Test the real glyph bitmap instead, mirroring how
-                // grabCharacters() (drawScreen.c) picks what's actually on
-                // screen for this cell: Animate[] redirects animated types
-                // to their current frame, ATT_GEODOGE picks one of 16
-                // neighbour-dependent cluster shapes instead of a single
-                // fixed glyph. ATT_BLANK types skip all of this -- known
-                // passable, no need to look at their (blank) art.
+                // Per-pixel glyph test, mirroring grabCharacters()
+                // (drawScreen.c): Animate[]/ATT_GEODOGE glyph selection,
+                // ATT_BLANK short-circuited as always passable.
                 bool pixelSolid = false;
-                unsigned char litMask = 0;    // which columns are lit in the glyph row just tested -- see below
+                unsigned char litMask = 0;
 
                 if (!(Attribute[hitType] & ATT_BLANK)) {
 
@@ -622,16 +556,10 @@ void drawParticles() {
                         fp = charSet[GET(*cell)];
                     }
 
-                    // subCol computed above (player check); subRow is the
-                    // same idea for the vertical axis.
                     int subRow = (particle[i].trixY_8 >> 8) - cellRow * CHAR_TRIX_Y;
 
-                    // tools/cset.py's pack_bits(): each glyph row packs one
-                    // bit per column across 3 planes, column 0 (leftmost) in
-                    // the highest bit of the CHAR_TRIX_X-wide field. OR the
-                    // 3 planes together -- collision only cares whether
-                    // ANYTHING is drawn there, not which of the roller's 3
-                    // render variants it happens to be this frame.
+                    // tools/cset.py pack_bits(): one bit per column across 3
+                    // planes, column 0 in the highest bit.
                     const unsigned char *rowData = fp + subRow * 3;
                     litMask = rowData[0] | rowData[1] | rowData[2];
                     pixelSolid = (litMask >> (CHAR_TRIX_X - 1 - subCol)) & 1;
@@ -639,13 +567,9 @@ void drawParticles() {
 
                 if (pixelSolid && (hitType == TYPE_ROCK || hitType == TYPE_GEODOGE)) {
 
-                    // One-shot decision, not a multi-frame nudge -- that was
-                    // the slow part. Which half of the glyph we hit picks a
-                    // side (dead centre has no side to roll toward -- straight
-                    // splash); test one column over and one pixel down for an
-                    // actual place to land, and either jump straight there or
-                    // give up immediately. No repeated re-testing, no easing
-                    // into it over several frames.
+                    // One-shot roll: which half of the glyph picks a side
+                    // (dead centre splashes immediately); test the board
+                    // (not this glyph) one column over and one pixel down.
                     int half = CHAR_TRIX_X >> 1;
 
                     if (subCol == half) {
@@ -659,27 +583,13 @@ void drawParticles() {
                     int newTrixX = (particle[i].trixX_8 >> 8) + rollDir;
                     int newTrixY = (particle[i].trixY_8 >> 8) + 1;
 
-                    // Testing the board here, not this glyph -- rolling off
-                    // the glyph's own edge column means "one column over" is
-                    // very often a different cell/glyph entirely, not a
-                    // position that exists within the one just hit.
                     if (!rainPixelSolid(newTrixX, newTrixY)) {
-                        // TEMP: horizontal-only commit for a look at the
-                        // roll in isolation. trixY_8 already advanced by
-                        // dir at the top of this frame (before this
-                        // collision check even ran) -- undo that so the
-                        // roll frame is a pure sideways step, not just a
-                        // skipped diagonal that still falls via gravity.
+                        // Horizontal only -- undo this frame's gravity fall
+                        // (already applied above, before this check ran) so
+                        // a roll is a pure sideways step.
                         particle[i].trixX_8 = newTrixX << 8;
                         particle[i].trixY_8 -= particle[i].dir;
-
-                        // Rolling off a rock isn't a free fall -- it's
-                        // shedding most of its momentum onto the rock's
-                        // surface. Cut the fall-speed accumulator to 1/4
-                        // so it keeps accelerating from a reduced speed
-                        // instead of continuing at whatever speed it had
-                        // built up before hitting this rock.
-                        particle[i].dir >>= 2;
+                        particle[i].dir >>= 2;    // sheds most of its speed onto the rock
                     } else {
                         ADDAUDIO(SFX_DRIP2);
                         nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
@@ -689,12 +599,6 @@ void drawParticles() {
 
                 } else if (pixelSolid) {
 
-                    // Splash at the drop's actual position, not the cell's
-                    // horizontal center -- after rolling off a rock the drop
-                    // is very often sitting in the edge column of whatever
-                    // cell it lands in next, not the middle of it, and
-                    // snapping to cellCol*CHAR_TRIX_X+CHAR_CENTER_X drew the
-                    // splash up to 2 pixels off from where it actually hit.
                     ADDAUDIO(SFX_DRIP2);
                     nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                     pushParticle(i);
@@ -712,24 +616,8 @@ void drawParticles() {
 
             if (!--particle[i].age || !drawBit(x, y, particle[i].colour)) {
 
-                // Belt and braces: age (200 frames) counts down every frame
-                // regardless of what the drop is doing, and it's possible
-                // (spawns high above a distant drip source, or off the
-                // bottom/side of the visible screen) for it to run out or
-                // scroll off-screen while still genuinely mid-fall, never
-                // having hit anything. Splash here too so a rain drop never
-                // just vanishes.
-                //
-                // Deliberately NOT using x/y from the top of this function:
-                // those bake in the generic xOffset/yOffset polar dance
-                // (sin_cos[dir>>3] * distance), which assumes dir is an angle
-                // and distance a radius. Rain repurposes dir as a fall-
-                // velocity accumulator instead (see the PT_RAIN case above),
-                // so that formula doesn't mean anything for it even though
-                // distance itself stays pinned at 0. particle[i].trixX_8/
-                // trixY_8 are the drop's real position, same as every other
-                // splash site in the
-                // PT_RAIN case already uses.
+                // Age/off-screen safety net -- splash here too so a rain
+                // drop never silently vanishes without hitting anything.
                 if (particle[i].type == PT_RAIN) {
                     ADDAUDIO(SFX_DRIP2);
                     nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
@@ -740,22 +628,11 @@ void drawParticles() {
         }
 }
 
-// Ported from Boulder-Dash-DEMO2025's makeRain() (main.c/drawscreen.c there) --
-// that version drove rain as its own dedicated pair of drops, hand-plotted
-// pixel-by-pixel against the raw character bitmap. This project already has a
-// general particle pool for exactly this kind of thing, so rain is just
-// another particle type (PT_RAIN, see the switch in drawParticles() above)
-// riding the same pool as dust/spirals/bubbles, gated on the per-cave
-// theCave->weather byte (decodeCaves.h) that was sitting there unused.
-
-// weatherIntensity is the frequency divisor makeRain() actually rolls
-// against: 1 in weatherIntensity calls attempts a spawn, so lower = heavier
-// rain, 1 is as heavy as it gets. theCave->weather seeds it (see
-// initWeather()) and is normally just copied straight across as a fixed
-// rate -- except 255, which means "rainstorms": long dry gaps punctuated by
-// a short, self-contained downpour that ramps up, holds at torrential, then
-// tails off again, cycling via weatherPhase below rather than holding at
-// one rate for the whole cave.
+// weatherIntensity is the frequency divisor makeRain() rolls against: 1 in
+// weatherIntensity calls attempts a spawn, lower = heavier rain.
+// theCave->weather seeds it -- except 255, which means "rainstorms": dry
+// gaps punctuated by a downpour that ramps up, holds at torrential, then
+// tails off, cycling via weatherPhase.
 #define WEATHER_WAIT_MAX_FRAMES (30 * 60)    // dry gap between storms: 0-30s, picked fresh each time
 #define WEATHER_RISE_FRAMES (2 * 60)         // build from WEATHER_LIGHT to torrential
 #define WEATHER_PEAK_FRAMES (12 * 60)        // hold at torrential
@@ -772,7 +649,7 @@ static int weatherPhaseTimer;    // counts down frames remaining in the current 
 void initWeather() {
     weatherPhase = WEATHER_WAIT;
     weatherPhaseTimer = rangeRandom(WEATHER_WAIT_MAX_FRAMES);
-    weatherIntensity = theCave->weather;    // only meaningful for the non-255 fixed-rate case
+    weatherIntensity = theCave->weather;    // meaningful only for the non-255 fixed-rate case
 }
 
 void makeRain() {
@@ -792,11 +669,8 @@ void makeRain() {
             return;    // dry -- no spawn attempts at all between storms
 
         case WEATHER_RISE:
-            // No hardware divide on this target and nothing links a soft-divide
-            // routine -- same class of bug as the CHAR_TRIX_X/Y hard fault
-            // earlier. WEATHER_RISE_FRAMES being a compile-time constant doesn't
-            // save us here; this compiler doesn't strength-reduce it either.
-            // Reciprocal-multiply-shift instead, same idiom as getBoardAddress().
+            // Reciprocal-multiply-shift -- no divide instruction, and a
+            // compile-time-constant divisor doesn't get folded either.
             weatherIntensity =
                 WEATHER_TORRENTIAL +
                 (((WEATHER_LIGHT - WEATHER_TORRENTIAL) * weatherPhaseTimer) * (0x10000 / WEATHER_RISE_FRAMES) >> 16);
@@ -815,7 +689,6 @@ void makeRain() {
             break;
 
         case WEATHER_FALL:
-            // same reciprocal-multiply-shift reasoning as WEATHER_RISE above
             weatherIntensity = WEATHER_TORRENTIAL +
                                (((WEATHER_LIGHT - WEATHER_TORRENTIAL) * (WEATHER_FALL_FRAMES - weatherPhaseTimer)) *
                                     (0x10000 / WEATHER_FALL_FRAMES) >>
@@ -831,11 +704,6 @@ void makeRain() {
     if (rangeRandom(weatherIntensity))
         return;
 
-    // SCREEN_TRIX_X/CHAR_TRIX_X and SCREEN_TRIX_Y/CHAR_TRIX_Y are both
-    // compile-time constants (folded away, no runtime div) -- but scrollX/Y
-    // are runtime values, so those divisions need the same reciprocal-
-    // multiply-shift trick as the PT_RAIN case above (ceiling-rounded
-    // reciprocal, same reasoning as there) rather than a plain '/'.
     int col = (((scrollX >> 16) * ((0x10000 + CHAR_TRIX_X - 1) / CHAR_TRIX_X)) >> 16) +
               rangeRandom(SCREEN_TRIX_X / CHAR_TRIX_X);
     int row = (((scrollY >> 16) * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16) +
@@ -846,35 +714,12 @@ void makeRain() {
 
     unsigned char *cell = RAM + _BOARD + row * _BOARD_COLS + col;
 
-    // only drip from a blank cell directly under something ATT_DRIP-flagged --
-    // same rule DEMO2025 used (its ATT_DRIP), now on WenHop's DIRT/BRICKWALL/
-    // STEELWALL/PEBBLE1/CONCRETE (see attribute.c)
+    // Only drip from a blank cell directly under an ATT_DRIP-flagged one.
     if ((Attribute[CharToType[GET(*cell)]] & ATT_BLANK) &&
         (Attribute[CharToType[GET(*(cell - _BOARD_COLS))]] & ATT_DRIP)) {
 
-#if RAIN_SPAWN_DEBUG
-        // TEMPORARY -- prints the raw CH_* index (attribute.h) of the cell this
-        // spawn believed was DRIP-flagged, right above the drop, so we can see
-        // exactly what the check actually read instead of guessing from static
-        // code review. Delete once the mislocated-spawn bug is confirmed/found.
-        {
-            char str[4];
-            drawDecimalToString(str, '0', GET(*(cell - _BOARD_COLS)));
-            displayFloatingString(col * CHAR_TRIX_X - (scrollX >> 16), (row - 1) * CHAR_TRIX_Y - (scrollY >> 16), 90,
-                                  str);
-        }
-#endif
-
-        // CHAR_CENTER_X pinned every drop to the same sub-pixel column within
-        // its character cell -- randomise across all CHAR_TRIX_X (5) positions
-        // instead so drops don't visibly line up. Doesn't affect the fall/
-        // collision math below (PT_RAIN case): cellCol there is a floor-divide
-        // back to the containing column, independent of where within it the
-        // drop actually sits.
         int idx = sphereDot(col * CHAR_TRIX_X + rangeRandom(CHAR_TRIX_X), row * CHAR_TRIX_Y, PT_RAIN, 200, 3);
         if (idx >= 0) {
-            // sphereDot() defaults these for the radiating-burst types --
-            // rain doesn't use them (see the PT_RAIN case), so pin them inert
             particle[idx].dir = 0;
             particle[idx].distance = 0;
             particle[idx].speed = 0;
