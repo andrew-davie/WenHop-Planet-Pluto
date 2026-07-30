@@ -665,10 +665,13 @@ void drawParticles() {
                     // position that exists within the one just hit.
                     if (!rainPixelSolid(newTrixX, newTrixY)) {
                         // TEMP: horizontal-only commit for a look at the
-                        // roll in isolation -- validation still checks the
-                        // diagonal (newTrixY), but the vertical move itself
-                        // is skipped here for now.
+                        // roll in isolation. trixY_8 already advanced by
+                        // dir at the top of this frame (before this
+                        // collision check even ran) -- undo that so the
+                        // roll frame is a pure sideways step, not just a
+                        // skipped diagonal that still falls via gravity.
                         particle[i].trixX_8 = newTrixX << 8;
+                        particle[i].trixY_8 -= particle[i].dir;
 
                         // Rolling off a rock isn't a free fall -- it's
                         // shedding most of its momentum onto the rock's
