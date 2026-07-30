@@ -458,7 +458,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-30 02:27 AEST
+// Last updated: 2026-07-31 04:01 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -520,7 +520,7 @@ static const unsigned short budget[128] = {
     _untimed_,    //  57 CH_GRINDER_0
     _untimed_,    //  58 CH_GRINDER_1
     _untimed_,    //  59 CH_HUB
-    _untimed_,    //  60 CH_WATER
+    _B + 225,     //  60 CH_WATER -- updated 2026-07-31 04:01 AEST (was untimed)
     _untimed_,    //  61 CH_WATERFLOW_0
     _untimed_,    //  62 CH_WATERFLOW_1
     _untimed_,    //  63 CH_WATERFLOW_2
