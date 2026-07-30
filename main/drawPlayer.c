@@ -135,7 +135,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
         int frameXOffset = -*(const signed char *)spr++;
         int frameYOffset = *(const signed char *)spr++;
 
-        int lavaLine = (lavaSurfaceTrixel - (scrollY >> 16)) * 3;
+        int lavaLine = ((liquidTrixel_8 << 8) - (scrollY >> 16)) * 3;
         playerSpriteY = ypos - frameYOffset - 1;
 
 

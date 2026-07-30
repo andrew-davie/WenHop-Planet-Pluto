@@ -45,7 +45,7 @@ OUTPUT = output
 DASM_TO_C = defines_dasm.h
 
 CFLAGS = -g3 -gdwarf-4 -gstrict-dwarf -mcpu=arm7tdmi -march=armv4t -mthumb \
-         -Wall -Wextra -Wshadow -Wno-unused-function -flto -ffunction-sections -Os \
+         -Wall -Wextra -Wshadow -Wno-unused-function -flto=2 -ffunction-sections -Os \
         -Wl,--print-memory-usage,--build-id=none -fno-builtin \
 		-mno-thumb-interwork -fextended-identifiers \
         -MMD -MP -Werror

@@ -25,6 +25,7 @@ const unsigned char P1_caveUseWall[] = {
     20, 4,4,                            // milling
     10, 15,                         // doge $
     0,                              // shake
+    0,                              // water
 
      17,  11,  50,  56,  8,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
@@ -142,6 +143,7 @@ const unsigned char caveraintest[] = {
     255,  22, 50,                           // milling
     10, 15,                         // doge $
     255,                              // weather (rain -- see particle.c's makeRain()) -- was 1 under the old hardcoded-frequency scheme; 4 keeps the same intensity now that this value IS the frequency divisor
+    0,                              // water
 
      0,  0,  0,  0,  0,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
@@ -190,6 +192,7 @@ const unsigned char cavetest[] = {
     255,  22, 50,                           // milling
     10, 15,                         // doge $
     4,                              // weather (rain -- see particle.c's makeRain()) -- was 1 under the old hardcoded-frequency scheme; 4 keeps the same intensity now that this value IS the frequency divisor
+    0,                              // water
 
      0,  0,  0,  0,  0,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
@@ -229,6 +232,82 @@ const unsigned char cavetest[] = {
 
 //------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
+
+const unsigned char P0_caveWater[] = {
+    // clang-format off
+
+    7,17,7,17,
+
+    0x98, 0x26, 0xC6,               // palette
+
+    60,  4,4,                           // milling
+    10, 15,                         // doge $
+    0, //255,                              // weather (255 = storms)
+    17+SCREEN_TRIX_Y,                // water -- this cave is locked to bounds_t == 17 (see resetTracking() in scroll.c), so just offscreen is bounds_t + SCREEN_TRIX_Y
+
+     17,  11,  50,  56,  8,         // randomiser[level]
+     30,  12,  12,  12,  12,        // doge req
+    200, 200, 200, 200, 200,
+
+    0, //WEAPON_MACE,                    // 0
+    0, //WEAPON_MACE,                    // 1
+    0, //WEAPON_MACE,                    // 2
+    0, //WEAPON_MACE,                    // 3
+    0, //WEAPON_MACE,                    // 4
+
+//    CAVEDEF_LOCK_Y,
+    0, CH_BRICKWALL, CH_BRICKWALL,           // flags, border, fill
+
+    // Random objects
+
+    3,
+    CH_DIRT,10,20,20,20,20,
+    CH_GEODOGE, 80,40,40,40,40,
+    CH_ROCK, 50,40,40,40,40,
+
+    DRAW_FILLED_RECT, CH_STEELWALL, 1,1,9,8, CH_ROCK,
+
+    DRAW_FILLED_RECT, CH_GEODOGE, 30, 2, 10, 5, CH_GEODOGE,
+
+
+    DRAW_FILLED_RECT, CH_BLANK, 3, 2, 5, 4, CH_BLANK,
+    DRAW_FILLED_RECT, CH_BRICKWALL, 3, 5, 5, 4, CH_STAR,
+
+    CH_CRACKED_BRICK, 4,5,
+    CH_CRACKED_BRICK, 5,5,
+    CH_CRACKED_BRICK, 6,5,
+
+    CH_DOOROPEN_0, 5, 6,
+    CH_MELLON_HUSK_BIRTH, 5, 2,
+
+   CH_BOMB,2,7,
+
+
+    DRAW_EOF,
+
+    // EXTRAS
+    // LEVEL 0 HERE
+
+    DRAW_EOF,
+
+     // LEVEL 1
+    DRAW_EOF,
+
+    // LEVEL 2
+    DRAW_EOF,
+
+    // LEVEL 3
+    DRAW_EOF, // LEVEL 4
+
+    DRAW_EOF,
+
+    'T', 'E', 'S', 'T', END_STRING
+
+    // clang-format on
+};
+
+
 const unsigned char P0_caveNew[] = {
     // clang-format off
 
@@ -239,6 +318,7 @@ const unsigned char P0_caveNew[] = {
     60,  4,4,                           // milling
     10, 15,                         // doge $
     255,                              // weather (255 = storms)
+    17 + SCREEN_TRIX_Y,                              // water
 
      17,  11,  50,  56,  8,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
@@ -313,6 +393,7 @@ const unsigned char caveNew2[] = {
     20,                             // milling
     10, 15,                         // doge $
     0,                              // shake
+    0,                              // water
 
      17,  11,  50,  56,  8,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
@@ -424,6 +505,7 @@ const unsigned char P2_caveWyrms[] = {
     20,  4,4,   // milling
     10, 15, // doge $
     0,          // weather
+    0,          // water
 
     10, 11, 50, 56, 8, // randomiser[level]
     20, 12, 12, 12, 12,
@@ -485,8 +567,9 @@ const unsigned char caveMace[] = {
     20,     // milling
     10, 15, // doge $
     5,      //              ,          // rain
+    0,      // water
 
-    
+
     10, 11, 50, 56, 8, // randomiser[level]
     1, 12, 12, 12, 12,
     200, 200, 200, 200, 200,
@@ -542,8 +625,9 @@ const unsigned char caveTest[] = {
     0,     // milling
     10, 15, // doge $
     0,      //              ,          // rain
+    0,      // water
 
-    
+
     10, 11, 50, 56, 8, // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
@@ -586,6 +670,7 @@ const unsigned char caveFast[] = {
     20,        // milling
     10, 15,    // doge $
     5,         //              ,          // rain
+    0,         // water
 
 
     10, 11, 50, 56, 8,    // randomiser[level]
@@ -633,8 +718,9 @@ const unsigned char caveA[] = {
     80,     // milling
     10, 15, // doge $
     5,      //              ,          // rain
+    BOARD_TRIX_Y+CHAR_TRIX_Y,  // water -- one character height under this cave's bottom bound
 
-    
+
     10, 11, 50, 56, 8, // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
@@ -706,9 +792,6 @@ const unsigned char caveA[] = {
     CH_MELLON_HUSK_BIRTH, 4, 2,
 
 
-    CH_WATER, 1, 20,
-
-
     DRAW_EOF,
 
     // EXTRAS
@@ -733,8 +816,9 @@ const unsigned char caveA2[] = {
     20,     // milling
     10, 15, // doge $
     5,      //              ,          // rain
+    0,      // water
 
-    
+
     10, 11, 50, 56, 8, // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
@@ -828,8 +912,9 @@ const unsigned char caveA5[] = {
     20,     // milling
     10, 15, // doge $
     5,      //              ,          // rain
+    0,      // water
 
-    
+
     10, 11, 50, 56, 8, // randomiser[level]
     25, 12, 12, 12, 12, 200, 200, 200, 200, 200,
     // 70,65,60,55,50,
@@ -869,6 +954,7 @@ const unsigned char caveA3[] = {
     20,    // milling
     1, 15, // doge $
     5,     //              ,          // rain
+    0,     // water
 
     10, 11, 50, 56, 8, // randomiser[level]
     8, 8, 8, 8, 8, 20, 200, 200, 200, 200,
@@ -953,7 +1039,8 @@ const unsigned char P3_starsAndStripes[] = {
     20,    4,4,                         // milling
     1, 15,                          // doge $
     0,                              // rain
-    
+    0,                              // water
+
     10,                             //0
     11,                             //1
     50,                             //2
@@ -1064,7 +1151,8 @@ const unsigned char P4_caveA4[] = {
     20, 4,4,   // milling
     1, 15, // doge $
     0,     //              ,          // rain
-    
+    0,     // water
+
     10,                             //0
     11,                             //1
     50,                             //2
@@ -1156,6 +1244,7 @@ void empty() {
 const struct caveHandler caveList[] = {
 
 
+    {P0_caveWater, none},
     // PLANET 0
     {P0_caveNew, none},    // GOOD puzzle screen
     {caveraintest, none},

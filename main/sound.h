@@ -8,6 +8,8 @@
 #define AUDIO_SINGLETON 0x40
 #define AUDIO_KILL 0x20
 #define AUDIO_ATTENUATE 16
+#define AUDIO_RETRIGGER 8    // ADDAUDIO() while already playing restarts it in place, instead of
+                             // risking a second overlapping copy or an unrelated eviction
 
 #define ADDAUDIO(id) audioRequest[id] = true
 
@@ -34,30 +36,38 @@ enum AudioID {
     SFX_EXPLODE,          // 05
     SFX_WHOOSH,           // 06
     SFX_BLIP,             // 07
-    SFX_EXTRA,            // 08
-    SFX_EXIT,             // 09
-    SFX_ZAP,              // 10
-    SFX_ZAP2,             // 11
-    SFX_EXPLODE_QUIET,    // 12
-    SFX_MAGIC,            // 13
-    SFX_MAGIC2,           // 14
-    SFX_ROCK,             // 15
-    SFX_ROCK2,            // 16
-    SFX_SCORE,            // 17
-    SFX_DOGE,             // 18
-    SFX_DOGE3,            // 19
-    SFX_DIRT,             // 20
-    SFX_PUSH,             // 21
-    SFX_SPACE,            // 22
-    SFX_DRIP,             // 23
-    SFX_BUBBLER,          // 24
-    SFX_DRIP2,            // 25
-    SFX_UNCOVER,          // 26
-    SFX_KEYPRESS,         // 27
+    SFX_CLOCK_LOUD,       // 08  loud one-shot clock chime, high priority
+    SFX_BONUS,            // 09  star grabbed
+    SFX_EXTRA,            // 10
+    SFX_DOOR,             // 11  door opened
+    SFX_EXIT,             // 12
+    SFX_ZAP,              // 13
+    SFX_ZAP2,             // 14
+    SFX_EXPLODE_QUIET,    // 15
+    SFX_THUNDER,          // 16
+    SFX_MAGIC,            // 17
+    SFX_MAGIC2,           // 18
+    SFX_ROCK,             // 19
+    SFX_ROCK2,            // 20
+    SFX_SCORE,            // 21
+    SFX_LIFT,             // 22  little whoosh when picking something up
+    SFX_DROP,             // 23  little whoosh (reversed) when putting something down
+    SFX_DOGE,             // 24
+    SFX_DOGE3,            // 25
+    SFX_DIRT,             // 26
+    SFX_PUSH,             // 27
+    SFX_SPACE,            // 28
+    SFX_DRIP,             // 29
+    SFX_BUBBLER,          // 30
+    SFX_DRIP2,            // 31
+    SFX_UNCOVER,          // 32
+    SFX_KEYPRESS,         // 33
 
 #if _ENABLE_LAVA2
     SFX_LAVA,    // 25
 #endif
+
+    SFX_CLOCK,    // lowest priority -- ticking clock ambience
 
     SFX_MAX,    // size only; not a sound
 };

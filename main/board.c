@@ -56,6 +56,7 @@ void restartBoardScan();
 void processPebble(unsigned char *me, int row, int col);
 void processWater(unsigned char *me, int row);
 void processWaterFlow(unsigned char *me, int row, int col);
+void convertWaterAndLavaObjects(unsigned char *me, int row, enum ObjectType type);
 void processCharBeltAndGrinder(unsigned char *me, unsigned char creature);
 void processFallingThings(unsigned char *me, int row, int col, unsigned char creature);
 void processCharRock(unsigned char *me);
@@ -361,31 +362,45 @@ void setupBoardScanner() {
             if (--ss < 0)
                 ss = 20;
 
-            if (gravity > 0 && lavaSurfaceTrixel && !ss)
-                lavaSurfaceTrixel -= gravity;
+            if (gravity > 0 && liquidTrixel_8 && !ss)
+                liquidTrixel_8 -= gravity << 8;
 
             // Surface lava "bubbles"
             int posX = ((scrollX * 5) >> 16) + rangeRandom(_BOARD_COLS);
-            nDotsAtTrixel(1, posX, lavaSurfaceTrixel - 2, PT_SPIRAL, 120, 0x10, 7);    // untested speed
+            nDotsAtTrixel(1, posX, (liquidTrixel_8 >> 8) - 2, PT_SPIRAL, 120, 0x10, 7);    // untested speed
         }
 
         if (showWater) {
-            static const unsigned char sinus[] = {0, 1, 1, 2, 2, 2, 3, 3, 4, 3, 3, 2, 2, 2, 1, 1};
-            static int waves = 0;
+            // static const signed char sinus[] = {0,    25,   49,   71,   90,   106,  117, 125, 127, 125, 117,
+            //                                     106,  90,   71,   49,   25,   0,    -25, -49, -71, -90, -106,
+            //                                     -117, -125, -127, -125, -117, -106, -90, -71, -49, -25};
+            // static int waves = 0;
 
-            if (lavaSurfaceTrixel) {
+            if (isStormActive() && liquidTrixel_8 > 0) {
 
-                lavaSurfaceTrixel -= sinus[(waves >> 0) & 15];
+                if (!rangeRandom(20)) {
+                    ADDAUDIO(SFX_THUNDER);
+                    FLASH(0x0F, 1);
+                }
 
-                if (((sinus[(waves >> 0) & 15] & 3) != 0) || (gameFrame & 31) == 0)
-                    ++waves;
+                // lavaSurfaceTrixel -= sinus[(waves >> 5) & 15];
 
-                lavaSurfaceTrixel += sinus[(waves >> 0) & 15];
+                // if (((sinus[(waves >> 5) & 15] & 3) != 0) || (gameFrame & 31) == 0) {
+                //     ++waves;
+
+                // if (!(gameFrame & 7))
+                //     lavaSurfaceTrixel--;
+                // }
+
+                // liquidTrixel_8 += sinus[(waves >> 5) & 31];
+                // waves++;
+
+                liquidTrixel_8 -= 20;
             }
 
             for (int i = 0; i < 4; i++) {
                 int posX = ((scrollX * 5) >> 16) + rangeRandom(_BOARD_COLS);
-                int deep = lavaSurfaceTrixel + rangeRandom(21 * CHAR_Y - lavaSurfaceTrixel);
+                int deep = (liquidTrixel_8 >> 8) + rangeRandom(21 * CHAR_Y - (liquidTrixel_8 >> 8));
                 if (deep > 0 && deep < _SCANLINES)
                     bubbles(1, posX, deep, 2240, 0x8000);
             }
@@ -600,6 +615,9 @@ void processBoardSquares() {
         if (creature < FLAG_THISFRAME) {
 
             enum ObjectType type = CharToType[creature];
+
+            convertWaterAndLavaObjects(cursor.me, cursor.row, type);
+
             if (Attribute[type] & select) {
 
                 if (T1TC + budget[creature] > availableIdleTime)
@@ -730,7 +748,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         if (!lastActiveStar) {
             if (--activeDelay < 0) {
                 activeDelay = (delay >> 1) + 1;
-                ADDAUDIO(SFX_SPACE);
+                //                ADDAUDIO(SFX_SPACE);
             }
         }
 
@@ -1257,6 +1275,7 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         if (!doges) {
             *cursor.me = CH_DOOROPEN_0;
             FLASH(0x28, 10);
+            ADDAUDIO(SFX_DOOR);
         }
         break;
 
@@ -1390,12 +1409,19 @@ void processPebble(unsigned char *me, int row, int col) {
 
 void processWater(unsigned char *me, int row) {
 
-    if ((row - 1) * CHAR_TRIX_Y >= lavaSurfaceTrixel) {
+    if ((row - 1) * CHAR_TRIX_Y >= (liquidTrixel_8 >> 8)) {
         unsigned char *neighbour = me + dirOffset[waterDir & 3];
         if (Attribute[CharToType[GET(*neighbour)]] & ATT_DISSOLVES) {
             *neighbour = CH_DUST_0;
         }
     }
+}
+
+void convertWaterAndLavaObjects(unsigned char *me, int row, enum ObjectType type) {
+
+    // Any blanks/dissolves below the rising surface convert to lava or water.
+    if ((showLava || showWater) && row * CHAR_TRIX_Y >= (liquidTrixel_8 >> 8) && (Attribute[type] & ATT_CONVERT))
+        *me = showLava ? CH_LAVA_BLANK : CH_WATER;
 }
 
 void processWaterFlow(unsigned char *me, int row, int col) {
@@ -1408,7 +1434,7 @@ void processWaterFlow(unsigned char *me, int row, int col) {
     }
 
     int line = (row + 1) * CHAR_TRIX_Y;
-    if (line < lavaSurfaceTrixel) {
+    if (line < (liquidTrixel_8 >> 8)) {
         if (row < 20) {
 
             unsigned char *next = me + _BOARD_COLS * gravity;

@@ -219,7 +219,7 @@ void setPalette(int buf) {
 
     static const unsigned char lbg[] = {0x48, 0x48, 0x46, 0x46, 0x44, 0x44, 0x42, 0x42, 0x42, 0x42, 0x42};
 
-    int lavaLine = (lavaSurfaceTrixel - (scrollY >> shift)) * 3;
+    int lavaLine = ((liquidTrixel_8 >> 8) - (scrollY >> shift)) * 3;
     int lavab = 0;
     if (lavaLine < 0)
         lavab = -lavaLine;

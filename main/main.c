@@ -52,7 +52,7 @@ int level;
 int millingTime;    // negative = expired
 int doges;
 int time;
-int lavaSurfaceTrixel;
+int liquidTrixel_8;
 bool showWater;
 bool showLava;
 

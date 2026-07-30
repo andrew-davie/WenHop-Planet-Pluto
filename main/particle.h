@@ -43,6 +43,10 @@ void initWeather();
 // itself never changes at runtime.
 extern int weatherIntensity;
 
+// True while a level-255 rainstorm is actively rising/peaking/falling;
+// false during the dry gap between storms (or for non-255 weather).
+int isStormActive();
+
 void initTool();
 void drawRope();
 void drawMace();

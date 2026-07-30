@@ -14,6 +14,7 @@
 #include "random.h"
 #include "reverseBits.h"
 #include "score.h"
+#include "sound.h"
 
 // #define RGB_BLACK       0
 #define RGB_RED 1
@@ -811,6 +812,8 @@ void drawScore() {
         int priorSecs = millingTime >> 16;
         millingTime -= (0x10000 / 60);
         if (millingTime >> 16 != priorSecs) {
+
+            ADDAUDIO((millingTime >> 16) > 9 ? SFX_CLOCK : SFX_CLOCK_LOUD);
             char str[4];
             drawDecimalToString(str, '0', millingTime >> 16);
             displayFloatingString(theCave->clockx, theCave->clocky, 60, str);

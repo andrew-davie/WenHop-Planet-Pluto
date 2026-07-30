@@ -22,6 +22,7 @@ struct CAVE_DEFINITION {
     unsigned char dogeValue;
     unsigned char extraDogeValue;
     unsigned char weather;
+    unsigned char water;    // 0 = no water, else the trixel line at which water appears
 
     unsigned char randomInit[5];    // use 0 for non-deterministic (purely random)
     unsigned char dogeRequired[5];

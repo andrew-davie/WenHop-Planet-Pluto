@@ -200,9 +200,85 @@ const unsigned char sampleExplodeQuiet[] = {
     CMD_STOP,
 };
 
+const unsigned char sampleThunder[] = {
+    // clang-format off
+
+    // sharp crack -- brief, loud, bright noise burst
+    8, 2, 15, 1,
+    8, 4, 15, 1,
+    8, 6, 14, 2,
+
+    // long decreasing rumble -- same AUDC=8 noise as the crack, but
+    // dragged out much further: AUDF climbs slowly (deepening the noise)
+    // while AUDV fades and each step's DUR grows, so the tail rolls on
+    // rather than cutting off like sampleExplode's.
+    8, 9,  12, 6,
+    8, 12, 11, 8,
+    8, 15, 10, 10,
+    8, 18, 9,  12,
+    8, 21, 7,  14,
+    8, 24, 5,  16,
+    8, 27, 3,  18,
+    8, 30, 1,  20,
+    CMD_STOP,
+
+    // clang-format on
+};
+
+const unsigned char sampleBonus[] = {
+    // clang-format off
+
+    // "bonus achieved" fanfare for grabbing a star: quick ascending
+    // arpeggio (AUDC=12, same bright div6 pure tone as sampleExit) then
+    // a sustained, louder top note to land the "ta-da".
+    12, 24, 10, 3,
+    12, 20, 11, 3,
+    12, 16, 12, 3,
+    12, 12, 13, 3,
+    12, 9,  14, 5,
+    12, 6,  15, 12,
+    CMD_STOP,
+
+    // clang-format on
+};
+
 const unsigned char sampleWhoosh[] = {
     15, 31, 1, 2,  15, 31, 2, 2,  15, 28, 3,  2,  15, 25, 4, 3,  15, 22, 5, 4,        15,
     19, 6,  5, 15, 16, 7,  6, 15, 13, 7,  10, 15, 10, 4,  2, 15, 7,  2,  2, CMD_STOP,
+};
+
+const unsigned char sampleWhooshSmall[] = {
+    // clang-format off
+
+    // little "whoosh" for picking something up -- same shape as
+    // sampleWhoosh (AUDC=15 pure tone, AUDF descending so pitch rises
+    // through the sweep) but compressed to a handful of quick, quiet
+    // steps since this fires on every pickup rather than being a
+    // one-off event.
+    15, 28, 2, 1,
+    15, 22, 3, 1,
+    15, 16, 4, 2,
+    15, 10, 3, 2,
+    15, 6,  1, 2,
+    CMD_STOP,
+
+    // clang-format on
+};
+
+const unsigned char sampleDrop[] = {
+    // clang-format off
+
+    // little "whoosh" for putting something down -- literally
+    // sampleWhooshSmall played in reverse, so pitch falls instead of
+    // rising, mirroring lift with drop.
+    15, 6,  1, 2,
+    15, 10, 3, 2,
+    15, 16, 4, 2,
+    15, 22, 3, 1,
+    15, 28, 2, 1,
+    CMD_STOP,
+
+    // clang-format on
 };
 
 const unsigned char sample10987654321[] = {
@@ -230,6 +306,41 @@ const unsigned char sampleDoge3[] = {
     5, 14, 1, 1, 5, 11, 3, 1, 5, 3, 4, 1, 5, 4, 3, 1, 5, 5, 1, 1, CMD_STOP,
 };
 
+const unsigned char sampleDoor[] = {
+    // clang-format off
+
+    // lock disengaging -- two clicks of actual noise (AUDC=8, same noise
+    // channel as sampleThunder/sampleExplode) rather than a musical note:
+    // a quiet click, a long delay, then a louder CLICK
+    8, 8, 5,  2,
+    8, 0, 0,  7,
+    8, 8, 13, 2,
+    CMD_STOP,
+
+    // clang-format on
+};
+
+const unsigned char sampleClock[] = {
+    // clang-format off
+
+    // ticking clock -- just the quiet "tick" now, no "TOCK".
+    8, 10, 1, 3,
+    CMD_STOP,
+
+    // clang-format on
+};
+
+const unsigned char sampleClockLoud[] = {
+    // clang-format off
+
+    // same tick as sampleClock, just +2 volume, for a high-priority,
+    // attention-grabbing version rather than background ambience.
+    8, 10, 3, 3,
+    CMD_STOP,
+
+    // clang-format on
+};
+
 const unsigned char sampleExit[] = {
     12, 16, 1, 1, 12, 16, 4, 1, 12, 16, 10, 1, 12, 16, 8, 4, 12, 16, 6, 1, 12, 16, 4, 1, 12, 16, 2, 1, CMD_STOP,
 };
@@ -253,16 +364,22 @@ const struct AudioTable AudioSamples[] = {
     {sampleExplode, 128, 0},                                            // SFX_EXPLODE
     {sampleWhoosh, 127, 0},                                             // SFX_WHOOSH
     {sampleBlip, 125, 0},                                               // SFX_BLIP
+    {sampleClockLoud, 120, 0},                                          // SFX_CLOCK_LOUD
+    {sampleBonus, 115, 0},                                              // SFX_BONUS
     {sampleExxtra, 110, 0},                                             // SFX_EXTRA
+    {sampleDoor, 105, 0},                                                // SFX_DOOR
     {sampleExit, 99, 0},                                                // SFX_EXIT
     {sampleZap, 98, AUDIO_ATTENUATE},                                   // SFX_ZAP
     {sampleZap2, 98, 0},                                                // SFX_ZAP2
     {sampleExplodeQuiet, 97, 0},                                        // SFX_EXPLODE_QUIET
+    {sampleThunder, 96, AUDIO_RETRIGGER},                               // SFX_THUNDER
     {sampleMagic, 50, AUDIO_KILL},                                      // SFX_MAGIC
     {sampleMagic2, 50, 0},                                              // SFX_MAGIC2
     {sampleRock, 11, 0},                                                // SFX_ROCK
     {sampleRock2, 10, 0},                                               // SFX_ROCK2
     {sampleDrip2, 10, 0},                                               // SFX_SCORE
+    {sampleWhooshSmall, 9, 0},                                          // SFX_LIFT
+    {sampleDrop, 9, 0},                                                 // SFX_DROP
     {sampleDoge2, 9, 0},                                                // SFX_DOGE
     {sampleDoge3, 9, 0},                                                // SFX_DOGE3
     {sampleDirt, 9, 0},                                                 // SFX_DIRT
@@ -277,6 +394,8 @@ const struct AudioTable AudioSamples[] = {
 #if _ENABLE_LAVA2
     {sampleLava, 2, true},    // 25 SFX_LAVA
 #endif
+
+    {sampleClock, 1, AUDIO_LOCKED | AUDIO_SINGLETON | AUDIO_KILL},      // SFX_CLOCK
 };
 
 _Static_assert(sizeof(AudioSamples) / sizeof(AudioSamples[0]) == SFX_MAX, "AudioSamples table wrong size");
@@ -343,6 +462,20 @@ void processSoundEffects() {
                     audioRequest[id] = false;
                     continue;
                 }
+            }
+
+            if (AudioSamples[id].flags & AUDIO_RETRIGGER) {
+                bool restarted = false;
+                for (int i = 0; i < CONCURRENT_SFX; i++)
+                    if (sfx[i].id == id) {
+                        sfx[i].index = 0;
+                        sfx[i].delay = AudioSamples[id].sample[3];
+                        sfx[i].attenuation = (AudioSamples[id].flags & AUDIO_ATTENUATE) ? rangeRandom(128) | 128 : 255;
+                        restarted = true;
+                        break;
+                    }
+                if (restarted)
+                    continue;
             }
 
             int lowest = -1;

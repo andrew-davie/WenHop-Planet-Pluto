@@ -44,9 +44,9 @@ int weapon;
 const short sin_cos[32] = {
     // clang-format off
     // Combined sin/cos table
-       0,   50,   98,  142,  181,  213,  237,  251,     //   0° (D) to <  90° (R)
+       0,   50,   98,  142,  181,  213,  237,  251,      //   0° (D) to <  90° (R)
      256,  251,  237,  213,  181,  142,   98,   50,      //  90° (R) to < 180° (U)
-       0,  -50,  -98, -142, -181, -213, -237, -251,    // 180° (U) to < 270° (L)
+       0,  -50,  -98, -142, -181, -213, -237, -251,      // 180° (U) to < 270° (L)
     -256, -251, -237, -213, -181, -142,  -98,  -50,      // 270° (L) to <   0° (D)
     // clang-format on
 };
@@ -486,7 +486,7 @@ void drawParticles() {
             }
 
             case PT_BUBBLE: {
-                if (y < lavaSurfaceTrixel) {
+                if (y < (liquidTrixel_8) >> 8) {
                     particle[i].age = 0;
                     continue;
                 }
@@ -505,9 +505,13 @@ void drawParticles() {
                     particle[i].dir += 8;
                 particle[i].trixY_8 += particle[i].dir;
 
-                // Reciprocal-multiply-shift: no hardware/soft divide on this
-                // target. Reciprocal rounded up so exact cell-boundary
-                // positions floor-divide correctly.
+                if (showWater && (particle[i].trixY_8 >> 8) >= (liquidTrixel_8 >> 8)) {
+                    ADDAUDIO(SFX_DRIP2);
+                    nDotsAtTrixel(3, particle[i].trixX_8 >> 8, liquidTrixel_8 >> 8, 12, PT_TWO, 30, 7);
+                    pushParticle(i);
+                    continue;
+                }
+
                 int cellCol = ((particle[i].trixX_8 >> 8) * ((0x10000 + CHAR_TRIX_X - 1) / CHAR_TRIX_X)) >> 16;
                 int cellRow = ((particle[i].trixY_8 >> 8) * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16;
 
@@ -652,6 +656,10 @@ void initWeather() {
     weatherIntensity = theCave->weather;    // meaningful only for the non-255 fixed-rate case
 }
 
+int isStormActive() {
+    return theCave->weather == 255 && weatherPhase == WEATHER_PEAK;
+}
+
 void makeRain() {
 
     if (!theCave->weather)
@@ -669,8 +677,7 @@ void makeRain() {
             return;    // dry -- no spawn attempts at all between storms
 
         case WEATHER_RISE:
-            // Reciprocal-multiply-shift -- no divide instruction, and a
-            // compile-time-constant divisor doesn't get folded either.
+
             weatherIntensity =
                 WEATHER_TORRENTIAL +
                 (((WEATHER_LIGHT - WEATHER_TORRENTIAL) * weatherPhaseTimer) * (0x10000 / WEATHER_RISE_FRAMES) >> 16);
@@ -727,6 +734,7 @@ void makeRain() {
     }
 }
 
+
 int sphereDot(int trixX, int trixY, int type, unsigned char age, unsigned char colour) {
 
 
@@ -754,15 +762,8 @@ int sphereDot(int trixX, int trixY, int type, unsigned char age, unsigned char c
                 particle[whichDrop].colour = colour;
 
                 particle[whichDrop].dir = getRandom32();    // 16.16 angle
-                particle[whichDrop].distance = 0;           // start at the spawn point; radiating-burst
-                                                             // types (nDots/nDotsAtTrixel) grow this via
-                                                             // speed each frame -- PT_SPIRAL2 overrides it
-                                                             // explicitly in nDots() when it wants a head start
+                particle[whichDrop].distance = 0;
             }
-
-            // else {
-            //     FLASH(0x42, 2);
-            // }
         }
     }
 

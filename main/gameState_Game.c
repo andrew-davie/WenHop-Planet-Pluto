@@ -88,6 +88,10 @@ void initGameState_Game() {
 
     exitMode = 0;    // --> initNextlife
 
+    liquidTrixel_8 = 10000;    // defaults reset before decodeCave() so theCave->water can set them
+    showLava = false;
+    showWater = false;
+
     decodeCave(cave);    // TODO: in initNextLife instead
 
 
@@ -111,10 +115,6 @@ void initGameState_Game() {
 
     gravity = 1;
     nextGravity = gravity;
-
-    lavaSurfaceTrixel = 10000;
-    showLava = false;
-    showWater = false;
 
     frame = 0;
 

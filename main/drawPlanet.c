@@ -216,7 +216,13 @@ const signed char line85[] = {
     114,    // 55
     123,    // 56 (was 127: south-pole sample lands exactly on texture_height, giving an
             // out-of-range char_row=4 in scale.py; 123 = row 3, last valid sub-line (27))
-    -1,  -1, -1, -1, -1, -1, -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
 };
 
 #define DIVISOR 12000
@@ -328,7 +334,7 @@ void drawPlanet(int half) {
     const unsigned char *image[6];
 
 
-    int trixLine = 10;    // armFrequency == 70000000 ? 6 : 6 + 7;    // start globe y @
+    int trixLine = 14;    // armFrequency == 70000000 ? 6 : 6 + 7;    // start globe y @
 
     unsigned char *pf0 = trixLine * 3 + RAM + _BUF_GLOBE_PF + (half ? 0 : (3 * _BUFFER_SIZE));
     unsigned char *pf1 = pf0 + _BUFFER_SIZE;

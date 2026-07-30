@@ -227,10 +227,10 @@ void initKernel_Globe() {
 
     sound_volume = VOLUME_PLAYING;
 
-    const int speed = 0x40;    // rangeRandom(80) + 16;
+    // const int speed = 0x40;    // rangeRandom(80) + 16;
 
-    loadTrack(10, track1b, 40, speed, 1);
-    loadTrack(0, track2b, 25, speed, 2);
+    // loadTrack(10, track1b, 40, speed, 1);
+    // loadTrack(0, track2b, 25, speed, 2);
 }
 
 

@@ -68,7 +68,7 @@ extern int level;
 extern int millingTime;    // negative = expired
 extern int doges;
 extern int time;
-extern int lavaSurfaceTrixel;
+extern int liquidTrixel_8;
 extern bool showWater;
 extern bool showLava;
 

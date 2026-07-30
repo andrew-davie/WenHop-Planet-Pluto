@@ -482,6 +482,13 @@ void blitShape(int ch, int trixX, int y, int height, int buffer) {
     const unsigned char *fp = charSet[ch];
 
 
+    // modifier must be derived from the true on-screen scanline the shape
+    // would have started at, BEFORE top-clipping clamps y to 0 -- otherwise
+    // every top-clipped draw picks the same roller phase regardless of how
+    // many scanlines were clipped, desyncing it from the independently
+    // rotating per-scanline colour cycle for 2 out of every 3 clip amounts.
+    int modifier = y + 1;
+
     // clip top
     if (y < 0) {
         fp -= y;
@@ -501,8 +508,6 @@ void blitShape(int ch, int trixX, int y, int height, int buffer) {
     // }
 
     // int modifier = y + colmod;
-
-    int modifier = y + 1;
 
     while (modifier > 2)
         modifier -= 3;

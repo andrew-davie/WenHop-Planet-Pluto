@@ -91,6 +91,11 @@ void decodeCave(int newCave) {
 
     initWeather();    // resets/seeds weatherIntensity from theCave->weather -- see particle.c
 
+    if (theCave->water) {    // as if a CH_WATER tile had been placed at this line
+        showWater = true;
+        liquidTrixel_8 = theCave->water << 8;    // low 8 bits are fractional
+    }
+
     decodingRow = 0;
     decodeFlasher = 1;    // 21;
     totalDogePossible = 0;
@@ -315,8 +320,8 @@ void StoreObject(int x, int y, objectType anObject) {
 
         showLava = true;
         int line = y * CHAR_TRIX_Y;
-        if (lavaSurfaceTrixel > 0 && line < lavaSurfaceTrixel)
-            lavaSurfaceTrixel = line;
+        if ((liquidTrixel_8 >> 8) > 0 && line < (liquidTrixel_8 >> 8))
+            liquidTrixel_8 = line << 8;
 
         break;
     }
@@ -324,9 +329,9 @@ void StoreObject(int x, int y, objectType anObject) {
     case TYPE_WATER: {
 
         showWater = true;
-        int line = y * CHAR_TRIX_Y;
-        if (lavaSurfaceTrixel > 0 && line < lavaSurfaceTrixel)
-            lavaSurfaceTrixel = line;
+        int line = (y + 1) * CHAR_TRIX_Y;
+        if ((liquidTrixel_8 >> 8) > 0 && line < (liquidTrixel_8 << 8))
+            liquidTrixel_8 = line << 8;
 
         break;
     }

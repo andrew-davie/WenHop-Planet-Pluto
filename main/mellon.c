@@ -270,6 +270,7 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
                     drop = true;
                     attachmentOffset = dropOffset[dir];
+                    ADDAUDIO(SFX_DROP);
                     return true;
                 }
             }
@@ -284,6 +285,8 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                     faceDirection = faceDirectionDef[dir];
 
                     attachment = pickup;
+
+                    ADDAUDIO(SFX_LIFT);
 
                     extern const unsigned char AnimateBomb[];
                     if (pickup == CH_BOMB)
@@ -382,8 +385,9 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
             // floatingCharacter(x, y, 30, CH_PLUS);
 
 
-            ADDAUDIO(SFX_ZAP2);
-            ADDAUDIO(SFX_WHOOSH);
+            // ADDAUDIO(SFX_ZAP2);
+            // ADDAUDIO(SFX_WHOOSH);
+            ADDAUDIO(SFX_BONUS);
             weapon = theCave->weapon[level];
             nDots(10, playerX + xdir[dir], playerY + ydir[dir], PT_SPIRAL2, 40, 3, 4, 50, 7);
 
@@ -641,9 +645,19 @@ void movePlayer(BoardCursor *cur) {
         *meAtt = attachment;
         drop = false;
 
-        if (Attribute[CharToType[GET(attachment)]] & ATT_MASSIVE &&
-            Attribute[CharToType[GET(*(meAtt + _BOARD_COLS))]] & ATT_MASSIVE)
-            shakeTime = 4;
+        if (Attribute[CharToType[GET(attachment)]] & ATT_MASSIVE) {
+
+            int attBelow = Attribute[CharToType[GET(*(meAtt + _BOARD_COLS))]];
+
+            // matches board.c's CH_ROCK_FALLING "stop falling" landing:
+            // any solid, non-squashable surface underneath counts, not
+            // just another massive object -- dirt/wall/steel included.
+            if (!(attBelow & ATT_BLANK) && !(attBelow & ATT_SQUASHABLE_TO_BLANKS)) {
+
+                shakeTime = 4;
+                ADDAUDIO(attBelow & ATT_HARD ? SFX_ROCK : SFX_ROCK2);
+            }
+        }
 
 
         waitRelease = true;
@@ -660,15 +674,19 @@ void movePlayer(BoardCursor *cur) {
 
     // breath bubbles
     static int breath;
-    if (showWater && playerY * CHAR_TRIX_Y > lavaSurfaceTrixel) {
+    if (showWater && playerY * CHAR_TRIX_Y > (liquidTrixel_8 << 8)) {
 
         breath++;
         if (!(breath & 35) && (breath & 63) < 21) {
             int x = (playerX * 5) + 3;
             int y = (playerY * CHAR_TRIX_Y) + 4;
             bubbles(1, x - 1, y - 2, 400, 0x1000);
+            ADDAUDIO(SFX_BUBBLER);
         }
     }
+
+    else
+        killAudio(SFX_BUBBLER);
 
     static unsigned char lastUsableSWCHA = 0;
 

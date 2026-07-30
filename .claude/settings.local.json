@@ -32,7 +32,25 @@
       "Bash(clang -std=c11 -O0 -o life_sim3 life_sim3.c)",
       "Bash(./life_sim3)",
       "Bash(clang -std=c11 -O0 -o life_wrap_diff life_wrap_diff.c)",
-      "Bash(./life_wrap_diff)"
+      "Bash(./life_wrap_diff)",
+      "Bash(tmux capture-pane *)",
+      "Bash(awk 'NR<=784 && /^const unsigned char P[0-9]+_/{name=$0; line=NR} END{}' main/caveData.c)",
+      "Bash(awk -F: '{print $1, $2}')",
+      "Bash(cd \"/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto\" && ls ../../ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/ 2>/dev/null | head -5; which arm-none-eabi-gcc 2>/dev/null)",
+      "Read(//Users/boo/Documents/software/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/**)",
+      "Bash(make caveData.o decodeCaves.o gameState_Game.o)",
+      "Bash(tmux kill-session *)",
+      "Bash(make caveData.o)",
+      "Bash(make particle.o)",
+      "Bash(make sound.o board.o)",
+      "Bash(make sound.o)",
+      "Bash(make sound.o mellon.o)",
+      "Bash(make mellon.o)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(cat ~/.claude/settings.json 2>/dev/null; echo \"---\"; cat \"/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto/.claude/settings.local.json\" 2>/dev/null)",
+      "Read(//Users/boo/.claude/**)",
+      "Bash(make draw.o)"
     ]
   }
 }
