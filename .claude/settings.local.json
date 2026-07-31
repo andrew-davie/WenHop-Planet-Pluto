@@ -51,7 +51,17 @@
       "Bash(cat ~/.claude/settings.json 2>/dev/null; echo \"---\"; cat \"/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto/.claude/settings.local.json\" 2>/dev/null)",
       "Read(//Users/boo/.claude/**)",
       "Bash(make draw.o)",
-      "Bash(awk 'NR==223{print \"223 -> index0 \\(TYPE_BLANK\\)\"} NR>=223 && NR<=276 {print NR\": \"$0}' attribute.c)"
+      "Bash(awk 'NR==223{print \"223 -> index0 \\(TYPE_BLANK\\)\"} NR>=223 && NR<=276 {print NR\": \"$0}' attribute.c)",
+      "Bash(python3 -c ' *)",
+      "Bash(grep -B2 -E \"^\\\\s*[0-9]+,\\\\s*$\")",
+      "Bash(python3 \"/private/tmp/claude-501/-Users-boo-Documents-software-Atari-2600-WenHop-Planet-Pluto/5b49e2e0-3142-4dcf-b306-9a36eaff59b4/scratchpad/proto.py\")",
+      "Bash(python3 tools/sprite_sheet_import.py gfx/TIX/astronaut-guy-sheet-v10.png --dry-run)",
+      "Bash(python3 tools/sprite_sheet_import.py gfx/TIX/astronaut-guy-sheet-v10.png)",
+      "Bash(gcc -fsyntax-only -I main main/sprites.c)",
+      "Bash(cd \"/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto\" && rm -f /tmp/crop*.png /tmp/band*.png)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
     ]
   }
 }
