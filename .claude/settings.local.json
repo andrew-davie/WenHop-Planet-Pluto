@@ -50,7 +50,8 @@
       "Skill(update-config:*)",
       "Bash(cat ~/.claude/settings.json 2>/dev/null; echo \"---\"; cat \"/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto/.claude/settings.local.json\" 2>/dev/null)",
       "Read(//Users/boo/.claude/**)",
-      "Bash(make draw.o)"
+      "Bash(make draw.o)",
+      "Bash(awk 'NR==223{print \"223 -> index0 \\(TYPE_BLANK\\)\"} NR>=223 && NR<=276 {print NR\": \"$0}' attribute.c)"
     ]
   }
 }

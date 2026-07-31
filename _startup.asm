@@ -105,13 +105,6 @@ initJumpCode        lda jumpCode,x
 ; DO NOT RUN *THIS* CODE AS IT WILL CRASH. JUMP TO THE RAM VERSION!
 
 
-JUMP_CODE_START
-jumpCode       	    cmp BANK1           ; hotspot bank-switch
-                    jsr 0               ; selfmod
-                    cmp BANK0           ; hotspot bank-switch
-                    rts
-JUMP_CODE_END
-
 
 ;-------------------------------------------------------------------------------
 ; EOF

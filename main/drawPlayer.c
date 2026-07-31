@@ -135,7 +135,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
         int frameXOffset = -*(const signed char *)spr++;
         int frameYOffset = *(const signed char *)spr++;
 
-        int lavaLine = ((liquidTrixel_8 << 8) - (scrollY >> 16)) * 3;
+        int lavaLine = ((liquidTrixel_8 >> 8) - (scrollY >> 16)) * 3;
         playerSpriteY = ypos - frameYOffset - 1;
 
 
@@ -199,8 +199,13 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
                     p1Colour[destLine] = convertColour(postProcessPlayerColours[c2]);
 
                     if (playerSpriteY++ >= lavaLine) {
-                        p0Colour[destLine] = ((p0Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);
-                        p1Colour[destLine] = ((p1Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);
+                        if (showWater) {
+                            p0Colour[destLine] = 0x96;    // light blue -- matches colour.c's wbg[] underwater backdrop
+                            p1Colour[destLine] = 0x96;
+                        } else {
+                            p0Colour[destLine] = ((p0Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);
+                            p1Colour[destLine] = ((p1Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);
+                        }
                     }
                 }
 
@@ -245,7 +250,10 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
                     p0Colour[destLine] = convertColour(postProcessPlayerColours[c1]);
 
                     if (playerSpriteY++ >= lavaLine) {
-                        p0Colour[destLine] = ((p0Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);
+                        if (showWater)
+                            p0Colour[destLine] = 0x96;    // light blue -- matches colour.c's wbg[] underwater backdrop
+                        else
+                            p0Colour[destLine] = ((p0Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);
                     }
                 }
                 int lum = (p0Colour[destLine] & 0xF) + luminance;

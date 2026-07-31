@@ -330,7 +330,7 @@ void StoreObject(int x, int y, objectType anObject) {
 
         showWater = true;
         int line = (y + 1) * CHAR_TRIX_Y;
-        if ((liquidTrixel_8 >> 8) > 0 && line < (liquidTrixel_8 << 8))
+        if ((liquidTrixel_8 >> 8) > 0 && line < (liquidTrixel_8 >> 8))
             liquidTrixel_8 = line << 8;
 
         break;

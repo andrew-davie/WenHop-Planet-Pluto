@@ -57,6 +57,11 @@ bool showWater;
 bool showLava;
 
 int cave;
+bool caveSequenceStarted;    // set true the moment any game actually starts (initGameState_Game()),
+                              // regardless of whether GS_MENU ran first -- lets initKernel_Menu()
+                              // tell a genuine first-ever boot apart from "a cave was already played
+                              // via some path that bypassed the menu", so it doesn't hand out cave 0
+                              // twice.
 unsigned char bufferedSWCHA;
 unsigned int usableSWCHA;
 unsigned int inhibitSWCHA;

@@ -487,7 +487,7 @@ void drawParticles() {
 
             case PT_BUBBLE: {
                 if (y < (liquidTrixel_8) >> 8) {
-                    particle[i].age = 0;
+                    pushParticle(i);
                     continue;
                 }
 

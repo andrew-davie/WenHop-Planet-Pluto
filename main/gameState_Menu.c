@@ -72,11 +72,12 @@ void initKernel_Menu() {
 
     flashTime2 = 0;
 
-    static int showCave = -1;
-    if (++showCave >= caveCount)
-        showCave = 0;
+    // caveSequenceStarted is only false on a genuine first-ever entry (nothing has played yet,
+    // including via a menu-bypassing dev shortcut) -- see main.c. In that case cave keeps its
+    // zero-initialised default. Otherwise, advance to the next cave in sequence, wrapping.
+    if (caveSequenceStarted && ++cave >= caveCount)
+        cave = 0;
 
-    cave = showCave;
     level = 0;
 
     colubk = 0;

@@ -243,7 +243,7 @@ const unsigned char P0_caveWater[] = {
 
     60,  4,4,                           // milling
     10, 15,                         // doge $
-    0, //255,                              // weather (255 = storms)
+    255,                              // weather (255 = storms)
     17+SCREEN_TRIX_Y,                // water -- this cave is locked to bounds_t == 17 (see resetTracking() in scroll.c), so just offscreen is bounds_t + SCREEN_TRIX_Y
 
      17,  11,  50,  56,  8,         // randomiser[level]
@@ -306,6 +306,255 @@ const unsigned char P0_caveWater[] = {
 
     // clang-format on
 };
+
+
+//------------------------------------------------------------------------------
+// DEV RIG: exercises every CH_* that (a) is still _untimed_ in board.c's budget[]
+// table and (b) actually has case-statement handling in board.c (via processTypes'
+// switch(type) or processCreatures' switch(creature)) -- so DEBUG_TIMES gets a real
+// sample instead of the 12500 placeholder. Objects with a case but no ATT_PHASE*
+// bit in Attribute[] (CH_DOOROPEN_0/CH_EXITBLANK via TYPE_OUTBOX, CH_ROCK_BONUS via
+// TYPE_ROCK_BONUS) are never selected by processBoardSquares()'s phase gate, so
+// their case is unreachable there regardless -- deliberately left off this rig.
+// Installed as caveList[0] in place of P0_caveWater (still defined above, untouched
+// -- swap the caveList[] entry back to restore it).
+const unsigned char P0_caveChTiming[] = {
+    // clang-format off
+
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,   // scroll bounds -- full board, free-scrolling
+
+    0x98, 0x26, 0xC6,               // palette
+
+    20, 4,4,                        // milling
+    10, 15,                         // doge $
+    0,                              // weather -- off, keep the board quiet
+    0,                              // water -- off; also keeps liquidTrixel_8 at its
+                                     // off-board sentinel, which is what lets the
+                                     // CH_WATERFLOW_0..4 cascade below keep extending
+                                     // (processWaterFlow only advances while
+                                     // line < liquidTrixel_8>>8)
+
+    0, 0, 0, 0, 0,                  // randomiser[level] -- non-deterministic
+    0, 0, 0, 0, 0,                  // doge req -- 0 so the door opens immediately
+    200, 200, 200, 200, 200,        // time -- generous, this cave isn't meant to be "won"
+
+    WEAPON_MACE,                    // 0
+    WEAPON_MACE,                    // 1
+    WEAPON_MACE,                    // 2
+    WEAPON_MACE,                    // 3
+    WEAPON_MACE,                    // 4
+
+    CAVEDEF_START_WITH_WEAPON, CH_STEELWALL, CH_BLANK,    // flags, border, fill
+
+    0,    // no random per-cell objects -- every placement below is explicit/deterministic
+
+    CH_MELLON_HUSK_BIRTH, 2, 2,
+    CH_DOOROPEN_0, 2, 20,
+
+    // row 3 -- CH_PEBBLE1, CH_PEBBLE2 (TYPE_PEBBLE1), CH_DOGE_STATIC (TYPE_DOGE),
+    //          CH_PEBBLE_ROCK, CH_ROCK_PEBBLE
+    CH_PEBBLE1, 3, 3,
+    CH_PEBBLE2, 10, 3,
+    CH_DOGE_STATIC, 17, 3,
+    CH_PEBBLE_ROCK, 24, 3,
+    CH_ROCK_PEBBLE, 31, 3,
+
+    // row 6 -- CH_ROCK_PEBBLE_1, and the four CH_PUSH_LEFT/RIGHT(+REVERSE) pushers
+    // (blank neighbour in the push direction, from interiorCharacter, is enough to
+    // exercise genericPush()'s/genericPushReverse()'s live branch)
+    CH_ROCK_PEBBLE_1, 3, 6,
+    CH_PUSH_LEFT, 10, 6,
+    CH_PUSH_LEFT_REVERSE, 17, 6,
+    CH_PUSH_RIGHT, 24, 6,
+    CH_PUSH_RIGHT_REVERSE, 31, 6,
+
+    // row 9 -- CH_PUSH_UP/DOWN(+REVERSE), CH_BLOCK (needs blank below -> falls once)
+    CH_PUSH_UP, 3, 9,
+    CH_PUSH_UP_REVERSE, 10, 9,
+    CH_PUSH_DOWN, 17, 9,
+    CH_PUSH_DOWN_REVERSE, 24, 9,
+    CH_BLOCK, 31, 9,
+
+    // row 11 -- CH_ROCK anchors (already timed; ATT_CONVEYOR, and stable since
+    // TYPE_GRINDER/TYPE_BELT aren't ATT_BLANK) so the grinders/belts below actually
+    // have something to feed instead of idling in their do-nothing branch
+    CH_ROCK, 3, 11,
+    CH_ROCK, 10, 11,
+    CH_ROCK, 17, 11,
+    CH_ROCK, 24, 11,
+
+    // row 12 -- CH_GRINDER_0/1, CH_BELT_0/1, CH_CONVERT_PIPE
+    // NOTE: StoreObject() force-parities a literal CH_GRINDER_0 placement to
+    // CH_GRINDER_1 when (x+y) is even ("ensure parity on gears") -- (3+12)=15 is
+    // odd, so this one lands as authored. The second slot is written directly as
+    // CH_GRINDER_1, which isn't subject to that override.
+    CH_GRINDER_0, 3, 12,
+    CH_GRINDER_1, 10, 12,
+    CH_BELT_0, 17, 12,
+    CH_BELT_1, 24, 12,
+    CH_CONVERT_PIPE, 31, 12,
+
+    // row 15 -- CH_DOGE_FALLING_TOP2 (blank below it, from interiorCharacter, is all
+    // it needs), CH_STAR_EXPLODE (self-paced by the shared Animate[] cycle)
+    CH_DOGE_FALLING_TOP2, 3, 15,
+    CH_STAR_EXPLODE, 10, 15,
+
+    // col 36 -- CH_OUTLET seeds CH_WATERFLOW_0 (both carry ATT_WATERFLOW, satisfying
+    // processWaterFlow()'s "above must be flow-carrying" check), which then rolls
+    // itself downward through _1/_2/_3/_4 one step per advance as it falls down the
+    // clear column beneath -- covers all five untimed CH_WATERFLOW_* from one seed
+    CH_OUTLET, 36, 1,
+    CH_WATERFLOW_0, 36, 2,
+
+    DRAW_EOF,
+
+    // no per-level extras -- everything above applies at every level (level is
+    // always 0 in practice; see gameState_Menu.c)
+    DRAW_EOF,    // LEVEL 0
+    DRAW_EOF,    // LEVEL 1
+    DRAW_EOF,    // LEVEL 2
+    DRAW_EOF,    // LEVEL 3
+    DRAW_EOF,    // LEVEL 4
+
+    'C', 'H', 'T', 'E', 'S', 'T', END_STRING
+
+    // clang-format on
+};
+
+//------------------------------------------------------------------------------
+// "VAULT BREACH" -- purpose-built level, installed as caveList[0] in place of the
+// CH_ timing rig above (still defined, untouched, easily restored).
+//
+// interiorCharacter is CH_DIRT, not CH_BLANK -- the visible window is only
+// SCREEN_TRIX_X x SCREEN_TRIX_Y (40x66 trix, ~8x6.6 board cells) at a time, so an
+// open BOARD_TRIX_X x BOARD_TRIX_Y (40x22-cell) board reads as long stretches of
+// dead black if left blank. Dirt is ATT_PERMEABLE (walks/digs like open floor,
+// mellon.c's moveHusk) but renders as ground, so the whole board stays visibly
+// textured; CH_BLANK is used only where a room deliberately needs to read as
+// open space (the vault interior). A light CH_ROCK/CH_GEODOGE scatter (randomiser
+// block below) adds organic variation and a few extra optional mining targets on
+// top of that base texture, same recipe the real planet caves use.
+//
+// Three rooms, west to east:
+//
+//  1. MINING YARD (cols 2-11) -- spawn, plus two CH_ROCK at (5,4)/(5,5) blocking
+//     the CH_BOMB at (8,4). Contact-pushing into a rock is what mines it (not a
+//     held action separate from movement -- checkLowPriorityMove's ATT_MINE path
+//     counts consecutive frames of moving into it, mellon.c) -- rocks don't mine
+//     themselves, the player mining them is what a joystick move into one does.
+//     Three more CH_GEODOGE (4,7)/(9,3)/(10,8) are optional mining side-targets:
+//     each becomes a doge in its own right, on top of the vault's cache below.
+//
+//  2. CHARGED CORRIDOR (cols 13-20) -- CH_BRICKWALL top/bottom framing (rows 2
+//     and 10) around three CH_INSULATOR_TOP/BOTTOM pairs (cols 14/16/18,
+//     rows 3/9), same idiom P1_caveUseWall uses. The gap between a pair arcs on
+//     and off in a travelling wave (setInsulatorPattern, board.c); crossing means
+//     timing the gaps, or ducking into one of the untouched lanes (13/15/17/19).
+//     Carry the bomb through here -- the detour is the point.
+//
+//  3. THE VAULT (cols 22-37) -- CH_BRICKWALL partition at col 22, breached only
+//     by bombing its 3-tall CH_CRACKED_BRICK weak point at (22, 5..7); plain
+//     brickwall isn't ATT_EXPLODABLE (explode(), board.c), so there's no way
+//     through except carrying the bomb the whole way from room 1. Drop it at
+//     (21,6) facing right -> it lands at (22,6); the blast's 3x3 footprint
+//     (cols 21-23, rows 5-7) covers all three cracked-brick cells, and the
+//     player's own cell is ATT_EXPLODABLE too, so retreat before the fuse
+//     (AnimateBomb) burns out. Rubble decays to CH_BLANK a couple of frames
+//     later. Inside, cleared to open CH_BLANK floor: a CH_CONVERT_GEODE_TO_DOGE
+//     seed at (27,5) has been chain-reacting through five adjacent CH_GEODOGE
+//     (28-32,5) since the level started (see its case, board.c) -- 6 doges
+//     waiting there alone. Door's at (34,5).
+//
+// dogeRequired is 5 -- covered by the vault cluster by itself with one spare, so
+// the level is always finishable via the designed path; the three yard geodoges
+// are pure bonus for a thorough player. water is set low and barely rising (see
+// below) -- background tension, not a hard gate on any of the above.
+const unsigned char P0_caveVaultBreach[] = {
+    // clang-format off
+
+    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,   // scroll bounds -- full board, free-scrolling
+
+    0x98, 0x26, 0xC6,               // palette
+
+    20, 4,4,                        // milling
+    10, 15,                         // doge $
+    0,                              // weather -- clean, no distractions
+    BOARD_TRIX_Y - 15,              // water -- starts almost at the very bottom of
+                                     // the board and creeps up slowly; ambient
+                                     // pressure, not a gate on the route above
+
+    0, 0, 0, 0, 0,                  // randomiser[level] -- non-deterministic
+    5, 5, 5, 5, 5,                  // doge req -- 5 of the 6 vault doges (3 more
+                                     // available as yard bonus, uncounted)
+    200, 200, 200, 200, 200,        // time
+
+    WEAPON_MACE,                    // 0
+    WEAPON_MACE,                    // 1
+    WEAPON_MACE,                    // 2
+    WEAPON_MACE,                    // 3
+    WEAPON_MACE,                    // 4
+
+    0, CH_STEELWALL, CH_DIRT,       // flags, border, fill -- dirt, see note above
+
+    // light organic scatter on top of the dirt fill -- same recipe the real
+    // planet caves use (e.g. P1_caveUseWall)
+    2,
+    CH_ROCK, 25,25,25,25,25,
+    CH_GEODOGE, 15,15,15,15,15,
+
+    CH_MELLON_HUSK_BIRTH, 2, 4,
+
+    // room 1 -- mining yard
+    CH_ROCK, 5, 4,
+    CH_ROCK, 5, 5,
+    CH_BOMB, 8, 4,
+    CH_GEODOGE, 4, 7,
+    CH_GEODOGE, 9, 3,
+    CH_GEODOGE, 10, 8,
+
+    // room 2 -- charged corridor
+    DRAW_LINE, CH_BRICKWALL, 13, 2, 2, 8,
+    DRAW_LINE, CH_BRICKWALL, 13, 10, 2, 8,
+    CH_INSULATOR_TOP, 14, 3,
+    CH_INSULATOR_BOTTOM, 14, 9,
+    CH_INSULATOR_TOP, 16, 3,
+    CH_INSULATOR_BOTTOM, 16, 9,
+    CH_INSULATOR_TOP, 18, 3,
+    CH_INSULATOR_BOTTOM, 18, 9,
+
+    // room 3 -- the vault: partition, weak point, cleared interior, cache, door
+    DRAW_LINE, CH_BRICKWALL, 22, 1, 4, 20,
+    CH_CRACKED_BRICK, 22, 5,
+    CH_CRACKED_BRICK, 22, 6,
+    CH_CRACKED_BRICK, 22, 7,
+
+    DRAW_FILLED_RECT, CH_BLANK, 24, 2, 13, 8, CH_BLANK,
+
+    CH_CONVERT_GEODE_TO_DOGE, 27, 5,
+    CH_GEODOGE, 28, 5,
+    CH_GEODOGE, 29, 5,
+    CH_GEODOGE, 30, 5,
+    CH_GEODOGE, 31, 5,
+    CH_GEODOGE, 32, 5,
+
+    CH_DOOROPEN_0, 34, 5,
+
+    DRAW_EOF,
+
+    // no per-level extras -- everything above applies at every level (level is
+    // always 0 in practice; see gameState_Menu.c)
+    DRAW_EOF,    // LEVEL 0
+    DRAW_EOF,    // LEVEL 1
+    DRAW_EOF,    // LEVEL 2
+    DRAW_EOF,    // LEVEL 3
+    DRAW_EOF,    // LEVEL 4
+
+    'V', 'A', 'U', 'L', 'T', END_STRING
+
+    // clang-format on
+};
+
+//------------------------------------------------------------------------------
 
 
 const unsigned char P0_caveNew[] = {
@@ -1244,9 +1493,10 @@ void empty() {
 const struct caveHandler caveList[] = {
 
 
-    {P0_caveWater, none},
+    {P0_caveVaultBreach, none},    // "Vault Breach" -- swap back to {P0_caveWater, none} (or
+                                    // {P0_caveChTiming, none}) to restore either earlier rig
     // PLANET 0
-    {P0_caveNew, none},    // GOOD puzzle screen
+    //    {P0_caveNew, none},    // GOOD puzzle screen
     {caveraintest, none},
     {cavetest, none},
 

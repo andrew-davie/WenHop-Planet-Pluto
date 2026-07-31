@@ -66,6 +66,7 @@ void initKernel_Game() {
 
 void initGameState_Game() {
 
+    caveSequenceStarted = true;
 
     initBoard();
     initNewGame();
@@ -88,7 +89,12 @@ void initGameState_Game() {
 
     exitMode = 0;    // --> initNextlife
 
-    liquidTrixel_8 = 10000;    // defaults reset before decodeCave() so theCave->water can set them
+    liquidTrixel_8 = (BOARD_TRIX_Y + CHAR_TRIX_Y) << 8;    // just under the board's bottom bound --
+                                                            // matches caveData.c's own "off the bottom
+                                                            // of the board" caves -- so decodeCave()'s
+                                                            // theCave->water, or a scanned water/lava
+                                                            // tile, always has something lower to pull
+                                                            // this down to
     showLava = false;
     showWater = false;
 
@@ -198,8 +204,19 @@ void VB_Game() {
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
-        if (!exitMode || autoMoveX || autoMoveY)
-            drawPlayerSprite();
+        // Always draw -- playerX/playerY (what this and scroll() both track) update the
+        // instant the exit door is stepped on (mellon.c's checkHighPriorityMove), but
+        // moveHusk() -- which would normally move the board's own CH_MELLON_HUSK cell to
+        // match -- is deliberately skipped there so the door tile can show CH_EXITBLANK
+        // instead. That leaves a stale CH_MELLON_HUSK sitting in the board array at the
+        // player's *previous* cell for the rest of exitMode's countdown (board.c's
+        // TYPE_MELLON_HUSK case needs a cell of that type to keep finding on each scan, or
+        // the countdown -> setGameState(GS_MENU) never fires), and it's still drawn as a
+        // tile via AnimMellonHusk. Suppressing this sprite once exitMode settled left that
+        // stale, wrongly-positioned tile glyph as the only visible "player" on screen --
+        // frozen one cell behind, not following the camera in to the door. Keeping the
+        // correctly-tracked sprite visible throughout covers for it.
+        drawPlayerSprite();
 
         if (!maskNeeded) {
 

@@ -620,7 +620,7 @@ bool checkLowPriorityMove(BoardCursor *cur, int dir) {
 
 void bubbles(int count, int dripX, int dripY, int age, int /*speed*/) {
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(dripX, dripY, PT_BUBBLE, age, 1);
+        int idx = sphereDot(dripX, dripY, PT_BUBBLE, age, 7);
         if (idx >= 0) {
             particle[idx].speed = 10;
             particle[idx].dir = 128 + rangeRandom(64) - 32;
@@ -674,7 +674,7 @@ void movePlayer(BoardCursor *cur) {
 
     // breath bubbles
     static int breath;
-    if (showWater && playerY * CHAR_TRIX_Y > (liquidTrixel_8 << 8)) {
+    if (showWater && playerY * CHAR_TRIX_Y > (liquidTrixel_8 >> 8)) {
 
         breath++;
         if (!(breath & 35) && (breath & 63) < 21) {
