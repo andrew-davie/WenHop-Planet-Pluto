@@ -341,52 +341,69 @@ def main():
     for e in existing:
         by_sig.setdefault((e['is_double'], e['n_rows'], e['rows']), e['name'])
 
-    matched = []   # (frame, existing_shape_name)
-    new_frames = []
+    # Two sheet frames with identical (colour-blind) pixel data are the same
+    # frame - whether that frame already exists in sprites.c, or whether two
+    # (or more) spots on THIS sheet happen to draw the same pose. Either way
+    # we only want one shape_* array; every position it was seen at gets
+    # recorded for the "// sheet:" provenance comment(s).
+    matched = []              # (frame, existing_shape_name) - name already in sprites.c
+    new_frames = []           # canonical frame, one per brand-new signature (first occurrence)
+    new_frame_positions = {}  # new frame name -> list of (x0,y0), all sheet occurrences
+    sig_to_new_name = {}
     for f in frames:
         sig = (f['is_double'], f['n_rows'], tuple(f['rows']))
-        name = by_sig.get(sig)
-        if name:
-            matched.append((f, name))
+        x0, y0 = f['bbox'][0], f['bbox'][1]
+        if sig in by_sig:
+            matched.append((f, by_sig[sig]))
+        elif sig in sig_to_new_name:
+            new_frame_positions[sig_to_new_name[sig]].append((x0, y0))
         else:
+            name = frame_name(x0, y0)
+            sig_to_new_name[sig] = name
+            new_frame_positions[name] = [(x0, y0)]
             new_frames.append(f)
+
+    matched_positions = {}  # existing name -> list of (x0,y0)
+    for f, name in matched:
+        matched_positions.setdefault(name, []).append((f['bbox'][0], f['bbox'][1]))
+
+    sheet_dupe_groups = ([(name, pos) for name, pos in matched_positions.items() if len(pos) > 1]
+                          + [(name, pos) for name, pos in new_frame_positions.items() if len(pos) > 1])
 
     print(f"Sheet: {sheet_name}  ({w}x{h})")
     print(f"Segmented frames: {len(frames)}  (dropped {dropped_all_red} all-red info marks)")
-    print(f"Matched existing: {len(matched)}   New: {len(new_frames)}")
+    print(f"Matched existing: {len(matched)}   New (unique): {len(new_frames)}")
+    if sheet_dupe_groups:
+        print(f"Duplicate poses on this sheet: {len(sheet_dupe_groups)} group(s) collapsed to one shape each")
     print()
 
     if args.dry_run:
-        for f, name in matched:
-            x0, y0 = f['bbox'][0], f['bbox'][1]
-            print(f"  MATCH  {name:30s} @ ({x0},{y0})")
+        for name, positions in sorted(matched_positions.items()):
+            tag = "MATCH" if len(positions) == 1 else f"MATCH (x{len(positions)} on sheet)"
+            print(f"  {tag:24s} {name:30s} @ {positions}")
         for f in new_frames:
             x0, y0 = f['bbox'][0], f['bbox'][1]
-            print(f"  NEW    {frame_name(x0, y0):30s} @ ({x0},{y0})  "
+            name = frame_name(x0, y0)
+            positions = new_frame_positions[name]
+            tag = "NEW" if len(positions) == 1 else f"NEW (x{len(positions)} on sheet)"
+            print(f"  {tag:24s} {name:30s} @ {positions}  "
                   f"{'double' if f['is_double'] else 'single'}  {f['n_rows']} rows")
         print("\n(dry run - no files modified)")
         return
 
     # --- Update comments on matched existing shapes -------------------------
     name_to_shape = {e['name']: e for e in existing}
-    # Collect edits keyed by decl_line so we can apply them without
-    # invalidating other line indices (we insert/replace comment lines
-    # directly above each declaration, processing bottom-to-top).
     edits = []  # (top_line_idx, decl_line_idx, new_comment_lines)
-    for f, name in matched:
+    for name, positions in matched_positions.items():
         shape = name_to_shape[name]
-        x0, y0 = f['bbox'][0], f['bbox'][1]
         top, comments = find_preceding_sheet_comments(sprites_c_lines, shape['decl_line'])
-        comments[sheet_name] = None  # mark this sheet as needing (re)write
-        new_lines = []
-        # preserve insertion order: existing sheets first (in original top-down
-        # order), updating this sheet's line in place; append if new
-        ordered_files = sorted(comments.keys(),
-                                key=lambda fn: comments[fn] if comments[fn] is not None else 1 << 30)
-        for fn in ordered_files:
-            new_lines.append(sheet_comment_line(fn, x0, y0) if fn == sheet_name
-                              else sprites_c_lines[comments[fn]])
-        edits.append((top, shape['decl_line'], new_lines))
+        # Fully replace this sheet's comment line(s) with the complete,
+        # freshly-computed set of positions found on it this run; leave any
+        # other sheet's comment line(s) exactly as they were.
+        other_lines = [sprites_c_lines[idx] for fn, idx in comments.items() if fn != sheet_name]
+        this_sheet_lines = [sheet_comment_line(sheet_name, x0, y0)
+                             for x0, y0 in sorted(positions, key=lambda p: (p[1], p[0]))]
+        edits.append((top, shape['decl_line'], other_lines + this_sheet_lines))
 
     edits.sort(key=lambda e: e[0], reverse=True)
     for top, decl_line, new_lines in edits:
@@ -409,7 +426,8 @@ def main():
             x0, y0 = f['bbox'][0], f['bbox'][1]
             name = frame_name(x0, y0)
             new_names.append(name)
-            insertion.append(sheet_comment_line(sheet_name, x0, y0))
+            for px, py in sorted(new_frame_positions[name], key=lambda p: (p[1], p[0])):
+                insertion.append(sheet_comment_line(sheet_name, px, py))
             insertion.extend(format_new_shape_block(name, f))
 
         sprites_c_lines[clang_on_idx:clang_on_idx] = insertion
@@ -466,7 +484,7 @@ def main():
         subprocess.run([sys.executable, str(SPRITE_VIS), str(sprites_c_path)], check=True)
 
     # --- Report ------------------------------------------------------------
-    print(f"Updated {len(matched)} existing shape(s) with sheet-location comments.")
+    print(f"Updated {len(matched_positions)} existing shape(s) with sheet-location comments.")
     print(f"Added {len(new_names)} new shape(s):")
     for f, name in zip(new_frames, new_names):
         x0, y0 = f['bbox'][0], f['bbox'][1]
@@ -475,6 +493,11 @@ def main():
     if new_names:
         print("\nNew shapes use placeholder colour HMT0 throughout and a centre point")
         print("at the bottom row, middle column - review/rename/recolour as needed.")
+    if sheet_dupe_groups:
+        print(f"\n{len(sheet_dupe_groups)} pose(s) appear more than once on this sheet "
+              f"(collapsed to a single shape, all locations recorded):")
+        for name, positions in sheet_dupe_groups:
+            print(f"  {name:30s} @ {sorted(positions, key=lambda p: (p[1], p[0]))}")
 
 
 if __name__ == '__main__':

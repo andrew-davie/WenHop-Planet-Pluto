@@ -58,7 +58,19 @@
       "Bash(python3 tools/sprite_sheet_import.py gfx/TIX/astronaut-guy-sheet-v10.png --dry-run)",
       "Bash(python3 tools/sprite_sheet_import.py gfx/TIX/astronaut-guy-sheet-v10.png)",
       "Bash(gcc -fsyntax-only -I main main/sprites.c)",
-      "Bash(cd \"/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto\" && rm -f /tmp/crop*.png /tmp/band*.png)"
+      "Bash(cd \"/Users/boo/Documents/software/Atari 2600/WenHop-Planet-Pluto\" && rm -f /tmp/crop*.png /tmp/band*.png)",
+      "Bash(cp /tmp/sprites_c_before.txt /tmp/test_sprites.c)",
+      "Bash(python3 tools/sprite_sheet_import.py gfx/TIX/astronaut-guy-sheet-v10.png --sprites-c /tmp/test_sprites.c --dry-run)",
+      "Bash(python3 tools/sprite_sheet_import.py gfx/TIX/astronaut-guy-sheet-v10.png --sprites-c /tmp/regen_sprites.c --sprites-h /tmp/regen_sprites.h)",
+      "Bash(gcc -fsyntax-only -I main /tmp/regen_sprites.c)",
+      "Bash(gcc -fsyntax-only -I /tmp/synctest /tmp/synctest/sprites.c)",
+      "Bash(rm -f /tmp/sprites_c_before.txt /tmp/sprites_h_before.txt /tmp/regen_sprites.c /tmp/regen_sprites.h /tmp/test_sprites.c)",
+      "Bash(rm -rf /tmp/synctest)",
+      "Skill(fewer-permission-prompts)",
+      "Skill(fewer-permission-prompts:*)",
+      "Bash(python3 /tmp/scan_perms.py)",
+      "Bash(python3 /tmp/analyze_bash.py)",
+      "Bash(python3 /tmp/analyze_bash2.py)"
     ],
     "additionalDirectories": [
       "/tmp"

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(clang -fsyntax-only *)",
+      "Bash(gcc -fsyntax-only *)",
+      "Bash(make *)",
+      "Bash(python3 *)",
+      "Edit(**)",
+      "Write(**)",
+      "NotebookEdit(**)",
+      "Bash(awk '/^const unsigned char shape_FRAME_19\\\\[\\\\]/,/^};/' main/sprites.c)"
+    ]
+  }
+}
