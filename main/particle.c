@@ -392,6 +392,22 @@ int popParticle() {
 }
 
 
+// Frees every live particle that isn't a spiral, handing its slot straight back to the
+// shared pool -- used by the teleport swirl (board.c) to starve out rain/dust/etc. so the
+// whole PARTICLE_COUNT budget is available for spirals instead of being split with whatever
+// else happens to be spawning that frame (makeRain() etc. aren't gated on teleportLocked).
+// PT_CHARACTER is spared too -- it's readable text (score popups, the level-start label),
+// not debris; the arrival swirl's first batch fires the same frame a level's label is
+// queued (schedule.c), so zapping it here would wipe it before it's ever drawn.
+void zapNonSpiralParticles() {
+
+    for (int i = 0; i < PARTICLE_COUNT; i++)
+        if (particle[i].age && particle[i].type != PT_SPIRAL && particle[i].type != PT_SPIRAL2 &&
+            particle[i].type != PT_CHARACTER)
+            pushParticle(i);
+}
+
+
 void initParticles() {
 
     particleStackPointer = 0;

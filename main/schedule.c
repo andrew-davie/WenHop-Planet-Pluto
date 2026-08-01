@@ -5,6 +5,7 @@
 #include "cdfjplus.h"
 
 #include "board.h"
+#include "caveData.h"
 #include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"
@@ -15,6 +16,12 @@
 
 enum SCHEDULE gameSchedule;
 
+// How long the level-start ID string (planet letter + level digit) stays on screen, in
+// frames from the moment it actually becomes visible (see displayFloatingStringCentered()'s
+// caller below and levelLabelTicks' comment in main.h -- both the particle's own age and
+// levelLabelTicks are seeded from this same constant so they always run out together).
+#define LEVEL_LABEL_TICKS 120
+
 
 void setSchedule(enum SCHEDULE nextGameSchedule) {
     gameSchedule = nextGameSchedule;
@@ -23,16 +30,45 @@ void setSchedule(enum SCHEDULE nextGameSchedule) {
 
 void scheduleUnpackCave() {
 
-    while (T1TC < availableIdleTime - 20000)    // <-- arbitrary time allowance for slowest cave decode
+    // availableIdleTime is unsigned -- on a lean-budget frame (availableIdleTime <= 20000) plain
+    // "availableIdleTime - 20000" wraps to a huge value instead of going negative, turning "not
+    // enough budget this frame" into "unlimited budget this frame" (see the equivalent fix and
+    // comment on scheduleInitState()'s own margin check, main.c). Checked explicitly first so a
+    // too-small budget always skips decoding this frame rather than decoding with no real limit.
+    while (availableIdleTime > 20000 && T1TC < availableIdleTime - 20000)    // <-- arbitrary time allowance for slowest cave decode
         if (!decodeExplicitData()) {
 
             if (!totalDogePossible)
                 totalDogePossible = -1;    // indicates "perfect" not possible
 
 
-            //            displayFloatingString(5, SCREEN_TRIX_Y - CHAR_TRIX_Y - 5, 120, "Mercury");
+            char label[3];
+            getCaveLabel(label, cave);
+            levelLabelTicks = LEVEL_LABEL_TICKS;
+            // Halfway between the top of the screen and true mid-screen (CHAR_TRIX_Y accounts
+            // for the glyph's own height, same as the old vertically-centred position did).
+            displayFloatingStringCentered((SCREEN_TRIX_Y - CHAR_TRIX_Y) >> 2, LEVEL_LABEL_TICKS, label);
 
             setSchedule(SCHEDULE_START_SCAN);
+
+            if (pendingTeleportArrival) {
+                pendingTeleportArrival = false;
+                relocatePlayerToTeleport();    // overrides the birth-spawn playerX/Y decode just set
+
+#if ENABLE_SWIPE
+                // Tried a circle iris-in here (GROW) -- circle's shape logic turned out not
+                // to be suitable for growing (only ever exercised as a SHRINK before, for
+                // startSwipeClose()'s death/exit close), and it looked broken rather than
+                // just slow once the step was fixed. Back to an instant reveal: the only
+                // visible transition is loadCave()'s own lumTarget=0 luminance fade back up
+                // (matches the fade-to-black that sent the player here; see board.c's
+                // teleportLocked case), same as before the circle-grow was ever tried.
+                clearMask(255);
+                maskNeeded = false;
+#endif
+                startTeleportArrivalSwirl(playerX, playerY);
+                break;
+            }
 
 #if ENABLE_SWIPE
             // Decode is genuinely finished now (not just "this object's

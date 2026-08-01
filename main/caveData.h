@@ -3,12 +3,28 @@
 struct caveHandler {
     const unsigned char *cave;
     void (*const handler)();
+
+    // Where a teleport arriving in this cave lands -- board cell (col, row), same
+    // coordinate space as CH_MELLON_HUSK_BIRTH/CH_TELEPORT placements in the cave data
+    // itself. Hand-set per cave in caveList[] below. {0, 0} means this cave doesn't
+    // support being a teleport destination at all -- (0,0) is always the border/corner
+    // cell, never a legitimate landing spot, so it doubles safely as the "disabled"
+    // sentinel. See startTeleportWarp()/relocatePlayerToTeleport().
+    unsigned char teleportX, teleportY;
 };
 
 
 extern const struct caveHandler caveList[];
 extern const int caveCount;
 extern unsigned char caveFlags;
+
+// caveList[] is laid out as 10 planets of CAVES_PER_PLANET levels each (see its "// PLANET n"
+// comments) -- planet p occupies indices [p*CAVES_PER_PLANET, (p+1)*CAVES_PER_PLANET).
+#define CAVES_PER_PLANET 10
+
+void loadCave(int newCave);    // shared level-(re)load body -- see gameState_Game.c
+void startTeleportWarp();      // picks a random cave with a teleport destination within the current cave's own planet grouping, and calls loadCave() on it
+void getCaveLabel(char *out, int caveIndex);    // writes "<planet letter A-J><level digit 0-9>" + NUL into out
 
 
 #define CAVEDEF_LOCK_X 4

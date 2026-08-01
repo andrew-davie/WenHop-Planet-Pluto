@@ -47,6 +47,7 @@ enum AudioID {
     SFX_THUNDER,          // 16
     SFX_MAGIC,            // 17
     SFX_MAGIC2,           // 18
+    SFX_TELEPORT,         // 18a  teleport tile: rising warp sweep, played at the start of the fade
     SFX_ROCK,             // 19
     SFX_ROCK2,            // 20
     SFX_SCORE,            // 21

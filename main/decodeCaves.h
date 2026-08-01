@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 enum WEAPON {
 
     WEAPON_NONE = 0,
@@ -51,5 +53,12 @@ enum DECODE_STATE {
 };
 
 extern int totalDogePossible;
+
+// Set by startTeleportWarp() (caveData.c) before it calls loadCave() -- tells
+// scheduleUnpackCave() (schedule.c) that once the newly-loaded cave finishes decoding, the
+// player should be dropped onto one of ITS CH_TELEPORT tiles rather than left at the cave's
+// authored CH_MELLON_HUSK_BIRTH spawn point. See relocatePlayerToTeleport().
+extern bool pendingTeleportArrival;
+void relocatePlayerToTeleport();
 
 // EOF

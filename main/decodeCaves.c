@@ -12,6 +12,7 @@
 #include "particle.h"
 #include "random.h"
 #include "scroll.h"
+#include "sound.h"
 #include "swipe.h"
 #include "wyrm.h"
 
@@ -38,6 +39,8 @@ static int decodingRow;
 static int doorX, doorY;
 static int processedLevel;
 int totalDogePossible;
+
+bool pendingTeleportArrival;
 
 static enum DECODE_STATE decodeState;
 
@@ -373,6 +376,28 @@ void DrawRect(objectType anObject, int x, int y, int aWidth, int aHeight) {
     DrawLine(anObject, x, y + aHeight - 1, aWidth, 2);
     DrawLine(anObject, x, y, aHeight, 4);
     DrawLine(anObject, x + aWidth - 1, y, aHeight, 4);
+}
+
+void relocatePlayerToTeleport() {
+
+    // decodeCave()/decodeExplicitData() already ran to completion and pointed playerX/Y at
+    // this cave's authored CH_MELLON_HUSK_BIRTH spawn -- that spot isn't wanted for a
+    // teleport arrival, so clear it before relocating.
+    RAM[_BOARD + playerY * _BOARD_COLS + playerX] = CH_BLANK;
+
+    // caveList[cave].teleportX/Y (caveData.c/.h) is this cave's hand-authored teleport
+    // landing spot -- same board-cell coordinate space as CH_MELLON_HUSK_BIRTH itself.
+    // startTeleportWarp() only ever picks a cave with a non-{0,0} one, so it's trusted
+    // here without any fallback search.
+    playerX = caveList[cave].teleportX;
+    playerY = caveList[cave].teleportY;
+
+    RAM[_BOARD + playerY * _BOARD_COLS + playerX] = FLAG(CH_MELLON_HUSK);
+
+    ADDAUDIO(SFX_MAGIC2);    // audible confirmation of arrival
+                             // scheduleUnpackCave() (schedule.c) triggers right after this
+
+    resetTracking();
 }
 
 void DrawFilledRect(objectType anObject, int x, int y, int aWidth, int aHeight, objectType aFillObject) {

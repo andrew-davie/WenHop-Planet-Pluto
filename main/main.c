@@ -8,6 +8,7 @@
 #include "main.h"
 
 #include "attribute.h"
+#include "characterset.h"
 #include "colour.h"
 #include "gameState.h"
 #include "kernels.h"
@@ -50,6 +51,7 @@ int armCycles;
 
 int level;
 int millingTime;    // negative = expired
+int levelLabelTicks;
 int doges;
 int time;
 int liquidTrixel_8;
@@ -396,7 +398,14 @@ void scheduleInitState() {
     if (!inOverscanPhase)
         return;
 
-    if (T1TC >= availableIdleTime - SCHEDULE_INIT_MARGIN)
+    // availableIdleTime is unsigned -- on a lean-budget frame (availableIdleTime <=
+    // SCHEDULE_INIT_MARGIN) "availableIdleTime - SCHEDULE_INIT_MARGIN" wraps to a huge value
+    // instead of going negative, which used to make this comparison false and fall through
+    // WITHOUT enough real budget -- the opposite of "not enough time, wait" this check exists
+    // for, and exactly the kind of real-time violation the inOverscanPhase comment above warns
+    // about. Checked explicitly first so a too-small budget always means "wait", never "proceed
+    // unbounded".
+    if (availableIdleTime <= SCHEDULE_INIT_MARGIN || T1TC >= availableIdleTime - SCHEDULE_INIT_MARGIN)
         return;    // not enough of this phase's budget left -- old kernel/state keeps running
                    // completely unchanged, try again next VB/OS
 
@@ -523,6 +532,12 @@ void initNewGame() {
     partialScore = 0;
 
     lives = 3;
+
+    // Reset-scope, not level-scope: initPlayer() (mellon.c) runs on every loadCave(), including
+    // teleports and ordinary level transitions within the same game, which must NOT drop
+    // whatever the player is currently carrying. A genuinely new game is the right place to
+    // clear it.
+    attachment = 0;
 
     initNextLife();
 }

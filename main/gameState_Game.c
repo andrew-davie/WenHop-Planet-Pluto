@@ -8,6 +8,7 @@
 #include "animations.h"
 #include "board.h"
 #include "caveData.h"
+#include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
 #include "draw.h"
@@ -68,8 +69,21 @@ void initGameState_Game() {
 
     caveSequenceStarted = true;
 
-    initBoard();
     initNewGame();
+
+    loadCave(cave);
+}
+
+
+// Shared by a genuine new-game entry (initGameState_Game() above, which calls initNewGame()
+// first) and startTeleportWarp() (caveData.c), which calls this directly, mid-game, to switch
+// to a different cave without resetting score/lives. Everything initGameState_Game() used to
+// do apart from initNewGame() lives here unchanged.
+void loadCave(int newCave) {
+
+    cave = newCave;
+
+    initBoard();
     initCharVector();
     initCharAnimations();
 
@@ -199,14 +213,18 @@ void VB_Game() {
     if (RAM[_SWCHB] != 0x3F)
         setGameState(GS_MENU);
 
-    processCharAnimations();
+    processCharAnimations();              // does NOT drive TYPE_TELEPORT -- see driveTeleportSpin()'s
+                                           // own comment (animations.c) for why that's deliberate
+    driveTeleportSpin(teleportLocked);    // idle spin normally, faster for as long as the player is
+                                           // actually entering the tile
+    updateTeleportArrivalSwirl();
     setPalette(_BUF_GAME_COLUBK);
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
-        // Always draw -- playerX/playerY (what this and scroll() both track) update the
-        // instant the exit door is stepped on (mellon.c's checkHighPriorityMove), but
-        // moveHusk() -- which would normally move the board's own CH_MELLON_HUSK cell to
+        // Always draw for exitMode -- playerX/playerY (what this and scroll() both track)
+        // update the instant the exit door is stepped on (mellon.c's checkHighPriorityMove),
+        // but moveHusk() -- which would normally move the board's own CH_MELLON_HUSK cell to
         // match -- is deliberately skipped there so the door tile can show CH_EXITBLANK
         // instead. That leaves a stale CH_MELLON_HUSK sitting in the board array at the
         // player's *previous* cell for the rest of exitMode's countdown (board.c's
@@ -216,12 +234,33 @@ void VB_Game() {
         // stale, wrongly-positioned tile glyph as the only visible "player" on screen --
         // frozen one cell behind, not following the camera in to the door. Keeping the
         // correctly-tracked sprite visible throughout covers for it.
+        //
+        // teleportLocked doesn't have that problem -- moveHusk() is skipped for the teleport
+        // tile itself too (mellon.c), but the tile the player is standing on is exactly where
+        // they actually are the whole time (it just keeps showing its RAM-static glyph), so
+        // there's no stale/wrongly-positioned stand-in to cover for. drawPlayerSprite() itself
+        // hides the sprite once the walk-in glide settles (see its own teleportLocked check) --
+        // always called from here, unconditionally, so its GRP0 clear still runs every frame;
+        // skipping the call entirely from here left the last real frame's sprite bitmap sitting
+        // in GRP0 forever, frozen on screen instead of disappearing.
         drawPlayerSprite();
+
+        // Unconditional (not gated on !maskNeeded below) so floating text -- notably the
+        // level-start ID string (schedule.c) -- draws into _BUF_GAME_PF0_LEFT throughout the
+        // swipe reveal too, same as drawPlayerSprite() above: applySwipeMask() (end of this
+        // function) then clips it to whatever the growing swipe has actually revealed so far,
+        // letting the swipe progressively reveal the string instead of it popping in only once
+        // the swipe fully completes. levelLabelTicks ticks down in lockstep right here, once
+        // per call, so it always reaches zero on the exact frame the ID string's own particle
+        // age does (see its comment in main.h) regardless of maskNeeded.
+        if (levelLabelTicks)
+            levelLabelTicks--;
+
+        drawFloatingChars();
 
         if (!maskNeeded) {
 
             drawScore();
-            drawFloatingChars();
             drawAttachedChar(attachment);
 
             drawMace();
@@ -245,6 +284,18 @@ void VB_Game() {
 }
 
 void OS_Game() {
+
+    // Deferred from movePlayer() (mellon.c), which sets this from deep inside a board scan --
+    // switching caves involves setSchedule(SCHEDULE_UNPACK_CAVE) and wiping/redecoding the board
+    // that same scan is still iterating over, so it can't safely happen right there. OS_Game() is
+    // a clean top-level per-frame entry point (never itself called from inside a board scan), so
+    // it's the first safe place to actually act on the request; the extra frame of latency this
+    // costs is imperceptible against a multi-second "stand still" timer.
+    if (teleportRequested) {
+        teleportRequested = false;
+        startTeleportWarp();
+        return;    // this frame's cave/schedule state just changed under us -- nothing below applies
+    }
 
     (*caveList[cave].handler)();
 

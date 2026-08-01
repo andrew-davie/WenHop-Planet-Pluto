@@ -54,6 +54,25 @@ const unsigned char sampleMagic2[] = {
     0x5, 0x8, 5, 15, CMD_STOP,
 };
 
+const unsigned char sampleTeleport[] = {
+    // Rising pitch/volume warp sweep, then decays back to silence -- AUDF counts DOWN
+    // (higher pitch) as AUDV climbs to its peak, then AUDV ramps back down to 0 before
+    // CMD_STOP. Deliberately does NOT end on a loud step: on real TIA hardware, abruptly
+    // zeroing AUDC/AUDF/AUDV from a loud note (whether via natural CMD_STOP leaving a stale
+    // register, or killRepeatingAudio()'s hard zero -- see board.c) is an audible click/
+    // squeal. Ending the sample already near-silent means there's nothing left to click.
+    8, 31, 3, 2,
+    8, 27, 6, 2,
+    8, 23, 9, 2,
+    8, 19, 12, 2,
+    8, 15, 15, 2,
+    8, 15, 10, 2,
+    8, 15, 6, 2,
+    8, 15, 3, 2,
+    8, 15, 0, 2,
+    CMD_STOP,
+};
+
 const unsigned char samplePick[] = {
     9,
     12,
@@ -375,6 +394,7 @@ const struct AudioTable AudioSamples[] = {
     {sampleThunder, 96, AUDIO_RETRIGGER},                               // SFX_THUNDER
     {sampleMagic, 50, AUDIO_KILL},                                      // SFX_MAGIC
     {sampleMagic2, 50, 0},                                              // SFX_MAGIC2
+    {sampleTeleport, 45, AUDIO_KILL},                                   // SFX_TELEPORT
     {sampleRock, 11, 0},                                                // SFX_ROCK
     {sampleRock2, 10, 0},                                               // SFX_ROCK2
     {sampleDrip2, 10, 0},                                               // SFX_SCORE

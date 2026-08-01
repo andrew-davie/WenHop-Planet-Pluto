@@ -65,7 +65,10 @@ extern int armCycles;
 extern unsigned int rand;
 extern unsigned char colubk;
 extern int level;
-extern int millingTime;    // negative = expired
+extern int millingTime;      // negative = expired
+extern int levelLabelTicks;    // frames left showing the level-start ID string (schedule.c) --
+                                // drawScore() (score.c) holds millingTime frozen and hides the
+                                // time string while this is nonzero
 extern int doges;
 extern int time;
 extern int liquidTrixel_8;

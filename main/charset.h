@@ -7,7 +7,7 @@ typedef struct {
     unsigned char data[CARS_CHAR_charset_auto_HEIGHT * 3]; // RGB
 } character_charset_auto;
 
-extern const character_charset_auto charset_auto[149];
+extern const character_charset_auto charset_auto[158];
 
 extern const unsigned char gfx_characterset_png_map[20][16];
 
@@ -153,12 +153,21 @@ extern const unsigned char gfx_characterset_png_map[20][16];
 #define CHAR_MAP_characterset_6_14 139
 #define CHAR_MAP_characterset_7_14 140
 #define CHAR_MAP_characterset_8_14 141
-#define CHAR_MAP_characterset_0_16 142
-#define CHAR_MAP_characterset_1_16 143
-#define CHAR_MAP_characterset_2_16 144
-#define CHAR_MAP_characterset_3_16 145
-#define CHAR_MAP_characterset_4_16 146
-#define CHAR_MAP_characterset_5_16 147
-#define CHAR_MAP_characterset_6_16 148
+#define CHAR_MAP_characterset_0_15 142
+#define CHAR_MAP_characterset_1_15 143
+#define CHAR_MAP_characterset_2_15 144
+#define CHAR_MAP_characterset_3_15 145
+#define CHAR_MAP_characterset_4_15 146
+#define CHAR_MAP_characterset_5_15 147
+#define CHAR_MAP_characterset_6_15 148
+#define CHAR_MAP_characterset_7_15 149
+#define CHAR_MAP_characterset_0_16 150
+#define CHAR_MAP_characterset_1_16 151
+#define CHAR_MAP_characterset_2_16 152
+#define CHAR_MAP_characterset_3_16 153
+#define CHAR_MAP_characterset_4_16 154
+#define CHAR_MAP_characterset_5_16 155
+#define CHAR_MAP_characterset_6_16 156
+#define CHAR_MAP_characterset_0_19 157
 
 //EOF

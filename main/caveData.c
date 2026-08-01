@@ -5,6 +5,7 @@
 #include "caveData.h"
 #include "decodeCaves.h"
 #include "main.h"
+#include "random.h"
 
 #define DIRT CH_DIRT
 #define STEEL CH_STEELWALL
@@ -136,25 +137,26 @@ const unsigned char P1_caveUseWall[] = {
 const unsigned char caveraintest[] = {
     // clang-format off
 
-    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,              // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    7,17,7,17,
 
     0x98, 0x26, 0xC6,               // palette
 
-    255,  22, 50,                           // milling
+    60,  4,4,                           // milling
     10, 15,                         // doge $
-    255,                              // weather (rain -- see particle.c's makeRain()) -- was 1 under the old hardcoded-frequency scheme; 4 keeps the same intensity now that this value IS the frequency divisor
-    0,                              // water
+    255,                              // weather (255 = storms)
+    17 + SCREEN_TRIX_Y,                              // water
 
-     0,  0,  0,  0,  0,         // randomiser[level]
+     17,  11,  50,  56,  8,         // randomiser[level]
      30,  12,  12,  12,  12,        // doge req
     200, 200, 200, 200, 200,
 
-    WEAPON_MACE,                    // 0
-    WEAPON_MACE,                    // 1
-    WEAPON_MACE,                    // 2
-    WEAPON_MACE,                    // 3
-    WEAPON_MACE,                    // 4
+    0, //WEAPON_MACE,                    // 0
+    0, //WEAPON_MACE,                    // 1
+    0, //WEAPON_MACE,                    // 2
+    0, //WEAPON_MACE,                    // 3
+    0, //WEAPON_MACE,                    // 4
 
+//    CAVEDEF_LOCK_Y,
     0, CH_BRICKWALL, CH_DIRT,           // flags, border, fill
 
     // Random objects
@@ -164,9 +166,14 @@ const unsigned char caveraintest[] = {
     // CH_GEODOGE, 80,40,40,40,40,
     CH_ROCK, 50,40,40,40,40,
 
+    DRAW_RECT, CH_STEELWALL, 1,1,9,8,
+    CH_TELEPORT, 6, 4,
+
+    // CH_BOMB, 2, 6,
 
     CH_DOOROPEN_0, 5, 6,
     CH_MELLON_HUSK_BIRTH, 5, 2,
+    CH_TELEPORT, 8, 3,
 
 
     DRAW_EOF,
@@ -185,7 +192,8 @@ const unsigned char caveraintest[] = {
 const unsigned char cavetest[] = {
     // clang-format off
 
-    0,0,BOARD_TRIX_X,BOARD_TRIX_Y,              // scroll bounds (TL(x,y), BR(x,y) in trixels)
+    7,17,7,17,                      // scroll bounds -- locked single screen (see P0_caveNew), so the whole
+                                     // cave is visible at once instead of needing to scroll to find things
 
     0x98, 0x26, 0xC6,               // palette
 
@@ -216,6 +224,69 @@ const unsigned char cavetest[] = {
 
     CH_DOOROPEN_0, 5, 6,
     CH_MELLON_HUSK_BIRTH, 5, 2,
+    CH_TELEPORT, 2, 4,
+    CH_TELEPORT, 8, 7,
+
+
+    DRAW_EOF,
+    DRAW_EOF,
+    DRAW_EOF,
+    DRAW_EOF,
+    DRAW_EOF,
+    DRAW_EOF,
+
+    'T', 'E', 'S', 'T', END_STRING
+
+    // clang-format on
+};
+
+
+// Blank/empty filler cave -- same small (locked single-screen) format as caveraintest, but
+// stripped down to just a border and an empty interior, no random fill, no hazards, no
+// CH_TELEPORT of its own. Used to pad caveList[] out to a full 10 planets x 10 levels
+// (100 entries) below, standing in for every level slot that doesn't have real content
+// authored yet -- every one of those slots points at this same array.
+const unsigned char caveBlank[] = {
+    // clang-format off
+
+    7,17,7,17,                      // scroll bounds -- locked single screen, same small format as caveraintest
+
+    0x98, 0x26, 0xC6,               // palette
+
+    60,  4,4,                           // milling
+    10, 15,                         // doge $
+    0,                              // weather (off)
+    0,                              // water (off)
+
+     0,  0,  0,  0,  0,             // randomiser[level]
+     0,  0,  0,  0,  0,             // doge req -- nothing to collect in an empty room
+    200, 200, 200, 200, 200,        // time to complete
+
+    0, //WEAPON_MACE,                    // 0
+    0, //WEAPON_MACE,                    // 1
+    0, //WEAPON_MACE,                    // 2
+    0, //WEAPON_MACE,                    // 3
+    0, //WEAPON_MACE,                    // 4
+
+    0, CH_BRICKWALL, CH_BLANK,           // flags, border, fill
+
+    // Random objects
+
+    0,
+
+    DRAW_RECT, CH_STEELWALL, 1,1,9,8,
+    CH_MELLON_HUSK_BIRTH, 5, 2,
+    CH_TELEPORT, 2, 4,
+    CH_DOOROPEN_0, 5, 6,           // own door, inside the steel-walled interior -- must be
+                                    // authored explicitly: decodeCave()/StoreObject() (decodeCaves.c)
+                                    // only ever update doorX/doorY when a cave places a door of its
+                                    // own, so a door-less cave otherwise inherits whatever door
+                                    // position the PREVIOUS cave left behind and DECODE_FLASH stamps
+                                    // a phantom door there. caveraintest/P0_caveNew's doors both
+                                    // happen to land at (5,6) too, which is inside this cave's own
+                                    // interior -- that's why planets A/B's caveBlank levels looked
+                                    // fine while planet C's (whose real cave's door is at (38,5),
+                                    // well outside this interior) didn't.
 
 
     DRAW_EOF,
@@ -894,6 +965,7 @@ const unsigned char caveTest[] = {
 
 
     CH_MELLON_HUSK_BIRTH, 20, 10,
+    CH_DOOROPEN_0, 20, 15,
 
     DRAW_EOF,
 
@@ -1129,6 +1201,8 @@ const unsigned char caveA2[] = {
     CH_HUB_1, 20, 8,
     CH_PUSH_DOWN, 20, 9,
 
+    CH_DOOROPEN_0, 2, 2,
+
     CH_GRINDER_0, 15, 15,
     CH_BELT_0, 16, 15,
     CH_BELT_1, 17, 15,
@@ -1179,6 +1253,7 @@ const unsigned char caveA5[] = {
     0,
 
     CH_MELLON_HUSK_BIRTH, 7, 6,
+    CH_DOOROPEN_0, 7, 11,
 
 
     // EXTRAS
@@ -1490,39 +1565,197 @@ void empty() {
 }
 
 
+// 10 planets x 10 levels = 100 entries. One existing cave kept per planet (always at that
+// planet's level 0 -- cavetest/P0_caveVaultBreach/P0_caveChTiming/caveNew2 stay retired,
+// commented out above, not part of this); every other slot points at caveBlank (see its
+// own comment) as a placeholder until real content is authored for it.
 const struct caveHandler caveList[] = {
 
-
-    {P0_caveVaultBreach, none},    // "Vault Breach" -- swap back to {P0_caveWater, none} (or
-                                    // {P0_caveChTiming, none}) to restore either earlier rig
     // PLANET 0
-    //    {P0_caveNew, none},    // GOOD puzzle screen
-    {caveraintest, none},
-    {cavetest, none},
+    {caveraintest, none, 5, 2},    // level 0
+    {caveBlank, none, 6, 5},       // level 1
+    {caveBlank, none, 6, 5},       // level 2
+    {caveBlank, none, 6, 5},       // level 3
+    {caveBlank, none, 6, 5},       // level 4
+    {caveBlank, none, 6, 5},       // level 5
+    {caveBlank, none, 6, 5},       // level 6
+    {caveBlank, none, 6, 5},       // level 7
+    {caveBlank, none, 6, 5},       // level 8
+    {caveBlank, none, 6, 5},       // level 9
 
     // PLANET 1
-    {P1_caveUseWall, none},    //
+    {P0_caveNew, none, 5, 2},    // level 0
+    {caveBlank, none, 6, 5},     // level 1
+    {caveBlank, none, 6, 5},     // level 2
+    {caveBlank, none, 6, 5},     // level 3
+    {caveBlank, none, 6, 5},     // level 4
+    {caveBlank, none, 6, 5},     // level 5
+    {caveBlank, none, 6, 5},     // level 6
+    {caveBlank, none, 6, 5},     // level 7
+    {caveBlank, none, 6, 5},     // level 8
+    {caveBlank, none, 6, 5},     // level 9
 
     // PLANET 2
-    {P2_caveWyrms, empty},    //
+    {P1_caveUseWall, none, 2, 3},    // level 0
+    {caveBlank, none, 6, 5},         // level 1
+    {caveBlank, none, 6, 5},         // level 2
+    {caveBlank, none, 6, 5},         // level 3
+    {caveBlank, none, 6, 5},         // level 4
+    {caveBlank, none, 6, 5},         // level 5
+    {caveBlank, none, 6, 5},         // level 6
+    {caveBlank, none, 6, 5},         // level 7
+    {caveBlank, none, 6, 5},         // level 8
+    {caveBlank, none, 6, 5},         // level 9
 
     // PLANET 3
-    {P3_starsAndStripes, spec},    //
+    {P2_caveWyrms, empty, 5, 5},    // level 0
+    {caveBlank, none, 6, 5},        // level 1
+    {caveBlank, none, 6, 5},        // level 2
+    {caveBlank, none, 6, 5},        // level 3
+    {caveBlank, none, 6, 5},        // level 4
+    {caveBlank, none, 6, 5},        // level 5
+    {caveBlank, none, 6, 5},        // level 6
+    {caveBlank, none, 6, 5},        // level 7
+    {caveBlank, none, 6, 5},        // level 8
+    {caveBlank, none, 6, 5},        // level 9
+
     // PLANET 4
+    {P3_starsAndStripes, spec, 2, 2},    // level 0
+    {caveBlank, none, 6, 5},             // level 1
+    {caveBlank, none, 6, 5},             // level 2
+    {caveBlank, none, 6, 5},             // level 3
+    {caveBlank, none, 6, 5},             // level 4
+    {caveBlank, none, 6, 5},             // level 5
+    {caveBlank, none, 6, 5},             // level 6
+    {caveBlank, none, 6, 5},             // level 7
+    {caveBlank, none, 6, 5},             // level 8
+    {caveBlank, none, 6, 5},             // level 9
+
     // PLANET 5
+    {P4_caveA4, none, 0, 0},    // level 0
+    {caveBlank, none, 6, 5},    // level 1
+    {caveBlank, none, 6, 5},    // level 2
+    {caveBlank, none, 6, 5},    // level 3
+    {caveBlank, none, 6, 5},    // level 4
+    {caveBlank, none, 6, 5},    // level 5
+    {caveBlank, none, 6, 5},    // level 6
+    {caveBlank, none, 6, 5},    // level 7
+    {caveBlank, none, 6, 5},    // level 8
+    {caveBlank, none, 6, 5},    // level 9
+
     // PLANET 6
+    {caveBlank, none, 6, 5},    // level 0
+    {caveBlank, none, 6, 5},    // level 1
+    {caveBlank, none, 6, 5},    // level 2
+    {caveBlank, none, 6, 5},    // level 3
+    {caveBlank, none, 6, 5},    // level 4
+    {caveBlank, none, 6, 5},    // level 5
+    {caveBlank, none, 6, 5},    // level 6
+    {caveBlank, none, 6, 5},    // level 7
+    {caveBlank, none, 6, 5},    // level 8
+    {caveBlank, none, 6, 5},    // level 9
+
     // PLANET 7
+    {caveBlank, none, 6, 5},    // level 0
+    {caveBlank, none, 6, 5},    // level 1
+    {caveBlank, none, 6, 5},    // level 2
+    {caveBlank, none, 6, 5},    // level 3
+    {caveBlank, none, 6, 5},    // level 4
+    {caveBlank, none, 6, 5},    // level 5
+    {caveBlank, none, 6, 5},    // level 6
+    {caveBlank, none, 6, 5},    // level 7
+    {caveBlank, none, 6, 5},    // level 8
+    {caveBlank, none, 6, 5},    // level 9
+
     // PLANET 8
+    {caveBlank, none, 6, 5},    // level 0
+    {caveBlank, none, 6, 5},    // level 1
+    {caveBlank, none, 6, 5},    // level 2
+    {caveBlank, none, 6, 5},    // level 3
+    {caveBlank, none, 6, 5},    // level 4
+    {caveBlank, none, 6, 5},    // level 5
+    {caveBlank, none, 6, 5},    // level 6
+    {caveBlank, none, 6, 5},    // level 7
+    {caveBlank, none, 6, 5},    // level 8
+    {caveBlank, none, 6, 5},    // level 9
+
     // PLANET 9
+    {caveBlank, none, 6, 5},    // level 0
+    {caveBlank, none, 6, 5},    // level 1
+    {caveBlank, none, 6, 5},    // level 2
+    {caveBlank, none, 6, 5},    // level 3
+    {caveBlank, none, 6, 5},    // level 4
+    {caveBlank, none, 6, 5},    // level 5
+    {caveBlank, none, 6, 5},    // level 6
+    {caveBlank, none, 6, 5},    // level 7
+    {caveBlank, none, 6, 5},    // level 8
+    {caveBlank, none, 6, 5},    // level 9
 
-
-    //    {caveNew2, none},    // GOOD puzzle screen
-
-
-    // cave definition, condition handler
-    {P4_caveA4, none},
 };
 
 const int caveCount = sizeof(caveList) / sizeof(caveList[0]);
+
+// Writes the 2-char (+ NUL) level label for the given cave index into out --
+// planet letter 'A'..'J' followed by the inner 0..9 level digit, e.g. cave 23
+// -> "C3". Finds the planet with the same subtract-loop trick startTeleportWarp()
+// uses below rather than "cave / CAVES_PER_PLANET" / "cave % CAVES_PER_PLANET":
+// this coprocessor has no divide instruction, and CAVES_PER_PLANET (10) isn't a
+// power of 2, so either expression risks a real libgcc call.
+void getCaveLabel(char *out, int caveIndex) {
+
+    int planet = 0;
+    int groupStart = 0;
+    while (groupStart + CAVES_PER_PLANET <= caveIndex) {
+        groupStart += CAVES_PER_PLANET;
+        planet++;
+    }
+
+    out[0] = 'A' + planet;
+    out[1] = '0' + (caveIndex - groupStart);
+    out[2] = 0;
+}
+
+void startTeleportWarp() {
+
+    // Stay within the current cave's own planet grouping (caveList[]'s "// PLANET n" blocks,
+    // CAVES_PER_PLANET entries each -- see caveData.h) -- teleporting should hop between
+    // levels of the same planet, not anywhere in the whole 100-cave roster. Finds the
+    // group's start index with a plain loop rather than "cave / CAVES_PER_PLANET *
+    // CAVES_PER_PLANET": this coprocessor has no divide instruction (see swipe.c's isqrt()
+    // comment), and CAVES_PER_PLANET (10) isn't a power of 2, so that expression risks a
+    // real libgcc call -- the loop sidesteps the question entirely.
+    int groupStart = 0;
+    while (groupStart + CAVES_PER_PLANET <= cave)
+        groupStart += CAVES_PER_PLANET;
+
+    int groupEnd = groupStart + CAVES_PER_PLANET;
+    if (groupEnd > caveCount)
+        groupEnd = caveCount;
+
+    // Reservoir-sample a random cave with a teleport destination from that group (see the
+    // struct's comment -- {0,0} means "no destination here"), excluding the current one --
+    // if that's the only eligible cave, land back on it; loadCave() reloading it fresh is
+    // harmless, same as looping a level.
+    int newCave = -1;
+    int count = 0;
+
+    for (int i = groupStart; i < groupEnd; i++)
+        if ((caveList[i].teleportX || caveList[i].teleportY) && i != cave) {
+            count++;
+            if (!rangeRandom(count))
+                newCave = i;
+        }
+
+    if (newCave < 0)
+        newCave = cave;
+
+    // decodeCave() (called from loadCave()) will place the player at this cave's normal
+    // CH_MELLON_HUSK_BIRTH spawn first, same as any other level load -- pendingTeleportArrival
+    // tells scheduleUnpackCave() (schedule.c) to relocate them onto a random blank tile instead,
+    // once the whole cave has actually finished decoding (see relocatePlayerToTeleport()).
+    pendingTeleportArrival = true;
+
+    loadCave(newCave);
+}
 
 // EOF

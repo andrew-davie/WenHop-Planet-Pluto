@@ -33,6 +33,7 @@ extern const short sin_cos[32];
 extern int weapon;
 
 void initParticles();
+void zapNonSpiralParticles();
 void drawParticles();
 void makeRain();
 void initWeather();

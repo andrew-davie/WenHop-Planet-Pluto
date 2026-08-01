@@ -19,6 +19,95 @@
 int playerX;    // char pos 0-39 (use *5 for pixel)
 int playerY;    // char pos 0-21 (use *10 for pixel and then *3 for scanline)
 
+bool teleportLocked;
+bool teleportCountingDown;
+int teleportSwirlTicks;
+bool teleportRequested;
+
+// Departure swirl: batches start the instant teleportLocked goes true (see
+// startTeleportDepartSwirl()'s call site below) and keep going for as long as
+// teleportLocked stays true -- board.c drives updateTeleportDepartSwirl() every such
+// frame, unconditionally, so no separate tick countdown is needed here.
+static int departSwirlBatchCounter;
+
+void startTeleportDepartSwirl() {
+    departSwirlBatchCounter = 0;
+}
+
+void updateTeleportDepartSwirl(int x, int y) {
+
+    // A small batch every TELEPORT_DEPART_SWIRL_BATCH_INTERVAL frames, not a full pool
+    // refill every frame -- see TELEPORT_SWIRL_PARTICLE_AGE's comment (mellon.h). Countdown,
+    // not "counter++ % INTERVAL" -- this coprocessor has no divide instruction (see swipe.c's
+    // isqrt() comment), and a non-power-of-2 INTERVAL forces the compiler to call out to
+    // libgcc's software __aeabi_idivmod for the modulo. departSwirlBatchCounter starts at 0
+    // (startTeleportDepartSwirl()), so the first call here fires immediately.
+    if (departSwirlBatchCounter <= 0) {
+
+        departSwirlBatchCounter = TELEPORT_DEPART_SWIRL_BATCH_INTERVAL;
+
+        zapNonSpiralParticles();
+        nDots(TELEPORT_DEPART_SWIRL_BATCH_SIZE, x, y, PT_SPIRAL2, TELEPORT_SWIRL_PARTICLE_AGE, CHAR_CENTER_X,
+              CHAR_CENTER_Y, 40, 7);
+    }
+
+    departSwirlBatchCounter--;
+}
+
+// 1.5 seconds at 60fps -- spirals building up around the arrival tile (see schedule.c's
+// pendingTeleportArrival handling). Shorter than an earlier pass at this (was 180/3s,
+// felt too slow) -- more particles now land in less time (see the batch size/interval in
+// mellon.h) rather than spreading the same amount out even further.
+#define TELEPORT_ARRIVAL_SWIRL_TICKS 90
+
+static int arrivalSwirlTicks;
+static int arrivalSwirlBatchCounter;
+static int arrivalSwirlX, arrivalSwirlY;
+
+void startTeleportArrivalSwirl(int x, int y) {
+    arrivalSwirlX = x;
+    arrivalSwirlY = y;
+    arrivalSwirlTicks = TELEPORT_ARRIVAL_SWIRL_TICKS;
+    arrivalSwirlBatchCounter = 0;
+}
+
+void updateTeleportArrivalSwirl() {
+
+    if (arrivalSwirlTicks) {
+
+        // Countdown, not modulo -- see updateTeleportDepartSwirl()'s comment (this coprocessor
+        // has no divide instruction, and TELEPORT_ARRIVAL_SWIRL_BATCH_INTERVAL isn't a power of
+        // 2, so "counter++ % INTERVAL" would force a real libgcc __aeabi_idivmod call).
+        if (arrivalSwirlBatchCounter <= 0) {
+
+            arrivalSwirlBatchCounter = TELEPORT_ARRIVAL_SWIRL_BATCH_INTERVAL;
+
+            zapNonSpiralParticles();
+            nDots(TELEPORT_ARRIVAL_SWIRL_BATCH_SIZE, arrivalSwirlX, arrivalSwirlY, PT_SPIRAL2,
+                  TELEPORT_SWIRL_PARTICLE_AGE, CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
+        }
+
+        arrivalSwirlBatchCounter--;
+        arrivalSwirlTicks--;
+    }
+}
+
+bool isTeleportArrivalSwirlActive() {
+    return arrivalSwirlTicks != 0;
+}
+
+// 0.5 seconds at 60fps -- the player now appears this much before the swirl itself actually
+// finishes (drawPlayer.c uses this instead of isTeleportArrivalSwirlActive() for its hidden
+// check), so they materialise while the last of the spiral dots are still landing rather than
+// waiting for arrivalSwirlTicks to hit 0. The swirl's own duration/spawn behaviour
+// (TELEPORT_ARRIVAL_SWIRL_TICKS, updateTeleportArrivalSwirl() above) is untouched -- this only
+// changes when the PLAYER stops being hidden, not how long the particles themselves run.
+#define TELEPORT_ARRIVAL_PLAYER_REVEAL_EARLY_TICKS 60
+
+bool isTeleportArrivalPlayerHidden() {
+    return arrivalSwirlTicks > TELEPORT_ARRIVAL_PLAYER_REVEAL_EARLY_TICKS;
+}
+
 int frameAdjustX;
 int frameAdjustY;
 static unsigned int pushCounter;
@@ -82,13 +171,17 @@ void initPlayer() {
     pushCounter = 0;
     playerDead = false;
 
+    teleportLocked = false;
+    teleportCountingDown = false;
+    teleportSwirlTicks = 0;
+    teleportRequested = false;
+
     faceDirection = FACE_RIGHT;
 
     gearsActive = false;
     gearsWaitRelease = false;
 
     drop = false;
-    attachment = 0;
     attachmentOffset = 0;
 
     startPlayerAnimation(ID_Stand);    // tmp
@@ -447,7 +540,11 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
             frameAdjustX = frameAdjustY = 0;
 
-            if (!exitMode) {
+            // Teleport tile: leave the destination square exactly as-is (don't drop a
+            // CH_MELLON_HUSK on top of it) so it keeps showing its RAM-static glyph while
+            // the player is standing on it -- see board.c's restartBoardScan(), which is
+            // told to stop treating "not a husk square" as a death here via teleportLocked.
+            if (!exitMode && destType != TYPE_TELEPORT) {
 
                 moveHusk(dir, cur->me, meOffset);
             }
@@ -518,6 +615,18 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
             handled = true;
         }
+    }
+
+    // Stepping onto a teleport tile locks the player there -- board.c's TYPE_MELLON_HUSK
+    // case stops calling movePlayer() the instant teleportLocked is set, so there's no
+    // "cancel by walking away" to handle here: this function (and its caller) simply won't
+    // run again for this player until the lock clears. Checked here rather than inline where
+    // destType == TYPE_TELEPORT is handled above because both this move and the TYPE_STAR
+    // grab above it reach this same point having actually moved the player onto meOffset.
+    if (handled && destType == TYPE_TELEPORT) {
+        teleportLocked = true;
+        teleportCountingDown = false;
+        startTeleportDepartSwirl();    // spirals start now, not once the walk-in glide settles
     }
 
     if (handled) {

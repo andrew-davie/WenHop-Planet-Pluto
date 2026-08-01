@@ -70,7 +70,10 @@
       "Skill(fewer-permission-prompts:*)",
       "Bash(python3 /tmp/scan_perms.py)",
       "Bash(python3 /tmp/analyze_bash.py)",
-      "Bash(python3 /tmp/analyze_bash2.py)"
+      "Bash(python3 /tmp/analyze_bash2.py)",
+      "Bash(git commit *)",
+      "Bash(gcc -O2 -o verify_seq verify_seq.c)",
+      "Bash(./verify_seq)"
     ],
     "additionalDirectories": [
       "/tmp"

@@ -25,6 +25,12 @@
 
 #define PARTICLE_GRAVITY_FLAG 0x80
 
+// How long the teleport tile's spiral dots spin alone before the fade-to-black starts --
+// board.c's TYPE_MELLON_HUSK case ticks once per full board-scan (one tick every
+// SPEED_BASE real frames -- see setupBoardScanner()), i.e. ~12 ticks/sec at NTSC's 60fps.
+// 12 ticks ~= 1 second.
+#define TELEPORT_SWIRL_TICKS 12
+
 
 // must be init'd at startup
 static int selectorCounter;
@@ -207,16 +213,16 @@ static const unsigned char ascii_width[] = {
     4,    //  62  >
     4,    //  63  ?
     4,    //  64  @
-    4,    //  65  A
-    4,    //  66  B
-    4,    //  67  C
-    4,    //  68  D
-    4,    //  69  E
-    4,    //  70  F
-    4,    //  71  G
-    4,    //  72  H
-    2,    //  73  I
-    4,    //  74  J
+    5,    //  65  A
+    5,    //  66  B
+    5,    //  67  C
+    5,    //  68  D
+    5,    //  69  E
+    5,    //  70  F
+    5,    //  71  G
+    5,    //  72  H
+    4,    //  73  I
+    5,    //  74  J
     4,    //  75  K
     4,    //  76  L
     6,    //  77  M
@@ -307,6 +313,19 @@ void displayFloatingString(int trixX, int trixY, int age, char *s) {
         trixX += widthOf(*s);
         s++;
     }
+}
+
+
+void displayFloatingStringCentered(int trixY, int age, char *s) {
+
+    int len = 0;
+    char *w = s;
+    while (*w) {
+        len += widthOf(*w);
+        w++;
+    }
+
+    displayFloatingString((SCREEN_TRIX_X - len) >> 1, trixY, age, s);
 }
 
 
@@ -577,7 +596,7 @@ static const unsigned short budget[128] = {
     _B + 1366,    // 114 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
     _B + 4594,    // 115 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
     _untimed_,    // 116 CH_CONCRETE
-    _untimed_,    // 117 (unused)
+    _untimed_,    // 117 CH_TELEPORT (never phase-selected -- no per-frame processing)
     _untimed_,    // 118 (unused)
     _untimed_,    // 119 (unused)
     _untimed_,    // 120 (unused)
@@ -796,10 +815,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         break;
 
     case TYPE_MELLON_HUSK:
-        if (!exitMode)
-            movePlayer(cur);
-
-        else {
+        if (exitMode) {
 
             exitMode--;
             if (exitMode < 20) {
@@ -810,6 +826,58 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
                 }
             }
         }
+
+        else if (teleportLocked) {
+
+            // The player is locked here from the instant they stepped onto the teleport tile
+            // (see checkHighPriorityMove(), mellon.c) -- movePlayer() isn't called at all while
+            // this is set, so joystick input is simply ignored, same as exitMode above. Wait for
+            // the walk-in glide (autoMoveFrameCount) to fully settle, then let the spiral dots
+            // spin alone for TELEPORT_SWIRL_TICKS before fading to black exactly like exitMode
+            // does above. Once the fade completes, switch cave -- loadCave() (gameState_Game.c)
+            // fades back up from there on its own, same as any level start.
+            // cur->col/cur->row are the driver husk square the player *left* -- moveHusk()
+            // is skipped for the teleport tile itself (mellon.c) so it keeps showing its
+            // RAM-static glyph, which means cur no longer tracks where the player actually
+            // is. Use playerX/playerY directly so the swirl is centred on the teleport tile.
+            //
+            // Unlike everything below, this isn't gated on !autoMoveFrameCount -- it starts
+            // the instant teleportLocked goes true (startTeleportDepartSwirl() is called
+            // right there, in checkHighPriorityMove()), i.e. as soon as the player starts
+            // moving onto the tile, so the swirl is already well under way by the time the
+            // sprite actually vanishes below instead of only beginning at that instant.
+            updateTeleportDepartSwirl(playerX, playerY);
+
+            if (!autoMoveFrameCount) {
+
+                if (!teleportCountingDown) {
+
+                    teleportCountingDown = true;
+                    teleportSwirlTicks = TELEPORT_SWIRL_TICKS;
+
+                    // movePlayer() would normally settle this back to standing itself once
+                    // movement stops -- it's skipped entirely while locked, so do it here instead.
+                    if (playerAnimationID == ID_WalkUp || playerAnimationID == ID_MineUp)
+                        startPlayerAnimation(ID_StandUp);
+                    else if (playerAnimationID == ID_Walk || playerAnimationID == ID_Mine)
+                        startPlayerAnimation(ID_StandLR);
+                    else if (playerAnimationID == ID_WalkDown || playerAnimationID == ID_MineDown)
+                        startPlayerAnimation(ID_Stand);
+                }
+
+                if (teleportSwirlTicks) {
+
+                    if (!--teleportSwirlTicks)
+                        lumTarget = -15;
+                }
+
+                else if (lumTarget == luminance)
+                    teleportRequested = true;
+            }
+        }
+
+        else
+            movePlayer(cur);
 
         break;
 
@@ -1321,8 +1389,8 @@ void restartBoardScan() {
             waitRelease = false;
 
         enum ObjectType manType = CharToType[what];
-        playerDead =
-            (manType != TYPE_MELLON_HUSK && manType != TYPE_MELLON_HUSK_PRE && manType != TYPE_OUTBOX && !exitMode);
+        playerDead = (manType != TYPE_MELLON_HUSK && manType != TYPE_MELLON_HUSK_PRE && manType != TYPE_OUTBOX &&
+                      !exitMode && !teleportLocked);
 
 
         if (oldDead != playerDead) {

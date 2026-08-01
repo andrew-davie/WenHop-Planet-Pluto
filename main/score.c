@@ -808,7 +808,11 @@ void drawDecimalToString(char *buffer, int chbase, int cvt) {
 
 void drawScore() {
 
-    if (millingTime >= 0) {
+    // Hold the level timer frozen (and its floating countdown-tick string hidden) until the
+    // level-start ID string (schedule.c) has finished showing -- levelLabelTicks itself is
+    // decremented in gameState_Game.c's VB_Game(), in step with drawFloatingChars()'s own
+    // particle-age countdown, so it reaches zero on exactly the frame the ID string disappears.
+    if (!levelLabelTicks && millingTime >= 0) {
         int priorSecs = millingTime >> 16;
         millingTime -= (0x10000 / 60);
         if (millingTime >> 16 != priorSecs) {

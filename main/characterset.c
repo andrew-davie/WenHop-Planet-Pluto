@@ -7,6 +7,17 @@
 static unsigned char char_parallaxBlank[CHAR_Y];
 
 
+// The teleport tile's 8-frame spinning-spoke cycle (3 bent spokes, no outer rim, 8 rotations 15
+// degrees apart -- 3-fold spoke symmetry x 15 degrees/frame = 120 degrees over 8 frames, i.e.
+// exactly a third of a full turn, so the loop is seamless) lives as real pixels in
+// gfx/characterset.png row 15, columns 0-7 (previously hand-written byte arrays here -- moved
+// into the source image and regenerated via tools/cset.py so it follows the same
+// image-to-CHAR_MAP pipeline every other character does). Colour 7 (white) for the spokes,
+// colour 1 (green) for the hub pixel at the centre (column 2, rows 4-5, where all 3 spokes
+// converge in every frame) so the pivot point reads as a distinct colour from the spokes
+// themselves. See AnimTeleport (animations.c) for the frame sequence/playback.
+
+
 const unsigned char *const charSet[] = {
 
 
@@ -132,7 +143,7 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_4_4),      // 114 CH_BOMB
     CH(CHAR_MAP_characterset_8_4),      // 115 CH_CRACKED_BRICK
     CH(CHAR_MAP_characterset_0_3),      // 116 CH_CONCRETE
-    0,                                  // 117
+    CH(CHAR_MAP_characterset_0_15),      // 117 CH_TELEPORT (spinning-spoke cycle, frame 0)
     0,                                  // 118
     0,                                  // 119
     0,                                  // 120
@@ -252,6 +263,14 @@ const unsigned char *const charSet[] = {
     CH2(CHAR_MAP_0to9_7_0),    // 220 CH_BIG_7
     CH2(CHAR_MAP_0to9_8_0),    // 221 CH_BIG_8
     CH2(CHAR_MAP_0to9_9_0),    // 222 CH_BIG_9
+
+    CH(CHAR_MAP_characterset_1_15),    // 223 CH_TELEPORT_1
+    CH(CHAR_MAP_characterset_2_15),    // 224 CH_TELEPORT_2
+    CH(CHAR_MAP_characterset_3_15),    // 225 CH_TELEPORT_3
+    CH(CHAR_MAP_characterset_4_15),    // 226 CH_TELEPORT_4
+    CH(CHAR_MAP_characterset_5_15),    // 227 CH_TELEPORT_5
+    CH(CHAR_MAP_characterset_6_15),    // 228 CH_TELEPORT_6
+    CH(CHAR_MAP_characterset_7_15),    // 229 CH_TELEPORT_7
 };
 
 _Static_assert(sizeof(charSet) / sizeof(charSet[0]) == CH_MAX, "charSet table wrong size");

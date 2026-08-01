@@ -76,6 +76,25 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
     myMemsetInt((unsigned int *)(RAM + _BUF_GAME_GRP0), 0, _BUFFER_SIZE * 2 / 4);
 
+    // Once the walk-in glide onto the teleport tile has settled (autoMoveFrameCount == 0,
+    // same gate board.c's teleportLocked branch uses before it starts the countdown), let the
+    // static + swirl dots read as the player being swallowed into the tile instead of drawing
+    // them standing on top of it. Mirrored on arrival: stay hidden through (most of) the arrival
+    // swirl (isTeleportArrivalPlayerHidden(), mellon.c) too, so the player doesn't pop into view
+    // standing on the tile before it's finished generating -- they appear 0.5s before the swirl
+    // itself actually ends (isTeleportArrivalPlayerHidden()'s own comment), not exactly when it
+    // ends, same as they vanished into one on departure.
+    //
+    // This does NOT return early, though -- it only skips the actual shape-drawing loops
+    // below (search "hidden" further down), after RAM[_P0_X]/playerSpriteY etc. have still
+    // been computed and committed from this frame's real playerX/playerY/scrollX/scrollY.
+    // GRP0 is already all zero from the memset above, so nothing shows regardless. Returning
+    // early right here used to leave those position registers stale at whatever they were
+    // the last time the sprite actually drew -- often still the *previous cave's* position,
+    // since a full cave switch happens while hidden -- so the first visible frame, instead of
+    // just appearing in the right place, had a frame or two of snapping over from the old
+    // stale position as soon as something (this function, next call) finally recomputed it.
+    bool hidden = (teleportLocked && !autoMoveFrameCount) || isTeleportArrivalPlayerHidden();
 
     static int root = 0;
     root++;
@@ -159,6 +178,12 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
             RAM[_P0_X] += 8;
         } else
             RAM[_P1_X] = RAM[_P0_X] + 8;
+
+        // Position is fully committed above -- everything from here down only decides what
+        // gets drawn into GRP0, which the memset at the top already left at "nothing". See
+        // this function's opening comment for why hiding happens here, not on early entry.
+        if (hidden)
+            return;
 
         int destLine = -1;
 

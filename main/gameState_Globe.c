@@ -219,7 +219,14 @@ void initKernel_Globe() {
     setJumpVectors(_BUF_GLOBE_JUMP, _globeLoop, _globeExit, _SCANLINES);
     initDataStreams_Globe();
 
+    // Wrap on the {0}-sentinel end of planets[] (planet.c), same check nextPlanet() (drawPlanet.c)
+    // already uses -- without it, repeatedly re-entering Globe (e.g. via SELECT/RESET) walks
+    // planet past the array's real entries forever, and every planets[planet] read after that
+    // (here, in OS_Globe()'s name/physics text, and in initPlanet()/drawPlanet() via body) reads
+    // out-of-bounds memory instead of wrapping back to a real planet.
     planet++;
+    if (!planets[planet].name)
+        planet = 0;
     initPlanet(planet);
 
     infoPhase = INFO_FADEUP;

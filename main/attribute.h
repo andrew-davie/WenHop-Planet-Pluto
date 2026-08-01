@@ -61,6 +61,7 @@ enum ObjectType {
     TYPE_BOMB,                     // 51
     TYPE_CRACKED_BRICK,            // 52
     TYPE_CONCRETE,                 // 53
+    TYPE_TELEPORT,                 // 54
 
 
     TYPE_MAX
@@ -192,6 +193,7 @@ enum ChName {
     CH_BOMB,                      // 114
     CH_CRACKED_BRICK,             // 115
     CH_CONCRETE,                  // 116
+    CH_TELEPORT,                  // 117
 
     // 127 is limit of board-resident character numbers
 
@@ -302,6 +304,20 @@ enum ChName {
     CH_BIG_7,    // 220
     CH_BIG_8,    // 221
     CH_BIG_9,    // 222
+
+    // "Animated" chars, never placed on the board (see the >127 comment above the CH_TELEPORT
+    // slot) -- the other 7 frames of the teleport tile's spinning-spoke cycle. CH_TELEPORT
+    // itself (below 128, since it IS placed on the board via cave data) is frame 0; these are
+    // 1-7. See AnimTeleport (animations.c) -- TYPE_TELEPORT auto-advances through all 8 fixed
+    // ROM bitmaps like any other animated character (processCharAnimations()), no per-frame
+    // hand-holding needed.
+    CH_TELEPORT_1,    // 223
+    CH_TELEPORT_2,    // 224
+    CH_TELEPORT_3,    // 225
+    CH_TELEPORT_4,    // 226
+    CH_TELEPORT_5,    // 227
+    CH_TELEPORT_6,    // 228
+    CH_TELEPORT_7,    // 229
 
     CH_MAX
 };

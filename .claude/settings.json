@@ -8,7 +8,9 @@
       "Edit(**)",
       "Write(**)",
       "NotebookEdit(**)",
-      "Bash(awk '/^const unsigned char shape_FRAME_19\\\\[\\\\]/,/^};/' main/sprites.c)"
+      "Bash(awk '/^const unsigned char shape_FRAME_19\\\\[\\\\]/,/^};/' main/sprites.c)",
+      "Bash(gcc -O2 -o verify_blk verify_blk.c)",
+      "Bash(./verify_blk)"
     ]
   }
 }

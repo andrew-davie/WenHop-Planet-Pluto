@@ -282,7 +282,56 @@ const unsigned char AnimMellonHusk[] = {
     // @+2
 };
 
+
+// A 3-spoke pinwheel, 8 rotations 15 degrees apart (characterset.c has the full geometry
+// rationale). Entirely owned by driveTeleportSpin() below, NOT by processCharAnimations()'s
+// usual auto-advance -- deliberately not wired into AnimateBase[] (see its own entry's comment).
+// Durations here are ANIM_HALT and unused: driveTeleportSpin() paces itself, independent of
+// whatever's in this table, and having AnimateBase[TYPE_TELEPORT] be 0 means
+// processCharAnimations() skips this type outright, so there's no second driver left that could
+// race it. (An earlier version wired this into AnimateBase[] so the idle case could ride the
+// normal mechanism "for free" -- but ANIM_LOOP always resolves through AnimateBase[type], a
+// single fixed pointer, so that auto-advance never actually stopped even while
+// driveTeleportSpin() was separately forcing the fast cadence: both were writing
+// Animate[TYPE_TELEPORT]/AnimCount[TYPE_TELEPORT] every frame, and the two drifted out of sync
+// until the untouched auto-advance's slow 3-tick cadence became the one you could see.)
+const unsigned char AnimTeleport[] = {
+    CH_TELEPORT, ANIM_HALT,
+    CH_TELEPORT_1, ANIM_HALT,
+    CH_TELEPORT_2, ANIM_HALT,
+    CH_TELEPORT_3, ANIM_HALT,
+    CH_TELEPORT_4, ANIM_HALT,
+    CH_TELEPORT_5, ANIM_HALT,
+    CH_TELEPORT_6, ANIM_HALT,
+    CH_TELEPORT_7, ANIM_HALT,
+};
+
 // clang-format on
+
+// Sole driver of TYPE_TELEPORT's animation, every frame, both speeds -- see AnimTeleport's own
+// comment for why processCharAnimations()/AnimateBase[] are deliberately kept out of this
+// entirely. fast is gameState_Game.c's teleportLocked -- true from the instant the player steps
+// onto the tile until initPlayer() clears it once the destination cave loads.
+#define TELEPORT_IDLE_HOLD_FRAMES 4    // "3 frame delay" idle cadence
+#define TELEPORT_FAST_HOLD_FRAMES 1    // one tick slower than every frame, which read as too fast
+
+void driveTeleportSpin(bool fast) {
+
+    static unsigned int frame;
+    static int hold;
+
+    if (hold) {
+        hold--;
+        return;
+    }
+
+    hold = (fast ? TELEPORT_FAST_HOLD_FRAMES : TELEPORT_IDLE_HOLD_FRAMES) - 1;
+
+    startCharAnimation(TYPE_TELEPORT, AnimTeleport + 2 * frame);
+
+    if (++frame >= 8)
+        frame = 0;
+}
 
 const unsigned char *const AnimateBase[] = {
 
@@ -347,6 +396,8 @@ const unsigned char *const AnimateBase[] = {
     AnimateBomb,            // 51 TYPE_BOMB
     AnimateCrackedBrick,    // 52 TYPE_CRACKED_BRICK
     0,                      // 53 TYPE_CONCRETE
+    0,                      // 54 TYPE_TELEPORT -- driveTeleportSpin() owns this one entirely
+                            // (below); deliberately not wired in here, see its own comment
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
@@ -407,6 +458,7 @@ const unsigned char PickupCharacter[] = {
     CH_BOMB,          // 51 TYPE_BOMB
     0,                // 52 TYPE_CRACKED_BRICK
     0,                // 53 TYPE_CONCRETE
+    0,                // 54 TYPE_TELEPORT
 
 };
 
