@@ -483,7 +483,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-03 00:35 AEST
+// Last updated: 2026-08-03 03:47 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -545,7 +545,7 @@ static const unsigned short budget[128] = {
     _B + 452,     //  57 CH_GRINDER_0 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 436,     //  58 CH_GRINDER_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _untimed_,    //  59 CH_HUB
-    _B + 229,     //  60 CH_WATER -- updated 2026-08-03 00:35 AEST (was 225)
+    _B + 232,     //  60 CH_WATER -- updated 2026-08-03 03:47 AEST (was 229)
     _B + 292,     //  61 CH_WATERFLOW_0 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 296,     //  62 CH_WATERFLOW_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 1256,    //  63 CH_WATERFLOW_2 -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -602,7 +602,7 @@ static const unsigned short budget[128] = {
     _B + 1366,    // 114 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
     _B + 4594,    // 115 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
     _untimed_,    // 116 CH_CONCRETE
-    _B + 758,     // 117 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-03 00:35 AEST (was untimed)
+    _B + 766,     // 117 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-03 03:47 AEST (was 758)
     _untimed_,    // 118 (unused)
     _untimed_,    // 119 (unused)
     _untimed_,    // 120 (unused)
@@ -1387,6 +1387,35 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
             *cursor.me = FLAG(CH_ROCK);
             ADDAUDIO(att & ATT_HARD ? SFX_ROCK : SFX_ROCK2);
             nDots(6, cursor.col, cursor.row, PT_TWO, 20, 2, 10, 60, 7);
+
+            // Shake ONLY when this landing extends an unbroken chain of rocks all the way down
+            // to a cracked brick -- not for landing on dirt/wall/steel/anything else, and not
+            // for landing on a rock that ISN'T itself sitting on such a chain. This is exactly
+            // what TYPE_CRACKED_BRICK's own rockCount-vs-lastRockCount tally (further up this
+            // file) already computes -- but that tally only gets compared once per FULL board
+            // scan cycle (setupBoardScanner()'s "if (gameFrame >= gameSpeed)" gate), and a full
+            // cycle can take many frames (processBoardSquares()'s scan cursor is time-budgeted,
+            // T1TC < availableIdleTime, not a guaranteed once-per-frame sweep) -- that's the lag.
+            // Evaluating the same condition right here, the instant a rock actually lands,
+            // fixes the lag without touching that tally at all (still drives the crack's visual
+            // stress level and its own break-apart chance exactly as before).
+            //
+            // Cheap by construction: the overwhelmingly common case (landed on dirt, wall,
+            // steel, anything that isn't a cracked brick or another rock) is a single type
+            // check, no walk at all. The walk only runs in the rare case of landing directly on
+            // an existing rock, and is bounded by that chain's own height -- the exact same walk
+            // TYPE_CRACKED_BRICK's tally already does, just triggered by the landing event
+            // instead of by the scanner happening to revisit the brick cell.
+            enum ObjectType belowType = CharToType[GET(*next)];
+            if (belowType == TYPE_CRACKED_BRICK)
+                shakeTime += 4;
+            else if (belowType == TYPE_ROCK) {
+                unsigned char *below = next + _BOARD_COLS;
+                while (CharToType[GET(*below)] == TYPE_ROCK)
+                    below += _BOARD_COLS;
+                if (CharToType[GET(*below)] == TYPE_CRACKED_BRICK)
+                    shakeTime += 4;
+            }
         }
         break;
     }
@@ -1417,6 +1446,22 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
             if (*Animate[TYPE_DOOR] == CH_DOOROPEN_STATIC)
                 *cursor.me = CH_DOOROPEN_STATIC;
         }
+        break;
+
+    // Mirror of CH_DOORCLOSED's own case above, but running in reverse: mellon.c's
+    // TYPE_TELEPORT trigger kicks off the shared TYPE_DOOR_OPEN closing animation
+    // (startCharAnimation(TYPE_DOOR_OPEN, AnimateDoorClose + 2)) the instant the player steps
+    // onto a teleport tile, so this cell just waits for that shared animation to reach its own
+    // terminal frame (CH_DOORCLOSED, held forever) before committing the real board write --
+    // same "cells the scanner revisits before then just fall through and try again" idiom.
+    // No trigger-latch check needed here (unlike CH_DOORCLOSED's Animate[TYPE_DOOR] ==
+    // AnimateDoor test) since nothing about revisiting this cell before a teleport ever starts
+    // that animation on its own -- TYPE_DOOR_OPEN's AnimateBase entry (animations.c) is
+    // AnimateDoorClose's own idle landing pad (frame 0, holds forever), which never equals
+    // CH_DOORCLOSED, so this is a no-op every frame until mellon.c actually triggers it.
+    case CH_DOOROPEN_STATIC:
+        if (*Animate[TYPE_DOOR_OPEN] == CH_DOORCLOSED)
+            *cursor.me = CH_DOORCLOSED;
         break;
 
     case CH_DOOROPEN_0:
