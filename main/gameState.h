@@ -53,6 +53,6 @@ void initGameState_RasterBleed();
 void VB_RasterBleed();
 void OS_RasterBleed();
 
-extern int attachment;
+void loadCave(int newCave);    // shared level-(re)load body -- defined alongside GS_GAME in gameState_Game.c
 
 // EOF

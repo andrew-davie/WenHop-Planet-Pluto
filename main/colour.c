@@ -248,8 +248,22 @@ void setPalette(int buf) {
         i += 3;
     }
 
-    const unsigned char *cl = showLava ? &lbg[0] : &wbg[0];
-    const unsigned char *clava = showLava ? &lavaColour[0] : &waterColour[0];
+    // wbg/lbg/waterColour/lavaColour above are raw palette values -- convert them the same way
+    // every other on-screen colour is (rollColour[]/bgCol above are already fade-aware, having
+    // gone through convertColour() when bgPalette/fgPalette/colubk were originally set), so the
+    // water/lava background and surface actually fade with the rest of the screen instead of
+    // staying at full brightness through a luminance fade. Converted once here into small local
+    // tables rather than per-scanline in the loop below, matching rollColour[]'s own pattern.
+    const unsigned char *clRaw = showLava ? &lbg[0] : &wbg[0];
+    const unsigned char *clavaRaw = showLava ? &lavaColour[0] : &waterColour[0];
+
+    unsigned char cl[sizeof(wbg)];
+    for (unsigned int j = 0; j < sizeof(wbg); j++)
+        cl[j] = convertColour(clRaw[j]);
+
+    unsigned char clava[sizeof(waterColour)];
+    for (unsigned int j = 0; j < sizeof(waterColour); j++)
+        clava[j] = convertColour(clavaRaw[j]);
 
     while (i < _SCANLINES) {
 

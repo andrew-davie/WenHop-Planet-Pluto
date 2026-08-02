@@ -55,8 +55,6 @@
 #define DIR_R 2
 #define DIR_D 4
 #define DIR_L 8
-extern int armFrequency;
-
 extern unsigned int frame;
 extern int tvSystem;
 extern int armFrequency;
@@ -91,6 +89,11 @@ extern const signed char dirOffset[];
 extern const signed char xdir[];
 extern const signed char ydir[];
 extern int exitMode;
+
+// exitMode's starting value (mellon.c's checkHighPriorityMove(), the TYPE_OUTBOX/TYPE_DOOR_OPEN
+// case) -- shared with playerAnimation.c's updatePlayerAnimation() so the exit walk-off drift's
+// total distance stays anchored to the same countdown, wherever EXIT_MODE_START itself changes.
+#define EXIT_MODE_START 40
 extern bool waitRelease;
 
 extern int gravity;
@@ -101,8 +104,6 @@ extern int boardCol;
 extern unsigned int idleTimer;
 extern int lives;
 extern unsigned int sparkleTimer;
-extern bool playerDead;
-extern int gameFrame;
 
 extern unsigned int availableIdleTime;
 extern int debris;

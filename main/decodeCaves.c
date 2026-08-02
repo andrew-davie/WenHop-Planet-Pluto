@@ -7,6 +7,7 @@
 #include "attribute.h"
 #include "caveData.h"
 #include "decodeCaves.h"
+#include "gameState.h"
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"
@@ -420,5 +421,67 @@ void DrawFilledRect(objectType anObject, int x, int y, int aWidth, int aHeight, 
         DrawRect(anObject, x, y, aWidth, aHeight);
     }
 }
+
+
+void getCaveLabel(char *out, int caveIndex) {
+
+    out[0] = 'A';
+
+    while (caveIndex >= CAVES_PER_PLANET) {
+        caveIndex -= CAVES_PER_PLANET;
+        out[0]++;
+    }
+
+    out[1] = '0' + caveIndex;
+    out[2] = 0;
+}
+
+void startTeleportWarp() {
+
+    // Stay within the current cave's own planet grouping (caveList[]'s "// PLANET n" blocks,
+    // CAVES_PER_PLANET entries each -- see caveData.h) -- teleporting should hop between
+    // levels of the same planet, not anywhere in the whole 100-cave roster. Finds the
+    // group's start index with a plain loop rather than "cave / CAVES_PER_PLANET *
+    // CAVES_PER_PLANET": this coprocessor has no divide instruction (see swipe.c's isqrt()
+    // comment), and CAVES_PER_PLANET (10) isn't a power of 2, so that expression risks a
+    // real libgcc call -- the loop sidesteps the question entirely.
+
+    int groupStart = 0;
+    while (groupStart + CAVES_PER_PLANET <= cave)
+        groupStart += CAVES_PER_PLANET;
+
+    int groupEnd = groupStart + CAVES_PER_PLANET;
+    if (groupEnd > caveCount)
+        groupEnd = caveCount;
+
+    // Reservoir-sample a random cave with a teleport destination from that group (see the
+    // struct's comment -- {0,0} means "no destination here"), excluding the current one --
+    // if that's the only eligible cave, land back on it; loadCave() reloading it fresh is
+    // harmless, same as looping a level.
+
+    // Gotta say - pretty awesome algorithm!
+
+    int newCave = -1;
+    int count = 0;
+
+    for (int i = groupStart; i < groupEnd; i++)
+        if ((caveList[i].teleportX || caveList[i].teleportY) && i != cave) {
+            count++;
+            if (!rangeRandom(count))
+                newCave = i;
+        }
+
+    if (newCave < 0)
+        newCave = cave;
+
+    // decodeCave() (called from loadCave()) will place the player at this cave's normal
+    // CH_MELLON_HUSK_BIRTH spawn first, same as any other level load -- pendingTeleportArrival
+    // tells scheduleUnpackCave() (schedule.c) to relocate them onto a random blank tile instead,
+    // once the whole cave has actually finished decoding (see relocatePlayerToTeleport()).
+    pendingTeleportArrival = true;
+
+    loadCave(newCave);
+}
+
 
 // EOF

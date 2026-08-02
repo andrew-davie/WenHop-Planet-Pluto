@@ -4,7 +4,7 @@
 
 // 10x10 world, wrapping left/right only (no wrap top/bottom).
 // A cell is 0 (dead) or 1-7 (alive, holding one of the 8 available colours).
-extern unsigned char wcol[LIFE_CELLS];
+unsigned char wcol[LIFE_CELLS];
 
 static unsigned char nextwcol[LIFE_CELLS];
 

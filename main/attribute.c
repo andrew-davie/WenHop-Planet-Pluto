@@ -15,7 +15,7 @@ const enum ObjectType CharToType[] = {
     TYPE_PLACEHOLDER,              // 001 CH_PLACEHOLDER
     TYPE_DIRT,                     // 002 CH_DIRT
     TYPE_BRICKWALL,                // 003 CH_BRICKWALL
-    TYPE_OUTBOX_PRE,               // 004 CH_DOORCLOSED
+    TYPE_DOOR,                     // 004 CH_DOORCLOSED
     TYPE_OUTBOX,                   // 005 CH_DOOROPEN_0
     TYPE_OUTBOX,                   // 006 CH_EXITBLANK
     TYPE_STEELWALL,                // 007 CH_STEELWALL
@@ -129,8 +129,8 @@ const enum ObjectType CharToType[] = {
     TYPE_CRACKED_BRICK,            // 115 CH_CRACKED_BRICK
     TYPE_CONCRETE,                 // 116 CH_CONCRETE
     TYPE_TELEPORT,                 // 117 CH_TELEPORT
-    0,                             // 118
-    0,                             // 119
+    TYPE_KEY,                      // 118 CH_KEY
+    TYPE_DOOR_OPEN,                // 119 CH_DOOROPEN_STATIC
     0,                             // 120
     0,                             // 121
     0,                             // 122
@@ -224,7 +224,7 @@ const unsigned int Attribute[] = {
     _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 01 TYPE_PLACEHOLDER,
    CNR| _ | _ | _ |DIS| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRT| _ |PER|XPD|CVT| _ | _ | _ |DRP , // 02 TYPE_DIRT,
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL| _ |DRP , // 03 TYPE_BRICKWALL,
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 04 TYPE_OUTBOX_PRE,
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 04 TYPE_DOOR,
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 05 TYPE_OUTBOX,
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRP , // 06 TYPE_STEELWALL,
     _ |PAD| _ |MLT| _ |PH1| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ |MAS| _ | _ | _ |XPD| _ | _ |ROL|PUP| _  , // 07 TYPE_ROCK,
@@ -274,7 +274,9 @@ const unsigned int Attribute[] = {
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 51 TYPE_BOMB
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _  , // 52 TYPE_CRACKED_BRICK
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ |ROL| _ |DRP , // 53 TYPE_CONCRETE
-    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PER| _ | _ | _ | _ | _ | _ | _  , // 54 TYPE_TELEPORT (walkable, solid -- like TYPE_STAR's ground)
+    _ |PAD| _ | _ | _ |PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PER| _ | _ | _ | _ | _ | _ | _  , // 54 TYPE_TELEPORT (walkable, solid -- like TYPE_STAR's ground; PH4 drives its idle sparkle, see board.c)
+    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 55 TYPE_KEY (solid ground pickup -- auto-grabbed by walking onto it, see mellon.c's checkHighPriorityMove; blocked while already carrying something)
+    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _  , // 56 TYPE_DOOR_OPEN (same walkable/exit bits as TYPE_OUTBOX, deliberately not TYPE_OUTBOX itself -- see its own comment)
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|----+---+
 
     // clang-format on

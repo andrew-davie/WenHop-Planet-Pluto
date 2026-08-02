@@ -20,9 +20,6 @@ static const unsigned char *img[_BOARD_COLS];
 static int previewStart;     // = _ARENA_SCANLINES;
 static int previewTarget;    // = PREVIEW_Y;
 
-
-unsigned char wcol[100];
-
 void initGridPreview(int startLine, int endLine) {
 
     previewStart = startLine;

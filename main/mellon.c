@@ -13,16 +13,69 @@
 #include "playerAnimation.h"
 #include "random.h"
 #include "score.h"
-#include "scroll.h"
 #include "sound.h"
 
 int playerX;    // char pos 0-39 (use *5 for pixel)
 int playerY;    // char pos 0-21 (use *10 for pixel and then *3 for scanline)
 
+// What the player is currently carrying, if anything (CH_... value, or 0). Invariant: never
+// carries FLAG_THISFRAME -- every site that assigns it (pickup, drop-conversion) writes a
+// plain CH_ value, so every reader can compare/index with it directly, no GET() needed. The
+// one place that DOES need the flag -- the deferred board write when the carried item is
+// actually dropped -- carries it separately via dropSkipThisFrame instead of baking it into
+// this variable (see dropSkipThisFrame's own comment).
+int attachment = 0;
+const OFFSET *attachmentOffset = 0;
+
 bool teleportLocked;
 bool teleportCountingDown;
 int teleportSwirlTicks;
 bool teleportRequested;
+
+// Departure: the tile the player stood on just before stepping onto the teleport tile --
+// checkHighPriorityMove() below records this the instant it locks teleportLocked, and
+// drawAttachedChar() (draw.c) draws the carried-object "drop" relative to THIS fixed tile
+// instead of the already-updated-to-destination playerX/playerY, so it renders exactly like
+// an ordinary stationary drop (player standing still, dropping in the direction they just
+// walked) rather than inheriting the walk-in glide's motion.
+int teleportDepartOriginX, teleportDepartOriginY;
+
+// Door-exit counterpart to teleportDepartOriginX/Y -- same role (checkHighPriorityMove()'s
+// exit trigger below records it, drawAttachedChar() draws relative to it instead of playerX/Y),
+// entirely separate storage. Needed for exactly the same reason teleport needs its own copy:
+// playerX/playerY get updated onto the door tile a few lines after the trigger fires (the
+// shared ATT_BLANK|PERMEABLE|GRAB|EXIT movement code just below it), so without a frozen
+// pre-move copy the drop would keep sliding as playerX/Y (and the walk-in glide on top of it)
+// changed under it instead of settling once, exactly the "jumping all over the place" bug this
+// was added to fix.
+int exitDepartOriginX, exitDepartOriginY;
+
+// Door-exit counterpart to teleportCarryLift() below -- same shape (armed to
+// DOOR_CARRY_LIFT_MAX, ticks down by one per visible frame), entirely separate counter, so it
+// can't add to or interfere with teleport's own ramp even though both ultimately feed the same
+// drawAttachedChar() offsetY pull (draw.c sums the two -- see its own comment). Armed by
+// initPlayer() only when doorExitArmsCarryLift was left set by the exit trigger just below
+// (checkHighPriorityMove()), never for a teleport arrival or a fresh level start, and cleared
+// right back to false there every time regardless, so it can only ever fire for the one cave
+// load it was actually set up for.
+static int doorCarryLiftTicks;
+
+// Not static -- initNewGame() (main.c) reads this too. Walking out through an exit door doesn't
+// go straight to loadCave() the way a teleport does: it routes through GS_MENU then GS_GLOBE
+// before GS_GAME is re-entered, and initGameState_Game() calls initNewGame() (which clears
+// attachment -- see its own comment, main.c) unconditionally on every entry to GS_GAME, not just
+// a genuine fresh game. Left true here for that whole detour (only initPlayer() below ever
+// clears it, on the loadCave() at the far end), initNewGame() checks it to tell "just finished a
+// level via the door" apart from "actually starting over", so the carried item survives the trip
+// the same way it already does for a teleport's direct loadCave() call.
+bool doorExitArmsCarryLift;
+
+int doorCarryLift() {
+    int lift = doorCarryLiftTicks;
+    if (doorCarryLiftTicks > 0)
+        doorCarryLiftTicks--;
+    return lift;
+}
 
 // Departure swirl: batches start the instant teleportLocked goes true (see
 // startTeleportDepartSwirl()'s call site below) and keep going for as long as
@@ -47,8 +100,10 @@ void updateTeleportDepartSwirl(int x, int y) {
         departSwirlBatchCounter = TELEPORT_DEPART_SWIRL_BATCH_INTERVAL;
 
         zapNonSpiralParticles();
+
+        // Speed 32 = the original 40, reduced 20% (matches the arrival swirl below).
         nDots(TELEPORT_DEPART_SWIRL_BATCH_SIZE, x, y, PT_SPIRAL2, TELEPORT_SWIRL_PARTICLE_AGE, CHAR_CENTER_X,
-              CHAR_CENTER_Y, 40, 7);
+              CHAR_CENTER_Y, 32, 7);
     }
 
     departSwirlBatchCounter--;
@@ -71,6 +126,15 @@ void startTeleportArrivalSwirl(int x, int y) {
     arrivalSwirlBatchCounter = 0;
 }
 
+// 0.5 seconds at 60fps -- the player now appears this much before the swirl itself actually
+// finishes (drawPlayer.c uses this instead of isTeleportArrivalSwirlActive() for its hidden
+// check), so they materialise while the last of the spiral dots are still landing rather than
+// waiting for arrivalSwirlTicks to hit 0. The swirl's own duration/spawn behaviour
+// (TELEPORT_ARRIVAL_SWIRL_TICKS, updateTeleportArrivalSwirl() below) is untouched -- this only
+// changes when the PLAYER stops being hidden, not how long the particles themselves run.
+// Moved above updateTeleportArrivalSwirl() (was below) so that function can use it directly.
+#define TELEPORT_ARRIVAL_PLAYER_REVEAL_EARLY_TICKS 60
+
 void updateTeleportArrivalSwirl() {
 
     if (arrivalSwirlTicks) {
@@ -83,8 +147,10 @@ void updateTeleportArrivalSwirl() {
             arrivalSwirlBatchCounter = TELEPORT_ARRIVAL_SWIRL_BATCH_INTERVAL;
 
             zapNonSpiralParticles();
+
+            // Speed 32 = the original 40, reduced 20%.
             nDots(TELEPORT_ARRIVAL_SWIRL_BATCH_SIZE, arrivalSwirlX, arrivalSwirlY, PT_SPIRAL2,
-                  TELEPORT_SWIRL_PARTICLE_AGE, CHAR_CENTER_X, CHAR_CENTER_Y, 40, 7);
+                  TELEPORT_SWIRL_PARTICLE_AGE, CHAR_CENTER_X, CHAR_CENTER_Y, 32, 7);
         }
 
         arrivalSwirlBatchCounter--;
@@ -96,20 +162,62 @@ bool isTeleportArrivalSwirlActive() {
     return arrivalSwirlTicks != 0;
 }
 
-// 0.5 seconds at 60fps -- the player now appears this much before the swirl itself actually
-// finishes (drawPlayer.c uses this instead of isTeleportArrivalSwirlActive() for its hidden
-// check), so they materialise while the last of the spiral dots are still landing rather than
-// waiting for arrivalSwirlTicks to hit 0. The swirl's own duration/spawn behaviour
-// (TELEPORT_ARRIVAL_SWIRL_TICKS, updateTeleportArrivalSwirl() above) is untouched -- this only
-// changes when the PLAYER stops being hidden, not how long the particles themselves run.
-#define TELEPORT_ARRIVAL_PLAYER_REVEAL_EARLY_TICKS 60
-
 bool isTeleportArrivalPlayerHidden() {
     return arrivalSwirlTicks > TELEPORT_ARRIVAL_PLAYER_REVEAL_EARLY_TICKS;
 }
 
+// True exactly when drawPlayerSprite() (drawPlayer.c) is suppressing the player's own sprite
+// for a teleport in progress -- departure (once the walk-in glide onto the tile has settled)
+// or arrival (isTeleportArrivalPlayerHidden(), above). Shared so anything else drawn "on" the
+// player -- currently just the carried-object icon, gameState_Game.c's drawAttachedChar()
+// call -- can be suppressed in lockstep instead of being left floating in place with no player
+// underneath it once the sprite itself vanishes into/out of the tile.
+bool isPlayerHidden() {
+    return (teleportLocked && !autoMoveFrameCount) || isTeleportArrivalPlayerHidden();
+}
+
+// Arrival only (departure uses a different mechanism entirely -- checkHighPriorityMove()'s
+// dropOffset[] trigger and drawAttachedChar()'s teleportLocked correction, draw.c). How far
+// drawAttachedChar() should pull the carried-object icon toward the player's own default draw
+// position -- 0 = normal carry height, TELEPORT_CARRY_LIFT_MAX (mellon.h) = fully merged with
+// the player. The instant the player stops being hidden on arrival
+// (isTeleportArrivalPlayerHidden() clearing), this starts at MAX and falls to 0 over the next
+// TELEPORT_CARRY_LIFT_MAX ticks, so the object visibly rises up out of the player instead of
+// popping straight to fully-carried.
+int teleportCarryLift() {
+
+    if (isTeleportArrivalSwirlActive() && !isTeleportArrivalPlayerHidden()) {
+
+        int ticksVisible = TELEPORT_ARRIVAL_PLAYER_REVEAL_EARLY_TICKS - arrivalSwirlTicks;
+        if (ticksVisible < TELEPORT_CARRY_LIFT_MAX)
+            return TELEPORT_CARRY_LIFT_MAX - ticksVisible;    // MAX right as they reappear, falling to 0
+    }
+
+    return 0;
+}
+
 int frameAdjustX;
 int frameAdjustY;
+
+// Exit sequence only (updatePlayerAnimation(), playerAnimation.c): how many luminance units to
+// darken the player sprite by, on top of whatever the level's own luminance fade already
+// contributes (drawPlayerSprite(), drawPlayer.c) -- 0 = normal, 15 = fully black. The level-wide
+// fade (lumTarget, board.c's exitMode case) doesn't start until exitMode drops below 20, so most
+// of the walk-off drift would otherwise play out at full brightness with the fade only catching
+// up in the last ~15 real frames; this fades the player out smoothly across the whole walk
+// instead, independent of that.
+int playerExitFade;
+
+// One-shot latch for the exit door's slide-shut trigger (updatePlayerAnimation(),
+// playerAnimation.c) -- set true right there the instant it fires, reset false here whenever a
+// fresh exit sequence starts (checkHighPriorityMove()'s exit trigger below). Comparing
+// Animate[TYPE_OUTBOX] against AnimateDoorClose + 2 directly doesn't work as a one-shot guard:
+// that pointer value is only true WHILE the slide is mid-flight -- once it finishes advancing to
+// AnimateDoorClose + 4 (CH_DOORCLOSED), the comparison starts matching "not yet triggered" again
+// and the trigger re-fires every single frame from then on, permanently restarting the slide
+// from scratch (visible as the door never actually settling, cycling closed for one frame then
+// snapping back open).
+bool doorClosing;
 static unsigned int pushCounter;
 enum FaceDirectionX faceDirection;
 bool playerDead;
@@ -121,6 +229,47 @@ static int kdelay = 0;
 
 static unsigned char *meAtt;
 static bool drop = false;
+
+// attachment itself is always kept clean of FLAG_THISFRAME (every setter strips it, every
+// reader can compare/index with it directly -- see attachment's own declaration below) --
+// but the deferred board write in movePlayer()'s "if (drop)" block (one frame after this is
+// set) still needs to know whether ITS write should carry the flag, same reasoning as
+// FLAG(CH_DUST_0) elsewhere: a cell dropped into a board position the scanner hasn't reached
+// yet this pass (right/down of the player, given scan order) must skip processing until next
+// frame, or it can fall/roll the instant it lands. dir isn't available in movePlayer(), so
+// this carries that one bit forward the one frame checkHighPriorityMove() -> movePlayer().
+static bool dropSkipThisFrame;
+
+// Carrying a key up to CH_DOORCLOSED (checkHighPriorityMove() below) starts a two-phase
+// countdown, but -- unlike teleportLocked, which this used to mirror -- doesn't freeze the
+// player for it: board.c's TYPE_MELLON_HUSK case calls movePlayer() every frame regardless,
+// calling updateDoorUnlock() alongside it whenever doorLocked is set. First the key's normal
+// drop arc (dropOffset[], same table every other drop uses) settles into the door's cell,
+// then the door itself becomes CH_DOOROPEN_0 and a short pause follows before doorLocked
+// clears. The player can walk off mid-animation -- drawAttachedChar() (draw.c) keeps drawing
+// the settling key pinned to doorUnlockOriginX/Y (recorded below) instead of the player's own
+// current position, exactly like teleportDepartOriginX/Y does for a teleport departure.
+// checkHighPriorityMove() also guards its trigger and the fire-button drop/pickup block with
+// !doorLocked, since attachment is still "spoken for" by the door until updateDoorUnlock()
+// clears it -- without that, walking straight back into the door (or firing to drop/pick up
+// elsewhere) mid-animation could re-trigger or double-consume the key.
+bool doorLocked;
+static unsigned char *doorUnlockCell;
+static int doorUnlockTicks;
+static bool doorOpened;
+int doorUnlockOriginX, doorUnlockOriginY;
+
+// This case only ticks once every SPEED_BASE (5) real render frames (see
+// TELEPORT_SWIRL_TICKS's comment above, board.c) -- drawAttachedChar() (draw.c) advances
+// attachmentOffset once per render call regardless. dropOffset[]'s arc used to be 8 real
+// keyframes deep and ran out well before a multi-tick put phase could commit, snapping the
+// key back to attachment's *default* draw offset (the "carried above head" pose) for the
+// remaining wait -- see REST_HOLD (above the dropOffset* tables) for the fix: 15 extra
+// repeats of the resting keyframe, 23 real entries total, good for ~4.6 ticks (23 render
+// calls / 5 per tick) before it would run out. Keep this at or below 4 so it stays inside
+// that budget; raising it further means growing REST_HOLD's repeat count too.
+#define DOOR_UNLOCK_PUT_TICKS 4
+#define DOOR_UNLOCK_PAUSE_TICKS 4    // extra beat with the door visibly open before doorLocked clears
 
 
 const enum JOYSTICK_DIRECTION joyDirectBit[] = {
@@ -136,6 +285,56 @@ const enum FaceDirectionX faceDirectionDef[] = {
     FACE_DOWN,
     FACE_LEFT,
 };
+
+static void startDoorUnlock(unsigned char *cell, int dir) {
+
+    doorLocked = true;
+    doorOpened = false;
+    doorUnlockCell = cell;
+    doorUnlockTicks = DOOR_UNLOCK_PUT_TICKS;
+
+    // playerX/playerY haven't moved onto the door tile for this trigger (the key is dropped
+    // forward into it, same as any other stationary drop) -- but the player is free to walk
+    // off starting next frame while doorLocked, so pin the settling key's draw position to
+    // wherever they were standing right now, same idea as teleportDepartOriginX/Y.
+    doorUnlockOriginX = playerX;
+    doorUnlockOriginY = playerY;
+
+    // Kick the visual split off now, the instant the key touches the door, so it has the whole
+    // DOOR_UNLOCK_PUT_TICKS wait (4 ticks * 5 real frames/tick = 20 real frames) to finish before
+    // updateDoorUnlock() below commits the real board write -- AnimateDoor's own total (14 real
+    // frames) comfortably fits inside that. If DOOR_UNLOCK_PUT_TICKS or AnimateDoor's per-frame
+    // delays ever change, keep that inequality true, or the door will become walkable mid-slide.
+    startCharAnimation(TYPE_DOOR, AnimateDoor + 2);
+
+    faceDirection = faceDirectionDef[dir];
+
+    // Give the stand pose immediately rather than waiting a frame for movePlayer()'s own
+    // walk-to-stand transition to catch up -- harmless either way now that movePlayer() runs
+    // every frame during doorLocked too (unlike teleportLocked/exitMode, which still skip it).
+    int dir2 = (gravity < 0) ? dir ^ 2 : dir;
+    startPlayerAnimation(dir2 == 0 ? ID_StandUp : dir2 == 2 ? ID_Stand : ID_StandLR);
+}
+
+void updateDoorUnlock() {
+
+    if (--doorUnlockTicks > 0)
+        return;
+
+    if (!doorOpened) {
+
+        *doorUnlockCell = CH_DOOROPEN_STATIC;    // not CH_DOOROPEN_0 -- see AnimateDoor's comment
+        ADDAUDIO(SFX_DOOR);
+
+        attachment = 0;
+        attachmentOffset = 0;
+
+        doorOpened = true;
+        doorUnlockTicks = DOOR_UNLOCK_PAUSE_TICKS;
+
+    } else
+        doorLocked = false;
+}
 
 const signed int animDeltaX[] = {
     0,
@@ -183,6 +382,15 @@ void initPlayer() {
 
     drop = false;
     attachmentOffset = 0;
+
+    // Door-exit counterpart to teleport arrival's own carry-lift ramp (which needs no arming
+    // here -- teleportCarryLift() drives itself purely off arrivalSwirlTicks, untouched).
+    // doorExitArmsCarryLift is only ever left true by the door-exit trigger just below
+    // (checkHighPriorityMove()) for the one cave load it set up; every other load through here
+    // (a teleport arrival, a fresh level start) leaves it false, so doorCarryLiftTicks stays 0
+    // and doorCarryLift() is a no-op for them, same as it always was pre-door.
+    doorCarryLiftTicks = (doorExitArmsCarryLift && attachment) ? DOOR_CARRY_LIFT_MAX : 0;
+    doorExitArmsCarryLift = false;
 
     startPlayerAnimation(ID_Stand);    // tmp
 }
@@ -272,6 +480,18 @@ const OFFSET *pickupOffset[] = {
 };
 
 
+// The last real keyframe in each table below is where the dropped object comes to rest --
+// repeated an extra REST_HOLD times before the {0,0} terminator so drawAttachedChar() (draw.c)
+// keeps showing it sitting there instead of its own per-render auto-advance running off the
+// end and falling back to attachment's default "carried above head" draw offset. Only actually
+// exercised by callers that hold attachment/drop deliberately for several ticks after landing
+// (see updateDoorUnlock(), which does exactly that) -- an ordinary drop still commits (writes
+// the board cell, clears attachment) on the very next tick regardless, long before these extra
+// entries would ever be reached.
+#define REST_HOLD(x, y)                                                                                       \
+    {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, \
+        {x, y}
+
 const OFFSET dropOffsetRight[] = {
 
     {0, -8 * 3},     //
@@ -282,6 +502,7 @@ const OFFSET dropOffsetRight[] = {
     {-4, -6 * 3},    //
     {-5, -4 * 3},    //
     {-5, -2 * 3},    //
+    REST_HOLD(-5, -2 * 3),
     {0, 0},          //
 };
 
@@ -295,6 +516,7 @@ const OFFSET dropOffsetLeft[] = {
     {4, -6 * 3},    //
     {5, -4 * 3},    //
     {5, -2 * 3},    //
+    REST_HOLD(5, -2 * 3),
     {0, 0},         //
 };
 
@@ -308,6 +530,7 @@ const OFFSET dropOffsetDown[] = {
     {-2, 2 * 3},     //
     {-1, 5 * 3},     //
     {0, 8 * 3},      //
+    REST_HOLD(0, 8 * 3),
     {0, 0},          //
 };
 
@@ -320,6 +543,7 @@ const OFFSET dropOffsetUp[] = {
     {1, -13 * 3},    //
     {1, -12 * 3},    //
     {1, -11 * 3},    //
+    REST_HOLD(1, -11 * 3),
     {0, 0},          //
 };
 
@@ -342,7 +566,12 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
     if (usableSWCHA & joyBit)
         return false;
 
-    if (!kdelay && !waitRelease) {
+    // !doorLocked: attachment is still CH_KEY (and still "spoken for" by the settling door,
+    // startDoorUnlock() below) for as long as doorLocked holds -- since the player can now
+    // walk around during that window, this block would otherwise let a fire-button press
+    // drop/re-pick-up that same key elsewhere while it's also mid-way into the door,
+    // double-consuming it. See doorLocked's own comment above for the full picture.
+    if (!doorLocked && !kdelay && !waitRelease) {
         if (!(inpt4 & 0x80)) {
 
             meAtt = cur->me + dirOffset[dir];
@@ -358,8 +587,7 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                     else if (type2 == TYPE_ROCK)
                         attachment = CH_ROCK_FALLING;
 
-                    if (dir == 1 || dir == 2)
-                        attachment |= FLAG_THISFRAME;
+                    dropSkipThisFrame = (dir == 1 || dir == 2);
 
                     drop = true;
                     attachmentOffset = dropOffset[dir];
@@ -384,9 +612,6 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                     extern const unsigned char AnimateBomb[];
                     if (pickup == CH_BOMB)
                         startCharAnimation(TYPE_BOMB, AnimateBomb);
-
-                    if (dir == 1 || dir == 2)
-                        attachment |= FLAG_THISFRAME;
 
                     attachmentOffset = pickupOffset[dir];
 
@@ -505,6 +730,66 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
             handled = true;
         }
 
+        // Auto-pickup on walk-in, same as TYPE_STAR above -- but gated on !attachment, unlike
+        // STAR: a key is something you carry (via `attachment`, same field the fire-button
+        // pickup path above uses), so if you're already carrying something this branch is
+        // simply skipped -- destType == TYPE_KEY has no ATT_BLANK/PERMEABLE/GRAB/EXIT either
+        // (attribute.c), so the generic walkable check below won't catch it and the move is
+        // blocked, same as walking into a wall.
+        else if (!attachment && destType == TYPE_KEY) {
+
+            ADDAUDIO(SFX_LIFT);
+
+            attachment = CH_KEY;
+            attachmentOffset = pickupOffset[dir];
+
+            playerX += xdir[dir];
+            playerY += ydir[dir];
+
+            moveHusk(dir, cur->me, meOffset);
+
+            int dir2 = (gravity < 0) ? dir ^ 2 : dir;
+
+            if (playerAnimationID != WalkAnimation[dir2])
+                startPlayerAnimation(WalkAnimation[dir2]);
+
+            if (!autoMoveFrameCount) {
+
+                autoMoveFrameCount = ((MOVE_SPEED) << playerSlow);
+
+                autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
+                autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
+            }
+
+            handled = true;
+        }
+
+        // Carrying a key up to a still-locked door (CH_DOORCLOSED specifically, not just any
+        // TYPE_DOOR -- board.c's ambient CH_DOORCLOSED case also opens these once
+        // !doges, this is just an earlier/alternate trigger): a normal drop, using the exact
+        // same attachmentOffset arc (dropOffset[dir]) and attachment (still CH_KEY, still
+        // drawn by drawAttachedChar()) as any other drop -- attachment doesn't get zeroed
+        // until updateDoorUnlock() actually commits. The key never becomes a real board
+        // character -- doorLocked (board.c's TYPE_MELLON_HUSK case) drives updateDoorUnlock()
+        // every frame until it swaps the door open; see its own comment for the two-phase
+        // timing and for why the player is NOT frozen while this plays out.
+        //
+        // !doorLocked here (as well as guarding the fire-button block above) stops this from
+        // re-triggering every frame the player holds the direction into a door that's already
+        // mid-open -- attachment stays CH_KEY and *meOffset stays CH_DOORCLOSED for the whole
+        // window, so without the guard this would just keep restarting startDoorUnlock().
+        //
+        // attachment is never flagged with FLAG_THISFRAME (every setter strips it -- see its
+        // declaration), so it can be compared directly here; *meOffset is a real board cell
+        // and still needs GET().
+        else if (!doorLocked && attachment == CH_KEY && GET(*meOffset) == CH_DOORCLOSED) {
+
+            attachmentOffset = dropOffset[dir];
+            startDoorUnlock(meOffset, dir);
+
+            handled = true;
+        }
+
 
         else if (Attribute[destType] & (ATT_BLANK | ATT_PERMEABLE | ATT_GRAB | ATT_EXIT)) {
 
@@ -513,12 +798,51 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
             if (Attribute[destType] & ATT_BLANK)
                 ADDAUDIO(SFX_SPACE);
 
-            else if (destType == TYPE_OUTBOX) {
+            // TYPE_DOOR_OPEN (an unlocked/opened door, mellon.c's updateDoorUnlock()/board.c's
+            // CH_DOORCLOSED case) is deliberately a different type than TYPE_OUTBOX -- see its
+            // own comment (attribute.h) -- but walking through one still has to finish the level
+            // exactly like walking into the real TYPE_OUTBOX exit tile does, so both are checked
+            // here.
+            else if (destType == TYPE_OUTBOX || destType == TYPE_DOOR_OPEN) {
 
                 *meOffset = CH_EXITBLANK;
                 ADDAUDIO(SFX_WHOOSH);
-                exitMode = 40;
+                exitMode = EXIT_MODE_START;
                 waitRelease = true;
+                doorClosing = false;    // fresh exit sequence -- see its own comment
+
+                // CH_EXITBLANK is TYPE_OUTBOX too, so from here it would otherwise keep rendering
+                // via the shared Animate[TYPE_OUTBOX]/AnimFlashOut cycle -- flashing on/off every
+                // 20 frames -- for the whole exit sequence, completely independent of exitMode.
+                // Pin it to AnimFlashOut's first frame (the door glyph, not blank) and freeze it
+                // there via haltCharAnimation() so it just sits still while the player walks off
+                // and the screen fades. Same "animate in unison" caveat as everywhere else this
+                // system is used -- any other TYPE_OUTBOX tile in the level freezes too, but the
+                // level is ending regardless.
+                startCharAnimation(TYPE_OUTBOX, AnimFlashOut);
+                haltCharAnimation(TYPE_OUTBOX);
+
+                // Same treatment as stepping onto a teleport tile (below): drop whatever's
+                // carried on the tile the player is leaving, using the ordinary drop arc.
+                // playerX/playerY are still the PRE-move position here (the shared
+                // playerX/playerY += xdir/ydir[dir] below hasn't run yet for this branch), so
+                // unlike teleport's version there's no subtraction needed to recover it -- just
+                // record it directly, before it changes. drawAttachedChar() (draw.c) then draws
+                // relative to this frozen exitDepartOriginX/Y, exactly like teleportLocked makes
+                // it draw relative to teleportDepartOriginX/Y, instead of the live (and, for the
+                // rest of the exit sequence, walk-in-gliding) playerX/playerY -- without that,
+                // the drop arc's offsets were being added on top of a base position that kept
+                // moving under it for the last few frames of the glide, reading as the item
+                // jumping around instead of settling into a single dropped position.
+                // attachment itself is untouched -- initPlayer() (gameState_Game.c's loadCave())
+                // carries it into the next cave and arms doorCarryLiftTicks so it rises back
+                // into carry pose there, same as a teleport arrival (see its own comment).
+                if (attachment) {
+                    exitDepartOriginX = playerX;
+                    exitDepartOriginY = playerY;
+                    attachmentOffset = dropOffset[dir];
+                    doorExitArmsCarryLift = true;
+                }
             }
 
             //             else if (destType == TYPE_FLIP_GRAVITY) {
@@ -627,6 +951,21 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
         teleportLocked = true;
         teleportCountingDown = false;
         startTeleportDepartSwirl();    // spirals start now, not once the walk-in glide settles
+
+        // Carried object (if any) "dropped" in the direction just walked, using the exact same
+        // table a real fire-button drop uses -- attachment itself is left untouched (no board
+        // write, nothing cleared). playerX/playerY are already updated to the destination
+        // (teleport) tile by this point, so the origin tile is recovered by subtracting this
+        // move back off -- drawAttachedChar() (draw.c) draws relative to that recorded origin,
+        // not playerX/playerY, so the result is pixel-identical to a real stationary drop.
+        // Arrival is unrelated -- initPlayer() (called by loadCave(), well before arrival's
+        // reveal) already resets attachmentOffset to 0 on its own, and teleportCarryLift()
+        // (draw.c) takes over from there.
+        if (attachment) {
+            teleportDepartOriginX = playerX - xdir[dir];
+            teleportDepartOriginY = playerY - ydir[dir];
+            attachmentOffset = dropOffset[dir];
+        }
     }
 
     if (handled) {
@@ -747,14 +1086,14 @@ void movePlayer(BoardCursor *cur) {
 
     if (drop) {
 
-        if (GET(attachment) == CH_BOMB)
+        if (attachment == CH_BOMB)
             startCharAnimation(TYPE_BOMB, AnimateBomb + 2);
 
         attachmentOffset = 0;
-        *meAtt = attachment;
+        *meAtt = dropSkipThisFrame ? FLAG(attachment) : attachment;
         drop = false;
 
-        if (Attribute[CharToType[GET(attachment)]] & ATT_MASSIVE) {
+        if (Attribute[CharToType[attachment]] & ATT_MASSIVE) {
 
             int attBelow = Attribute[CharToType[GET(*(meAtt + _BOARD_COLS))]];
 

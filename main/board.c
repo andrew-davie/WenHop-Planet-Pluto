@@ -919,11 +919,17 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
             }
         }
 
-        else if (doorLocked)
-            updateDoorUnlock();
+        else {
 
-        else
+            // Unlike teleportLocked/exitMode above, doorLocked does NOT skip movePlayer() --
+            // the player stays fully controllable while the key settles into the door and it
+            // swings open (mellon.c's doorLocked comment has the full reasoning); updateDoorUnlock()
+            // just needs to keep ticking alongside it every frame it's set.
+            if (doorLocked)
+                updateDoorUnlock();
+
             movePlayer(cur);
+        }
 
         break;
 

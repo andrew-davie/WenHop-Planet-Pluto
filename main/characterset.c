@@ -31,7 +31,7 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_0_2),      // 002 CH_DIRT,
     CH(CHAR_MAP_characterset_4_3),      // 003 CH_BRICKWALL,
     CH(CHAR_MAP_characterset_8_3),      // 004 CH_DOORCLOSED,
-    CH(CHAR_MAP_characterset_8_3),      // 005 CH_DOOROPEN_0,
+    CH(CHAR_MAP_characterset_2_17),     // 005 CH_DOOROPEN_0, -- AnimateDoor's final frame (animations.c)
     CH(CHAR_MAP_characterset_0_0),      // 006 CH_EXITBLANK,
     CH(CHAR_MAP_characterset_6_3),      // 007 CH_STEELWALL,
     CH(CHAR_MAP_characterset_1_2),      // 008 CH_PEBBLE1,
@@ -144,8 +144,8 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_8_4),      // 115 CH_CRACKED_BRICK
     CH(CHAR_MAP_characterset_0_3),      // 116 CH_CONCRETE
     CH(CHAR_MAP_characterset_0_15),      // 117 CH_TELEPORT (spinning-spoke cycle, frame 0)
-    0,                                  // 118
-    0,                                  // 119
+    CH(CHAR_MAP_characterset_3_2),       // 118 CH_KEY
+    CH(CHAR_MAP_characterset_2_17),      // 119 CH_DOOROPEN_STATIC -- same graphic as CH_DOOROPEN_0
     0,                                  // 120
     0,                                  // 121
     0,                                  // 122
@@ -271,6 +271,8 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_5_15),    // 227 CH_TELEPORT_5
     CH(CHAR_MAP_characterset_6_15),    // 228 CH_TELEPORT_6
     CH(CHAR_MAP_characterset_7_15),    // 229 CH_TELEPORT_7
+
+    CH(CHAR_MAP_characterset_0_17),    // 230 CH_DOORSLIDE_1
 };
 
 _Static_assert(sizeof(charSet) / sizeof(charSet[0]) == CH_MAX, "charSet table wrong size");

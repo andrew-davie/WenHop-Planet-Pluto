@@ -588,7 +588,8 @@ void blitShape(int ch, int trixX, int y, int height, int buffer) {
 
 void drawAttachedChar(int ch) {
 
-    ch = GET(ch);
+    // ch is always `attachment` (mellon.c), which is never flagged with FLAG_THISFRAME -- see
+    // its declaration -- so no GET() needed here.
     int type = CharToType[ch];
 
     if (Animate[type])
@@ -617,12 +618,60 @@ void drawAttachedChar(int ch) {
             attachmentOffset = 0;
     }
 
+    // Departure: draw relative to the tile the player stood on BEFORE stepping onto the
+    // teleport tile (teleportDepartOriginX/Y, mellon.c), not their current playerX/playerY --
+    // those already point at the destination (teleport) tile from the instant the move
+    // started, and the walk-in glide's catch-up visual (autoMoveX/autoMoveY) would otherwise
+    // drag the object along with it. Using the fixed origin tile with no glide contribution at
+    // all makes this pixel-identical to an ordinary stationary drop -- exactly the look wanted
+    // (object lands neatly on the teleport tile, no sliding) -- since dropOffset[]'s own arc is
+    // already calibrated for a stationary player dropping into the next cell over. The exit
+    // door's departure (exitDepartOriginX/Y, mellon.c) is the same idea for the same reason --
+    // separate storage, separate trigger (exitMode instead of teleportLocked), but otherwise an
+    // exact mirror.
+    int baseX = playerX;
+    int baseY = playerY;
+    int glideX = autoMoveX;
+    int glideY = autoMoveY;
 
-    int y = playerY * CHAR_Y - (scrollY >> 16) * 3 + autoMoveY /*- 20 + 1*/ - (shakeY >> 16) + offsetY;
+    if (teleportLocked) {
+        baseX = teleportDepartOriginX;
+        baseY = teleportDepartOriginY;
+        glideX = 0;
+        glideY = 0;
+    } else if (exitMode) {
+        baseX = exitDepartOriginX;
+        baseY = exitDepartOriginY;
+        glideX = 0;
+        glideY = 0;
+    } else if (doorLocked) {
+        // Unlike the two cases above, the player isn't frozen here -- they can walk off while
+        // the key is still settling into the door, so pin the draw to doorUnlockOriginX/Y
+        // (mellon.c's startDoorUnlock()) rather than the player's own now-possibly-moving
+        // playerX/playerY, same reasoning as teleportDepartOriginX/Y.
+        baseX = doorUnlockOriginX;
+        baseY = doorUnlockOriginY;
+        glideX = 0;
+        glideY = 0;
+    }
+
+    // Arrival: the reverse case -- teleportCarryLift() and doorCarryLift() (mellon.c) are each
+    // driven entirely by their own side's state (the teleport arrival swirl vs. doorExitArms-
+    // CarryLift/initPlayer()) and never both nonzero for the same cave load, so summing them
+    // here is safe -- effectively just "whichever one applies this time". Pulls offsetY toward 0
+    // by that fraction (offsetY is always negative -- the object draws above the player), so it
+    // visibly rises up out of them instead of popping straight to fully-carried. >>4
+    // approximates /16 rather than /TELEPORT_CARRY_LIFT_MAX exactly, avoiding a real divide
+    // (this coprocessor has none -- see swipe.c's isqrt() comment); harmless since the lift is 0
+    // well before the residual few percent would be visible. A no-op outside both arrival
+    // windows (both return 0), same as the departure correction above is outside departure.
+    offsetY -= (offsetY * (teleportCarryLift() + doorCarryLift())) >> 4;
+
+    int y = baseY * CHAR_Y - (scrollY >> 16) * 3 + glideY /*- 20 + 1*/ - (shakeY >> 16) + offsetY;
 
 
-    int trixX = ((playerX - 1) * CHAR_TRIX_X) + -(scrollX >> 16) + (faceDirection * (frameAdjustX + (autoMoveX >> 2))) +
-                2 - (shakeX >> 16) - offsetX;
+    int trixX = ((baseX - 1) * CHAR_TRIX_X) + -(scrollX >> 16) + (faceDirection * (frameAdjustX + (glideX >> 2))) + 2 -
+                (shakeX >> 16) - offsetX;
 
     //    if (y + CHAR_Y >= 0 && y < _SCANLINES && trixX > -8 && trixX < 40)
     blitShape(ch, trixX, y, CHAR_Y, _BUF_GAME_PF0_LEFT);

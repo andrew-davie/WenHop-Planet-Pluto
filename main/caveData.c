@@ -172,7 +172,7 @@ const unsigned char caveraintest[] = {
     // CH_BOMB, 2, 6,
 
     CH_DOOROPEN_0, 5, 6,
-    CH_MELLON_HUSK_BIRTH, 5, 2,
+    CH_MELLON_HUSK_BIRTH, 2, 4,
     CH_TELEPORT, 8, 3,
 
 
@@ -259,7 +259,7 @@ const unsigned char caveBlank[] = {
     0,                              // water (off)
 
      0,  0,  0,  0,  0,             // randomiser[level]
-     0,  0,  0,  0,  0,             // doge req -- nothing to collect in an empty room
+     10,  0,  0,  0,  0,             // doge req -- nothing to collect in an empty room
     200, 200, 200, 200, 200,        // time to complete
 
     0, //WEAPON_MACE,                    // 0
@@ -276,8 +276,8 @@ const unsigned char caveBlank[] = {
 
     DRAW_RECT, CH_STEELWALL, 1,1,9,8,
     CH_MELLON_HUSK_BIRTH, 5, 2,
-    CH_TELEPORT, 2, 4,
-    CH_DOOROPEN_0, 5, 6,           // own door, inside the steel-walled interior -- must be
+    CH_TELEPORT, 4, 4,
+    CH_DOORCLOSED, 5, 6,           // own door, inside the steel-walled interior -- must be
                                     // authored explicitly: decodeCave()/StoreObject() (decodeCaves.c)
                                     // only ever update doorX/doorY when a cave places a door of its
                                     // own, so a door-less cave otherwise inherits whatever door
@@ -288,6 +288,8 @@ const unsigned char caveBlank[] = {
                                     // fine while planet C's (whose real cave's door is at (38,5),
                                     // well outside this interior) didn't.
 
+
+    CH_KEY, 7,6,
 
     DRAW_EOF,
     DRAW_EOF,
@@ -1695,67 +1697,5 @@ const struct caveHandler caveList[] = {
 
 const int caveCount = sizeof(caveList) / sizeof(caveList[0]);
 
-// Writes the 2-char (+ NUL) level label for the given cave index into out --
-// planet letter 'A'..'J' followed by the inner 0..9 level digit, e.g. cave 23
-// -> "C3". Finds the planet with the same subtract-loop trick startTeleportWarp()
-// uses below rather than "cave / CAVES_PER_PLANET" / "cave % CAVES_PER_PLANET":
-// this coprocessor has no divide instruction, and CAVES_PER_PLANET (10) isn't a
-// power of 2, so either expression risks a real libgcc call.
-void getCaveLabel(char *out, int caveIndex) {
-
-    int planet = 0;
-    int groupStart = 0;
-    while (groupStart + CAVES_PER_PLANET <= caveIndex) {
-        groupStart += CAVES_PER_PLANET;
-        planet++;
-    }
-
-    out[0] = 'A' + planet;
-    out[1] = '0' + (caveIndex - groupStart);
-    out[2] = 0;
-}
-
-void startTeleportWarp() {
-
-    // Stay within the current cave's own planet grouping (caveList[]'s "// PLANET n" blocks,
-    // CAVES_PER_PLANET entries each -- see caveData.h) -- teleporting should hop between
-    // levels of the same planet, not anywhere in the whole 100-cave roster. Finds the
-    // group's start index with a plain loop rather than "cave / CAVES_PER_PLANET *
-    // CAVES_PER_PLANET": this coprocessor has no divide instruction (see swipe.c's isqrt()
-    // comment), and CAVES_PER_PLANET (10) isn't a power of 2, so that expression risks a
-    // real libgcc call -- the loop sidesteps the question entirely.
-    int groupStart = 0;
-    while (groupStart + CAVES_PER_PLANET <= cave)
-        groupStart += CAVES_PER_PLANET;
-
-    int groupEnd = groupStart + CAVES_PER_PLANET;
-    if (groupEnd > caveCount)
-        groupEnd = caveCount;
-
-    // Reservoir-sample a random cave with a teleport destination from that group (see the
-    // struct's comment -- {0,0} means "no destination here"), excluding the current one --
-    // if that's the only eligible cave, land back on it; loadCave() reloading it fresh is
-    // harmless, same as looping a level.
-    int newCave = -1;
-    int count = 0;
-
-    for (int i = groupStart; i < groupEnd; i++)
-        if ((caveList[i].teleportX || caveList[i].teleportY) && i != cave) {
-            count++;
-            if (!rangeRandom(count))
-                newCave = i;
-        }
-
-    if (newCave < 0)
-        newCave = cave;
-
-    // decodeCave() (called from loadCave()) will place the player at this cave's normal
-    // CH_MELLON_HUSK_BIRTH spawn first, same as any other level load -- pendingTeleportArrival
-    // tells scheduleUnpackCave() (schedule.c) to relocate them onto a random blank tile instead,
-    // once the whole cave has actually finished decoding (see relocatePlayerToTeleport()).
-    pendingTeleportArrival = true;
-
-    loadCave(newCave);
-}
 
 // EOF

@@ -17,10 +17,18 @@ typedef struct {
 } OFFSET;
 
 
+extern int attachment;    // what the player is currently carrying, if anything (CH_... value, or 0)
 extern const OFFSET *attachmentOffset;
 
 extern int frameAdjustX;
 extern int frameAdjustY;
+
+// Extra luminance darkening applied to just the player sprite during the exit walk-off -- see
+// its own comment (mellon.c).
+extern int playerExitFade;
+
+// One-shot latch for the exit door's slide-shut trigger -- see its own comment (mellon.c).
+extern bool doorClosing;
 
 enum JOYSTICK_DIRECTION {
     JOYSTICK_UP = 1,
@@ -57,6 +65,10 @@ extern bool teleportCountingDown;
 extern int teleportSwirlTicks;
 extern bool teleportRequested;
 
+// The tile the player stood on just before stepping onto the teleport tile -- see its own
+// comment (mellon.c). Only meaningful while teleportLocked is true.
+extern int teleportDepartOriginX, teleportDepartOriginY;
+
 // Departure swirl: starts the instant teleportLocked goes true (checkHighPriorityMove(),
 // mellon.c) -- i.e. as soon as the player starts moving onto the tile, not gated on the
 // walk-in glide (autoMoveFrameCount) settling like the rest of the teleportLocked sequence
@@ -75,6 +87,43 @@ bool isTeleportArrivalSwirlActive();    // true from startTeleportArrivalSwirl()
 bool isTeleportArrivalPlayerHidden();   // like isTeleportArrivalSwirlActive(), but clears 0.5s
                                          // early -- see its own comment (mellon.c)
 
+// True whenever drawPlayerSprite() (drawPlayer.c) is suppressing the player sprite for a
+// teleport departure or arrival in progress -- see its own comment (mellon.c). Anything else
+// drawn relative to the player should check this too, so it disappears/reappears in lockstep
+// with the sprite instead of being left visible with nothing under it. Teleport only -- the
+// exit-door sequence's own equivalent (exitMode, once playerExitFade reaches full black) is
+// checked separately, alongside this, wherever this is used (drawPlayer.c, gameState_Game.c),
+// rather than being folded in here, so this stays exactly what it always was and the door
+// logic can't accidentally perturb teleport's.
+bool isPlayerHidden();
+
+// Ties the carried-object arrival rise duration to the same MOVE_SPEED-frame span the
+// departure walk-in glide takes (see teleportCarryLift()'s comment, mellon.c) -- not otherwise
+// related to MOVE_SPEED, just a convenient existing constant of about the right size. Relies
+// on MOVE_SPEED (main.h) already being visible wherever this expands -- true for both current
+// users (mellon.c, draw.c), each of which includes main.h directly.
+#define TELEPORT_CARRY_LIFT_MAX MOVE_SPEED
+
+// 0 (normal carry height) .. TELEPORT_CARRY_LIFT_MAX (fully merged with the player) -- see its
+// own comment (mellon.c). drawAttachedChar() (draw.c) pulls the carried-object icon's draw
+// offset toward the player's own position by this much on arrival, so it visibly rises out of
+// them instead of popping straight to fully-carried.
+int teleportCarryLift();
+
+// Door-exit counterpart to teleportDepartOriginX/Y and teleportCarryLift() above -- same shape,
+// entirely separate state, so the exit door can mirror teleport's departure-drop/arrival-lift
+// behaviour exactly without sharing any of teleport's own variables or touching its code path.
+// See their own comments (mellon.c) for the two-sided arm/consume story.
+#define DOOR_CARRY_LIFT_MAX MOVE_SPEED
+int doorCarryLift();
+extern int exitDepartOriginX, exitDepartOriginY;
+
+// See its own comment (mellon.c) -- lets initNewGame() (main.c) tell a door-exit's detour
+// through GS_MENU/GS_GLOBE back to GS_GAME apart from an actual fresh game, so it doesn't
+// clear out whatever's attached just because that detour happens to pass through the same
+// initNewGame() call a real new game uses.
+extern bool doorExitArmsCarryLift;
+
 // Both teleport swirls spawn a small batch of spirals every N frames instead of trying to
 // zap-and-refill the whole particle pool every single frame -- that was real, sustained
 // extra work on top of whatever board processing was also happening that frame, a
@@ -85,12 +134,29 @@ bool isTeleportArrivalPlayerHidden();   // like isTeleportArrivalSwirlActive(), 
 // committed all at once on frame 1. Same age both sides; batch size/cadence tuned
 // separately per side (departure needed a bigger batch to read as noticeable at all;
 // arrival needed more packed into less total time, not just a bigger batch).
-#define TELEPORT_SWIRL_PARTICLE_AGE 90
+#define TELEPORT_SWIRL_PARTICLE_AGE 72    // 90, reduced 20%
 
 #define TELEPORT_DEPART_SWIRL_BATCH_SIZE 8
 #define TELEPORT_DEPART_SWIRL_BATCH_INTERVAL 8
 
 #define TELEPORT_ARRIVAL_SWIRL_BATCH_SIZE 6
 #define TELEPORT_ARRIVAL_SWIRL_BATCH_INTERVAL 6
+
+// Carrying a key up to a locked door (checkHighPriorityMove(), mellon.c) sets doorLocked and
+// starts the two-phase put-down/open timer -- unlike teleportLocked, the player is NOT frozen
+// for it: board.c's TYPE_MELLON_HUSK case keeps calling movePlayer() every frame regardless,
+// alongside updateDoorUnlock(). See updateDoorUnlock()'s own comment (mellon.c) for the timing,
+// and doorUnlockOriginX/Y below for how the settling key stays visually pinned to the door tile
+// while the player is free to walk away mid-animation.
+extern bool doorLocked;
+void updateDoorUnlock();
+
+// The tile the player was standing on when the key touched the door -- recorded by
+// startDoorUnlock() (mellon.c), same role as teleportDepartOriginX/Y and exitDepartOriginX/Y
+// above. Needed because doorLocked no longer freezes the player: drawAttachedChar() (draw.c)
+// draws the settling key relative to THIS fixed position instead of the player's own
+// (potentially now-moving) playerX/playerY, so it stays pinned to the door instead of
+// following the player off across the board.
+extern int doorUnlockOriginX, doorUnlockOriginY;
 
 // EOF

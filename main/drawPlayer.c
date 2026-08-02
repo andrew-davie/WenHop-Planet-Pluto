@@ -94,7 +94,13 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
     // since a full cave switch happens while hidden -- so the first visible frame, instead of
     // just appearing in the right place, had a frame or two of snapping over from the old
     // stale position as soon as something (this function, next call) finally recomputed it.
-    bool hidden = (teleportLocked && !autoMoveFrameCount) || isTeleportArrivalPlayerHidden();
+    // Also hidden once the exit-sequence fade (playerExitFade, updatePlayerAnimation() --
+    // mellon.c's own comment) has pushed the player all the way to black -- 15 is where that
+    // fade's luminance clamp guarantees full black for any base hue, so past that point they're
+    // fully invisible already; skipping the draw outright avoids a faint black silhouette still
+    // being visibly distinct against non-black backgrounds behind them (water, lava, etc., whose
+    // own colouring the shape-drawing loops below apply on top of the luminance clamp).
+    bool hidden = isPlayerHidden() || (exitMode && playerExitFade >= 15);
 
     static int root = 0;
     root++;
@@ -157,7 +163,6 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
         int lavaLine = ((liquidTrixel_8 >> 8) - (scrollY >> 16)) * 3;
         playerSpriteY = ypos - frameYOffset - 1;
 
-
         int pX = (xpos) * 4 + (faceDirection * (8 + frameXOffset + frameAdjustX + autoMoveX)) + 3;
 
         if (pulsePlayerColour) {
@@ -182,8 +187,21 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
         // Position is fully committed above -- everything from here down only decides what
         // gets drawn into GRP0, which the memset at the top already left at "nothing". See
         // this function's opening comment for why hiding happens here, not on early entry.
-        if (hidden)
+        //
+        // Exit fade is the one hidden case that never comes back -- teleport's hidden window
+        // ends with the player reappearing, so keeping pX/playerSpriteY fresh above matters
+        // there (avoids a stale-position snap on the first visible frame, per this function's
+        // own opening comment). Once the exit fade has taken over, there's no "reappearing" to
+        // prepare for, and forcing the X position to 0 here (instead of leaving it at wherever
+        // the player actually was) is what actually stops a visible artifact showing through --
+        // just skipping the shape-drawing loops below wasn't enough on its own.
+        if (hidden) {
+            if (exitMode && playerExitFade >= 15) {
+                RAM[_P0_X] = 0;
+                RAM[_P1_X] = 0;
+            }
             return;
+        }
 
         int destLine = -1;
 
@@ -234,18 +252,26 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
                     }
                 }
 
-                int lum = (p0Colour[destLine] & 0xF) + luminance;
-                if (lum < 0)
-                    lum = 0;
-                if (lum > 15)
-                    lum = 15;
-                p0Colour[destLine] = (p0Colour[destLine] & 0xF0) + lum;
-                lum = (p1Colour[destLine] & 0xF) + luminance;
-                if (lum < 0)
-                    lum = 0;
-                if (lum > 15)
-                    lum = 15;
-                p1Colour[destLine] = (p1Colour[destLine] & 0xF0) + lum;
+                // <= 0 (not just < 0): once darkening has pushed a colour all the way down to
+                // this hue's own darkest shade (lum == 0), the next step is true black (0x00),
+                // not (colour & 0xF0) -- which would just leave that hue's floor showing forever,
+                // never actually reaching black. Same reasoning both p0 and p1 below.
+                int lum = (p0Colour[destLine] & 0xF) + luminance - playerExitFade;
+                if (lum <= 0)
+                    p0Colour[destLine] = 0;
+                else {
+                    if (lum > 15)
+                        lum = 15;
+                    p0Colour[destLine] = (p0Colour[destLine] & 0xF0) + lum;
+                }
+                lum = (p1Colour[destLine] & 0xF) + luminance - playerExitFade;
+                if (lum <= 0)
+                    p1Colour[destLine] = 0;
+                else {
+                    if (lum > 15)
+                        lum = 15;
+                    p1Colour[destLine] = (p1Colour[destLine] & 0xF0) + lum;
+                }
 
 
                 destLine += gravity;
@@ -255,7 +281,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
 
         else {
 
-            unsigned char *p0Colour = RAM + _BUF_GAME_COLUP0 + playerSpriteY + 1;
+            unsigned char *p0Colour = RAM + _BUF_GAME_COLUP0 + playerSpriteY;
             unsigned char *p0 = RAM + _BUF_GAME_GRP0 + playerSpriteY;
 
             for (int line = 0; line < (shapeHeight & 0x3F); line++) {
@@ -281,12 +307,16 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
                             p0Colour[destLine] = ((p0Colour[destLine] & 0x0f) - 2) ^ (rooted & 0xF0);
                     }
                 }
-                int lum = (p0Colour[destLine] & 0xF) + luminance;
-                if (lum < 0)
-                    lum = 0;
-                if (lum > 15)
-                    lum = 15;
-                p0Colour[destLine] = (p0Colour[destLine] & 0xF0) + lum;
+                // <= 0 (not just < 0): see the SPRITE_DOUBLE branch above's comment -- once
+                // darkening bottoms out at this hue's own floor, the next step is true black.
+                int lum = (p0Colour[destLine] & 0xF) + luminance - playerExitFade;
+                if (lum <= 0)
+                    p0Colour[destLine] = 0;
+                else {
+                    if (lum > 15)
+                        lum = 15;
+                    p0Colour[destLine] = (p0Colour[destLine] & 0xF0) + lum;
+                }
 
 
                 destLine += gravity;

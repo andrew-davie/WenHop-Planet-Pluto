@@ -23,96 +23,85 @@ enum FRAME {
 
     // see (sprites.c) -> create a frame shape_* and add to spriteShape[] table
 
-    FRAME_BLANK,          // 00
-    FRAME_STAND,          // 01
-    FRAME_ARMS_IN_AIR,    // 02
-    FRAME_HUNCH,          // 03
-    FRAME_PUSH,           // 04
-    FRAME_PUSH2,          // 05
-    FRAME_WALK1,          // 06
-    FRAME_WALK2,          // 07
-    FRAME_WALK3,          // 08
-    FRAME_WALK4,          // 09
-    FRAME_SKELETON1,      // 10
-    FRAME_SKELETON2,      // 11
-    FRAME_SKELETON3,      // 12
-    FRAME_SKELETON4,      // 13
-    FRAME_SKELETON5,      // 14
-    FRAME_WALKUP0,        // 15
-    FRAME_WALKUP1,        // 16
-    FRAME_WALKUP2,        // 17
-    FRAME_WALKUP3,        // 18
-    FRAME_WALKDOWN0,      // 19
-    FRAME_WALKDOWN1,      // 20
-    FRAME_WALKDOWN2,      // 21
-    FRAME_WALKDOWN3,      // 22
-    FRAME_MINE_UP_0,      // 23
-    FRAME_MINE_UP_1,      // 24
-    FRAME_MINE_DOWN_0,    // 25
-    FRAME_MINE_DOWN_1,    // 26
-    FRAME_15,             // 27
-    FRAME_16,             // 28
-    FRAME_20,             // 29
-    FRAME_21,             // 30
-    FRAME_24,             // 31
-    FRAME_25,             // 32
-    FRAME_26,             // 33
-    FRAME_27,             // 34
-    FRAME_28,             // 35
-    FRAME_29,             // 36
-    FRAME_30,             // 37
-    FRAME_31,             // 38
-    FRAME_32,             // 39
-    FRAME_33,             // 40
-    FRAME_34,             // 41
-    FRAME_35,             // 42
-    FRAME_36,             // 43
-    FRAME_37,             // 44
-    FRAME_38,             // 45
-    FRAME_40,             // 46
-    FRAME_41,             // 47
-    FRAME_42,             // 48
-    FRAME_44,             // 49
-    FRAME_45,             // 50
-    FRAME_DIE_0,          // 51
-    FRAME_DIE_1,          // 52
-    FRAME_DIE_2,          // 53
-    FRAME_DIE_3,          // 54
-    FRAME_DIE_4,          // 55
-    FRAME_PICKUP,         // 56
-    FRAME_PICKUP2,        // 56
+    FRAME_BLANK,            // 00
+    FRAME_NEW_X004_Y004,    // 01
+    FRAME_ARMS_IN_AIR,      // 02
+    FRAME_NEW_X020_Y274,    // 03
+    FRAME_NEW_X017_Y124,    // 04
+    FRAME_NEW_X000_Y124,    // 05
+    FRAME_NEW_X004_Y064,    // 06
+    FRAME_WALK2,            // 07
+    FRAME_WALK3,            // 08
+    FRAME_WALK4,            // 09
+    // FRAME_SKELETON1,  // currently unused
+    // FRAME_SKELETON2,  // currently unused
+    // FRAME_SKELETON3,  // currently unused
+    // FRAME_SKELETON4,  // currently unused
+    // FRAME_SKELETON5,  // currently unused
+    FRAME_NEW_X004_Y034,    // 10
+    FRAME_NEW_X020_Y033,    // 11
+    FRAME_WALKUP2,          // 12
+    FRAME_NEW_X052_Y033,    // 13
+    FRAME_NEW_X004_Y094,    // 14
+    FRAME_NEW_X020_Y093,    // 15
+    FRAME_WALKDOWN2,        // 16
+    FRAME_NEW_X052_Y093,    // 17
+    FRAME_MINE_UP_0,        // 18
+    FRAME_MINE_UP_1,        // 19
+    FRAME_MINE_DOWN_0,      // 20
+    FRAME_MINE_DOWN_1,      // 21
+    // FRAME_15,  // currently unused
+    // FRAME_16,  // currently unused
+    // FRAME_20,  // currently unused
+    // FRAME_21,  // currently unused
+    // FRAME_24,  // currently unused
+    // FRAME_25,  // currently unused
+    // FRAME_26,  // currently unused
+    // FRAME_27,  // currently unused
+    // FRAME_29,  // currently unused
+    // FRAME_30,  // currently unused
+    // FRAME_32,  // currently unused
+    // FRAME_35,  // currently unused
+    // FRAME_36,  // currently unused
+    // FRAME_37,  // currently unused
+    // FRAME_38,  // currently unused
+    // FRAME_40,  // currently unused
+    // FRAME_41,  // currently unused
+    // FRAME_42,  // currently unused
+    // FRAME_44,  // currently unused
+    // FRAME_DIE_0,  // currently unused
+    // FRAME_DIE_1,  // currently unused
+    // FRAME_DIE_2,  // currently unused
+    // FRAME_DIE_3,  // currently unused
+    // FRAME_DIE_4,  // currently unused
+    FRAME_PICKUP,     // 22
+    FRAME_PICKUP2,    // 23
 
-    FRAME_NEW_X019_Y063,
-    FRAME_NEW_X051_Y063,
-    FRAME_NEW_X020_Y150,
-    FRAME_NEW_X000_Y156,
-    FRAME_NEW_X020_Y181,
-    FRAME_NEW_X004_Y183,
-    FRAME_NEW_X036_Y241,
-    FRAME_NEW_X035_Y301,
-    FRAME_NEW_X018_Y303,
-    FRAME_NEW_X050_Y303,
-    FRAME_NEW_X116_Y364,
-    FRAME_NEW_X018_Y394,
-    FRAME_NEW_X034_Y394,
-    FRAME_NEW_X081_Y407,
-    FRAME_NEW_X115_Y410,
-    FRAME_NEW_X128_Y410,
-    FRAME_NEW_X101_Y412,
-    FRAME_NEW_X019_Y429,
-    FRAME_NEW_X023_Y454,
-    FRAME_NEW_X018_Y481,
-    FRAME_NEW_X002_Y510,
-    FRAME_NEW_X018_Y510,
-    FRAME_NEW_X019_Y546,
-    FRAME_NEW_X051_Y546,
-    FRAME_NEW_X003_Y547,
-    FRAME_NEW_X019_Y576,
-    FRAME_NEW_X051_Y576,
-    FRAME_NEW_X003_Y577,
-    FRAME_NEW_X019_Y606,
-    FRAME_NEW_X051_Y606,
-    FRAME_NEW_X004_Y607,
+    // FRAME_NEW_X019_Y063,  // currently unused
+    // FRAME_NEW_X051_Y063,  // currently unused
+    // FRAME_NEW_X020_Y150,  // currently unused
+    // FRAME_NEW_X020_Y181,  // currently unused
+    // FRAME_NEW_X004_Y183,  // currently unused
+    // FRAME_NEW_X036_Y241,  // currently unused
+    // FRAME_NEW_X018_Y303,  // currently unused
+    // FRAME_NEW_X116_Y364,  // currently unused
+    // FRAME_NEW_X115_Y410,  // currently unused
+    // FRAME_NEW_X128_Y410,  // currently unused
+    // FRAME_NEW_X101_Y412,  // currently unused
+    // FRAME_NEW_X019_Y429,  // currently unused
+    // FRAME_NEW_X023_Y454,  // currently unused
+    // FRAME_NEW_X018_Y481,  // currently unused
+    // FRAME_NEW_X002_Y510,  // currently unused
+    // FRAME_NEW_X018_Y510,  // currently unused
+    // FRAME_NEW_X019_Y546,  // currently unused
+    // FRAME_NEW_X051_Y546,  // currently unused
+    // FRAME_NEW_X003_Y547,  // currently unused
+    // FRAME_NEW_X019_Y576,  // currently unused
+    // FRAME_NEW_X051_Y576,  // currently unused
+    // FRAME_NEW_X003_Y577,  // currently unused
+    // FRAME_NEW_X019_Y606,  // currently unused
+    // FRAME_NEW_X051_Y606,  // currently unused
+    // FRAME_NEW_X004_Y607,  // currently unused
     FRAME_MAX,
 
     // actions start after frames

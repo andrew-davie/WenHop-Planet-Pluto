@@ -16,15 +16,10 @@ struct caveHandler {
 
 extern const struct caveHandler caveList[];
 extern const int caveCount;
-extern unsigned char caveFlags;
 
 // caveList[] is laid out as 10 planets of CAVES_PER_PLANET levels each (see its "// PLANET n"
 // comments) -- planet p occupies indices [p*CAVES_PER_PLANET, (p+1)*CAVES_PER_PLANET).
 #define CAVES_PER_PLANET 10
-
-void loadCave(int newCave);    // shared level-(re)load body -- see gameState_Game.c
-void startTeleportWarp();      // picks a random cave with a teleport destination within the current cave's own planet grouping, and calls loadCave() on it
-void getCaveLabel(char *out, int caveIndex);    // writes "<planet letter A-J><level digit 0-9>" + NUL into out
 
 
 #define CAVEDEF_LOCK_X 4

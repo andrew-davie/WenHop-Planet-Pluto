@@ -6,19 +6,19 @@
         "tia_constants.h": "dasm",
         "i2c_v2.3.inc": "dasm",
         "ASM_routines.s": "asm",
-        "main/custom/custom.S": "asm",
-    }
+        "main/custom/custom.S": "asm"
+    },
 
     "[asm]": {
         "editor.insertSpaces": true,
         "editor.tabSize": 4
-    }
+    },
 
     "[c]": {
         "editor.insertSpaces": true,
         "editor.tabSize": 4
-    }
+    },
 
-    "workbench.editor.limit.enabled": true,
+    "workbench.editor.limit.enabled": false,
     "workbench.editor.limit.value": 6
 }

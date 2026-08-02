@@ -61,4 +61,9 @@ extern int totalDogePossible;
 extern bool pendingTeleportArrival;
 void relocatePlayerToTeleport();
 
+void startTeleportWarp();    // picks a random cave with a teleport destination within the current cave's own planet
+                             // grouping, and calls loadCave() on it
+void getCaveLabel(char *out, int caveIndex);    // writes "<planet letter A-J><level digit 0-9>" + NUL into out
+
+
 // EOF

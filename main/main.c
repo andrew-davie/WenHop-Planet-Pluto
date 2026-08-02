@@ -13,6 +13,7 @@
 #include "gameState.h"
 #include "kernels.h"
 #include "main.h"
+#include "mellon.h"
 #include "random.h"
 #include "savekey.h"
 #include "schedule.h"
@@ -536,8 +537,14 @@ void initNewGame() {
     // Reset-scope, not level-scope: initPlayer() (mellon.c) runs on every loadCave(), including
     // teleports and ordinary level transitions within the same game, which must NOT drop
     // whatever the player is currently carrying. A genuinely new game is the right place to
-    // clear it.
-    attachment = 0;
+    // clear it -- EXCEPT this same function also runs when GS_GAME is re-entered after finishing
+    // a level by walking out through an exit door, which detours through GS_MENU/GS_GLOBE before
+    // looping back to initGameState_Game() rather than calling loadCave() directly the way a
+    // teleport does. doorExitArmsCarryLift (mellon.c) stays true across that whole detour (only
+    // the loadCave() at the far end, via initPlayer(), ever clears it), so it's the way to tell
+    // that apart from an actual fresh game here.
+    if (!doorExitArmsCarryLift)
+        attachment = 0;
 
     initNextLife();
 }

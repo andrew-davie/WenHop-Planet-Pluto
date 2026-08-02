@@ -30,9 +30,6 @@
 #include "wyrm.h"
 
 
-int attachment = 0;
-const OFFSET *attachmentOffset = 0;
-
 void initDataStreams_Game() {
 
     static const struct dataStreams streams[] = {
@@ -104,11 +101,11 @@ void loadCave(int newCave) {
     exitMode = 0;    // --> initNextlife
 
     liquidTrixel_8 = (BOARD_TRIX_Y + CHAR_TRIX_Y) << 8;    // just under the board's bottom bound --
-                                                            // matches caveData.c's own "off the bottom
-                                                            // of the board" caves -- so decodeCave()'s
-                                                            // theCave->water, or a scanned water/lava
-                                                            // tile, always has something lower to pull
-                                                            // this down to
+                                                           // matches caveData.c's own "off the bottom
+                                                           // of the board" caves -- so decodeCave()'s
+                                                           // theCave->water, or a scanned water/lava
+                                                           // tile, always has something lower to pull
+                                                           // this down to
     showLava = false;
     showWater = false;
 
@@ -214,36 +211,36 @@ void VB_Game() {
         setGameState(GS_MENU);
 
     processCharAnimations();              // does NOT drive TYPE_TELEPORT -- see driveTeleportSpin()'s
-                                           // own comment (animations.c) for why that's deliberate
+                                          // own comment (animations.c) for why that's deliberate
     driveTeleportSpin(teleportLocked);    // idle spin normally, faster for as long as the player is
-                                           // actually entering the tile
+                                          // actually entering the tile
     updateTeleportArrivalSwirl();
     setPalette(_BUF_GAME_COLUBK);
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
 
-        // Always draw for exitMode -- playerX/playerY (what this and scroll() both track)
-        // update the instant the exit door is stepped on (mellon.c's checkHighPriorityMove),
-        // but moveHusk() -- which would normally move the board's own CH_MELLON_HUSK cell to
-        // match -- is deliberately skipped there so the door tile can show CH_EXITBLANK
-        // instead. That leaves a stale CH_MELLON_HUSK sitting in the board array at the
-        // player's *previous* cell for the rest of exitMode's countdown (board.c's
-        // TYPE_MELLON_HUSK case needs a cell of that type to keep finding on each scan, or
-        // the countdown -> setGameState(GS_MENU) never fires), and it's still drawn as a
-        // tile via AnimMellonHusk. Suppressing this sprite once exitMode settled left that
-        // stale, wrongly-positioned tile glyph as the only visible "player" on screen --
-        // frozen one cell behind, not following the camera in to the door. Keeping the
-        // correctly-tracked sprite visible throughout covers for it.
-        //
-        // teleportLocked doesn't have that problem -- moveHusk() is skipped for the teleport
-        // tile itself too (mellon.c), but the tile the player is standing on is exactly where
-        // they actually are the whole time (it just keeps showing its RAM-static glyph), so
-        // there's no stale/wrongly-positioned stand-in to cover for. drawPlayerSprite() itself
-        // hides the sprite once the walk-in glide settles (see its own teleportLocked check) --
-        // always called from here, unconditionally, so its GRP0 clear still runs every frame;
-        // skipping the call entirely from here left the last real frame's sprite bitmap sitting
-        // in GRP0 forever, frozen on screen instead of disappearing.
-        drawPlayerSprite();
+        // // Always draw for exitMode -- playerX/playerY (what this and scroll() both track)
+        // // update the instant the exit door is stepped on (mellon.c's checkHighPriorityMove),
+        // // but moveHusk() -- which would normally move the board's own CH_MELLON_HUSK cell to
+        // // match -- is deliberately skipped there so the door tile can show CH_EXITBLANK
+        // // instead. That leaves a stale CH_MELLON_HUSK sitting in the board array at the
+        // // player's *previous* cell for the rest of exitMode's countdown (board.c's
+        // // TYPE_MELLON_HUSK case needs a cell of that type to keep finding on each scan, or
+        // // the countdown -> setGameState(GS_MENU) never fires), and it's still drawn as a
+        // // tile via AnimMellonHusk. Suppressing this sprite once exitMode settled left that
+        // // stale, wrongly-positioned tile glyph as the only visible "player" on screen --
+        // // frozen one cell behind, not following the camera in to the door. Keeping the
+        // // correctly-tracked sprite visible throughout covers for it.
+        // //
+        // // teleportLocked doesn't have that problem -- moveHusk() is skipped for the teleport
+        // // tile itself too (mellon.c), but the tile the player is standing on is exactly where
+        // // they actually are the whole time (it just keeps showing its RAM-static glyph), so
+        // // there's no stale/wrongly-positioned stand-in to cover for. drawPlayerSprite() itself
+        // // hides the sprite once the walk-in glide settles (see its own teleportLocked check) --
+        // // always called from here, unconditionally, so its GRP0 clear still runs every frame;
+        // // skipping the call entirely from here left the last real frame's sprite bitmap sitting
+        // // in GRP0 forever, frozen on screen instead of disappearing.
+        // drawPlayerSprite();
 
         // Unconditional (not gated on !maskNeeded below) so floating text -- notably the
         // level-start ID string (schedule.c) -- draws into _BUF_GAME_PF0_LEFT throughout the
@@ -261,7 +258,26 @@ void VB_Game() {
         if (!maskNeeded) {
 
             drawScore();
-            drawAttachedChar(attachment);
+
+            // Same visibility as the player sprite itself (isPlayerHidden(), mellon.c, plus the
+            // same exit-fade check drawPlayerSprite() (drawPlayer.c) makes locally rather than
+            // through isPlayerHidden() -- that's teleport-only by design) -- otherwise a carried
+            // item is left floating in place, with no player drawn under it, for as long as
+            // drawPlayerSprite() is suppressing the sprite for a teleport departure/arrival or
+            // an exit-sequence fade to black.
+            //
+            // Also suppressed once the door-exit drop (exitDepartOriginX/Y's attachmentOffset
+            // arc, mellon.c's exit trigger) has run its course -- attachmentOffset naturally
+            // exhausts back to 0 a couple of dozen real frames after landing (dropOffset[]'s
+            // REST_HOLD, mellon.c), long before playerExitFade catches up to 15, and without
+            // this the item fell back to its default "carried above head" draw offset for the
+            // rest of the walk-off/fade -- popping back into view floating at the door, above
+            // and behind the drifting-away player, instead of staying down where it was
+            // dropped. Teleport doesn't need the equivalent check: isPlayerHidden() already
+            // hides it within a frame or two of landing, well before its own arc could exhaust.
+            if (!isPlayerHidden() && !(exitMode && playerExitFade >= 15) &&
+                !(exitMode && attachment && !attachmentOffset))
+                drawAttachedChar(attachment);
 
             drawMace();
             // drawRope();
@@ -307,6 +323,9 @@ void OS_Game() {
     if (gameSchedule != SCHEDULE_UNPACK_CAVE && gameState == nextGameState) {
         drawScreen();
         setPFColours(theCave->palette, (unsigned char *)(RAM + _BUF_GAME_COLUPF));
+
+
+        drawPlayerSprite();    // MUST be in OS to avoid 1-frame lag in sprite pos
     }
 
     getJoystick();

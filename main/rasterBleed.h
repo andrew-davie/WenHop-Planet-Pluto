@@ -41,9 +41,6 @@ typedef struct {
     unsigned char r, g, b;
 } RGB;
 
-extern const int FRAME_SETS_MAX;
-extern const ScanLine *const *const frame_sets[];
-
 unsigned char blendAtariColour(unsigned char a, unsigned char b, int xPercent);
 void rasterBleed(int image, int y);
 

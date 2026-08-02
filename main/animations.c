@@ -240,6 +240,58 @@ const unsigned char AnimFlashOut[] = {
     ANIM_LOOP
 };
 
+// The door splitting open down its centre seam, both halves retracting toward the outer edges
+// (not sliding off to one side) -- CH_DOORSLIDE_1 opens just the centre column, CH_DOOROPEN_STATIC
+// widens that to the two centre columns either side, leaving a door-post column on each edge so
+// it never reads as blank. A symmetric split on a glyph only 5px wide has room for exactly this
+// one step in between without running out of edge to keep: one more widening would consume the
+// last two door-post columns and leave nothing recognisably door-shaped.
+//
+// Frame 0 (closed, delay 0 -- holds forever) is AnimateBase[TYPE_DOOR], so every TYPE_DOOR cell
+// idles here by default from level load. The actual "open" trigger is
+// startCharAnimation(TYPE_DOOR, AnimateDoor + 2), which skips straight past frame 0 into the
+// split -- same pattern as AnimateBomb's idle-vs-triggered split above. No ANIM_LOOP: the final
+// frame's delay-0 holds it at CH_DOOROPEN_STATIC -- deliberately NOT CH_DOOROPEN_0, which would
+// pull in TYPE_OUTBOX's AnimFlashOut the moment the board write below lands (CharToType[] keys
+// off the raw byte); CH_DOOROPEN_STATIC is the same graphic under TYPE_DOOR_OPEN, which has no
+// animation, so it just stays put instead of flickering to blank every 20 frames forever. A real
+// board write is still needed to actually make the tile walkable, see updateDoorUnlock() and
+// board.c's CH_DOORCLOSED case, both of which time their commit to land after this finishes.
+//
+// Shared per-type like every other AnimateBase entry (see this table's own "animate in unison"
+// warning) -- if a level has more than one closed door, they all split open together the moment
+// any single one is triggered, not just the one actually interacted with.
+const unsigned char AnimateDoor[] = {
+
+    CH_DOORCLOSED, 0,
+
+    CH_DOORSLIDE_1, 14,
+    CH_DOOROPEN_STATIC, 0,
+};
+
+// The reverse of AnimateDoor above -- the exit door (mellon.c's exit trigger, via TYPE_OUTBOX)
+// sliding shut once the player has faded almost to black (updatePlayerAnimation(),
+// playerAnimation.c), instead of just snapping straight to closed. Same CH_DOORSLIDE_1 crack
+// frame both directions -- it's symmetric, so it works for either the door opening or closing
+// through it. Not wired into any AnimateBase[] slot -- nothing auto-advances into this from idle,
+// it's only ever reached via startCharAnimation(TYPE_OUTBOX, AnimateDoorClose + 2), mirroring
+// AnimateDoor's own idle-vs-triggered split (frame 0 here is just a landing pad matching
+// TYPE_OUTBOX's already-open state, never actually shown).
+//
+// CH_DOORSLIDE_1's hold here is intentionally short -- even shorter than AnimateDoor's own
+// opening hold -- there's only this one static crack frame between open and closed (a symmetric
+// split on a glyph this narrow doesn't have room for more without going fully blank, see
+// CH_DOORSLIDE_1's own comment), so holding it for longer doesn't read as a slow slide, it reads
+// as the animation freezing on a single unmoving frame for that whole stretch, then snapping
+// straight to closed. A short hold at least keeps it feeling like one continuous motion.
+const unsigned char AnimateDoorClose[] = {
+
+    CH_DOOROPEN_STATIC, 0,
+
+    CH_DOORSLIDE_1, 8,
+    CH_DOORCLOSED, 0,
+};
+
 const unsigned char AnimPulseDoge[] = {
 
     CH_DOGE_00, 12, //ANIM_RNDSPEED,
@@ -346,7 +398,7 @@ const unsigned char *const AnimateBase[] = {
     0,                      // 01 TYPE_PLACEHOLDER
     0,                      // 02 TYPE_DIRT
     0,                      // 03 TYPE_BRICKWALL
-    0,                      // 04 TYPE_OUTBOX_PRE
+    AnimateDoor,            // 04 TYPE_DOOR
     AnimFlashOut,           // 05 TYPE_OUTBOX
     0,                      // 06 TYPE_STEELWALL
     0,                      // 07 TYPE_ROCK
@@ -398,6 +450,8 @@ const unsigned char *const AnimateBase[] = {
     0,                      // 53 TYPE_CONCRETE
     0,                      // 54 TYPE_TELEPORT -- driveTeleportSpin() owns this one entirely
                             // (below); deliberately not wired in here, see its own comment
+    0,                      // 55 TYPE_KEY -- no animation
+    0,                      // 56 TYPE_DOOR_OPEN -- deliberately static, see its own comment
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
@@ -408,7 +462,7 @@ const unsigned char PickupCharacter[] = {
     0,                // 01 TYPE_PLACEHOLDER
     0,                // 02 TYPE_DIRT
     0,                // 03 TYPE_BRICKWALL
-    CH_DOORCLOSED,    // 04 TYPE_OUTBOX_PRE
+    CH_DOORCLOSED,    // 04 TYPE_DOOR
     CH_DOOROPEN_0,    // 05 TYPE_OUTBOX
     0,                // 06 TYPE_STEELWALL
     CH_ROCK,          // 07 TYPE_ROCK
@@ -459,6 +513,8 @@ const unsigned char PickupCharacter[] = {
     0,                // 52 TYPE_CRACKED_BRICK
     0,                // 53 TYPE_CONCRETE
     0,                // 54 TYPE_TELEPORT
+    0,                // 55 TYPE_KEY -- auto-grabbed by walking onto it (mellon.c), not fire-button-yankable
+    0,                // 56 TYPE_DOOR_OPEN
 
 };
 
@@ -488,6 +544,11 @@ void startCharAnimation(int type, const unsigned char *idx) {
         // if (type == TYPE_PIT_L || type == TYPE_PIT_R)
         //     AnimCount[type] = speed;
     }
+}
+
+
+void haltCharAnimation(int type) {
+    AnimCount[type] = ANIM_HALT;
 }
 
 

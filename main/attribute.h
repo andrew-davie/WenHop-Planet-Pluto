@@ -11,7 +11,7 @@ enum ObjectType {
     TYPE_PLACEHOLDER,              // 01
     TYPE_DIRT,                     // 02
     TYPE_BRICKWALL,                // 03
-    TYPE_OUTBOX_PRE,               // 04
+    TYPE_DOOR,                     // 04
     TYPE_OUTBOX,                   // 05
     TYPE_STEELWALL,                // 06
     TYPE_ROCK,                     // 07
@@ -62,6 +62,15 @@ enum ObjectType {
     TYPE_CRACKED_BRICK,            // 52
     TYPE_CONCRETE,                 // 53
     TYPE_TELEPORT,                 // 54
+    TYPE_KEY,                      // 55
+
+    // A door that has finished the AnimateDoor slide-open (animations.c) -- same walkable/exit
+    // attributes as TYPE_OUTBOX, but its own AnimateBase entry is 0 (no animation), so it just
+    // sits on CH_DOOROPEN_STATIC forever instead of inheriting TYPE_OUTBOX's AnimFlashOut cycle
+    // (that flash is fine for the real level exit, but reads as a bug on an ordinary unlocked
+    // door). Also skipped by board.c's per-visit CH_DOOROPEN_0 FLASH()/particle case, for the
+    // same reason -- see CH_DOOROPEN_STATIC's own comment.
+    TYPE_DOOR_OPEN,                // 56
 
 
     TYPE_MAX
@@ -194,6 +203,15 @@ enum ChName {
     CH_CRACKED_BRICK,             // 115
     CH_CONCRETE,                  // 116
     CH_TELEPORT,                  // 117
+    CH_KEY,                       // 118
+
+    // The board byte AnimateDoor (animations.c) ends on and updateDoorUnlock()/board.c's
+    // CH_DOORCLOSED case commit to once the slide-open finishes -- same graphic as CH_DOOROPEN_0
+    // (both map to the same charSet[] cell) but its own TYPE_DOOR_OPEN (attribute.h/.c) so it
+    // doesn't inherit TYPE_OUTBOX's flashing (see TYPE_DOOR_OPEN's own comment). Real board
+    // character, deliberately kept < 128 unlike CH_DOORSLIDE_1 -- it's what the tile actually
+    // and permanently becomes, not a mid-flight animation-only frame.
+    CH_DOOROPEN_STATIC,           // 119
 
     // 127 is limit of board-resident character numbers
 
@@ -318,6 +336,14 @@ enum ChName {
     CH_TELEPORT_5,    // 227
     CH_TELEPORT_6,    // 228
     CH_TELEPORT_7,    // 229
+
+    // Door slide-open frame -- AnimateDoor (animations.c). Only the closed (CH_DOORCLOSED) and
+    // fully-open (CH_DOOROPEN_0) frames are ever real board bytes; this in-between frame, like
+    // CH_TELEPORT_1-7 above, only ever exists as *Animate[TYPE_DOOR] while the animation is
+    // mid-flight (drawScreen.c substitutes *Animate[type] for the raw board byte whenever it's
+    // set -- see its own comment). Symmetric centre-split opening on a 5px-wide glyph only has
+    // room for one such step without the door ending up fully blank -- see AnimateDoor's comment.
+    CH_DOORSLIDE_1,    // 230
 
     CH_MAX
 };
