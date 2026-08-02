@@ -31,6 +31,12 @@
 // 12 ticks ~= 1 second.
 #define TELEPORT_SWIRL_TICKS 12
 
+// Idle ambience for a teleport tile nobody's using: TYPE_TELEPORT is PH4 (attribute.c),
+// so this case is only reached ~3 times/sec per tile (1 of every 4 board scans, and full
+// scans run ~12/sec -- see TELEPORT_SWIRL_TICKS's comment above). 1-in-20 of those makes
+// a single spiral dot land roughly every 6-7 seconds on average -- occasional, not a swirl.
+#define TELEPORT_IDLE_SPARKLE_CHANCE 20
+
 
 // must be init'd at startup
 static int selectorCounter;
@@ -477,7 +483,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-07-31 13:42 AEST
+// Last updated: 2026-08-03 00:35 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -539,7 +545,7 @@ static const unsigned short budget[128] = {
     _B + 452,     //  57 CH_GRINDER_0 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 436,     //  58 CH_GRINDER_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _untimed_,    //  59 CH_HUB
-    _B + 225,     //  60 CH_WATER -- updated 2026-07-31 04:01 AEST (was untimed)
+    _B + 229,     //  60 CH_WATER -- updated 2026-08-03 00:35 AEST (was 225)
     _B + 292,     //  61 CH_WATERFLOW_0 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 296,     //  62 CH_WATERFLOW_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 1256,    //  63 CH_WATERFLOW_2 -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -596,7 +602,7 @@ static const unsigned short budget[128] = {
     _B + 1366,    // 114 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
     _B + 4594,    // 115 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
     _untimed_,    // 116 CH_CONCRETE
-    _untimed_,    // 117 CH_TELEPORT (never phase-selected -- no per-frame processing)
+    _B + 758,     // 117 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-03 00:35 AEST (was untimed)
     _untimed_,    // 118 (unused)
     _untimed_,    // 119 (unused)
     _untimed_,    // 120 (unused)
@@ -786,8 +792,29 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
 
     case TYPE_OUTBOX:
-        FLASH(0x28, 10);
-        nDots(10, cur->col, cur->row, PT_SPIRAL, 40, 2, 5, 0x40, 7);    // untested speed
+        // Suppressed once the player has actually stepped onto the exit (exitMode) -- this fires
+        // on every board-scan visit to the cell, i.e. continuously for the whole walk-off/fade
+        // sequence, and was colliding with the door-glyph animation and the player's own fade,
+        // reading as the door and player randomly flashing colour and the door's final closed
+        // frame taking longer than it should to actually settle in. Still fires normally for any
+        // other TYPE_OUTBOX cell (decorative pre-opened doors, etc.) that isn't mid-exit.
+        if (!exitMode) {
+            FLASH(0x28, 10);
+            nDots(10, cur->col, cur->row, PT_SPIRAL, 40, 2, 5, 0x40, 7);    // untested speed
+        }
+        break;
+
+    case TYPE_TELEPORT:
+        // Quiescent tile only -- teleportLocked means THIS tile is mid-departure (its board
+        // cell stays CH_TELEPORT throughout, see checkHighPriorityMove()'s comment), which
+        // already has its own dedicated swirl (updateTeleportDepartSwirl()); skip so the two
+        // don't stack. Otherwise just an occasional single dot so it doesn't look completely
+        // dead between uses -- same particle type/age as the real swirls
+        // (TELEPORT_SWIRL_PARTICLE_AGE, mellon.h) for a consistent look, just one dot instead
+        // of a batch.
+        if (!teleportLocked && !rangeRandom(TELEPORT_IDLE_SPARKLE_CHANCE))
+            nDots(1, cur->col, cur->row, PT_SPIRAL2, TELEPORT_SWIRL_PARTICLE_AGE, CHAR_CENTER_X, CHAR_CENTER_Y, 32,
+                  7);
         break;
 
     case TYPE_DOGE: {
@@ -825,6 +852,22 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
                     return true;
                 }
             }
+
+            // Once the walk-in glide has fully settled (autoMoveFrameCount == 0, same gate
+            // teleportLocked uses below) -- i.e. the player is now standing squarely on the exit
+            // tile, not still sliding in -- start them walking on the spot as if continuing on
+            // through the doorway, instead of leaving them frozen mid-stride. ID_WalkUpSlow, not
+            // ID_WalkUp -- same 4 frames, held much longer each (playerAnimation.c), so the leg
+            // cycle matches the gentle drift below instead of looking like a fast walk/jog in
+            // place; ID_WalkUp itself is untouched for ordinary movement elsewhere.
+            // updatePlayerAnimation() (playerAnimation.c) does the actual "walking off into the
+            // distance" work, easing frameAdjustY up for as long as exitMode and this settled
+            // state both hold. movePlayer() (which would normally settle the animation itself once
+            // movement stops) is never called while exitMode is set, so nothing else does it; the
+            // != guard keeps this a one-shot rather than restarting the walk cycle every tick for
+            // the rest of the countdown.
+            if (!autoMoveFrameCount && playerAnimationID != ID_WalkUpSlow)
+                startPlayerAnimation(ID_WalkUpSlow);
         }
 
         else if (teleportLocked) {
@@ -875,6 +918,9 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
                     teleportRequested = true;
             }
         }
+
+        else if (doorLocked)
+            updateDoorUnlock();
 
         else
             movePlayer(cur);
@@ -1341,9 +1387,29 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     case CH_DOORCLOSED:
         if (!doges) {
-            *cursor.me = CH_DOOROPEN_0;
-            FLASH(0x28, 10);
-            ADDAUDIO(SFX_DOOR);
+
+            // Kick off the shared TYPE_DOOR split-open animation the first time any closed door
+            // is revisited after the last doge is collected -- Animate[TYPE_DOOR] still points at
+            // AnimateDoor[0] (CH_DOORCLOSED, delay 0, holds forever) until this fires, so checking
+            // against that same starting pointer is enough to trigger exactly once, no separate
+            // latch needed. Every CH_DOORCLOSED cell in the cave shares this one animation (see
+            // AnimateBase[]'s "animate in unison" warning), so they'll all split open together,
+            // not just whichever cell the scanner happens to be on.
+            if (Animate[TYPE_DOOR] == AnimateDoor) {
+                startCharAnimation(TYPE_DOOR, AnimateDoor + 2);
+                ADDAUDIO(SFX_DOOR);
+            }
+
+            // Only commit THIS cell to the real open/walkable state once the shared animation has
+            // actually finished -- same idiom as TYPE_BOMB/TYPE_STAR_EXPLODE above (*Animate[type]
+            // == <terminal frame>), so a door can't become walkable before it looks open. Commits
+            // to CH_DOOROPEN_STATIC, not CH_DOOROPEN_0 -- see AnimateDoor's comment (animations.c)
+            // for why: CH_DOOROPEN_0 is TYPE_OUTBOX, which flashes forever (AnimFlashOut); this
+            // cell just needs to sit still on the open glyph. No FLASH() either -- just the
+            // animation settling. Cells the scanner revisits before then just fall through and
+            // try again next pass.
+            if (*Animate[TYPE_DOOR] == CH_DOOROPEN_STATIC)
+                *cursor.me = CH_DOOROPEN_STATIC;
         }
         break;
 
@@ -1667,7 +1733,6 @@ void genericPush(unsigned char *me, int row, int col, int offsetX, int offsetY) 
     //??
     if (playerPos == pushPos && (atEdge || !(attPushPosFurther & ATT_PERMEABLE))) {
         FLASH(0x42, 8);
-        startPlayerAnimation(ID_Xray);
         nDots(6, col + offsetX, row + offsetY, PT_TWO, 50, 3, 4, 0x180, 7);
     }
 
@@ -1810,8 +1875,10 @@ void explode(unsigned char *where, unsigned char explosionShape) {
             *cell = shape[i];
         }
 
-        else if (cellType == TYPE_OUTBOX_PRE)
-            *cell = CH_DOOROPEN_0;
+        else if (cellType == TYPE_DOOR)
+            *cell = CH_DOOROPEN_STATIC;    // blast damage -- blown open instantly, no slide
+                                            // animation; static, not CH_DOOROPEN_0, so it doesn't
+                                            // flash forever either (see AnimateDoor's comment)
     }
 
     FLASH(4, 4);
