@@ -2030,9 +2030,16 @@ void doRollRock(unsigned char *me, int row, int col) {
 
             unsigned char *sideDown = side + _BOARD_COLS;
             unsigned char sd = *sideDown;
-            int attSideDown = Attribute[CharToType[sd]];
+            enum ObjectType sideDownType = CharToType[sd];
+            int attSideDown = Attribute[sideDownType];
 
-            if (sd < FLAG_THISFRAME && (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
+            // Never roll into the player's own square -- ATT_SQUASHABLE_TO_BLANKS is also set on
+            // TYPE_MELLON_HUSK (for unrelated reasons), so without this exclusion a rock would
+            // happily "crush" the player the same way it crushes a squashable object underneath.
+            // TYPE_MELLON_HUSK_PRE excluded too, matching the same pair movePlayer() (mellon.c)
+            // treats as "the player is legitimately standing here" when detecting a crush death.
+            if (sd < FLAG_THISFRAME && sideDownType != TYPE_MELLON_HUSK && sideDownType != TYPE_MELLON_HUSK_PRE &&
+                (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
 
                 if (offset > 0) {
                     *me = FLAG(CH_ROCK_SIDE_1);
