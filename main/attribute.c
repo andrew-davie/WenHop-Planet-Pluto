@@ -123,22 +123,22 @@ const enum ObjectType CharToType[] = {
     TYPE_MOUNT,                    // 109 CH_MOUNT_D
     TYPE_MOUNT,                    // 110 CH_MOUNT_L
     TYPE_MOUNT,                    // 111 CH_MOUNT_R
-    TYPE_PIT_L,                    // 112 CH_PIT_L0
-    TYPE_PIT_R,                    // 112 CH_PIT_R0
-    TYPE_BOMB,                     // 114 CH_BOMB
-    TYPE_CRACKED_BRICK,            // 115 CH_CRACKED_BRICK
-    TYPE_CONCRETE,                 // 116 CH_CONCRETE
-    TYPE_TELEPORT,                 // 117 CH_TELEPORT
-    TYPE_KEY,                      // 118 CH_KEY
-    TYPE_DOOR_OPEN,                // 119 CH_DOOROPEN_STATIC
-    TYPE_IMMOVABLE,                // 120 CH_IMMOVABLE
-    TYPE_IMMOVABLE_FALLING,        // 121 CH_IMMOVABLE_FALLING
-    TYPE_IMMOVABLE_FALLING,        // 122 CH_IMMOVABLE_FALLING_TOP
-    TYPE_IMMOVABLE_FALLING,        // 123 CH_IMMOVABLE_FALLING_BOTTOM
-    TYPE_ROCK_ROLLING,             // 124 CH_ROCK_SIDE_1
-    TYPE_ROCK_ROLLING,             // 125 CH_ROCK_SIDE_2
-    TYPE_ROCK_ROLLING,             // 126 CH_ROCK_SIDE_3
-    TYPE_ROCK_ROLLING,             // 127 CH_ROCK_SIDE_4
+    TYPE_BOMB,                     // 112 CH_BOMB
+    TYPE_CRACKED_BRICK,            // 113 CH_CRACKED_BRICK
+    TYPE_CONCRETE,                 // 114 CH_CONCRETE
+    TYPE_TELEPORT,                 // 115 CH_TELEPORT
+    TYPE_KEY,                      // 116 CH_KEY
+    TYPE_DOOR_OPEN,                // 117 CH_DOOROPEN_STATIC
+    TYPE_IMMOVABLE,                // 118 CH_IMMOVABLE
+    TYPE_IMMOVABLE_FALLING,        // 119 CH_IMMOVABLE_FALLING
+    TYPE_IMMOVABLE_FALLING,        // 120 CH_IMMOVABLE_FALLING_TOP
+    TYPE_IMMOVABLE_FALLING,        // 121 CH_IMMOVABLE_FALLING_BOTTOM
+    TYPE_ROCK_ROLLING,             // 122 CH_ROCK_SIDE_1
+    TYPE_ROCK_ROLLING,             // 123 CH_ROCK_SIDE_2
+    TYPE_ROCK_ROLLING,             // 124 CH_ROCK_SIDE_3
+    TYPE_ROCK_ROLLING,             // 125 CH_ROCK_SIDE_4
+    0,                             // 126 (unused)
+    0,                             // 127 (unused)
 
     // chars 128 onwards are virtual
     // THESE SHOULD NOT BE CALLING CharToType !!!!
@@ -149,16 +149,7 @@ const enum ObjectType CharToType[] = {
     // TYPE_DOGE,             // 131 CH_DOGE_04
     // TYPE_DOGE,             // 132 CH_DOGE_05
     //                        //
-    // TYPE_PIT_L,            // 133 CH_PIT_L1
-    // TYPE_PIT_R,            // 134 CH_PIT_R1
-    // TYPE_PIT_L,            // 135 CH_PIT_L2
-    // TYPE_PIT_R,            // 136 CH_PIT_R2
-    // TYPE_PIT_L,            // 137 CH_PIT_L3
-    // TYPE_PIT_R,            // 138 CH_PIT_R3
-    // TYPE_PIT_L,            // 139 CH_PIT_L4
-    // TYPE_PIT_R,            // 140 CH_PIT_R4
-    //                        //
-    // TYPE_BOMB,             // 141 CH_BOMB_FLASH
+    // TYPE_BOMB,             // 133 CH_BOMB_FLASH
     //                        //
     // TYPE_CRACKED_BRICK,    // 142 CH_CRACKED_BRICK_1
     // TYPE_CRACKED_BRICK,    // 143 CH_CRACKED_BRICK_1
@@ -270,9 +261,7 @@ const unsigned int Attribute[] = {
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 46 TYPE_STAR_EXPLODING
     _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ | _ | _ | _ | _ |ROL|PUP| _ | _ , // 47 TYPE_ROCK_BONUS
     _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 48 TYPE_MOUNT
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 49 TYPE_PIT_L
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 50 TYPE_PIT_R
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 51 TYPE_BOMB
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 49 TYPE_BOMB
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 52 TYPE_CRACKED_BRICK
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ |ROL| _ |DRP| _ , // 53 TYPE_CONCRETE
     _ |PAD| _ | _ | _ |PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PER| _ | _ | _ | _ | _ | _ | _ | _ , // 54 TYPE_TELEPORT (walkable, solid -- like TYPE_STAR's ground; PH4 drives its idle sparkle, see board.c)

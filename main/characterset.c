@@ -138,22 +138,22 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_14_2),     // 109 CH_MOUNT_D
     CH(CHAR_MAP_characterset_14_1),     // 110 CH_MOUNT_L
     CH(CHAR_MAP_characterset_13_1),     // 111 CH_MOUNT_R
-    CH(CHAR_MAP_characterset_0_9),      // 112 CH_PIT_L0
-    CH(CHAR_MAP_characterset_1_9),      // 113 CH_PIT_R0
-    CH(CHAR_MAP_characterset_4_4),      // 114 CH_BOMB
-    CH(CHAR_MAP_characterset_8_4),      // 115 CH_CRACKED_BRICK
-    CH(CHAR_MAP_characterset_0_3),      // 116 CH_CONCRETE
-    CH(CHAR_MAP_characterset_0_15),      // 117 CH_TELEPORT (spinning-spoke cycle, frame 0)
-    CH(CHAR_MAP_characterset_3_2),       // 118 CH_KEY
-    CH(CHAR_MAP_characterset_2_17),      // 119 CH_DOOROPEN_STATIC -- same graphic as CH_DOOROPEN_0
-    CH(CHAR_MAP_characterset_4_6),       // 120 CH_IMMOVABLE
-    CH(CHAR_MAP_characterset_4_6),       // 121 CH_IMMOVABLE_FALLING -- same graphic as CH_IMMOVABLE, mirrors CH_ROCK/CH_ROCK_FALLING
-    CH(CHAR_MAP_characterset_5_6),       // 122 CH_IMMOVABLE_FALLING_TOP
-    CH(CHAR_MAP_characterset_6_6),       // 123 CH_IMMOVABLE_FALLING_BOTTOM
-    CH(CHAR_MAP_characterset_11_11),    // 124 CH_ROCK_SIDE_1
-    CH(CHAR_MAP_characterset_13_11),    // 125 CH_ROCK_SIDE_2
-    CH(CHAR_MAP_characterset_12_11),    // 126 CH_ROCK_SIDE_3
-    CH(CHAR_MAP_characterset_14_11),    // 127 CH_ROCK_SIDE_4
+    CH(CHAR_MAP_characterset_4_4),      // 112 CH_BOMB
+    CH(CHAR_MAP_characterset_8_4),      // 113 CH_CRACKED_BRICK
+    CH(CHAR_MAP_characterset_0_3),      // 114 CH_CONCRETE
+    CH(CHAR_MAP_characterset_0_15),      // 115 CH_TELEPORT (spinning-spoke cycle, frame 0)
+    CH(CHAR_MAP_characterset_3_2),       // 116 CH_KEY
+    CH(CHAR_MAP_characterset_2_17),      // 117 CH_DOOROPEN_STATIC -- same graphic as CH_DOOROPEN_0
+    CH(CHAR_MAP_characterset_4_6),       // 118 CH_IMMOVABLE
+    CH(CHAR_MAP_characterset_4_6),       // 119 CH_IMMOVABLE_FALLING -- same graphic as CH_IMMOVABLE, mirrors CH_ROCK/CH_ROCK_FALLING
+    CH(CHAR_MAP_characterset_5_6),       // 120 CH_IMMOVABLE_FALLING_TOP
+    CH(CHAR_MAP_characterset_6_6),       // 121 CH_IMMOVABLE_FALLING_BOTTOM
+    CH(CHAR_MAP_characterset_11_11),    // 122 CH_ROCK_SIDE_1
+    CH(CHAR_MAP_characterset_13_11),    // 123 CH_ROCK_SIDE_2
+    CH(CHAR_MAP_characterset_12_11),    // 124 CH_ROCK_SIDE_3
+    CH(CHAR_MAP_characterset_14_11),    // 125 CH_ROCK_SIDE_4
+    0,                                   // 126 (unused)
+    0,                                   // 127 (unused)
 
 
     // "Animated" chars that do not appear on the board but are displayed
@@ -165,16 +165,7 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_10_5),    // 131 CH_DOGE_04
     CH(CHAR_MAP_characterset_14_5),    // 132 CH_DOGE_05
                                        //
-    CH(CHAR_MAP_characterset_3_9),     // 133 CH_PIT_L1
-    CH(CHAR_MAP_characterset_4_9),     // 134 CH_PIT_R1
-    CH(CHAR_MAP_characterset_6_9),     // 135 CH_PIT_L2
-    CH(CHAR_MAP_characterset_7_9),     // 136 CH_PIT_R2
-    CH(CHAR_MAP_characterset_9_9),     // 137 CH_PIT_L3
-    CH(CHAR_MAP_characterset_10_9),    // 138 CH_PIT_R3
-    CH(CHAR_MAP_characterset_12_9),    // 139 CH_PIT_L4
-    CH(CHAR_MAP_characterset_13_9),    // 140 CH_PIT_R4
-                                       //
-    CH(CHAR_MAP_characterset_5_4),     // 141 CH_BOMB_FLASH
+    CH(CHAR_MAP_characterset_5_4),     // 133 CH_BOMB_FLASH
                                        //
     CH(CHAR_MAP_characterset_9_4),     // 142 CH_CRACKED_BRICK_1
     CH(CHAR_MAP_characterset_10_4),    // 143 CH_CRACKED_BRICK_2

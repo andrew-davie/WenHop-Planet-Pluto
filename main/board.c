@@ -598,22 +598,22 @@ static const unsigned short budget[128] = {
     _untimed_,    // 109 CH_MOUNT_D
     _untimed_,    // 110 CH_MOUNT_L
     _untimed_,    // 111 CH_MOUNT_R
-    _untimed_,    // 112 CH_PIT_L0
-    _untimed_,    // 113 CH_PIT_R0
-    _B + 1366,    // 114 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
-    _B + 4594,    // 115 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
-    _untimed_,    // 116 CH_CONCRETE
-    _B + 766,     // 117 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-03 03:47 AEST (was 758)
-    _untimed_,    // 118 (unused)
-    _untimed_,    // 119 (unused)
-    _untimed_,    // 120 CH_IMMOVABLE
-    _untimed_,    // 121 CH_IMMOVABLE_FALLING
-    _untimed_,    // 122 CH_IMMOVABLE_FALLING_TOP
-    _untimed_,    // 123 CH_IMMOVABLE_FALLING_BOTTOM
-    _untimed_,    // 124 CH_ROCK_SIDE_1
-    _untimed_,    // 125 CH_ROCK_SIDE_2
-    _untimed_,    // 126 CH_ROCK_SIDE_3
-    _untimed_,    // 127 CH_ROCK_SIDE_4
+    _B + 1366,    // 112 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
+    _B + 4594,    // 113 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
+    _untimed_,    // 114 CH_CONCRETE
+    _B + 766,     // 115 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-03 03:47 AEST (was 758)
+    _untimed_,    // 116 CH_KEY
+    _untimed_,    // 117 CH_DOOROPEN_STATIC
+    _untimed_,    // 118 CH_IMMOVABLE
+    _untimed_,    // 119 CH_IMMOVABLE_FALLING
+    _untimed_,    // 120 CH_IMMOVABLE_FALLING_TOP
+    _untimed_,    // 121 CH_IMMOVABLE_FALLING_BOTTOM
+    _untimed_,    // 122 CH_ROCK_SIDE_1
+    _untimed_,    // 123 CH_ROCK_SIDE_2
+    _untimed_,    // 124 CH_ROCK_SIDE_3
+    _untimed_,    // 125 CH_ROCK_SIDE_4
+    _untimed_,    // 126 (unused)
+    _untimed_,    // 127 (unused)
 };
 
 

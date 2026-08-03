@@ -56,9 +56,7 @@ enum ObjectType {
     TYPE_STAR_EXPLODE,             // 46
     TYPE_ROCK_BONUS,               // 47
     TYPE_MOUNT,                    // 48
-    TYPE_PIT_L,                    // 49
-    TYPE_PIT_R,                    // 50
-    TYPE_BOMB,                     // 51
+    TYPE_BOMB,                     // 49
     TYPE_CRACKED_BRICK,            // 52
     TYPE_CONCRETE,                 // 53
     TYPE_TELEPORT,                 // 54
@@ -208,13 +206,11 @@ enum ChName {
     CH_MOUNT_D,                   // 109
     CH_MOUNT_L,                   // 110
     CH_MOUNT_R,                   // 111
-    CH_PIT_L0,                    // 112
-    CH_PIT_R0,                    // 113
-    CH_BOMB,                      // 114
-    CH_CRACKED_BRICK,             // 115
-    CH_CONCRETE,                  // 116
-    CH_TELEPORT,                  // 117
-    CH_KEY,                       // 118
+    CH_BOMB,                      // 112
+    CH_CRACKED_BRICK,             // 113
+    CH_CONCRETE,                  // 114
+    CH_TELEPORT,                  // 115
+    CH_KEY,                       // 116
 
     // The board byte AnimateDoor (animations.c) ends on and updateDoorUnlock()/board.c's
     // CH_DOORCLOSED case commit to once the slide-open finishes -- same graphic as CH_DOOROPEN_0
@@ -222,17 +218,17 @@ enum ChName {
     // doesn't inherit TYPE_OUTBOX's flashing (see TYPE_DOOR_OPEN's own comment). Real board
     // character, deliberately kept < 128 unlike CH_DOORSLIDE_1 -- it's what the tile actually
     // and permanently becomes, not a mid-flight animation-only frame.
-    CH_DOOROPEN_STATIC,           // 119
+    CH_DOOROPEN_STATIC,           // 117
 
     // An indestructible falling block -- see TYPE_IMMOVABLE's own comment (above) for the
     // attribute reasoning. CH_IMMOVABLE_FALLING reuses CH_IMMOVABLE's own graphic (same
     // convention as CH_ROCK/CH_ROCK_FALLING both pointing at one charSet[] cell); the TOP/
     // BOTTOM pair are the one-frame split used while it's mid-fall between two board rows,
     // same mechanism as CH_ROCK_FALLING_TOP/BOTTOM.
-    CH_IMMOVABLE,                 // 120
-    CH_IMMOVABLE_FALLING,         // 121
-    CH_IMMOVABLE_FALLING_TOP,     // 122
-    CH_IMMOVABLE_FALLING_BOTTOM,  // 123
+    CH_IMMOVABLE,                 // 118
+    CH_IMMOVABLE_FALLING,         // 119
+    CH_IMMOVABLE_FALLING_TOP,     // 120
+    CH_IMMOVABLE_FALLING_BOTTOM,  // 121
 
     // Diagonal-roll transition, same 1-frame-then-resolve idea as CH_DOGE_SIDE_1-4 but for a
     // settled CH_ROCK rolling off an ATT_ROLL surface instead of a doge: _1/_2 are the departing
@@ -244,10 +240,14 @@ enum ChName {
     // boundary, so _1/_2 show the trailing sliver still left in the departing cell and _3/_4 show
     // the leading bulk that's already arrived, together reading as one rock straddling both
     // squares for that single frame.
-    CH_ROCK_SIDE_1,               // 124
-    CH_ROCK_SIDE_2,               // 125
-    CH_ROCK_SIDE_3,               // 126
-    CH_ROCK_SIDE_4,               // 127
+    CH_ROCK_SIDE_1,               // 122
+    CH_ROCK_SIDE_2,               // 123
+    CH_ROCK_SIDE_3,               // 124
+    CH_ROCK_SIDE_4,               // 125
+
+    // 126, 127 unused -- 2 free board-resident slots (CH_DOGE_01 below is pinned to 128 via an
+    // explicit enum initializer, so removing entries up here doesn't shrink the virtual range;
+    // it just reopens gap slots like this one)
 
     // 127 is limit of board-resident character numbers
 
@@ -260,16 +260,7 @@ enum ChName {
     CH_DOGE_04,            // 131
     CH_DOGE_05,            // 132
                            //
-    CH_PIT_L1,             // 133
-    CH_PIT_R1,             // 134
-    CH_PIT_L2,             // 135
-    CH_PIT_R2,             // 136
-    CH_PIT_L3,             // 137
-    CH_PIT_R3,             // 138
-    CH_PIT_L4,             // 139
-    CH_PIT_R4,             // 140
-                           //
-    CH_BOMB_FLASH,         // 141
+    CH_BOMB_FLASH,         // 133
                            //
     CH_CRACKED_BRICK_1,    // 142
     CH_CRACKED_BRICK_2,    // 143

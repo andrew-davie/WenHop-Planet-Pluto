@@ -66,26 +66,6 @@ const unsigned char AnimateStar[] = {
     CH_STAR,0,
 };
 
-const unsigned char AnimatePitL[] = {
-    CH_PIT_L0,3,
-    CH_PIT_L1,3,
-    CH_PIT_L2,3,
-    CH_PIT_L3,3,
-    CH_PIT_L4,3,
-
-    ANIM_LOOP
-};
-
-const unsigned char AnimatePitR[] = {
-    CH_PIT_R0,3,
-    CH_PIT_R1,3,
-    CH_PIT_R2,3,
-    CH_PIT_R3,3,
-    CH_PIT_R4,3,
-
-    ANIM_LOOP
-};
-
 
 const unsigned char AnimateStarExplode[] = {
 
@@ -448,9 +428,7 @@ const unsigned char *const AnimateBase[] = {
     AnimateStarExplode,     // 46 TYPE_STAR_EXPLODE
     AnimateRockBonus,       // 47 TYPE_ROCK_BONUS
     0,                      // 48 TYPE_MOUNT
-    AnimatePitL,            // 49 TYPE_PIT_L
-    AnimatePitR,            // 50 TYPE_PIT_R
-    AnimateBomb,            // 51 TYPE_BOMB
+    AnimateBomb,            // 49 TYPE_BOMB
     AnimateCrackedBrick,    // 52 TYPE_CRACKED_BRICK
     0,                      // 53 TYPE_CONCRETE
     0,                      // 54 TYPE_TELEPORT -- driveTeleportSpin() owns this one entirely
@@ -518,9 +496,7 @@ const unsigned char PickupCharacter[] = {
     0,                // 46 TYPE_STAR_EXPLODE
     CH_ROCK_BONUS,    // 47 TYPE_ROCK_BONUS
     0,                // 48 TYPE_MOUNT
-    0,                // 49 TYPE_PIT_L
-    0,                // 50 TYPE_PIT_R
-    CH_BOMB,          // 51 TYPE_BOMB
+    CH_BOMB,          // 49 TYPE_BOMB
     0,                // 52 TYPE_CRACKED_BRICK
     0,                // 53 TYPE_CONCRETE
     0,                // 54 TYPE_TELEPORT
@@ -551,12 +527,6 @@ void startCharAnimation(int type, const unsigned char *idx) {
         Animate[type] = idx++;
         AnimCount[type] = *idx;
 
-        // extern int lastRockCount;
-        // int speed = 8 - lastRockCount + 1;
-        // if (speed < 1)
-        //     speed = 1;
-        // if (type == TYPE_PIT_L || type == TYPE_PIT_R)
-        //     AnimCount[type] = speed;
     }
 }
 
