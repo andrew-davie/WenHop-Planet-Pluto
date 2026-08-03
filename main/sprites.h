@@ -112,6 +112,12 @@ enum FRAME {
     // FRAME_NEW_X019_Y606,  // currently unused
     // FRAME_NEW_X051_Y606,  // currently unused
     // FRAME_NEW_X004_Y607,  // currently unused
+    FRAME_NEW_X000_Y156,
+    FRAME_NEW_X035_Y301,
+    FRAME_NEW_X050_Y303,
+    FRAME_NEW_X018_Y394,
+    FRAME_NEW_X034_Y394,
+    FRAME_NEW_X081_Y407,
     FRAME_MAX,
 
     // actions start after frames

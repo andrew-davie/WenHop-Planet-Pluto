@@ -1000,6 +1000,7 @@ const unsigned char shape_FRAME_MINE_DOWN_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (48,397)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (48,397)
 // const unsigned char shape_FRAME_DIE_2[] = {
 //
 //     SPRITE_DOUBLE | 23,
@@ -1035,6 +1036,7 @@ const unsigned char shape_FRAME_MINE_DOWN_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (64,404)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (64,404)
 // const unsigned char shape_FRAME_DIE_3[] = {
 //
 //     SPRITE_DOUBLE | 16,
@@ -1503,7 +1505,7 @@ const unsigned char shape_FRAME_PUSH1[] = {
     ONE( _XXXX_X_, HMT3 ),                      // 10   |◼️🟩🟩🟩🟩◼️🟩◼️|
     ONE( _XXXX_X_, HMT3 ),                      // 11   |◼️🟩🟩🟩🟩◼️🟩◼️|
     ONE( X_XXXX__, HMT3 ),                      // 12   |🟩◼️🟩🟩🟩🟩◼️◼️|
-    ONE( XXXXXXXX, BDY0 ),                      // 13   |🟦🟦🟦🟦🟦🟦🟦🟦|  <- arms braced out
+    ONE( XXXXXXXX, BDY0 ),                      // 13   |🟦🟦🟦🟦🟦🟦🟦🟦|
     ONE( X_XX_X__, BDY1 ),                      // 14   |🟪◼️🟪🟪◼️🟪◼️◼️|
     ONE( X_XX_X__, BDY2 ),                      // 15   |🟫◼️🟫🟫◼️🟫◼️◼️|
     ONE( XXXX_X__, BDY2 ),                      // 16   |🟫🟫🟫🟫◼️🟫◼️◼️|
@@ -1539,7 +1541,7 @@ const unsigned char shape_FRAME_PUSH2[] = {
     ONE( _XXXX_X_, HMT3 ),                      // 10   |◼️🟩🟩🟩🟩◼️🟩◼️|
     ONE( _XXXX_X_, HMT3 ),                      // 11   |◼️🟩🟩🟩🟩◼️🟩◼️|
     ONE( __X_XX__, HMT3 ),                      // 12   |◼️◼️🟩◼️🟩🟩◼️◼️|
-    ONE( XXXXXXXX, BDY1 ),                      // 13   |🟪🟪🟪🟪🟪🟪🟪🟪|  <- arms braced out
+    ONE( XXXXXXXX, BDY1 ),                      // 13   |🟪🟪🟪🟪🟪🟪🟪🟪|
     ONE( XX_XXXX_, BDY0 ),                      // 14   |🟦🟦◼️🟦🟦🟦🟦◼️|
     ONE( XX_XXXX_, BDY1 ),                      // 15   |🟪🟪◼️🟪🟪🟪🟪◼️|
     ONE( XXX_XX__, BDY2 ),                      // 16   |🟫🟫🟫◼️🟫🟫◼️◼️|
@@ -1577,7 +1579,7 @@ const unsigned char shape_FRAME_PUSH3[] = {
     ONE( _XXXX_X_, HMT3 ),                      // 10   |◼️🟩🟩🟩🟩◼️🟩◼️|
     ONE( _XXXX_X_, HMT3 ),                      // 11   |◼️🟩🟩🟩🟩◼️🟩◼️|
     ONE( X_XXXX__, HMT3 ),                      // 12   |🟩◼️🟩🟩🟩🟩◼️◼️|
-    ONE( XXXXXXXX, BDY1 ),                      // 13   |🟪🟪🟪🟪🟪🟪🟪🟪|  <- arms braced out
+    ONE( XXXXXXXX, BDY1 ),                      // 13   |🟪🟪🟪🟪🟪🟪🟪🟪|
     ONE( X_XX_X__, BDY0 ),                      // 14   |🟦◼️🟦🟦◼️🟦◼️◼️|
     ONE( X_XX_X__, BDY1 ),                      // 15   |🟪◼️🟪🟪◼️🟪◼️◼️|
     ONE( XXXX_X__, BDY2 ),                      // 16   |🟫🟫🟫🟫◼️🟫◼️◼️|
@@ -1613,7 +1615,7 @@ const unsigned char shape_FRAME_PUSH4[] = {
     ONE( _XXX__X_, HMT3 ),                      // 10   |◼️🟩🟩🟩◼️◼️🟩◼️|
     ONE( _XXX__X_, HMT3 ),                      // 11   |◼️🟩🟩🟩◼️◼️🟩◼️|
     ONE( X_XXXX__, HMT3 ),                      // 12   |🟩◼️🟩🟩🟩🟩◼️◼️|
-    ONE( XXXXXXXX, BDY1 ),                      // 13   |🟪🟪🟪🟪🟪🟪🟪🟪|  <- arms braced out
+    ONE( XXXXXXXX, BDY1 ),                      // 13   |🟪🟪🟪🟪🟪🟪🟪🟪|
     ONE( _XXX_X_X, BDY0 ),                      // 14   |◼️🟦🟦🟦◼️🟦◼️🟦|
     ONE( XXXX_X_X, BDY1 ),                      // 15   |🟪🟪🟪🟪◼️🟪◼️🟪|
     ONE( XXXX_X__, BDY2 ),                      // 16   |🟫🟫🟫🟫◼️🟫◼️◼️|
@@ -2348,10 +2350,215 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 // };
 
 
+// sheet: astronaut-guy-sheet-v10.png @ (0,156)
+const unsigned char shape_FRAME_NEW_X000_Y156[] = {
+
+    SPRITE_DOUBLE | 24,
+    6,
+    0,
+
+                                                //      +--------------------------+
+    TWO( ___X__XX, XX______, HMT0, HMT0 ),      // 00   |◼️◼️◼️🟥◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X__XXX, XXX_____, HMT0, HMT0 ),      // 01   |◼️◼️🟥◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( _X___XXX, XXX_____, HMT0, HMT0 ),      // 02   |◼️🟥◼️◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( _XX_XXXX, XXXX____, HMT0, HMT0 ),      // 03   |◼️🟥🟥◼️🟥🟥🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( X_X_XXXX, XXXX____, HMT0, HMT0 ),      // 04   |🟥◼️🟥◼️🟥🟥🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( X__XXX_X, XXX_____, HMT0, HMT0 ),      // 05   |🟥◼️◼️🟥🟥🟥◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( X__XXX_X, XXX_____, HMT0, HMT0 ),      // 06   |🟥◼️◼️🟥🟥🟥◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( X___XX_X, XXX_____, HMT0, HMT0 ),      // 07   |🟥◼️◼️◼️🟥🟥◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( ____XXXX, XXXX____, HMT0, HMT0 ),      // 08   |◼️◼️◼️◼️🟥🟥🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( ____XXXX, XXXX____, HMT0, HMT0 ),      // 09   |◼️◼️◼️◼️🟥🟥🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( ____XXX_, ________, HMT0, HMT0 ),      // 10   |◼️◼️◼️◼️🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _____X_X, XXX_____, HMT0, HMT0 ),      // 11   |◼️◼️◼️◼️◼️🟥◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( ____X_XX, XXX_____, HMT0, HMT0 ),      // 12   |◼️◼️◼️◼️🟥◼️🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( ____X_X_, ___X____, HMT0, HMT0 ),      // 13   |◼️◼️◼️◼️🟥◼️🟥◼️◼️◼️◼️🟥◼️◼️◼️◼️|
+    TWO( ____XX_X, XXXX____, HMT0, HMT0 ),      // 14   |◼️◼️◼️◼️🟥🟥◼️🟥🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( _____X_X, XXXX____, HMT0, HMT0 ),      // 15   |◼️◼️◼️◼️◼️🟥◼️🟥🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( _____X__, ________, HMT0, HMT0 ),      // 16   |◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _______X, XXX_____, HMT0, HMT0 ),      // 17   |◼️◼️◼️◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( _______X, XXX_____, HMT0, HMT0 ),      // 18   |◼️◼️◼️◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( ______X_, _X______, HMT0, HMT0 ),      // 19   |◼️◼️◼️◼️◼️◼️🟥◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( _____XXX, XX______, HMT0, HMT0 ),      // 20   |◼️◼️◼️◼️◼️🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( _____X_X, XX______, HMT0, HMT0 ),      // 21   |◼️◼️◼️◼️◼️🟥◼️🟥🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( _____X__, _X______, HMT0, HMT0 ),      // 22   |◼️◼️◼️◼️◼️🟥◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( ________, _X______, HMT0, HMT0 ),      // 23   |◼️◼️◼️◼️◼️◼️🟢◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+                                                //      +--------------------------+
+};
+
+// sheet: astronaut-guy-sheet-v10.png @ (35,301)
+const unsigned char shape_FRAME_NEW_X035_Y301[] = {
+
+    SPRITE_DOUBLE | 23,
+    5,
+    0,
+
+                                                //      +--------------------------+
+    TWO( _X______, X_______, HMT0, HMT0 ),      // 00   |◼️🟥◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _X_XXXX_, X_______, HMT0, HMT0 ),      // 01   |◼️🟥◼️🟥🟥🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( X_XXXXXX, _X______, HMT0, HMT0 ),      // 02   |🟥◼️🟥🟥🟥🟥🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( X_X____X, _X______, HMT0, HMT0 ),      // 03   |🟥◼️🟥◼️◼️◼️◼️🟥◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( XXX_X__X, XX______, HMT0, HMT0 ),      // 04   |🟥🟥🟥◼️🟥◼️◼️🟥🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( XX_X____, XX______, HMT0, HMT0 ),      // 05   |🟥🟥◼️🟥◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( XX_X____, XX______, HMT0, HMT0 ),      // 06   |🟥🟥◼️🟥◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( XX______, XX______, HMT0, HMT0 ),      // 07   |🟥🟥◼️◼️◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( XX______, XX______, HMT0, HMT0 ),      // 08   |🟥🟥◼️◼️◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( XXX____X, XX______, HMT0, HMT0 ),      // 09   |🟥🟥🟥◼️◼️◼️◼️🟥🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( XX_XXXX_, XX______, HMT0, HMT0 ),      // 10   |🟥🟥◼️🟥🟥🟥🟥◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( _X_XXXX_, X_______, HMT0, HMT0 ),      // 11   |◼️🟥◼️🟥🟥🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _XX____X, X_______, HMT0, HMT0 ),      // 12   |◼️🟥🟥◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _XXXXXXX, X_______, HMT0, HMT0 ),      // 13   |◼️🟥🟥🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _XX_XX_X, ________, HMT0, HMT0 ),      // 14   |◼️🟥🟥◼️🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( __X_XX_X, ________, HMT0, HMT0 ),      // 15   |◼️◼️🟥◼️🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XXXX_, ________, HMT0, HMT0 ),      // 16   |◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XXXX_, ________, HMT0, HMT0 ),      // 17   |◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____XX__, ________, HMT0, HMT0 ),      // 18   |◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___X__X_, ________, HMT0, HMT0 ),      // 19   |◼️◼️◼️🟥◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( __XXXXXX, ________, HMT0, HMT0 ),      // 20   |◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( __X_XX_X, ________, HMT0, HMT0 ),      // 21   |◼️◼️🟥◼️🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( __X____X, ________, HMT0, HMT0 ),      // 22   |◼️◼️🟥◼️◼️🟢◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+                                                //      +--------------------------+
+};
+
+// sheet: astronaut-guy-sheet-v10.png @ (50,303)
+const unsigned char shape_FRAME_NEW_X050_Y303[] = {
+
+    SPRITE_DOUBLE | 26,
+    6,
+    0,
+
+                                                //      +--------------------------+
+    TWO( ____XXXX, ________, HMT0, HMT0 ),      // 00   |◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XXXXX, X_______, HMT0, HMT0 ),      // 01   |◼️◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XXXXX, X_______, HMT0, HMT0 ),      // 02   |◼️◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( __XXX__X, XX______, HMT0, HMT0 ),      // 03   |◼️◼️🟥🟥🟥◼️◼️🟥🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __XX_X__, XX______, HMT0, HMT0 ),      // 04   |◼️◼️🟥🟥◼️🟥◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __XXX___, XX______, HMT0, HMT0 ),      // 05   |◼️◼️🟥🟥🟥◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_X___, _X______, HMT0, HMT0 ),      // 06   |◼️◼️🟥◼️🟥◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_____, _X______, HMT0, HMT0 ),      // 07   |◼️◼️🟥◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_____, _X______, HMT0, HMT0 ),      // 08   |◼️◼️🟥◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_____, _X______, HMT0, HMT0 ),      // 09   |◼️◼️🟥◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( ___X____, X_______, HMT0, HMT0 ),      // 10   |◼️◼️◼️🟥◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XX__X, X_______, HMT0, HMT0 ),      // 11   |◼️◼️◼️🟥🟥◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _X__XXXX, __X_____, HMT0, HMT0 ),      // 12   |◼️🟥◼️◼️🟥🟥🟥🟥◼️◼️🟥◼️◼️◼️◼️◼️|
+    TWO( XXXX____, XXXX____, HMT0, HMT0 ),      // 13   |🟥🟥🟥🟥◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( XXXXXXXX, XXXX____, HMT0, HMT0 ),      // 14   |🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( __XX_XX_, XX______, HMT0, HMT0 ),      // 15   |◼️◼️🟥🟥◼️🟥🟥◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( ___X_XX_, X_______, HMT0, HMT0 ),      // 16   |◼️◼️◼️🟥◼️🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XXXXX, X_______, HMT0, HMT0 ),      // 17   |◼️◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____XXXX, ________, HMT0, HMT0 ),      // 18   |◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____X__X, ________, HMT0, HMT0 ),      // 19   |◼️◼️◼️◼️🟥◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _____XX_, ________, HMT0, HMT0 ),      // 20   |◼️◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____XXXX, ________, HMT0, HMT0 ),      // 21   |◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _____XX_, ________, HMT0, HMT0 ),      // 22   |◼️◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____X__X, ________, HMT0, HMT0 ),      // 23   |◼️◼️◼️◼️🟥◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___X____, X_______, HMT0, HMT0 ),      // 24   |◼️◼️◼️🟥◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___X____, X_______, HMT0, HMT0 ),      // 25   |◼️◼️◼️🟥◼️◼️🟢◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+                                                //      +--------------------------+
+};
+
+// sheet: astronaut-guy-sheet-v10.png @ (18,394)
+const unsigned char shape_FRAME_NEW_X018_Y394[] = {
+
+    SPRITE_DOUBLE | 26,
+    6,
+    0,
+
+                                                //      +--------------------------+
+    TWO( ____XXXX, ________, HMT0, HMT0 ),      // 00   |◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XXXXX, X_______, HMT0, HMT0 ),      // 01   |◼️◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XX__X, X_______, HMT0, HMT0 ),      // 02   |◼️◼️◼️🟥🟥◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( __XX_X__, XX______, HMT0, HMT0 ),      // 03   |◼️◼️🟥🟥◼️🟥◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __XXX___, XX______, HMT0, HMT0 ),      // 04   |◼️◼️🟥🟥🟥◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_X___, _X______, HMT0, HMT0 ),      // 05   |◼️◼️🟥◼️🟥◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_____, _X______, HMT0, HMT0 ),      // 06   |◼️◼️🟥◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_____, _X______, HMT0, HMT0 ),      // 07   |◼️◼️🟥◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_____, _X______, HMT0, HMT0 ),      // 08   |◼️◼️🟥◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __XX____, XX______, HMT0, HMT0 ),      // 09   |◼️◼️🟥🟥◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( ___XX__X, X_______, HMT0, HMT0 ),      // 10   |◼️◼️◼️🟥🟥◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XXXXX, X_______, HMT0, HMT0 ),      // 11   |◼️◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _X__XXXX, __X_____, HMT0, HMT0 ),      // 12   |◼️🟥◼️◼️🟥🟥🟥🟥◼️◼️🟥◼️◼️◼️◼️◼️|
+    TWO( XXXX____, XXXX____, HMT0, HMT0 ),      // 13   |🟥🟥🟥🟥◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( XXXXXXXX, XXXX____, HMT0, HMT0 ),      // 14   |🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️|
+    TWO( __XX_XX_, XX______, HMT0, HMT0 ),      // 15   |◼️◼️🟥🟥◼️🟥🟥◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( ___X_XX_, X_______, HMT0, HMT0 ),      // 16   |◼️◼️◼️🟥◼️🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XXXXX, X_______, HMT0, HMT0 ),      // 17   |◼️◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____XXXX, ________, HMT0, HMT0 ),      // 18   |◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____X__X, ________, HMT0, HMT0 ),      // 19   |◼️◼️◼️◼️🟥◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _____XX_, ________, HMT0, HMT0 ),      // 20   |◼️◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____XXXX, ________, HMT0, HMT0 ),      // 21   |◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( _____XX_, ________, HMT0, HMT0 ),      // 22   |◼️◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____X__X, ________, HMT0, HMT0 ),      // 23   |◼️◼️◼️◼️🟥◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____X__X, ________, HMT0, HMT0 ),      // 24   |◼️◼️◼️◼️🟥◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____X__X, ________, HMT0, HMT0 ),      // 25   |◼️◼️◼️◼️🟥◼️🟢🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+                                                //      +--------------------------+
+};
+
+// sheet: astronaut-guy-sheet-v10.png @ (34,394)
+const unsigned char shape_FRAME_NEW_X034_Y394[] = {
+
+    SPRITE_DOUBLE | 26,
+    6,
+    0,
+
+                                                //      +--------------------------+
+    TWO( _X______, __X_____, HMT0, HMT0 ),      // 00   |◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️|
+    TWO( __XX____, XX______, HMT0, HMT0 ),      // 01   |◼️◼️🟥🟥◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_____, _X______, HMT0, HMT0 ),      // 02   |◼️◼️🟥◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( _X__XXXX, __X_____, HMT0, HMT0 ),      // 03   |◼️🟥◼️◼️🟥🟥🟥🟥◼️◼️🟥◼️◼️◼️◼️◼️|
+    TWO( _X_X____, X_X_____, HMT0, HMT0 ),      // 04   |◼️🟥◼️🟥◼️◼️◼️◼️🟥◼️🟥◼️◼️◼️◼️◼️|
+    TWO( XX_X_X__, X_XX____, HMT0, HMT0 ),      // 05   |🟥🟥◼️🟥◼️🟥◼️◼️🟥◼️🟥🟥◼️◼️◼️◼️|
+    TWO( _XX_X___, _XX_____, HMT0, HMT0 ),      // 06   |◼️🟥🟥◼️🟥◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️|
+    TWO( _XX_X___, _XX_____, HMT0, HMT0 ),      // 07   |◼️🟥🟥◼️🟥◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️|
+    TWO( _XX_____, _XX_____, HMT0, HMT0 ),      // 08   |◼️🟥🟥◼️◼️◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️|
+    TWO( _XX_____, _XX_____, HMT0, HMT0 ),      // 09   |◼️🟥🟥◼️◼️◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️|
+    TWO( _XXX____, XXX_____, HMT0, HMT0 ),      // 10   |◼️🟥🟥🟥◼️◼️◼️◼️🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( _XXXXXXX, XXX_____, HMT0, HMT0 ),      // 11   |◼️🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️|
+    TWO( __X_XXXX, _X______, HMT0, HMT0 ),      // 12   |◼️◼️🟥◼️🟥🟥🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __X_XXXX, _X______, HMT0, HMT0 ),      // 13   |◼️◼️🟥◼️🟥🟥🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __XX____, XX______, HMT0, HMT0 ),      // 14   |◼️◼️🟥🟥◼️◼️◼️◼️🟥🟥◼️◼️◼️◼️◼️◼️|
+    TWO( __XXXXXX, X_______, HMT0, HMT0 ),      // 15   |◼️◼️🟥🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___X_XX_, X_______, HMT0, HMT0 ),      // 16   |◼️◼️◼️🟥◼️🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___X_XX_, X_______, HMT0, HMT0 ),      // 17   |◼️◼️◼️🟥◼️🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____XXXX, ________, HMT0, HMT0 ),      // 18   |◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____XXXX, ________, HMT0, HMT0 ),      // 19   |◼️◼️◼️◼️🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ____X__X, ________, HMT0, HMT0 ),      // 20   |◼️◼️◼️◼️🟥◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___X_XX_, X_______, HMT0, HMT0 ),      // 21   |◼️◼️◼️🟥◼️🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___XXXXX, X_______, HMT0, HMT0 ),      // 22   |◼️◼️◼️🟥🟥🟥🟥🟥🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___X_XX_, X_______, HMT0, HMT0 ),      // 23   |◼️◼️◼️🟥◼️🟥🟥◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___X____, X_______, HMT0, HMT0 ),      // 24   |◼️◼️◼️🟥◼️◼️◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+    TWO( ___X____, X_______, HMT0, HMT0 ),      // 25   |◼️◼️◼️🟥◼️◼️🟢◼️🟥◼️◼️◼️◼️◼️◼️◼️|
+                                                //      +--------------------------+
+};
+
+// sheet: astronaut-guy-sheet-v10.png @ (81,407)
+const unsigned char shape_FRAME_NEW_X081_Y407[] = {
+
+    SPRITE_DOUBLE | 13,
+    7,
+    0,
+
+                                                //      +--------------------------+
+    TWO( __X_____, ___X____, HMT0, HMT0 ),      // 00   |◼️◼️🟥◼️◼️◼️◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️|
+    TWO( X_XX____, __XX_X__, HMT0, HMT0 ),      // 01   |🟥◼️🟥🟥◼️◼️◼️◼️◼️◼️🟥🟥◼️🟥◼️◼️|
+    TWO( __X__XXX, X__X____, HMT0, HMT0 ),      // 02   |◼️◼️🟥◼️◼️🟥🟥🟥🟥◼️◼️🟥◼️◼️◼️◼️|
+    TWO( _XX_XXXX, XX_XX___, HMT0, HMT0 ),      // 03   |◼️🟥🟥◼️🟥🟥🟥🟥🟥🟥◼️🟥🟥◼️◼️◼️|
+    TWO( _X__X___, _X__X___, HMT0, HMT0 ),      // 04   |◼️🟥◼️◼️🟥◼️◼️◼️◼️🟥◼️◼️🟥◼️◼️◼️|
+    TWO( _X_X__X_, X_X_X___, HMT0, HMT0 ),      // 05   |◼️🟥◼️🟥◼️◼️🟥◼️🟥◼️🟥◼️🟥◼️◼️◼️|
+    TWO( _X_X___X, __X_X___, HMT0, HMT0 ),      // 06   |◼️🟥◼️🟥◼️◼️◼️🟥◼️◼️🟥◼️🟥◼️◼️◼️|
+    TWO( __X___X_, X__X____, HMT0, HMT0 ),      // 07   |◼️◼️🟥◼️◼️◼️🟥◼️🟥◼️◼️🟥◼️◼️◼️◼️|
+    TWO( __X__X__, _X_X____, HMT0, HMT0 ),      // 08   |◼️◼️🟥◼️◼️🟥◼️◼️◼️🟥◼️🟥◼️◼️◼️◼️|
+    TWO( __X__X__, ___X____, HMT0, HMT0 ),      // 09   |◼️◼️🟥◼️◼️🟥◼️◼️◼️◼️◼️🟥◼️◼️◼️◼️|
+    TWO( X_XX____, __XX_X__, HMT0, HMT0 ),      // 10   |🟥◼️🟥🟥◼️◼️◼️◼️◼️◼️🟥🟥◼️🟥◼️◼️|
+    TWO( X__XXXXX, XXX__X__, HMT0, HMT0 ),      // 11   |🟥◼️◼️🟥🟥🟥🟥🟥🟥🟥🟥◼️◼️🟥◼️◼️|
+    TWO( _X__XXXX, XX__X___, HMT0, HMT0 ),      // 12   |◼️🟥◼️◼️🟥🟥🟥🟢🟥🟥◼️◼️🟥◼️◼️◼️|
+                                                //      +--------------------------+
+};
+
 // clang-format on
 
 // sheet: astronaut-guy-sheet-v10.png @ (115,410)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (115,410)
 // const unsigned char shape_FRAME_NEW_X115_Y410[] = {
 //
 //     SPRITE_DOUBLE | 10,
@@ -2374,6 +2581,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (128,410)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (128,410)
 // const unsigned char shape_FRAME_NEW_X128_Y410[] = {
 //
 //     SPRITE_DOUBLE | 10,
@@ -2396,6 +2604,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (101,412)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (101,412)
 // const unsigned char shape_FRAME_NEW_X101_Y412[] = {
 //
 //     6,
@@ -2414,6 +2623,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (19,429)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (19,429)
 // const unsigned char shape_FRAME_NEW_X019_Y429[] = {
 //
 //     SPRITE_DOUBLE | 21,
@@ -2447,6 +2657,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (23,454)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (23,454)
 // const unsigned char shape_FRAME_NEW_X023_Y454[] = {
 //
 //     SPRITE_DOUBLE | 26,
@@ -2485,6 +2696,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (18,481)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (18,481)
 // const unsigned char shape_FRAME_NEW_X018_Y481[] = {
 //
 //     SPRITE_DOUBLE | 23,
@@ -2520,6 +2732,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (2,510)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (2,510)
 // const unsigned char shape_FRAME_NEW_X002_Y510[] = {
 //
 //     SPRITE_DOUBLE | 28,
@@ -2560,6 +2773,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (18,510)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (18,510)
 // const unsigned char shape_FRAME_NEW_X018_Y510[] = {
 //
 //     SPRITE_DOUBLE | 28,
@@ -2600,6 +2814,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (19,546)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (19,546)
 // const unsigned char shape_FRAME_NEW_X019_Y546[] = {
 //
 //     SPRITE_DOUBLE | 23,
@@ -2635,6 +2850,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (51,546)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (51,546)
 // const unsigned char shape_FRAME_NEW_X051_Y546[] = {
 //
 //     SPRITE_DOUBLE | 23,
@@ -2671,6 +2887,8 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 // sheet: astronaut-guy-sheet-v10.png @ (3,547)
 // sheet: astronaut-guy-sheet-v10.png @ (35,547)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (3,547)
+// sheet: astronaut-guy-sheet-v10.png @ (35,547)
 // const unsigned char shape_FRAME_NEW_X003_Y547[] = {
 //
 //     SPRITE_DOUBLE | 23,
@@ -2706,6 +2924,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (19,576)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (19,576)
 // const unsigned char shape_FRAME_NEW_X019_Y576[] = {
 //
 //     SPRITE_DOUBLE | 23,
@@ -2741,6 +2960,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (51,576)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (51,576)
 // const unsigned char shape_FRAME_NEW_X051_Y576[] = {
 //
 //     SPRITE_DOUBLE | 23,
@@ -2777,6 +2997,8 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 // sheet: astronaut-guy-sheet-v10.png @ (3,577)
 // sheet: astronaut-guy-sheet-v10.png @ (35,577)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (3,577)
+// sheet: astronaut-guy-sheet-v10.png @ (35,577)
 // const unsigned char shape_FRAME_NEW_X003_Y577[] = {
 //
 //     SPRITE_DOUBLE | 23,
@@ -2812,6 +3034,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (19,606)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (19,606)
 // const unsigned char shape_FRAME_NEW_X019_Y606[] = {
 //
 //     SPRITE_DOUBLE | 24,
@@ -2848,6 +3071,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 // sheet: astronaut-guy-sheet-v10.png @ (51,606)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (51,606)
 // const unsigned char shape_FRAME_NEW_X051_Y606[] = {
 //
 //     SPRITE_DOUBLE | 24,
@@ -2885,6 +3109,8 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 // sheet: astronaut-guy-sheet-v10.png @ (4,607)
 // sheet: astronaut-guy-sheet-v10.png @ (36,607)
 // currently unused
+// sheet: astronaut-guy-sheet-v10.png @ (4,607)
+// sheet: astronaut-guy-sheet-v10.png @ (36,607)
 // const unsigned char shape_FRAME_NEW_X004_Y607[] = {
 //
 //     SPRITE_DOUBLE | 23,
@@ -2920,7 +3146,7 @@ const unsigned char shape_FRAME_MINE_UP_1[] = {
 
 const unsigned char *const spriteShape[] = {
 
-    0,                            // 00
+    0,
     shape_FRAME_NEW_X004_Y004,    // 01
     shape_FRAME_ARMS_IN_AIR,      // 02
     shape_FRAME_NEW_X020_Y274,    // 03
@@ -3002,9 +3228,18 @@ const unsigned char *const spriteShape[] = {
     // shape_FRAME_NEW_X019_Y606,  // currently unused
     // shape_FRAME_NEW_X051_Y606,  // currently unused
     // shape_FRAME_NEW_X004_Y607,  // currently unused
+    shape_FRAME_NEW_X000_Y156,      // 28
+    shape_FRAME_NEW_X035_Y301,      // 29
+    shape_FRAME_NEW_X050_Y303,      // 30
+    shape_FRAME_NEW_X018_Y394,      // 31
+    shape_FRAME_NEW_X034_Y394,      // 32
+    shape_FRAME_NEW_X081_Y407,      // 33
 };
 
 _Static_assert(sizeof(spriteShape) / sizeof(spriteShape[0]) == FRAME_MAX, "spriteShape table wrong size");
 
 
 // EOF
+                                                //      +---------------+
+                                                //      |🟢❌❌❌❌❌❌❌❌|  ← centre
+                                                //      +---------------+

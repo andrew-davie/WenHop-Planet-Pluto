@@ -1251,6 +1251,21 @@ void movePlayer(BoardCursor *cur) {
     if (autoMoveFrameCount)
         return;
 
+    // The walk-in glide that started the shove (checkHighPriorityMove()'s ATT_SHOVE trigger,
+    // below) has now fully settled -- commit the block for real into the square reserved with
+    // CH_PLACEHOLDER back then, and let go of it. Must happen here, before checkHighPriorityMove
+    // is given a chance to start a brand new move below: that call returns early on success
+    // (skipping straight past the "switch back to standing" tail further down), so if a new
+    // move started on the exact same frame the shove glide ended, the commit would otherwise be
+    // skipped -- leaving the immovable attached and following the player through however many
+    // subsequent moves it took before a frame finally passed with no new move beginning.
+    if (attachmentIsShove) {
+
+        *shoveDestCell = CH_IMMOVABLE;
+        shoveDestCell = 0;
+        attachment = 0;
+        attachmentIsShove = false;
+    }
 
     lastUsableSWCHA = usableSWCHA;
 
@@ -1270,17 +1285,6 @@ void movePlayer(BoardCursor *cur) {
     // switch back to standing facing forward, turning if required
 
     if (!autoMoveFrameCount) {
-
-        // The walk-in glide that started the shove (checkHighPriorityMove()'s ATT_SHOVE
-        // trigger, above) has now fully settled -- commit the block for real into the square
-        // reserved with CH_PLACEHOLDER back then, and let go of it.
-        if (attachmentIsShove) {
-
-            *shoveDestCell = CH_IMMOVABLE;
-            shoveDestCell = 0;
-            attachment = 0;
-            attachmentIsShove = false;
-        }
 
         if (playerAnimationID == ID_WalkUp || playerAnimationID == ID_MineUp)
             startPlayerAnimation(ID_StandUp);
