@@ -713,10 +713,6 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
         } else
 
-            // if (!rangeRandom(30))
-            // nDots(1, cur->col, cur->row, PT_CHARACTER, 30, CHAR_CENTER_X, CHAR_CENTER_Y, 2500, CH_RUBBLE);
-
-
             nDots(2, cur->col, cur->row, PT_SPIRAL, 10, 4, 1, rangeRandom(50) + 20, 1 + (getRandom32() & 2));
         break;
 
