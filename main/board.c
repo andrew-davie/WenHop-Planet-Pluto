@@ -2050,9 +2050,15 @@ void doRollRock(unsigned char *me, int row, int col) {
                     *(me + offset) = FLAG(CH_ROCK_SIDE_4);
                 }
 
+                // Single-cell crush, not explode() -- explode() hits the full 3x3 area around
+                // sideDown, and TYPE_MELLON_HUSK carries ATT_EXPLODABLE (so a bomb's blast can
+                // kill the player standing in it), which would let a rock rolling past crush the
+                // player via splash damage from an ADJACENT cell even with the direct-target
+                // exclusion above. A rock rolling over one specific squashable thing has no
+                // business having a blast radius at all.
                 if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
-                    explode(sideDown, FLAG(CH_DUST_0));
-                    initParticles();
+                    ADDAUDIO(SFX_ROCK2);
+                    *(sideDown) = FLAG(CH_DUST_0);
                 } else
                     *(sideDown) = FLAG(CH_BLANK);
 
