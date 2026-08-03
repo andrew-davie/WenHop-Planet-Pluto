@@ -280,7 +280,7 @@ const unsigned int Attribute[] = {
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 56 TYPE_DOOR_OPEN (same walkable/exit bits as TYPE_OUTBOX, deliberately not TYPE_OUTBOX itself -- see its own comment)
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ |MAS| _ | _ | _ | _ | _ | _ |ROL| _ | _ |SHV, // 57 TYPE_IMMOVABLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ |CRU| _ | _ | _ | _ , // 58 TYPE_IMMOVABLE_FALLING
-    _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 59 TYPE_ROCK_ROLLING
+    _ |PAD| _ | _ | _ |PH2| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 59 TYPE_ROCK_ROLLING -- PH2 (half speed) vs TYPE_ROCK_FALLING's PH1, so the roll's midpoint visibly lingers instead of snapping through in one scan pass
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+---+
 
     // clang-format on
