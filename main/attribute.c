@@ -149,8 +149,6 @@ const enum ObjectType CharToType[] = {
     // TYPE_DOGE,             // 131 CH_DOGE_04
     // TYPE_DOGE,             // 132 CH_DOGE_05
     //                        //
-    // TYPE_BOMB,             // 133 CH_BOMB_FLASH
-    //                        //
     // TYPE_CRACKED_BRICK,    // 142 CH_CRACKED_BRICK_1
     // TYPE_CRACKED_BRICK,    // 143 CH_CRACKED_BRICK_1
     // TYPE_CRACKED_BRICK,    // 144 CH_CRACKED_BRICK_1
