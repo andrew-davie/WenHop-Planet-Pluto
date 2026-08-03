@@ -1294,7 +1294,14 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         // inconsistent 1-or-2-pass wait depending on luck. Starting only on a phase this check
         // itself is active makes the very next PH2 pass exactly 2 passes away, always -- a
         // consistent wait instead of a coin flip.
-        else if ((attNext & ATT_ROLL) && (isActive[selectorCounter & 3] & ATT_PHASE2))
+        //
+        // !(selectorCounter & 1), not isActive[selectorCounter & 3] & ATT_PHASE2 -- equivalent
+        // (isActive[] only sets PH2 at indices 0/2, i.e. exactly the even values of
+        // selectorCounter & 3), but cheaper: a straight parity check on selectorCounter itself
+        // instead of a table lookup. Tied to PH2's CURRENT layout in isActive[] above, not
+        // symbolically to ATT_PHASE2 -- if that table's PH2 slots ever move off the even indices
+        // this needs updating alongside it.
+        else if ((attNext & ATT_ROLL) && !(selectorCounter & 1))
             doRollRock(cursor.me, cursor.row, cursor.col);
 
         break;
