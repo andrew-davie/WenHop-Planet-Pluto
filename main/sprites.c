@@ -1475,6 +1475,147 @@ const unsigned char shape_FRAME_WALK4[] = {
 };
 
 
+// Hand-authored push-cycle frames: exact duplicates of the walk cycle above (same order --
+// FRAME_NEW_X004_Y064, WALK2, WALK3, WALK4), just with row 13 (already the shoulder/arm-swing
+// row in each original) widened to a full-width horizontal dash, standing in for both arms
+// braced straight out against whatever's being shoved. See FRAME_PUSH1's own comment
+// (sprites.h) for why this exists instead of an imported sheet pose.
+const unsigned char shape_FRAME_PUSH1[] = {
+
+    26,
+    4,
+    0,
+                                                //      +-------------+
+    ONE( __XXXX__, HMT0 ),                      // 00   |◼️◼️🟥🟥🟥🟥◼️◼️|
+    ONE( _XXXXXX_, HMT0 ),                      // 01   |◼️🟥🟥🟥🟥🟥🟥◼️|
+    ONE( _XXXXXX_, HMT0 ),                      // 02   |◼️🟥🟥🟥🟥🟥🟥◼️|
+    ONE( XXXXX_XX, HMT1 ),                      // 03   |🟧🟧🟧🟧🟧◼️🟧🟧|
+    ONE( XXXX___X, HMT1 ),                      // 04   |🟧🟧🟧🟧◼️◼️◼️🟧|
+    ONE( XX_X_X_X, HMT1 ),                      // 05   |🟧🟧◼️🟧◼️🟧◼️🟧|
+    ONE( XX_X_X_X, HMT1 ),                      // 06   |🟧🟧◼️🟧◼️🟧◼️🟧|
+    ONE( XX_X___X, HMT2 ),                      // 07   |🟨🟨◼️🟨◼️◼️◼️🟨|
+    ONE( XXXX___X, HMT2 ),                      // 08   |🟨🟨🟨🟨◼️◼️◼️🟨|
+    ONE( XXXX___X, HMT2 ),                      // 09   |🟨🟨🟨🟨◼️◼️◼️🟨|
+    ONE( _XXXX_X_, HMT3 ),                      // 10   |◼️🟩🟩🟩🟩◼️🟩◼️|
+    ONE( _XXXX_X_, HMT3 ),                      // 11   |◼️🟩🟩🟩🟩◼️🟩◼️|
+    ONE( X_XXXX__, HMT3 ),                      // 12   |🟩◼️🟩🟩🟩🟩◼️◼️|
+    ONE( XXXXXXXX, BDY0 ),                      // 13   |🟦🟦🟦🟦🟦🟦🟦🟦|  <- arms braced out
+    ONE( X_XX_X__, BDY1 ),                      // 14   |🟪◼️🟪🟪◼️🟪◼️◼️|
+    ONE( X_XX_X__, BDY2 ),                      // 15   |🟫◼️🟫🟫◼️🟫◼️◼️|
+    ONE( XXXX_X__, BDY2 ),                      // 16   |🟫🟫🟫🟫◼️🟫◼️◼️|
+    ONE( X_XX____, BDY2 ),                      // 17   |🟫◼️🟫🟫◼️◼️◼️◼️|
+    ONE( X_XX_X__, BDY2 ),                      // 18   |🟫◼️🟫🟫◼️🟫◼️◼️|
+    ONE( X_XX_X__, HMT2 ),                      // 19   |🟨◼️🟨🟨◼️🟨◼️◼️|
+    ONE( X_X_X___, HMT2 ),                      // 20   |🟨◼️🟨◼️🟨◼️◼️◼️|
+    ONE( ___XX___, HMT2 ),                      // 21   |◼️◼️◼️🟨🟨◼️◼️◼️|
+    ONE( ___XX___, HMT2 ),                      // 22   |◼️◼️◼️🟨🟨◼️◼️◼️|
+    ONE( __XX____, HMT2 ),                      // 23   |◼️◼️🟨🟨◼️◼️◼️◼️|
+    ONE( __XX____, HMT2 ),                      // 24   |◼️◼️🟨🟨◼️◼️◼️◼️|
+    ONE( __XXX___, HMT0 ),                      // 25   |◼️◼️🟥🟥🟢◼️◼️◼️|
+                                                //      +-------------+
+};
+
+const unsigned char shape_FRAME_PUSH2[] = {
+
+    24,
+    3,
+    3,
+                                                //      +-------------+
+    ONE( ___XXX__, HMT0 ),                      // 00   |◼️◼️◼️🟥🟥🟥◼️◼️|
+    ONE( _XXXXXX_, HMT0 ),                      // 01   |◼️🟥🟥🟥🟥🟥🟥◼️|
+    ONE( _XXXXXX_, HMT0 ),                      // 02   |◼️🟥🟥🟥🟥🟥🟥◼️|
+    ONE( XXXXX_XX, HMT1 ),                      // 03   |🟧🟧🟧🟧🟧◼️🟧🟧|
+    ONE( XXXXX__X, HMT1 ),                      // 04   |🟧🟧🟧🟧🟧◼️◼️🟧|
+    ONE( XXX_X_XX, HMT1 ),                      // 05   |🟧🟧🟧◼️🟧◼️🟧🟧|
+    ONE( XXX_X_XX, HMT1 ),                      // 06   |🟧🟧🟧◼️🟧◼️🟧🟧|
+    ONE( XXX_X__X, HMT2 ),                      // 07   |🟨🟨🟨◼️🟨◼️◼️🟨|
+    ONE( XXXXX__X, HMT2 ),                      // 08   |🟨🟨🟨🟨🟨◼️◼️🟨|
+    ONE( XXXXX__X, HMT2 ),                      // 09   |🟨🟨🟨🟨🟨◼️◼️🟨|
+    ONE( _XXXX_X_, HMT3 ),                      // 10   |◼️🟩🟩🟩🟩◼️🟩◼️|
+    ONE( _XXXX_X_, HMT3 ),                      // 11   |◼️🟩🟩🟩🟩◼️🟩◼️|
+    ONE( __X_XX__, HMT3 ),                      // 12   |◼️◼️🟩◼️🟩🟩◼️◼️|
+    ONE( XXXXXXXX, BDY1 ),                      // 13   |🟪🟪🟪🟪🟪🟪🟪🟪|  <- arms braced out
+    ONE( XX_XXXX_, BDY0 ),                      // 14   |🟦🟦◼️🟦🟦🟦🟦◼️|
+    ONE( XX_XXXX_, BDY1 ),                      // 15   |🟪🟪◼️🟪🟪🟪🟪◼️|
+    ONE( XXX_XX__, BDY2 ),                      // 16   |🟫🟫🟫◼️🟫🟫◼️◼️|
+    ONE( X_XX____, BDY2 ),                      // 17   |🟫◼️🟫🟫◼️◼️◼️◼️|
+    ONE( _X______, BDY2 ),                      // 18   |◼️🟫◼️◼️◼️◼️◼️◼️|
+    ONE( _X_XXX_X, HMT1 ),                      // 19   |◼️🟧◼️🟧🟧🟧◼️🟧|
+    ONE( XXXX_XXX, HMT2 ),                      // 20   |🟨🟨🟨🟢◼️🟨🟨🟨|
+    ONE( XXX__XXX, HMT2 ),                      // 21   |🟨🟨🟨◼️◼️🟨🟨🟨|
+    ONE( X_X___X_, HMT2 ),                      // 22   |🟨◼️🟨◼️◼️◼️🟨◼️|
+    ONE( ______X_, HMT0 ),                      // 23   |◼️◼️◼️◼️◼️◼️🟥◼️|
+                                                //      +-------------+
+};
+
+const unsigned char shape_FRAME_PUSH3[] = {
+
+    26,
+    3,
+    0,
+                                                //      +-------------+
+    ONE( __XXXX__, HMT0 ),                      // 00   |◼️◼️🟥🟥🟥🟥◼️◼️|
+    ONE( _XXXXXX_, HMT0 ),                      // 01   |◼️🟥🟥🟥🟥🟥🟥◼️|
+    ONE( _XXXXXX_, HMT0 ),                      // 02   |◼️🟥🟥🟥🟥🟥🟥◼️|
+    ONE( XXXXX_XX, HMT1 ),                      // 03   |🟧🟧🟧🟧🟧◼️🟧🟧|
+    ONE( XXXX___X, HMT1 ),                      // 04   |🟧🟧🟧🟧◼️◼️◼️🟧|
+    ONE( XX_X_X_X, HMT1 ),                      // 05   |🟧🟧◼️🟧◼️🟧◼️🟧|
+    ONE( XX_X_X_X, HMT1 ),                      // 06   |🟧🟧◼️🟧◼️🟧◼️🟧|
+    ONE( XX_X___X, HMT2 ),                      // 07   |🟨🟨◼️🟨◼️◼️◼️🟨|
+    ONE( XXXX___X, HMT2 ),                      // 08   |🟨🟨🟨🟨◼️◼️◼️🟨|
+    ONE( XXXX___X, HMT2 ),                      // 09   |🟨🟨🟨🟨◼️◼️◼️🟨|
+    ONE( _XXXX_X_, HMT3 ),                      // 10   |◼️🟩🟩🟩🟩◼️🟩◼️|
+    ONE( _XXXX_X_, HMT3 ),                      // 11   |◼️🟩🟩🟩🟩◼️🟩◼️|
+    ONE( X_XXXX__, HMT3 ),                      // 12   |🟩◼️🟩🟩🟩🟩◼️◼️|
+    ONE( XXXXXXXX, BDY1 ),                      // 13   |🟪🟪🟪🟪🟪🟪🟪🟪|  <- arms braced out
+    ONE( X_XX_X__, BDY0 ),                      // 14   |🟦◼️🟦🟦◼️🟦◼️◼️|
+    ONE( X_XX_X__, BDY1 ),                      // 15   |🟪◼️🟪🟪◼️🟪◼️◼️|
+    ONE( XXXX_X__, BDY2 ),                      // 16   |🟫🟫🟫🟫◼️🟫◼️◼️|
+    ONE( X_XX____, BDY2 ),                      // 17   |🟫◼️🟫🟫◼️◼️◼️◼️|
+    ONE( X_XX_X__, BDY2 ),                      // 18   |🟫◼️🟫🟫◼️🟫◼️◼️|
+    ONE( X_XX_X__, BDY2 ),                      // 19   |🟫◼️🟫🟫◼️🟫◼️◼️|
+    ONE( X_X_X___, HMT1 ),                      // 20   |🟧◼️🟧◼️🟧◼️◼️◼️|
+    ONE( ___XX___, HMT2 ),                      // 21   |◼️◼️◼️🟨🟨◼️◼️◼️|
+    ONE( ___XX___, HMT2 ),                      // 22   |◼️◼️◼️🟨🟨◼️◼️◼️|
+    ONE( __XX____, HMT2 ),                      // 23   |◼️◼️🟨🟨◼️◼️◼️◼️|
+    ONE( __XX____, HMT2 ),                      // 24   |◼️◼️🟨🟨◼️◼️◼️◼️|
+    ONE( __XXX___, HMT0 ),                      // 25   |◼️◼️🟥🟢🟥◼️◼️◼️|
+                                                //      +-------------+
+};
+
+const unsigned char shape_FRAME_PUSH4[] = {
+
+    24,
+    3,
+    3,
+                                                //      +-------------+
+    ONE( ___XXX__, HMT0 ),                      // 00   |◼️◼️◼️🟥🟥🟥◼️◼️|
+    ONE( _XXXXXX_, HMT0 ),                      // 01   |◼️🟥🟥🟥🟥🟥🟥◼️|
+    ONE( _XXXXXX_, HMT0 ),                      // 02   |◼️🟥🟥🟥🟥🟥🟥◼️|
+    ONE( XXXX__XX, HMT1 ),                      // 03   |🟧🟧🟧🟧◼️◼️🟧🟧|
+    ONE( XXX__X_X, HMT1 ),                      // 04   |🟧🟧🟧◼️◼️🟧◼️🟧|
+    ONE( X_X_X__X, HMT1 ),                      // 05   |🟧◼️🟧◼️🟧◼️◼️🟧|
+    ONE( X_X_X__X, HMT1 ),                      // 06   |🟧◼️🟧◼️🟧◼️◼️🟧|
+    ONE( X_X____X, HMT2 ),                      // 07   |🟨◼️🟨◼️◼️◼️◼️🟨|
+    ONE( XXX____X, HMT2 ),                      // 08   |🟨🟨🟨◼️◼️◼️◼️🟨|
+    ONE( XXX____X, HMT2 ),                      // 09   |🟨🟨🟨◼️◼️◼️◼️🟨|
+    ONE( _XXX__X_, HMT3 ),                      // 10   |◼️🟩🟩🟩◼️◼️🟩◼️|
+    ONE( _XXX__X_, HMT3 ),                      // 11   |◼️🟩🟩🟩◼️◼️🟩◼️|
+    ONE( X_XXXX__, HMT3 ),                      // 12   |🟩◼️🟩🟩🟩🟩◼️◼️|
+    ONE( XXXXXXXX, BDY1 ),                      // 13   |🟪🟪🟪🟪🟪🟪🟪🟪|  <- arms braced out
+    ONE( _XXX_X_X, BDY0 ),                      // 14   |◼️🟦🟦🟦◼️🟦◼️🟦|
+    ONE( XXXX_X_X, BDY1 ),                      // 15   |🟪🟪🟪🟪◼️🟪◼️🟪|
+    ONE( XXXX_X__, BDY2 ),                      // 16   |🟫🟫🟫🟫◼️🟫◼️◼️|
+    ONE( _XX_____, BDY2 ),                      // 17   |◼️🟫🟫◼️◼️◼️◼️◼️|
+    ONE( _____X__, HMT1 ),                      // 18   |◼️◼️◼️◼️◼️🟧◼️◼️|
+    ONE( _X_X_X_X, HMT2 ),                      // 19   |◼️🟨◼️🟨◼️🟨◼️🟨|
+    ONE( XXXXXXXX, HMT2 ),                      // 20   |🟨🟨🟨🟢🟨🟨🟨🟨|
+    ONE( XXXX_XXX, HMT2 ),                      // 21   |🟨🟨🟨🟨◼️🟨🟨🟨|
+    ONE( X_X___X_, HMT2 ),                      // 22   |🟨◼️🟨◼️◼️◼️🟨◼️|
+    ONE( ______X_, HMT0 ),                      // 23   |◼️◼️◼️◼️◼️◼️🟥◼️|
+                                                //      +-------------+
+};
+
 
 // Walk-up-cycle frame 0/4 - used by AnimationWalkUp (FRAME_NEW_X004_Y034 -> UP1 ->
 // UP2 -> UP3, looped) and as the first frame of AnimationStandUp, in
@@ -2821,6 +2962,10 @@ const unsigned char *const spriteShape[] = {
     // shape_FRAME_DIE_4,  // currently unused
     shape_FRAME_PICKUP,     // 22
     shape_FRAME_PICKUP2,    // 23
+    shape_FRAME_PUSH1,
+    shape_FRAME_PUSH2,
+    shape_FRAME_PUSH3,
+    shape_FRAME_PUSH4,
     // shape_FRAME_NEW_X019_Y063,  // currently unused
     // shape_FRAME_NEW_X051_Y063,  // currently unused
     // shape_FRAME_NEW_X020_Y150,  // currently unused

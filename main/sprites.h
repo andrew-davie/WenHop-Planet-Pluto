@@ -77,6 +77,16 @@ enum FRAME {
     FRAME_PICKUP,     // 22
     FRAME_PICKUP2,    // 23
 
+    // Duplicates of the FRAME_NEW_X004_Y064/WALK2/WALK3/WALK4 walk cycle (in that same order)
+    // with a full-width horizontal dash added at the arm row (row 13 in each -- already the
+    // shoulder/arm-swing row in the originals, just widened to span the whole sprite), for the
+    // "shoving an immovable block" animation (AnimationPush, playerAnimation.c) -- there was no
+    // existing push pose on the artist's sheet to import, so this is a hand-authored stand-in.
+    FRAME_PUSH1,
+    FRAME_PUSH2,
+    FRAME_PUSH3,
+    FRAME_PUSH4,
+
     // FRAME_NEW_X019_Y063,  // currently unused
     // FRAME_NEW_X051_Y063,  // currently unused
     // FRAME_NEW_X020_Y150,  // currently unused

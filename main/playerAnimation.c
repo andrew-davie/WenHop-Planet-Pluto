@@ -236,6 +236,17 @@ const signed char AnimationWalk[] = {
     //    ACTION_STOP,
 };
 
+// Same cadence as AnimationWalk, using FRAME_PUSH1-4 (sprites.h/.c) instead -- see ID_Push's
+// own comment (playerAnimation.h).
+const signed char AnimationPush[] = {
+
+    FRAME_PUSH1, 6,
+    FRAME_PUSH2, 6,
+    FRAME_PUSH3, 6,
+    FRAME_PUSH4, 6,
+    ACTION_LOOP,
+};
+
 const signed char AnimationWalkUp[] = {
 
     FRAME_NEW_X004_Y034, 6,
@@ -422,6 +433,7 @@ const signed char *const AnimationVector[] = {
     AnimationPickup,         // 15 ID_Pickup
     AnimationStandArmsUp,    // 16 ID_StandArmsUp
     AnimationWalkUpSlow,     // 17 ID_WalkUpSlow
+    AnimationPush,           // 18 ID_Push
 };
 
 _Static_assert(sizeof(AnimationVector) / sizeof(AnimationVector[0]) == ID_MAX, "AnimationVector table wrong size");

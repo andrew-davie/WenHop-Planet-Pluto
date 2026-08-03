@@ -27,6 +27,23 @@ int playerY;    // char pos 0-21 (use *10 for pixel and then *3 for scanline)
 int attachment = 0;
 const OFFSET *attachmentOffset = 0;
 
+// True while `attachment` holds an immovable block being shoved (checkHighPriorityMove()'s
+// ATT_SHOVE trigger below) rather than something actually carried. Changes how
+// drawAttachedChar() (draw.c) positions it -- rigidly beside the player at their own height,
+// not above their head, and ignoring attachmentOffset entirely (no drop/pickup arc, it just
+// doesn't move relative to the player until movePlayer() (below) commits it into
+// shoveDestCell once the walk-in glide finishes) -- and guards the ordinary fire-button
+// drop/pickup block (checkHighPriorityMove()'s own top section) from treating it as a normal
+// carried item mid-shove.
+bool attachmentIsShove;
+
+// Where to commit the real CH_IMMOVABLE once the walk-in glide finishes (autoMoveFrameCount
+// reaches 0) and attachmentIsShove clears -- see movePlayer()'s own check, below. Holds
+// CH_PLACEHOLDER (looks blank, isn't enterable -- see the trigger's own comment) in the
+// meantime, so the destination can't be walked into or spawned onto while the block is still
+// mid-carry.
+unsigned char *shoveDestCell;
+
 bool teleportLocked;
 bool teleportCountingDown;
 int teleportSwirlTicks;
@@ -576,7 +593,12 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
     // walk around during that window, this block would otherwise let a fire-button press
     // drop/re-pick-up that same key elsewhere while it's also mid-way into the door,
     // double-consuming it. See doorLocked's own comment above for the full picture.
-    if (!doorLocked && !kdelay && !waitRelease) {
+    //
+    // !attachmentIsShove: same reasoning -- attachment is CH_IMMOVABLE and "spoken for" by
+    // the in-progress shove (checkHighPriorityMove()'s ATT_SHOVE trigger, below) until the
+    // walk-in glide commits it (movePlayer()'s own check); without this guard a fire-button
+    // press mid-shove would try to drop/re-pick-up the block as if it were an ordinary carry.
+    if (!doorLocked && !attachmentIsShove && !kdelay && !waitRelease) {
         if (!(inpt4 & 0x80)) {
 
             meAtt = cur->me + dirOffset[dir];
@@ -810,6 +832,52 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
             handled = true;
         }
 
+
+        // Walking into an ATT_SHOVE object (TYPE_IMMOVABLE) from the left or right tries to
+        // shove it one square further the same way -- distinct from ATT_PUSH/PSH (board.c's
+        // genericPush(), a mechanical pusher-bar shoving something), this is the PLAYER doing
+        // it by walking into it. No vertical case -- shoving is left/right only (dir 1 or 3).
+        // Reuses the ordinary carry-attachment system instead of any new board characters: see
+        // attachmentIsShove's own comment for the full picture. !attachment guards against
+        // shoving while already carrying/shoving something else, and naturally also prevents
+        // re-triggering on the SAME block before its previous shove has settled (attachment
+        // stays CH_IMMOVABLE, non-zero, for the whole walk-in glide).
+        else if (!attachment && (dir == 1 || dir == 3) && (Attribute[destType] & ATT_SHOVE)) {
+
+            unsigned char *behindCell = meOffset + dirOffset[dir];
+
+            if (Attribute[CharToType[GET(*behindCell)]] & ATT_BLANK) {
+
+                // Reserve the destination with CH_PLACEHOLDER -- looks blank (charSet[] maps
+                // it to the same invisible glyph as CH_BLANK) but has no ATT_BLANK/PERMEABLE
+                // etc of its own, so nothing else can walk into or spawn onto it while the
+                // real object is still mid-carry. shoveDestCell remembers where to commit the
+                // real CH_IMMOVABLE once the walk-in glide finishes (movePlayer(), below).
+                *behindCell = CH_PLACEHOLDER;
+                shoveDestCell = behindCell;
+
+                attachment = CH_IMMOVABLE;
+                attachmentIsShove = true;
+
+                playerX += xdir[dir];
+                playerY += ydir[dir];
+
+                moveHusk(dir, cur->me, meOffset);
+
+                if (playerAnimationID != ID_Push)
+                    startPlayerAnimation(ID_Push);
+
+                if (!autoMoveFrameCount) {
+
+                    autoMoveFrameCount = (MOVE_SPEED << playerSlow);
+
+                    autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
+                    autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
+                }
+
+                handled = true;
+            }
+        }
 
         else if (Attribute[destType] & (ATT_BLANK | ATT_PERMEABLE | ATT_GRAB | ATT_EXIT)) {
 
@@ -1203,10 +1271,21 @@ void movePlayer(BoardCursor *cur) {
 
     if (!autoMoveFrameCount) {
 
+        // The walk-in glide that started the shove (checkHighPriorityMove()'s ATT_SHOVE
+        // trigger, above) has now fully settled -- commit the block for real into the square
+        // reserved with CH_PLACEHOLDER back then, and let go of it.
+        if (attachmentIsShove) {
+
+            *shoveDestCell = CH_IMMOVABLE;
+            shoveDestCell = 0;
+            attachment = 0;
+            attachmentIsShove = false;
+        }
+
         if (playerAnimationID == ID_WalkUp || playerAnimationID == ID_MineUp)
             startPlayerAnimation(ID_StandUp);
 
-        else if (playerAnimationID == ID_Walk || playerAnimationID == ID_Mine)
+        else if (playerAnimationID == ID_Walk || playerAnimationID == ID_Mine || playerAnimationID == ID_Push)
             startPlayerAnimation(ID_StandLR);
 
         else if (playerAnimationID == ID_WalkDown || playerAnimationID == ID_MineDown)
