@@ -1261,7 +1261,20 @@ void movePlayer(BoardCursor *cur) {
     // subsequent moves it took before a frame finally passed with no new move beginning.
     if (attachmentIsShove) {
 
-        *shoveDestCell = CH_IMMOVABLE;
+        // Check for support right here instead of just settling as CH_IMMOVABLE and waiting for
+        // board.c's own ambient check (case CH_IMMOVABLE) to notice on its next scan pass: that
+        // gap let the player push the block again before gravity ever got a look-in, since
+        // checkHighPriorityMove() re-evaluates every single frame but the board scanner only
+        // revisits this cell once per sweep -- a settled-looking, still-pushable CH_IMMOVABLE
+        // could get shoved clean across a pit, one square at a time, without ever falling in.
+        // Falling has to win that race, not input.
+        unsigned char *below = shoveDestCell + _BOARD_COLS;
+        if (Attribute[CharToType[GET(*below)]] & ATT_BLANK) {
+            *below = FLAG(CH_IMMOVABLE_FALLING_BOTTOM);
+            *shoveDestCell = FLAG(CH_IMMOVABLE_FALLING_TOP);
+        } else
+            *shoveDestCell = CH_IMMOVABLE;
+
         shoveDestCell = 0;
         attachment = 0;
         attachmentIsShove = false;
