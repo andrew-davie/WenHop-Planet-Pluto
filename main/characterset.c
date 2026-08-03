@@ -146,10 +146,10 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_0_15),      // 117 CH_TELEPORT (spinning-spoke cycle, frame 0)
     CH(CHAR_MAP_characterset_3_2),       // 118 CH_KEY
     CH(CHAR_MAP_characterset_2_17),      // 119 CH_DOOROPEN_STATIC -- same graphic as CH_DOOROPEN_0
-    0,                                  // 120
-    0,                                  // 121
-    0,                                  // 122
-    0,                                  // 123
+    CH(CHAR_MAP_characterset_4_6),       // 120 CH_IMMOVABLE
+    CH(CHAR_MAP_characterset_4_6),       // 121 CH_IMMOVABLE_FALLING -- same graphic as CH_IMMOVABLE, mirrors CH_ROCK/CH_ROCK_FALLING
+    CH(CHAR_MAP_characterset_5_6),       // 122 CH_IMMOVABLE_FALLING_TOP
+    CH(CHAR_MAP_characterset_6_6),       // 123 CH_IMMOVABLE_FALLING_BOTTOM
     0,                                  // 124
     0,                                  // 125
     0,                                  // 126

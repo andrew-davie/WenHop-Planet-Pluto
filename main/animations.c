@@ -460,6 +460,8 @@ const unsigned char *const AnimateBase[] = {
                             // same as TYPE_OUTBOX uses it); needs a real AnimateBase entry (not 0)
                             // so processCharAnimations() actually services this type at all -- see
                             // board.c's teleport-departure trigger and CH_DOOROPEN_STATIC case
+    0,                      // 57 TYPE_IMMOVABLE -- no animation, static like TYPE_ROCK
+    0,                      // 58 TYPE_IMMOVABLE_FALLING
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
@@ -523,6 +525,8 @@ const unsigned char PickupCharacter[] = {
     0,                // 54 TYPE_TELEPORT
     0,                // 55 TYPE_KEY -- auto-grabbed by walking onto it (mellon.c), not fire-button-yankable
     0,                // 56 TYPE_DOOR_OPEN
+    0,                // 57 TYPE_IMMOVABLE -- can't be fire-button picked up, per its own name
+    0,                // 58 TYPE_IMMOVABLE_FALLING
 
 };
 

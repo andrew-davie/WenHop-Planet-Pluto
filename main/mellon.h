@@ -20,6 +20,11 @@ typedef struct {
 extern int attachment;    // what the player is currently carrying, if anything (CH_... value, or 0)
 extern const OFFSET *attachmentOffset;
 
+// See attachmentIsShove/shoveDestCell's own comments (mellon.c) -- the "attachment held rigidly
+// beside the player while shoving an immovable block" mode and the board cell to commit it into.
+extern bool attachmentIsShove;
+extern unsigned char *shoveDestCell;
+
 extern int frameAdjustX;
 extern int frameAdjustY;
 

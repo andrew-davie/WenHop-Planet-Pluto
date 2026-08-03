@@ -606,7 +606,19 @@ void drawAttachedChar(int ch) {
     int offsetX = 0;
     int offsetY = attachment == CH_DOGE_00 ? -12 : -24;
 
-    if (attachmentOffset) {
+    if (attachmentIsShove) {
+
+        // Rigidly beside the player at their own height, not above their head, and not
+        // animated at all -- no drop/pickup arc, it just sits there (mellon.c's
+        // checkHighPriorityMove() sets faceDirection to match the shove direction, so this is
+        // exactly which side the player is pushing from) until movePlayer() commits it into
+        // shoveDestCell once the walk-in glide finishes. attachmentOffset is deliberately left
+        // untouched/unused here -- see attachmentIsShove's own comment (mellon.c).
+        offsetY = 0;
+        offsetX = (faceDirection == FACE_LEFT) ? CHAR_TRIX_X : -CHAR_TRIX_X;
+    }
+
+    else if (attachmentOffset) {
 
         offsetX = attachmentOffset->x;
         offsetY = attachmentOffset->y;

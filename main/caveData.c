@@ -174,7 +174,7 @@ const unsigned char caveraintest[] = {
     CH_DOOROPEN_0, 5, 6,
     CH_MELLON_HUSK_BIRTH, 2, 4,
     CH_TELEPORT, 8, 3,
-
+    CH_IMMOVABLE, 6,2,
 
     DRAW_EOF,
     DRAW_EOF,

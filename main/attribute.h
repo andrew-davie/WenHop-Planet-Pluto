@@ -72,6 +72,12 @@ enum ObjectType {
     // same reason -- see CH_DOOROPEN_STATIC's own comment.
     TYPE_DOOR_OPEN,                // 56
 
+    // Falls like a rock (same gravity/TOP-BOTTOM split mechanism) but can't be mined (no
+    // ATT_MINE) or destroyed by explosions (no ATT_EXPLODABLE), and can't be pushed or picked
+    // up by the player (no ATT_PUSH/ATT_PICKUP) -- see attribute.c's own comment on its
+    // Attribute[] row for the full reasoning on each omission.
+    TYPE_IMMOVABLE,                 // 57
+    TYPE_IMMOVABLE_FALLING,         // 58
 
     TYPE_MAX
 };
@@ -212,6 +218,16 @@ enum ChName {
     // character, deliberately kept < 128 unlike CH_DOORSLIDE_1 -- it's what the tile actually
     // and permanently becomes, not a mid-flight animation-only frame.
     CH_DOOROPEN_STATIC,           // 119
+
+    // An indestructible falling block -- see TYPE_IMMOVABLE's own comment (above) for the
+    // attribute reasoning. CH_IMMOVABLE_FALLING reuses CH_IMMOVABLE's own graphic (same
+    // convention as CH_ROCK/CH_ROCK_FALLING both pointing at one charSet[] cell); the TOP/
+    // BOTTOM pair are the one-frame split used while it's mid-fall between two board rows,
+    // same mechanism as CH_ROCK_FALLING_TOP/BOTTOM.
+    CH_IMMOVABLE,                 // 120
+    CH_IMMOVABLE_FALLING,         // 121
+    CH_IMMOVABLE_FALLING_TOP,     // 122
+    CH_IMMOVABLE_FALLING_BOTTOM,  // 123
 
     // 127 is limit of board-resident character numbers
 
@@ -391,6 +407,11 @@ DEFINE_ENUM_WITH_BIT_VALUES(TypeAttributes,
     ATT(PICKUP),                // 27
     ATT(MASSIVE),               // 28
     ATT(DRIP),                  // 29  can have a rain drip form beneath it
+    ATT(SHOVE),                 // 30  can be pushed sideways by the player walking into it
+                                //     (distinct from ATT_PUSH/PSH, which is "can be pushed BY
+                                //     a pusher-bar MACHINE", board.c's genericPush() -- kept
+                                //     last so it doesn't renumber POS_CORNER/POS_GEODOGE below,
+                                //     which are pinned to specific counter positions)
 );
 
 #define POS_CORNER 26           /* must match ATT(CORNER) #*/

@@ -605,10 +605,10 @@ static const unsigned short budget[128] = {
     _B + 766,     // 117 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-03 03:47 AEST (was 758)
     _untimed_,    // 118 (unused)
     _untimed_,    // 119 (unused)
-    _untimed_,    // 120 (unused)
-    _untimed_,    // 121 (unused)
-    _untimed_,    // 122 (unused)
-    _untimed_,    // 123 (unused)
+    _untimed_,    // 120 CH_IMMOVABLE
+    _untimed_,    // 121 CH_IMMOVABLE_FALLING
+    _untimed_,    // 122 CH_IMMOVABLE_FALLING_TOP
+    _untimed_,    // 123 CH_IMMOVABLE_FALLING_BOTTOM
     _untimed_,    // 124 (unused)
     _untimed_,    // 125 (unused)
     _untimed_,    // 126 (unused)
@@ -1290,9 +1290,24 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         break;
     }
 
+    // Same ambient "should I start falling" check as CH_ROCK/CH_GEODOGE above -- an immovable
+    // block can't be pushed or mined away, but gravity doesn't ask permission.
+    case CH_IMMOVABLE: {
+        unsigned char *next = cursor.me + _BOARD_COLS;
+        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+            *next = FLAG(CH_IMMOVABLE_FALLING_BOTTOM);
+            *cursor.me = FLAG(CH_IMMOVABLE_FALLING_TOP);
+        }
+        break;
+    }
+
 
     case CH_ROCK_FALLING_TOP:
         *cur->me = FLAG(CH_DUST_ROCK_0);
+        break;
+
+    case CH_IMMOVABLE_FALLING_TOP:
+        *cur->me = FLAG(CH_DUST_ROCK_0);    // same departure-dust cosmetic as a falling rock
         break;
 
     case CH_GEODOGE_FALLING_TOP:
@@ -1329,6 +1344,10 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     case CH_ROCK_FALLING_BOTTOM:
         *cur->me = FLAG(CH_ROCK_FALLING);
+        break;
+
+    case CH_IMMOVABLE_FALLING_BOTTOM:
+        *cur->me = FLAG(CH_IMMOVABLE_FALLING);
         break;
 
     case CH_GEODOGE_FALLING_BOTTOM:
@@ -1427,6 +1446,36 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
                         shakeTime += 4;
                 }
             }
+        }
+        break;
+    }
+
+    // Same fall/land mechanics as CH_ROCK_FALLING (support check, squash whatever's
+    // squashable underneath, settle with a landing sound) but without the cracked-brick
+    // chain-shake -- that was a bespoke rock/geodoge feature, not asked for here. An
+    // immovable block still can't be mined or exploded once it's fallen and settled: that's
+    // enforced by TYPE_IMMOVABLE simply never having ATT_MINE/ATT_EXPLODABLE (attribute.c),
+    // not by anything special in this case.
+    case CH_IMMOVABLE_FALLING: {
+
+        unsigned char *next = cursor.me + _BOARD_COLS;
+        int att = Attribute[CharToType[GET(*next)]];
+
+        if (att & ATT_BLANK) {
+            *cursor.me = FLAG(CH_IMMOVABLE_FALLING_TOP);
+            *next = FLAG(CH_IMMOVABLE_FALLING_BOTTOM);
+        }
+
+        else if (att & ATT_SQUASHABLE_TO_BLANKS) {
+            explode(next, FLAG(CH_DUST_0));
+            initParticles();
+
+        } else {
+
+            // stop falling
+            *cursor.me = FLAG(CH_IMMOVABLE);
+            ADDAUDIO(att & ATT_HARD ? SFX_ROCK : SFX_ROCK2);
+            nDots(6, cursor.col, cursor.row, PT_TWO, 20, 2, 10, 60, 7);
         }
         break;
     }
