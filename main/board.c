@@ -1388,33 +1388,44 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
             ADDAUDIO(att & ATT_HARD ? SFX_ROCK : SFX_ROCK2);
             nDots(6, cursor.col, cursor.row, PT_TWO, 20, 2, 10, 60, 7);
 
-            // Shake ONLY when this landing extends an unbroken chain of rocks all the way down
-            // to a cracked brick -- not for landing on dirt/wall/steel/anything else, and not
-            // for landing on a rock that ISN'T itself sitting on such a chain. This is exactly
-            // what TYPE_CRACKED_BRICK's own rockCount-vs-lastRockCount tally (further up this
-            // file) already computes -- but that tally only gets compared once per FULL board
-            // scan cycle (setupBoardScanner()'s "if (gameFrame >= gameSpeed)" gate), and a full
-            // cycle can take many frames (processBoardSquares()'s scan cursor is time-budgeted,
-            // T1TC < availableIdleTime, not a guaranteed once-per-frame sweep) -- that's the lag.
-            // Evaluating the same condition right here, the instant a rock actually lands,
-            // fixes the lag without touching that tally at all (still drives the crack's visual
-            // stress level and its own break-apart chance exactly as before).
+            // Unlike a deliberate carried-drop (mellon.c), a rock that fell here on its own
+            // should stay completely silent, shake-wise, UNLESS it lands directly on a
+            // cracked brick, lands on a massive object sitting on a cracked brick, or lands
+            // on a massive object sitting on a massive object sitting on a cracked brick --
+            // i.e. a brick within the top 3 squares of the stack it just landed on/against.
+            // Landing on dirt/wall/steel/anything else, or on a deeper stack with no brick
+            // that close, is a total non-event here.
             //
-            // Cheap by construction: the overwhelmingly common case (landed on dirt, wall,
-            // steel, anything that isn't a cracked brick or another rock) is a single type
-            // check, no walk at all. The walk only runs in the rare case of landing directly on
-            // an existing rock, and is bounded by that chain's own height -- the exact same walk
-            // TYPE_CRACKED_BRICK's tally already does, just triggered by the landing event
-            // instead of by the scanner happening to revisit the brick cell.
+            // Unrolled to exactly 3 checks (next, one below it, one below that) instead of a
+            // loop that walks however far the actual chain goes -- breaking a cracked brick is
+            // designed around at most 3 rocks stacked on it, so nothing legitimate ever needs
+            // to look further than that anyway. This matters beyond just average-case speed:
+            // board.c's time-sliced scheduler (processBoardSquares()) reserves
+            // budget[CH_ROCK_FALLING]'s registered WORST case before it'll even attempt to
+            // process a falling rock at all -- an unbounded walk would inflate that one shared
+            // reservation to match the tallest possible chain anywhere on the board, and EVERY
+            // falling rock would have to pay it just to get scheduled, even ones that will
+            // never walk past the first cell. A fixed 3-check cap keeps that reservation small
+            // and constant regardless of board layout, so screens with dozens of rocks falling
+            // at once don't start starving each other of processing time over a cost that
+            // (per the 3-rock design rule) was never actually going to be paid.
             enum ObjectType belowType = CharToType[GET(*next)];
             if (belowType == TYPE_CRACKED_BRICK)
                 shakeTime += 4;
-            else if (belowType == TYPE_ROCK) {
+
+            else if (Attribute[belowType] & ATT_MASSIVE) {
+
                 unsigned char *below = next + _BOARD_COLS;
-                while (CharToType[GET(*below)] == TYPE_ROCK)
-                    below += _BOARD_COLS;
-                if (CharToType[GET(*below)] == TYPE_CRACKED_BRICK)
+                belowType = CharToType[GET(*below)];
+
+                if (belowType == TYPE_CRACKED_BRICK)
                     shakeTime += 4;
+
+                else if (Attribute[belowType] & ATT_MASSIVE) {
+                    below += _BOARD_COLS;
+                    if (CharToType[GET(*below)] == TYPE_CRACKED_BRICK)
+                        shakeTime += 4;
+                }
             }
         }
         break;
@@ -1751,6 +1762,33 @@ void processFallingThings(unsigned char *me, int row, int col, unsigned char cre
 
         case CH_GEODOGE_FALLING: {
             *me = CH_GEODOGE;
+
+            // Same chain-to-cracked-brick shake as board.c's CH_ROCK_FALLING landing case --
+            // see its own comment for the full reasoning (3-rock design rule, fixed 3-check
+            // unrolled cap instead of a loop, why that matters for budget[]'s worst-case
+            // reservation). TYPE_GEODOGE is ATT_MASSIVE same as TYPE_ROCK, so a falling
+            // geodoge landing directly on a cracked brick, or on a massive object (rock or
+            // geodoge) that's on one, or two deep, shakes exactly the same way a falling rock
+            // does. TYPE_DOGE is NOT massive (checked directly against attribute.c), so plain
+            // doges staying out of this is correct, not an oversight.
+            enum ObjectType belowType = CharToType[GET(*next)];
+            if (belowType == TYPE_CRACKED_BRICK)
+                shakeTime += 4;
+
+            else if (Attribute[belowType] & ATT_MASSIVE) {
+
+                unsigned char *below = next + _BOARD_COLS;
+                belowType = CharToType[GET(*below)];
+
+                if (belowType == TYPE_CRACKED_BRICK)
+                    shakeTime += 4;
+
+                else if (Attribute[belowType] & ATT_MASSIVE) {
+                    below += _BOARD_COLS;
+                    if (CharToType[GET(*below)] == TYPE_CRACKED_BRICK)
+                        shakeTime += 4;
+                }
+            }
             break;
         }
 

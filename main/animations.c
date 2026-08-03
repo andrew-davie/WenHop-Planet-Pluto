@@ -269,14 +269,19 @@ const unsigned char AnimateDoor[] = {
     CH_DOOROPEN_STATIC, 0,
 };
 
-// The reverse of AnimateDoor above -- the exit door (mellon.c's exit trigger, via TYPE_OUTBOX)
-// sliding shut once the player has faded almost to black (updatePlayerAnimation(),
-// playerAnimation.c), instead of just snapping straight to closed. Same CH_DOORSLIDE_1 crack
-// frame both directions -- it's symmetric, so it works for either the door opening or closing
-// through it. Not wired into any AnimateBase[] slot -- nothing auto-advances into this from idle,
-// it's only ever reached via startCharAnimation(TYPE_OUTBOX, AnimateDoorClose + 2), mirroring
-// AnimateDoor's own idle-vs-triggered split (frame 0 here is just a landing pad matching
-// TYPE_OUTBOX's already-open state, never actually shown).
+// The reverse of AnimateDoor above -- used two ways: (1) the exit door (mellon.c's exit
+// trigger, via TYPE_OUTBOX) sliding shut once the player has faded almost to black
+// (updatePlayerAnimation(), playerAnimation.c), and (2) any key/doge-unlocked door
+// (TYPE_DOOR_OPEN) sliding shut again the instant the player steps onto a teleport
+// (mellon.c's TYPE_TELEPORT trigger, board.c's CH_DOOROPEN_STATIC case commits the board
+// write once this finishes) -- so a returning player sees why it's locked again instead of
+// just finding it that way. Same CH_DOORSLIDE_1 crack frame both directions -- it's
+// symmetric, so it works for either the door opening or closing through it. Frame 0 here is
+// just a landing pad matching each type's already-open idle state, never actually shown --
+// TYPE_OUTBOX's own base is AnimFlashOut instead, so it's only reached via
+// startCharAnimation(TYPE_OUTBOX, AnimateDoorClose + 2); TYPE_DOOR_OPEN's AnimateBase entry
+// IS this table directly (see its own comment, above), since unlike TYPE_OUTBOX it has no
+// other idle animation of its own to fall back to between triggers.
 //
 // CH_DOORSLIDE_1's hold here is intentionally short -- even shorter than AnimateDoor's own
 // opening hold -- there's only this one static crack frame between open and closed (a symmetric
@@ -451,7 +456,10 @@ const unsigned char *const AnimateBase[] = {
     0,                      // 54 TYPE_TELEPORT -- driveTeleportSpin() owns this one entirely
                             // (below); deliberately not wired in here, see its own comment
     0,                      // 55 TYPE_KEY -- no animation
-    0,                      // 56 TYPE_DOOR_OPEN -- deliberately static, see its own comment
+    AnimateDoorClose,       // 56 TYPE_DOOR_OPEN -- idle landing pad only (frame 0, holds forever,
+                            // same as TYPE_OUTBOX uses it); needs a real AnimateBase entry (not 0)
+                            // so processCharAnimations() actually services this type at all -- see
+                            // board.c's teleport-departure trigger and CH_DOOROPEN_STATIC case
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");

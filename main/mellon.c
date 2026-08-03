@@ -447,18 +447,23 @@ void moveHusk(int dir, unsigned char *me, unsigned char *meOffset) {
 }
 
 
+// A genuine arc, not a constant-rate diagonal: the first half moves almost entirely in y (the
+// item rising straight up off the ground beside the player, x barely shifting) and the second
+// half moves almost entirely in x (sweeping sideways into the carried position, y already
+// settled) -- mostly vertical near the side, mostly horizontal near the top, instead of x and y
+// ticking down together the whole way (which reads as a straight diagonal line no matter how
+// many keyframes it's split into).
 const OFFSET sampleOffsetRight[] = {
 
-    {-5, -2 * 3}, {-5, -2 * 3}, {-5, -2 * 3}, {-5, -2 * 3}, {-5, -2 * 3},
-
-
-    {-5, -2 * 3}, {-5, -4 * 3}, {-4, -6 * 3}, {-4, -6 * 3}, {-3, -7 * 3},
-    {-2, -7 * 3}, {-1, -7 * 3}, {0, -8 * 3},  {0, 0},
+    {-5, -2 * 3}, {-5, -5 * 3}, {-4, -7 * 3}, {-4, -8 * 3},
+    {-3, -8 * 3}, {-2, -8 * 3}, {-1, -8 * 3}, {0, -8 * 3}, {0, 0},
 };
 
+// Mirror of sampleOffsetRight above (x negated, same y).
 const OFFSET sampleOffsetLeft[] = {
 
-    {5, -2 * 3}, {5, -4 * 3}, {4, -6 * 3}, {4, -6 * 3}, {3, -7 * 3}, {2, -7 * 3}, {1, -7 * 3}, {0, -8 * 3}, {0, 0},
+    {5, -2 * 3}, {5, -5 * 3}, {4, -7 * 3}, {4, -8 * 3},
+    {3, -8 * 3}, {2, -8 * 3}, {1, -8 * 3}, {0, -8 * 3}, {0, 0},
 };
 
 const OFFSET sampleOffsetDown[] = {
@@ -581,11 +586,26 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                 int type2 = CharToType[GET(*meAtt)];
                 if (Attribute[type2] & ATT_BLANK) {
 
-                    if (type2 == TYPE_GEODOGE)
-                        attachment = CH_GEODOGE_FALLING;
+                    // What's being converted here is what's actually being CARRIED
+                    // (CharToType[attachment]), not the target cell (type2) -- type2 is
+                    // guaranteed blank by the check just above, and neither TYPE_ROCK nor
+                    // TYPE_GEODOGE is ever ATT_BLANK, so comparing type2 against them here
+                    // could never be true (this used to compare type2, dead code). Only
+                    // convert to the falling variant if there's ALSO nothing solid directly
+                    // below the target -- landing right on solid ground (dirt, wall, rock,
+                    // brick, whatever) should commit as a settled item so the immediate
+                    // landing check just below (movePlayer()'s "if (drop)" block) fires this
+                    // same frame, not whenever board.c's case CH_ROCK_FALLING: next happens to
+                    // get scanned. Only a drop into a genuine gap (open air under the target
+                    // too) needs to actually fall first.
+                    if (Attribute[CharToType[GET(*(meAtt + _BOARD_COLS))]] & ATT_BLANK) {
 
-                    else if (type2 == TYPE_ROCK)
-                        attachment = CH_ROCK_FALLING;
+                        if (CharToType[attachment] == TYPE_GEODOGE)
+                            attachment = CH_GEODOGE_FALLING;
+
+                        else if (CharToType[attachment] == TYPE_ROCK)
+                            attachment = CH_ROCK_FALLING;
+                    }
 
                     dropSkipThisFrame = (dir == 1 || dir == 2);
 
@@ -952,6 +972,19 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
         teleportCountingDown = false;
         startTeleportDepartSwirl();    // spirals start now, not once the walk-in glide settles
 
+        // Any door this player unlocked with a key/doges in THIS cave gets locked again the
+        // instant they step onto a teleport, same as decodeCave() would silently reset it on
+        // any fresh load -- but doing it here too, visibly, on the way out, means a returning
+        // player sees *why* it's shut instead of just finding it that way and wondering if they
+        // imagined opening it. Harmless if there's no CH_DOOROPEN_STATIC cell in the cave at
+        // all -- board.c's CH_DOOROPEN_STATIC case is the one that actually commits each such
+        // cell once this finishes, this just kicks off the shared visual (and its own copy of
+        // the same open-side cue, ADDAUDIO(SFX_DOOR)) unconditionally, same as the open
+        // trigger does. Plenty of time to finish well before the fade-to-black completes --
+        // this is a much shorter sequence than TELEPORT_SWIRL_TICKS.
+        startCharAnimation(TYPE_DOOR_OPEN, AnimateDoorClose + 2);
+        ADDAUDIO(SFX_DOOR);
+
         // Carried object (if any) "dropped" in the direction just walked, using the exact same
         // table a real fire-button drop uses -- attachment itself is left untouched (no board
         // write, nothing cleared). playerX/playerY are already updated to the destination
@@ -1097,14 +1130,19 @@ void movePlayer(BoardCursor *cur) {
 
             int attBelow = Attribute[CharToType[GET(*(meAtt + _BOARD_COLS))]];
 
-            // matches board.c's CH_ROCK_FALLING "stop falling" landing:
-            // any solid, non-squashable surface underneath counts, not
-            // just another massive object -- dirt/wall/steel included.
-            if (!(attBelow & ATT_BLANK) && !(attBelow & ATT_SQUASHABLE_TO_BLANKS)) {
-
-                shakeTime = 4;
+            // Sound plays for landing on ANY solid, non-squashable surface -- dirt/wall/steel
+            // included, not just another massive object.
+            if (!(attBelow & ATT_BLANK) && !(attBelow & ATT_SQUASHABLE_TO_BLANKS))
                 ADDAUDIO(attBelow & ATT_HARD ? SFX_ROCK : SFX_ROCK2);
-            }
+
+            // Shake is narrower than sound: a DELIBERATE drop gives a small, unconditional
+            // thud as long as what's underneath is genuinely hard (dirt doesn't count, a
+            // rock/wall/steel does) -- no chain-to-cracked-brick check here, that's only for
+            // a rock that fell and landed on its own (board.c's CH_ROCK_FALLING case). The
+            // player placed this on purpose; it shakes regardless of what it's sitting on top
+            // of, same as it always has, just smaller now.
+            if (attBelow & ATT_HARD)
+                shakeTime += 2;
         }
 
 
