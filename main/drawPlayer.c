@@ -100,7 +100,12 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
     // fully invisible already; skipping the draw outright avoids a faint black silhouette still
     // being visibly distinct against non-black backgrounds behind them (water, lava, etc., whose
     // own colouring the shape-drawing loops below apply on top of the luminance clamp).
-    bool hidden = isPlayerHidden() || (exitMode && playerExitFade >= 15);
+    // AnimationDie (playerAnimation.c) is an empty stub -- ACTION_STOP with no frames -- relying
+    // entirely on the death sequence's swipe-circle closing in (board.c, ENABLE_SWIPE) as the
+    // visual, with nothing else ever blanking the sprite itself. Without this, the player just
+    // stays frozen on-screen in their last pose for the whole death->GS_MENU sequence, visibly
+    // untouched by the circle closing in around/over them.
+    bool hidden = isPlayerHidden() || (exitMode && playerExitFade >= 15) || playerDead;
 
     static int root = 0;
     root++;
