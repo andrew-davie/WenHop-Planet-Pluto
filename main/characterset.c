@@ -148,10 +148,10 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_13_11),    // 119 CH_ROCK_SIDE_2
     CH(CHAR_MAP_characterset_12_11),    // 120 CH_ROCK_SIDE_3
     CH(CHAR_MAP_characterset_14_11),    // 121 CH_ROCK_SIDE_4
-    0,                                   // 122 (unused)
-    0,                                   // 123 (unused)
-    0,                                   // 124 (unused)
-    0,                                   // 125 (unused)
+    CH(CHAR_MAP_characterset_13_2),      // 122 CH_GEODOGE_SIDE_1
+    CH(CHAR_MAP_characterset_14_1),      // 123 CH_GEODOGE_SIDE_2
+    CH(CHAR_MAP_characterset_14_2),      // 124 CH_GEODOGE_SIDE_3
+    CH(CHAR_MAP_characterset_13_1),      // 125 CH_GEODOGE_SIDE_4
     0,                                   // 126 (unused)
     0,                                   // 127 (unused)
 

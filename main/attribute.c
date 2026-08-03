@@ -133,10 +133,10 @@ const enum ObjectType CharToType[] = {
     TYPE_ROCK_ROLLING,             // 119 CH_ROCK_SIDE_2
     TYPE_ROCK_ROLLING,             // 120 CH_ROCK_SIDE_3
     TYPE_ROCK_ROLLING,             // 121 CH_ROCK_SIDE_4
-    0,                             // 122 (unused)
-    0,                             // 123 (unused)
-    0,                             // 124 (unused)
-    0,                             // 125 (unused)
+    TYPE_GEODOGE_ROLLING,          // 122 CH_GEODOGE_SIDE_1
+    TYPE_GEODOGE_ROLLING,          // 123 CH_GEODOGE_SIDE_2
+    TYPE_GEODOGE_ROLLING,          // 124 CH_GEODOGE_SIDE_3
+    TYPE_GEODOGE_ROLLING,          // 125 CH_GEODOGE_SIDE_4
     0,                             // 126 (unused)
     0,                             // 127 (unused)
 
@@ -265,6 +265,7 @@ const unsigned int Attribute[] = {
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ |MAS| _ | _ | _ | _ | _ | _ |ROL| _ | _ |SHV, // 54 TYPE_IMMOVABLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ |CRU| _ | _ | _ | _ , // 55 TYPE_IMMOVABLE_FALLING
     _ |PAD| _ | _ | _ |PH2| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 56 TYPE_ROCK_ROLLING -- PH2 (half speed) vs TYPE_ROCK_FALLING's PH1, so the roll's midpoint visibly lingers instead of snapping through in one scan pass
+    _ |PAD| _ | _ | _ |PH2| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 57 TYPE_GEODOGE_ROLLING -- same PH2 reasoning as TYPE_ROCK_ROLLING
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+---+
 
     // clang-format on

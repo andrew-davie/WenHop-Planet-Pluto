@@ -78,6 +78,7 @@ void genericPushReverse(unsigned char *me, int offsetX, int offsetY);
 void chainReact_Pipe(unsigned char *me);
 void doRoll(unsigned char *me, int row, int col);
 void doRollRock(unsigned char *me, int row, int col);
+void doRollGeodoge(unsigned char *me, int row, int col);
 void setInsulator(unsigned char *p, int row, int col);
 
 //------------------------------------------------------------------------------
@@ -608,10 +609,10 @@ static const unsigned short budget[128] = {
     _untimed_,    // 119 CH_ROCK_SIDE_2
     _untimed_,    // 120 CH_ROCK_SIDE_3
     _untimed_,    // 121 CH_ROCK_SIDE_4
-    _untimed_,    // 122 (unused)
-    _untimed_,    // 123 (unused)
-    _untimed_,    // 124 (unused)
-    _untimed_,    // 125 (unused)
+    _untimed_,    // 122 CH_GEODOGE_SIDE_1
+    _untimed_,    // 123 CH_GEODOGE_SIDE_2
+    _untimed_,    // 124 CH_GEODOGE_SIDE_3
+    _untimed_,    // 125 CH_GEODOGE_SIDE_4
     _untimed_,    // 126 (unused)
     _untimed_,    // 127 (unused)
 };
@@ -1305,10 +1306,18 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     case CH_GEODOGE: {
         unsigned char *next = cursor.me + _BOARD_COLS;
-        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+        int attNext = Attribute[CharToType[GET(*next)]];
+
+        if (attNext & ATT_BLANK) {
             *next = FLAG(CH_GEODOGE_FALLING_BOTTOM);
             *cursor.me = FLAG(CH_GEODOGE_FALLING_TOP);
         }
+
+        // Same roll mechanic as CH_ROCK (see doRollRock()'s comment), same PH2 phase gate for
+        // the same consistent-timing reason -- see case CH_ROCK, above.
+        else if ((attNext & ATT_ROLL) && !(selectorCounter & 1))
+            doRollGeodoge(cursor.me, cursor.row, cursor.col);
+
         break;
     }
 
@@ -1357,6 +1366,18 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
     case CH_ROCK_SIDE_4:
         *cur->me = FLAG(CH_ROCK_FALLING_TOP);
         *(cur->me + _BOARD_COLS) = FLAG(CH_ROCK_FALLING_BOTTOM);
+        break;
+
+    case CH_GEODOGE_SIDE_1:
+    case CH_GEODOGE_SIDE_2:
+        *cur->me = FLAG(CH_BLANK);
+        break;
+
+    // Same idea as CH_ROCK_SIDE_3/4 above, but resolving into the geodoge's own falling pair.
+    case CH_GEODOGE_SIDE_3:
+    case CH_GEODOGE_SIDE_4:
+        *cur->me = FLAG(CH_GEODOGE_FALLING_TOP);
+        *(cur->me + _BOARD_COLS) = FLAG(CH_GEODOGE_FALLING_BOTTOM);
         break;
 
     case CH_DOGE_SIDE_3:
@@ -2067,6 +2088,55 @@ void doRollRock(unsigned char *me, int row, int col) {
                 // player via splash damage from an ADJACENT cell even with the direct-target
                 // exclusion above. A rock rolling over one specific squashable thing has no
                 // business having a blast radius at all.
+                if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
+                    ADDAUDIO(SFX_ROCK2);
+                    *(sideDown) = FLAG(CH_DUST_0);
+                } else
+                    *(sideDown) = FLAG(CH_BLANK);
+
+                int off = offset < 0 ? 4 : 0;
+
+                nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
+                nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
+                nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
+                nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+
+                return;
+            }
+        }
+    }
+}
+
+
+// Same as doRollRock() above, but for a settled CH_GEODOGE rolling off an ATT_ROLL surface --
+// see its comment for the full reasoning (single-cell crush not explode(), player-square
+// exclusion, etc). Only the transition characters differ (CH_GEODOGE_SIDE_1-4, resolving into
+// CH_GEODOGE_FALLING_TOP/BOTTOM instead of the rock's own pair).
+void doRollGeodoge(unsigned char *me, int row, int col) {
+
+    for (int offset = -1; offset < 2; offset += 2) {
+
+        unsigned char *side = me + offset;
+        unsigned char sc = *side;
+        if (sc < FLAG_THISFRAME && (Attribute[CharToType[sc]] & ATT_BLANK)) {
+
+            unsigned char *sideDown = side + _BOARD_COLS;
+            unsigned char sd = *sideDown;
+            enum ObjectType sideDownType = CharToType[sd];
+            int attSideDown = Attribute[sideDownType];
+
+            if (sd < FLAG_THISFRAME && sideDownType != TYPE_MELLON_HUSK && sideDownType != TYPE_MELLON_HUSK_PRE &&
+                (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
+
+                if (offset > 0) {
+                    *me = FLAG(CH_GEODOGE_SIDE_1);
+                    *(me + offset) = FLAG(CH_GEODOGE_SIDE_3);
+
+                } else {
+                    *me = FLAG(CH_GEODOGE_SIDE_2);
+                    *(me + offset) = FLAG(CH_GEODOGE_SIDE_4);
+                }
+
                 if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
                     ADDAUDIO(SFX_ROCK2);
                     *(sideDown) = FLAG(CH_DUST_0);

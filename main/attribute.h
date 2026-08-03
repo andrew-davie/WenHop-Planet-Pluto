@@ -81,6 +81,9 @@ enum ObjectType {
     // straight down -- see doRollRock()'s comment (board.c) for the full mechanic.
     TYPE_ROCK_ROLLING,              // 56
 
+    // Same as TYPE_ROCK_ROLLING but for CH_GEODOGE_SIDE_1-4 -- see doRollGeodoge() (board.c).
+    TYPE_GEODOGE_ROLLING,           // 57
+
     TYPE_MAX
 };
 
@@ -239,6 +242,14 @@ enum ChName {
     CH_ROCK_SIDE_2,               // 119
     CH_ROCK_SIDE_3,               // 120
     CH_ROCK_SIDE_4,               // 121
+
+    // Same diagonal-roll transition as CH_ROCK_SIDE_1-4 above, but for a settled CH_GEODOGE --
+    // see doRollGeodoge() (board.c). _3/_4 resolve into CH_GEODOGE_FALLING_TOP/BOTTOM, not the
+    // rock pair.
+    CH_GEODOGE_SIDE_1,            // 122
+    CH_GEODOGE_SIDE_2,            // 123
+    CH_GEODOGE_SIDE_3,            // 124
+    CH_GEODOGE_SIDE_4,            // 125
 
     // 126, 127 unused -- 2 free board-resident slots (CH_DOGE_01 below is pinned to 128 via an
     // explicit enum initializer, so removing entries up here doesn't shrink the virtual range;

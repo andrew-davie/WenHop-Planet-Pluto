@@ -440,6 +440,7 @@ const unsigned char *const AnimateBase[] = {
     0,                      // 54 TYPE_IMMOVABLE -- no animation, static like TYPE_ROCK
     0,                      // 55 TYPE_IMMOVABLE_FALLING
     0,                      // 56 TYPE_ROCK_ROLLING -- no animation, same as TYPE_DOGE_FALLING2
+    0,                      // 57 TYPE_GEODOGE_ROLLING -- same
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
@@ -503,6 +504,7 @@ const unsigned char PickupCharacter[] = {
     0,                // 54 TYPE_IMMOVABLE -- can't be fire-button picked up, per its own name
     0,                // 55 TYPE_IMMOVABLE_FALLING
     0,                // 56 TYPE_ROCK_ROLLING -- transitional only, never fire-button-yankable
+    0,                // 57 TYPE_GEODOGE_ROLLING -- same
 
 };
 
