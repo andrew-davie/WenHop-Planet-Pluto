@@ -48,7 +48,7 @@ PADDING_ROW_RE = re.compile(r'^\s*//\s+\|[' + RED + BROWN + r']+\|')
 BORDER_ROW_RE  = re.compile(r'^\s*//\s+\+-+\+')
 
 PATTERN_RE     = re.compile(r'[X_]{2,}')
-ARRAY_START_RE = re.compile(r'const\s+unsigned\s+char\s+\w+\[\]\s*=\s*\{')
+ARRAY_START_RE = re.compile(r'^const\s+unsigned\s+char\s+\w+\[\]\s*=\s*\{')
 SCALAR_RE      = re.compile(r'^\s*(?:\w+\s*\|\s*)?(-?0x[0-9a-fA-F]+|-?\d+)\s*[,;]?\s*(?://.*)?$')
 BYTE0_LINE_RE  = re.compile(r'^(?P<indent>\s*)(?:\w+\s*\|\s*)?(-?0x[0-9a-fA-F]+|-?\d+)(?P<tail>\s*[,;]?\s*(?://[^\n]*)?)$')
 

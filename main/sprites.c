@@ -3228,18 +3228,15 @@ const unsigned char *const spriteShape[] = {
     // shape_FRAME_NEW_X019_Y606,  // currently unused
     // shape_FRAME_NEW_X051_Y606,  // currently unused
     // shape_FRAME_NEW_X004_Y607,  // currently unused
-    shape_FRAME_NEW_X000_Y156,      // 28
-    shape_FRAME_NEW_X035_Y301,      // 29
-    shape_FRAME_NEW_X050_Y303,      // 30
-    shape_FRAME_NEW_X018_Y394,      // 31
-    shape_FRAME_NEW_X034_Y394,      // 32
-    shape_FRAME_NEW_X081_Y407,      // 33
+    shape_FRAME_NEW_X000_Y156,    // 28
+    shape_FRAME_NEW_X035_Y301,    // 29
+    shape_FRAME_NEW_X050_Y303,    // 30
+    shape_FRAME_NEW_X018_Y394,    // 31
+    shape_FRAME_NEW_X034_Y394,    // 32
+    shape_FRAME_NEW_X081_Y407,    // 33
 };
 
 _Static_assert(sizeof(spriteShape) / sizeof(spriteShape[0]) == FRAME_MAX, "spriteShape table wrong size");
 
 
 // EOF
-                                                //      +---------------+
-                                                //      |🟢❌❌❌❌❌❌❌❌|  ← centre
-                                                //      +---------------+
