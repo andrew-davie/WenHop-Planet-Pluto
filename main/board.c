@@ -79,6 +79,7 @@ void chainReact_Pipe(unsigned char *me);
 void doRoll(unsigned char *me, int row, int col);
 void doRollRock(unsigned char *me, int row, int col);
 void doRollGeodoge(unsigned char *me, int row, int col);
+void doRollMotionArc(int col, int row, int trailSide);
 void setInsulator(unsigned char *p, int row, int col);
 
 //------------------------------------------------------------------------------
@@ -2042,6 +2043,24 @@ void doRoll(unsigned char *me, int row, int col) {
 }
 
 
+// Comic-style motion arc: 3 short-lived stationary dots on the side a rolling rock/geodoge
+// rolled IN FROM (trailSide, the opposite of the roll's direction of travel), tracing a shallow
+// curve through the cell. Speed 0 throughout -- see nDots()/drawParticles()'s "distance +=
+// speed" update -- so these never drift, they just sit at their spawn spot and fade, reading as
+// "something was just here" rather than another outward-flying spark (that's what the existing
+// PT_TWO burst in doRollRock()/doRollGeodoge() already does, on the opposite side). Ages are
+// short and fixed (no randomness) since this is meant as a quick one-frame-of-motion cue, not a
+// lingering effect.
+void doRollMotionArc(int col, int row, int trailSide) {
+
+    int off = trailSide < 0 ? 4 : 0;
+
+    nDots(1, col, row, PT_TWO, 8, trailSide * 2 + off, 3, 0, 1);
+    nDots(1, col, row, PT_TWO, 11, trailSide * 4 + off, 5, 0, 1);
+    nDots(1, col, row, PT_TWO, 14, trailSide * 6 + off, 7, 0, 1);
+}
+
+
 // A settled CH_ROCK that can't fall straight down (case CH_ROCK, above) but is resting on
 // something with ATT_ROLL tries each side in turn: if that side square is blank AND the square
 // diagonally below it is blank OR crushable, the rock commences a one-frame diagonal-roll
@@ -2101,6 +2120,12 @@ void doRollRock(unsigned char *me, int row, int col) {
                 nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
                 nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
 
+                // Comic-style motion arc: a few stationary (speed 0, so distance never grows --
+                // see nDots()/drawParticles()) dots trailing on the side the rock rolled IN
+                // FROM, not the spark burst's direction of travel above. Fixed short fades, no
+                // randomness -- just a "this was here a moment ago" cue, not another burst.
+                doRollMotionArc(col, row, -offset);
+
                 return;
             }
         }
@@ -2149,6 +2174,8 @@ void doRollGeodoge(unsigned char *me, int row, int col) {
                 nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
                 nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
                 nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+
+                doRollMotionArc(col, row, -offset);
 
                 return;
             }
