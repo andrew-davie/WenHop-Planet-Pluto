@@ -1478,8 +1478,12 @@ const unsigned char shape_FRAME_WALK4[] = {
 // Hand-authored push-cycle frames: exact duplicates of the walk cycle above (same order --
 // FRAME_NEW_X004_Y064, WALK2, WALK3, WALK4), just with row 13 (already the shoulder/arm-swing
 // row in each original) widened to a full-width horizontal dash, standing in for both arms
-// braced straight out against whatever's being shoved. See FRAME_PUSH1's own comment
-// (sprites.h) for why this exists instead of an imported sheet pose.
+// braced straight out against whatever's being shoved. There was no push pose on the artist's
+// sheet to import, so this was drawn directly in code, then painted onto
+// astronaut-guy-sheet-v10.png itself (blank area right of the walk cycle) so the sheet stays
+// the source of truth -- see the "// sheet:" comments below.
+// sheet: astronaut-guy-sheet-v10.png @ (76,64)
+// sheet: astronaut-guy-sheet-v10.png @ (108,64)
 const unsigned char shape_FRAME_PUSH1[] = {
 
     26,
@@ -1515,6 +1519,7 @@ const unsigned char shape_FRAME_PUSH1[] = {
                                                 //      +-------------+
 };
 
+// sheet: astronaut-guy-sheet-v10.png @ (92,64)
 const unsigned char shape_FRAME_PUSH2[] = {
 
     24,
@@ -1548,6 +1553,11 @@ const unsigned char shape_FRAME_PUSH2[] = {
                                                 //      +-------------+
 };
 
+// DUPLICATE: pixel-identical to FRAME_PUSH1 (frame 1/4 of the same cycle), same as
+// FRAME_NEW_X004_Y064/WALK3 above -- kept as its own array/frame identity for the animation
+// program, but the sheet importer's colour-blind matching can only attribute the sheet pose to
+// one of the two names, so this one has no "// sheet:" line of its own (its sheet occurrence
+// at (108,64) is recorded against FRAME_PUSH1 instead).
 const unsigned char shape_FRAME_PUSH3[] = {
 
     26,
@@ -1583,6 +1593,7 @@ const unsigned char shape_FRAME_PUSH3[] = {
                                                 //      +-------------+
 };
 
+// sheet: astronaut-guy-sheet-v10.png @ (124,64)
 const unsigned char shape_FRAME_PUSH4[] = {
 
     24,
