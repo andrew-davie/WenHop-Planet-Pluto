@@ -1286,7 +1286,15 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         // rock can roll off (ATT_ROLL -- another rock, a wall, concrete, etc, same convention
         // TYPE_DOGE already uses above) and one side is open with room to keep falling past it,
         // start rolling that way instead of just sitting there. See doRollRock()'s own comment.
-        else if (attNext & ATT_ROLL)
+        //
+        // Gated to only fire on a PH2-active pass (same phase TYPE_ROCK_ROLLING's own
+        // CH_ROCK_SIDE_1-4 are processed on): CH_ROCK itself is PH1 (checked every pass), so
+        // without this the roll could START on either phase parity, and since the transition
+        // only actually gets looked at again on PH2 passes, that made the hang time an
+        // inconsistent 1-or-2-pass wait depending on luck. Starting only on a phase this check
+        // itself is active makes the very next PH2 pass exactly 2 passes away, always -- a
+        // consistent wait instead of a coin flip.
+        else if ((attNext & ATT_ROLL) && (isActive[selectorCounter & 3] & ATT_PHASE2))
             doRollRock(cursor.me, cursor.row, cursor.col);
 
         break;
