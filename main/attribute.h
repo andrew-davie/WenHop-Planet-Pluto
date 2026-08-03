@@ -7,16 +7,16 @@ enum ObjectType {
     // update PickupCharacter[] in animations.c
 
 
-    TYPE_BLANK,                    // 00      ASSUMED == 0 in code
-    TYPE_PLACEHOLDER,              // 01
-    TYPE_DIRT,                     // 02
-    TYPE_BRICKWALL,                // 03
-    TYPE_DOOR,                     // 04
-    TYPE_OUTBOX,                   // 05
-    TYPE_STEELWALL,                // 06
-    TYPE_ROCK,                     // 07
-    TYPE_DOGE,                     // 08
-    TYPE_MELLON_HUSK_PRE,          // 09
+    TYPE_BLANK,                    // 0      ASSUMED == 0 in code
+    TYPE_PLACEHOLDER,              // 1
+    TYPE_DIRT,                     // 2
+    TYPE_BRICKWALL,                // 3
+    TYPE_DOOR,                     // 4
+    TYPE_OUTBOX,                   // 5
+    TYPE_STEELWALL,                // 6
+    TYPE_ROCK,                     // 7
+    TYPE_DOGE,                     // 8
+    TYPE_MELLON_HUSK_PRE,          // 9
     TYPE_MELLON_HUSK,              // 10
     TYPE_PEBBLE1,                  // 11
     TYPE_DUST_0,                   // 12
@@ -55,12 +55,11 @@ enum ObjectType {
     TYPE_STAR_FALLING,             // 45
     TYPE_STAR_EXPLODE,             // 46
     TYPE_ROCK_BONUS,               // 47
-    TYPE_MOUNT,                    // 48
-    TYPE_BOMB,                     // 49
-    TYPE_CRACKED_BRICK,            // 52
-    TYPE_CONCRETE,                 // 53
-    TYPE_TELEPORT,                 // 54
-    TYPE_KEY,                      // 55
+    TYPE_BOMB,                     // 48
+    TYPE_CRACKED_BRICK,            // 49
+    TYPE_CONCRETE,                 // 50
+    TYPE_TELEPORT,                 // 51
+    TYPE_KEY,                      // 52
 
     // A door that has finished the AnimateDoor slide-open (animations.c) -- same walkable/exit
     // attributes as TYPE_OUTBOX, but its own AnimateBase entry is 0 (no animation), so it just
@@ -68,19 +67,19 @@ enum ObjectType {
     // (that flash is fine for the real level exit, but reads as a bug on an ordinary unlocked
     // door). Also skipped by board.c's per-visit CH_DOOROPEN_0 FLASH()/particle case, for the
     // same reason -- see CH_DOOROPEN_STATIC's own comment.
-    TYPE_DOOR_OPEN,                // 56
+    TYPE_DOOR_OPEN,                // 53
 
     // Falls like a rock (same gravity/TOP-BOTTOM split mechanism) but can't be mined (no
     // ATT_MINE) or destroyed by explosions (no ATT_EXPLODABLE), and can't be pushed or picked
     // up by the player (no ATT_PUSH/ATT_PICKUP) -- see attribute.c's own comment on its
     // Attribute[] row for the full reasoning on each omission.
-    TYPE_IMMOVABLE,                 // 57
-    TYPE_IMMOVABLE_FALLING,         // 58
+    TYPE_IMMOVABLE,                 // 54
+    TYPE_IMMOVABLE_FALLING,         // 55
 
     // The 1-frame diagonal-roll transition (CH_ROCK_SIDE_1-4, attribute.h) a settled rock passes
     // through when it rolls off something with ATT_ROLL underneath it instead of falling
     // straight down -- see doRollRock()'s comment (board.c) for the full mechanic.
-    TYPE_ROCK_ROLLING,              // 59
+    TYPE_ROCK_ROLLING,              // 56
 
     TYPE_MAX
 };
@@ -202,15 +201,11 @@ enum ChName {
     CH_ELECTRIC_H2,               // 105
     CH_ELECTRIC_H3,               // 106
     CH_CROSSED_STREAMS,           // 107
-    CH_MOUNT_U,                   // 108
-    CH_MOUNT_D,                   // 109
-    CH_MOUNT_L,                   // 110
-    CH_MOUNT_R,                   // 111
-    CH_BOMB,                      // 112
-    CH_CRACKED_BRICK,             // 113
-    CH_CONCRETE,                  // 114
-    CH_TELEPORT,                  // 115
-    CH_KEY,                       // 116
+    CH_BOMB,                      // 108
+    CH_CRACKED_BRICK,             // 109
+    CH_CONCRETE,                  // 110
+    CH_TELEPORT,                  // 111
+    CH_KEY,                       // 112
 
     // The board byte AnimateDoor (animations.c) ends on and updateDoorUnlock()/board.c's
     // CH_DOORCLOSED case commit to once the slide-open finishes -- same graphic as CH_DOOROPEN_0
@@ -218,17 +213,17 @@ enum ChName {
     // doesn't inherit TYPE_OUTBOX's flashing (see TYPE_DOOR_OPEN's own comment). Real board
     // character, deliberately kept < 128 unlike CH_DOORSLIDE_1 -- it's what the tile actually
     // and permanently becomes, not a mid-flight animation-only frame.
-    CH_DOOROPEN_STATIC,           // 117
+    CH_DOOROPEN_STATIC,           // 113
 
     // An indestructible falling block -- see TYPE_IMMOVABLE's own comment (above) for the
     // attribute reasoning. CH_IMMOVABLE_FALLING reuses CH_IMMOVABLE's own graphic (same
     // convention as CH_ROCK/CH_ROCK_FALLING both pointing at one charSet[] cell); the TOP/
     // BOTTOM pair are the one-frame split used while it's mid-fall between two board rows,
     // same mechanism as CH_ROCK_FALLING_TOP/BOTTOM.
-    CH_IMMOVABLE,                 // 118
-    CH_IMMOVABLE_FALLING,         // 119
-    CH_IMMOVABLE_FALLING_TOP,     // 120
-    CH_IMMOVABLE_FALLING_BOTTOM,  // 121
+    CH_IMMOVABLE,                 // 114
+    CH_IMMOVABLE_FALLING,         // 115
+    CH_IMMOVABLE_FALLING_TOP,     // 116
+    CH_IMMOVABLE_FALLING_BOTTOM,  // 117
 
     // Diagonal-roll transition, same 1-frame-then-resolve idea as CH_DOGE_SIDE_1-4 but for a
     // settled CH_ROCK rolling off an ATT_ROLL surface instead of a doge: _1/_2 are the departing
@@ -240,10 +235,10 @@ enum ChName {
     // boundary, so _1/_2 show the trailing sliver still left in the departing cell and _3/_4 show
     // the leading bulk that's already arrived, together reading as one rock straddling both
     // squares for that single frame.
-    CH_ROCK_SIDE_1,               // 122
-    CH_ROCK_SIDE_2,               // 123
-    CH_ROCK_SIDE_3,               // 124
-    CH_ROCK_SIDE_4,               // 125
+    CH_ROCK_SIDE_1,               // 118
+    CH_ROCK_SIDE_2,               // 119
+    CH_ROCK_SIDE_3,               // 120
+    CH_ROCK_SIDE_4,               // 121
 
     // 126, 127 unused -- 2 free board-resident slots (CH_DOGE_01 below is pinned to 128 via an
     // explicit enum initializer, so removing entries up here doesn't shrink the virtual range;

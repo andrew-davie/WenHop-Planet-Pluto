@@ -134,24 +134,24 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_10_0),     // 105 CH_ELECTRIC_H2
     CH(CHAR_MAP_characterset_11_0),     // 106 CH_ELECTRIC_H3
     CH(CHAR_MAP_characterset_12_0),     // 107 CH_CROSSED_STREAMS
-    CH(CHAR_MAP_characterset_13_2),     // 108 CH_MOUNT_U
-    CH(CHAR_MAP_characterset_14_2),     // 109 CH_MOUNT_D
-    CH(CHAR_MAP_characterset_14_1),     // 110 CH_MOUNT_L
-    CH(CHAR_MAP_characterset_13_1),     // 111 CH_MOUNT_R
-    CH(CHAR_MAP_characterset_4_4),      // 112 CH_BOMB
-    CH(CHAR_MAP_characterset_8_4),      // 113 CH_CRACKED_BRICK
-    CH(CHAR_MAP_characterset_0_3),      // 114 CH_CONCRETE
-    CH(CHAR_MAP_characterset_0_15),      // 115 CH_TELEPORT (spinning-spoke cycle, frame 0)
-    CH(CHAR_MAP_characterset_3_2),       // 116 CH_KEY
-    CH(CHAR_MAP_characterset_2_17),      // 117 CH_DOOROPEN_STATIC -- same graphic as CH_DOOROPEN_0
-    CH(CHAR_MAP_characterset_4_6),       // 118 CH_IMMOVABLE
-    CH(CHAR_MAP_characterset_4_6),       // 119 CH_IMMOVABLE_FALLING -- same graphic as CH_IMMOVABLE, mirrors CH_ROCK/CH_ROCK_FALLING
-    CH(CHAR_MAP_characterset_5_6),       // 120 CH_IMMOVABLE_FALLING_TOP
-    CH(CHAR_MAP_characterset_6_6),       // 121 CH_IMMOVABLE_FALLING_BOTTOM
-    CH(CHAR_MAP_characterset_11_11),    // 122 CH_ROCK_SIDE_1
-    CH(CHAR_MAP_characterset_13_11),    // 123 CH_ROCK_SIDE_2
-    CH(CHAR_MAP_characterset_12_11),    // 124 CH_ROCK_SIDE_3
-    CH(CHAR_MAP_characterset_14_11),    // 125 CH_ROCK_SIDE_4
+    CH(CHAR_MAP_characterset_4_4),      // 108 CH_BOMB
+    CH(CHAR_MAP_characterset_8_4),      // 109 CH_CRACKED_BRICK
+    CH(CHAR_MAP_characterset_0_3),      // 110 CH_CONCRETE
+    CH(CHAR_MAP_characterset_0_15),      // 111 CH_TELEPORT (spinning-spoke cycle, frame 0)
+    CH(CHAR_MAP_characterset_3_2),       // 112 CH_KEY
+    CH(CHAR_MAP_characterset_2_17),      // 113 CH_DOOROPEN_STATIC -- same graphic as CH_DOOROPEN_0
+    CH(CHAR_MAP_characterset_4_6),       // 114 CH_IMMOVABLE
+    CH(CHAR_MAP_characterset_4_6),       // 115 CH_IMMOVABLE_FALLING -- same graphic as CH_IMMOVABLE, mirrors CH_ROCK/CH_ROCK_FALLING
+    CH(CHAR_MAP_characterset_5_6),       // 116 CH_IMMOVABLE_FALLING_TOP
+    CH(CHAR_MAP_characterset_6_6),       // 117 CH_IMMOVABLE_FALLING_BOTTOM
+    CH(CHAR_MAP_characterset_11_11),    // 118 CH_ROCK_SIDE_1
+    CH(CHAR_MAP_characterset_13_11),    // 119 CH_ROCK_SIDE_2
+    CH(CHAR_MAP_characterset_12_11),    // 120 CH_ROCK_SIDE_3
+    CH(CHAR_MAP_characterset_14_11),    // 121 CH_ROCK_SIDE_4
+    0,                                   // 122 (unused)
+    0,                                   // 123 (unused)
+    0,                                   // 124 (unused)
+    0,                                   // 125 (unused)
     0,                                   // 126 (unused)
     0,                                   // 127 (unused)
 

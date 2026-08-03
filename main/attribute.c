@@ -11,106 +11,106 @@ const enum ObjectType CharToType[] = {
     // see ChName for corresponding character name/number
     // may need to update worstRequiredTime if that's in use
 
-    TYPE_BLANK,                    // 000 CH_BLANK
-    TYPE_PLACEHOLDER,              // 001 CH_PLACEHOLDER
-    TYPE_DIRT,                     // 002 CH_DIRT
-    TYPE_BRICKWALL,                // 003 CH_BRICKWALL
-    TYPE_DOOR,                     // 004 CH_DOORCLOSED
-    TYPE_OUTBOX,                   // 005 CH_DOOROPEN_0
-    TYPE_OUTBOX,                   // 006 CH_EXITBLANK
-    TYPE_STEELWALL,                // 007 CH_STEELWALL
-    TYPE_PEBBLE1,                  // 008 CH_PEBBLE1
-    TYPE_PEBBLE1,                  // 009 CH_PEBBLE2
-    TYPE_ROCK,                     // 010 CH_ROCK
-    TYPE_ROCK_FALLING,             // 011 CH_ROCK_FALLING
-    TYPE_DOGE,                     // 012 CH_DOGE_00
-    TYPE_DOGE_FALLING,             // 013 CH_DOGE_FALLING
-    TYPE_MELLON_HUSK_PRE,          // 014 CH_MELLON_HUSK_BIRTH
-    TYPE_LAVA,                     // 015 CH_LAVA_BLANK
-    TYPE_LAVA,                     // 016 CH_LAVA_SMALL
-    TYPE_LAVA,                     // 017 CH_LAVA_MEDIUM
-    TYPE_LAVA,                     // 018 CH_LAVA_LARGE
-    TYPE_MELLON_HUSK,              // 019 CH_MELLON_HUSK
-    TYPE_DOGE,                     // 020 CH_DOGE_STATIC
-    TYPE_PEBBLE_ROCK,              // 021 CH_PEBBLE_ROCK
-    TYPE_ROCK_PEBBLE,              // 022 CH_ROCK_PEBBLE
-    TYPE_ROCK_PEBBLE,              // 023 CH_ROCK_PEBBLE_1
-    TYPE_DUST_0,                   // 024 CH_DUST_0
-    TYPE_DUST_0,                   // 025 CH_DUST_1
-    TYPE_DUST_0,                   // 026 CH_DUST_2
-    TYPE_GEODOGE,                  // 027 CH_CONGLOMERATE
-    TYPE_DUST_ROCK,                // 028 CH_DUST_ROCK_0
-    TYPE_DUST_ROCK,                // 029 CH_DUST_ROCK_1
-    TYPE_DUST_ROCK,                // 030 CH_DUST_ROCK_2
-    TYPE_CONVERT_GEODE_TO_DOGE,    // 031 CH_CONVERT_GEODE_TO_DOGE
-    TYPE_PUSHER,                   // 032 CH_HORIZONTAL_BAR
-    TYPE_PUSHER,                   // 033 CH_PUSH_LEFT
-    TYPE_PUSHER,                   // 034 CH_PUSH_LEFT_REVERSE
-    TYPE_PUSHER,                   // 035 CH_PUSH_RIGHT
-    TYPE_PUSHER,                   // 036 CH_PUSH_RIGHT_REVERSE
-    TYPE_PUSHER,                   // 037 CH_VERTICAL_BAR
-    TYPE_PUSHER,                   // 038 CH_PUSH_UP
-    TYPE_PUSHER,                   // 039 CH_PUSH_UP_REVERSE
-    TYPE_PUSHER,                   // 040 CH_PUSH_DOWN
-    TYPE_PUSHER,                   // 041 CH_PUSH_DOWN_REVERSE
-    TYPE_WYRM,                     // 042 CH_WYRM_BODY
-    TYPE_WYRM,                     // 043 CH_WYRM_VERT_BODY
-    TYPE_WYRM,                     // 044 CH_WYRM_CORNER_LD
-    TYPE_WYRM,                     // 045 CH_WYRM_CORNER_RD
-    TYPE_WYRM,                     // 046 CH_WYRM_CORNER_LU
-    TYPE_WYRM,                     // 047 CH_WYRM_CORNER_RU
-    TYPE_WYRM,                     // 048 CH_WYRM_HEAD_U
-    TYPE_WYRM,                     // 049 CH_WYRM_HEAD_R
-    TYPE_WYRM,                     // 050 CH_WYRM_HEAD_D
-    TYPE_WYRM,                     // 051 CH_WYRM_HEAD_L
-    TYPE_GEODOGE_FALLING,          // 052 CH_GEODOGE_FALLING
-    TYPE_FLIP_GRAVITY,             // 053 CH_FLIP_GRAVITY_0
-    TYPE_FLIP_GRAVITY,             // 054 CH_FLIP_GRAVITY_1
-    TYPE_FLIP_GRAVITY,             // 055 CH_FLIP_GRAVITY_2
-    TYPE_BLOCK,                    // 056 CH_BLOCK
-    TYPE_GRINDER,                  // 057 CH_GRINDER_0
-    TYPE_GRINDER_1,                // 058 CH_GRINDER_1
-    TYPE_HUB,                      // 059 CH_HUB
-    TYPE_WATER,                    // 060 CH_WATER_0
-    TYPE_WATERFLOW_0,              // 061 CH_WATERFLOW_0
-    TYPE_WATERFLOW_1,              // 062 CH_WATERFLOW_1
-    TYPE_WATERFLOW_2,              // 063 CH_WATERFLOW_2
-    TYPE_WATERFLOW_3,              // 064 CH_WATERFLOW_3
-    TYPE_WATERFLOW_4,              // 065 CH_WATERFLOW_4
-    TYPE_HUB,                      // 066 CH_HUB_1
-    TYPE_OUTLET,                   // 067 CH_OUTLET
-    TYPE_BELT,                     // 068 CH_BELT_0
-    TYPE_BELT_1,                   // 069 CH_BELT_1
-    TYPE_PUSHER,                   // 070 CH_PUSH_DOWN2
-    TYPE_CONVERT_GEODE_TO_DOGE,    // 071 CH_GEODOGE_CONVERT  (deprecated)
-    TYPE_CONVERT_PIPE,             // 072 CH_CONVERT_PIPE
-    TYPE_WYRM,                     // 073 CH_WYRM_TAIL_U
-    TYPE_WYRM,                     // 074 CH_WYRM_HEAD_R
-    TYPE_WYRM,                     // 075 CH_WYRM_HEAD_D
-    TYPE_WYRM,                     // 076 CH_WYRM_HEAD_L,
-    TYPE_DOGE_FALLING,             // 077 CH_DOGE_FALLING_TOP
-    TYPE_DOGE_FALLING,             // 078 CH_DOGE_FALLING_BOTTOM
-    TYPE_ROCK_FALLING,             // 079 CH_ROCK_FALLING_TOP
-    TYPE_ROCK_FALLING,             // 080 CH_ROCK_FALLING_BOTTOM
-    TYPE_GEODOGE_FALLING,          // 081 CH_GEODOGE_FALLING_TOP
-    TYPE_GEODOGE_FALLING,          // 082 CH_GEODOGE_FALLING_BOTTOM
-    TYPE_DOGE_FALLING2,            // 083 CH_DOGE_FALLING_TOP2
-    TYPE_DOGE_FALLING2,            // 084 CH_DOGE_FALLING_BOTTOM2
-    TYPE_DOGE_FALLING2,            // 085 CH_DOGE_SIDE_1
-    TYPE_DOGE_FALLING2,            // 086 CH_DOGE_SIDE_3
-    TYPE_DOGE_FALLING2,            // 087 CH_DOGE_SIDE_2
-    TYPE_DOGE_FALLING2,            // 088 CH_DOGE_SIDE_4
-    TYPE_ELECTRIC,                 // 089 CH_ELECTRIC_0
-    TYPE_ELECTRIC,                 // 090 CH_ELECTRIC_1
-    TYPE_ELECTRIC,                 // 091 CH_ELECTRIC_2
-    TYPE_ELECTRIC,                 // 092 CH_ELECTRIC_3
-    TYPE_DIRT,                     // 093 CH_BROKEN_DIRT  (not actually used on board)
-    TYPE_INSULATOR,                // 094 CH_INSULATOR_TOP
-    TYPE_INSULATOR,                // 095 CH_INSULATOR_BOTTOM
-    TYPE_STAR,                     // 096 CH_STAR
-    TYPE_STAR_FALLING,             // 097 CH_STAR_TOP
-    TYPE_STAR_FALLING,             // 098 CH_STAR_BOTTOM
-    TYPE_ROCK_BONUS,               // 099 CH_ROCK_BONUS
+    TYPE_BLANK,                    // 0 CH_BLANK
+    TYPE_PLACEHOLDER,              // 1 CH_PLACEHOLDER
+    TYPE_DIRT,                     // 2 CH_DIRT
+    TYPE_BRICKWALL,                // 3 CH_BRICKWALL
+    TYPE_DOOR,                     // 4 CH_DOORCLOSED
+    TYPE_OUTBOX,                   // 5 CH_DOOROPEN_0
+    TYPE_OUTBOX,                   // 6 CH_EXITBLANK
+    TYPE_STEELWALL,                // 7 CH_STEELWALL
+    TYPE_PEBBLE1,                  // 8 CH_PEBBLE1
+    TYPE_PEBBLE1,                  // 9 CH_PEBBLE2
+    TYPE_ROCK,                     // 10 CH_ROCK
+    TYPE_ROCK_FALLING,             // 11 CH_ROCK_FALLING
+    TYPE_DOGE,                     // 12 CH_DOGE_00
+    TYPE_DOGE_FALLING,             // 13 CH_DOGE_FALLING
+    TYPE_MELLON_HUSK_PRE,          // 14 CH_MELLON_HUSK_BIRTH
+    TYPE_LAVA,                     // 15 CH_LAVA_BLANK
+    TYPE_LAVA,                     // 16 CH_LAVA_SMALL
+    TYPE_LAVA,                     // 17 CH_LAVA_MEDIUM
+    TYPE_LAVA,                     // 18 CH_LAVA_LARGE
+    TYPE_MELLON_HUSK,              // 19 CH_MELLON_HUSK
+    TYPE_DOGE,                     // 20 CH_DOGE_STATIC
+    TYPE_PEBBLE_ROCK,              // 21 CH_PEBBLE_ROCK
+    TYPE_ROCK_PEBBLE,              // 22 CH_ROCK_PEBBLE
+    TYPE_ROCK_PEBBLE,              // 23 CH_ROCK_PEBBLE_1
+    TYPE_DUST_0,                   // 24 CH_DUST_0
+    TYPE_DUST_0,                   // 25 CH_DUST_1
+    TYPE_DUST_0,                   // 26 CH_DUST_2
+    TYPE_GEODOGE,                  // 27 CH_CONGLOMERATE
+    TYPE_DUST_ROCK,                // 28 CH_DUST_ROCK_0
+    TYPE_DUST_ROCK,                // 29 CH_DUST_ROCK_1
+    TYPE_DUST_ROCK,                // 30 CH_DUST_ROCK_2
+    TYPE_CONVERT_GEODE_TO_DOGE,    // 31 CH_CONVERT_GEODE_TO_DOGE
+    TYPE_PUSHER,                   // 32 CH_HORIZONTAL_BAR
+    TYPE_PUSHER,                   // 33 CH_PUSH_LEFT
+    TYPE_PUSHER,                   // 34 CH_PUSH_LEFT_REVERSE
+    TYPE_PUSHER,                   // 35 CH_PUSH_RIGHT
+    TYPE_PUSHER,                   // 36 CH_PUSH_RIGHT_REVERSE
+    TYPE_PUSHER,                   // 37 CH_VERTICAL_BAR
+    TYPE_PUSHER,                   // 38 CH_PUSH_UP
+    TYPE_PUSHER,                   // 39 CH_PUSH_UP_REVERSE
+    TYPE_PUSHER,                   // 40 CH_PUSH_DOWN
+    TYPE_PUSHER,                   // 41 CH_PUSH_DOWN_REVERSE
+    TYPE_WYRM,                     // 42 CH_WYRM_BODY
+    TYPE_WYRM,                     // 43 CH_WYRM_VERT_BODY
+    TYPE_WYRM,                     // 44 CH_WYRM_CORNER_LD
+    TYPE_WYRM,                     // 45 CH_WYRM_CORNER_RD
+    TYPE_WYRM,                     // 46 CH_WYRM_CORNER_LU
+    TYPE_WYRM,                     // 47 CH_WYRM_CORNER_RU
+    TYPE_WYRM,                     // 48 CH_WYRM_HEAD_U
+    TYPE_WYRM,                     // 49 CH_WYRM_HEAD_R
+    TYPE_WYRM,                     // 50 CH_WYRM_HEAD_D
+    TYPE_WYRM,                     // 51 CH_WYRM_HEAD_L
+    TYPE_GEODOGE_FALLING,          // 52 CH_GEODOGE_FALLING
+    TYPE_FLIP_GRAVITY,             // 53 CH_FLIP_GRAVITY_0
+    TYPE_FLIP_GRAVITY,             // 54 CH_FLIP_GRAVITY_1
+    TYPE_FLIP_GRAVITY,             // 55 CH_FLIP_GRAVITY_2
+    TYPE_BLOCK,                    // 56 CH_BLOCK
+    TYPE_GRINDER,                  // 57 CH_GRINDER_0
+    TYPE_GRINDER_1,                // 58 CH_GRINDER_1
+    TYPE_HUB,                      // 59 CH_HUB
+    TYPE_WATER,                    // 60 CH_WATER_0
+    TYPE_WATERFLOW_0,              // 61 CH_WATERFLOW_0
+    TYPE_WATERFLOW_1,              // 62 CH_WATERFLOW_1
+    TYPE_WATERFLOW_2,              // 63 CH_WATERFLOW_2
+    TYPE_WATERFLOW_3,              // 64 CH_WATERFLOW_3
+    TYPE_WATERFLOW_4,              // 65 CH_WATERFLOW_4
+    TYPE_HUB,                      // 66 CH_HUB_1
+    TYPE_OUTLET,                   // 67 CH_OUTLET
+    TYPE_BELT,                     // 68 CH_BELT_0
+    TYPE_BELT_1,                   // 69 CH_BELT_1
+    TYPE_PUSHER,                   // 70 CH_PUSH_DOWN2
+    TYPE_CONVERT_GEODE_TO_DOGE,    // 71 CH_GEODOGE_CONVERT  (deprecated)
+    TYPE_CONVERT_PIPE,             // 72 CH_CONVERT_PIPE
+    TYPE_WYRM,                     // 73 CH_WYRM_TAIL_U
+    TYPE_WYRM,                     // 74 CH_WYRM_HEAD_R
+    TYPE_WYRM,                     // 75 CH_WYRM_HEAD_D
+    TYPE_WYRM,                     // 76 CH_WYRM_HEAD_L,
+    TYPE_DOGE_FALLING,             // 77 CH_DOGE_FALLING_TOP
+    TYPE_DOGE_FALLING,             // 78 CH_DOGE_FALLING_BOTTOM
+    TYPE_ROCK_FALLING,             // 79 CH_ROCK_FALLING_TOP
+    TYPE_ROCK_FALLING,             // 80 CH_ROCK_FALLING_BOTTOM
+    TYPE_GEODOGE_FALLING,          // 81 CH_GEODOGE_FALLING_TOP
+    TYPE_GEODOGE_FALLING,          // 82 CH_GEODOGE_FALLING_BOTTOM
+    TYPE_DOGE_FALLING2,            // 83 CH_DOGE_FALLING_TOP2
+    TYPE_DOGE_FALLING2,            // 84 CH_DOGE_FALLING_BOTTOM2
+    TYPE_DOGE_FALLING2,            // 85 CH_DOGE_SIDE_1
+    TYPE_DOGE_FALLING2,            // 86 CH_DOGE_SIDE_3
+    TYPE_DOGE_FALLING2,            // 87 CH_DOGE_SIDE_2
+    TYPE_DOGE_FALLING2,            // 88 CH_DOGE_SIDE_4
+    TYPE_ELECTRIC,                 // 89 CH_ELECTRIC_0
+    TYPE_ELECTRIC,                 // 90 CH_ELECTRIC_1
+    TYPE_ELECTRIC,                 // 91 CH_ELECTRIC_2
+    TYPE_ELECTRIC,                 // 92 CH_ELECTRIC_3
+    TYPE_DIRT,                     // 93 CH_BROKEN_DIRT  (not actually used on board)
+    TYPE_INSULATOR,                // 94 CH_INSULATOR_TOP
+    TYPE_INSULATOR,                // 95 CH_INSULATOR_BOTTOM
+    TYPE_STAR,                     // 96 CH_STAR
+    TYPE_STAR_FALLING,             // 97 CH_STAR_TOP
+    TYPE_STAR_FALLING,             // 98 CH_STAR_BOTTOM
+    TYPE_ROCK_BONUS,               // 99 CH_ROCK_BONUS
     TYPE_STAR_EXPLODE,             // 100 CH_STAR_EXPLODE
     TYPE_INSULATOR,                // 101 CH_INSULATOR_L
     TYPE_INSULATOR,                // 102 CH_INSULATOR_R
@@ -119,24 +119,24 @@ const enum ObjectType CharToType[] = {
     TYPE_ELECTRIC,                 // 105 CH_ELECTRIC_H2
     TYPE_ELECTRIC,                 // 106 CH_ELECTRIC_H3
     TYPE_ELECTRIC,                 // 107 CH_CROSSED_STREAMS
-    TYPE_MOUNT,                    // 108 CH_MOUNT_U
-    TYPE_MOUNT,                    // 109 CH_MOUNT_D
-    TYPE_MOUNT,                    // 110 CH_MOUNT_L
-    TYPE_MOUNT,                    // 111 CH_MOUNT_R
-    TYPE_BOMB,                     // 112 CH_BOMB
-    TYPE_CRACKED_BRICK,            // 113 CH_CRACKED_BRICK
-    TYPE_CONCRETE,                 // 114 CH_CONCRETE
-    TYPE_TELEPORT,                 // 115 CH_TELEPORT
-    TYPE_KEY,                      // 116 CH_KEY
-    TYPE_DOOR_OPEN,                // 117 CH_DOOROPEN_STATIC
-    TYPE_IMMOVABLE,                // 118 CH_IMMOVABLE
-    TYPE_IMMOVABLE_FALLING,        // 119 CH_IMMOVABLE_FALLING
-    TYPE_IMMOVABLE_FALLING,        // 120 CH_IMMOVABLE_FALLING_TOP
-    TYPE_IMMOVABLE_FALLING,        // 121 CH_IMMOVABLE_FALLING_BOTTOM
-    TYPE_ROCK_ROLLING,             // 122 CH_ROCK_SIDE_1
-    TYPE_ROCK_ROLLING,             // 123 CH_ROCK_SIDE_2
-    TYPE_ROCK_ROLLING,             // 124 CH_ROCK_SIDE_3
-    TYPE_ROCK_ROLLING,             // 125 CH_ROCK_SIDE_4
+    TYPE_BOMB,                     // 108 CH_BOMB
+    TYPE_CRACKED_BRICK,            // 109 CH_CRACKED_BRICK
+    TYPE_CONCRETE,                 // 110 CH_CONCRETE
+    TYPE_TELEPORT,                 // 111 CH_TELEPORT
+    TYPE_KEY,                      // 112 CH_KEY
+    TYPE_DOOR_OPEN,                // 113 CH_DOOROPEN_STATIC
+    TYPE_IMMOVABLE,                // 114 CH_IMMOVABLE
+    TYPE_IMMOVABLE_FALLING,        // 115 CH_IMMOVABLE_FALLING
+    TYPE_IMMOVABLE_FALLING,        // 116 CH_IMMOVABLE_FALLING_TOP
+    TYPE_IMMOVABLE_FALLING,        // 117 CH_IMMOVABLE_FALLING_BOTTOM
+    TYPE_ROCK_ROLLING,             // 118 CH_ROCK_SIDE_1
+    TYPE_ROCK_ROLLING,             // 119 CH_ROCK_SIDE_2
+    TYPE_ROCK_ROLLING,             // 120 CH_ROCK_SIDE_3
+    TYPE_ROCK_ROLLING,             // 121 CH_ROCK_SIDE_4
+    0,                             // 122 (unused)
+    0,                             // 123 (unused)
+    0,                             // 124 (unused)
+    0,                             // 125 (unused)
     0,                             // 126 (unused)
     0,                             // 127 (unused)
 
@@ -208,16 +208,16 @@ const unsigned int Attribute[] = {
 
 // CNR PAD DGE MLT DIS PH* PIP GND CVY WTF MIN RKF QUI XIT HRD SQB PSH GRB MAS DRT SPC PER XPD CVT CRU ROL PUP DRP SHV
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ |RKF|QUI| _ | _ | _ | _ | _ | _ | _ |SPC|PER|XPD|CVT| _ | _ | _ | _ | _ , // 00 TYPE_BLANK,
-    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 01 TYPE_PLACEHOLDER,
-   CNR| _ | _ | _ |DIS| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRT| _ |PER|XPD|CVT| _ | _ | _ |DRP| _ , // 02 TYPE_DIRT,
-    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL| _ |DRP| _ , // 03 TYPE_BRICKWALL,
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 04 TYPE_DOOR,
-    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 05 TYPE_OUTBOX,
-    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRP| _ , // 06 TYPE_STEELWALL,
-    _ |PAD| _ |MLT| _ |PH1| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ |MAS| _ | _ | _ |XPD| _ | _ |ROL|PUP| _ | _ , // 07 TYPE_ROCK,
-    _ |PAD| _ |MLT| _ |PH4| _ |GND|CVY| _ | _ | _ | _ | _ | _ | _ |PSH|GRB| _ | _ | _ | _ |XPD| _ | _ |ROL|PUP| _ | _ , // 08 TYPE_DOGE,
-    _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 09 TYPE_MELLON_HUSK_PRE,
+    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ |RKF|QUI| _ | _ | _ | _ | _ | _ | _ |SPC|PER|XPD|CVT| _ | _ | _ | _ | _ , // 0 TYPE_BLANK,
+    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 1 TYPE_PLACEHOLDER,
+   CNR| _ | _ | _ |DIS| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRT| _ |PER|XPD|CVT| _ | _ | _ |DRP| _ , // 2 TYPE_DIRT,
+    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |ROL| _ |DRP| _ , // 3 TYPE_BRICKWALL,
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 4 TYPE_DOOR,
+    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 5 TYPE_OUTBOX,
+    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRP| _ , // 6 TYPE_STEELWALL,
+    _ |PAD| _ |MLT| _ |PH1| _ |GND|CVY| _ |MIN| _ | _ | _ |HRD| _ |PSH| _ |MAS| _ | _ | _ |XPD| _ | _ |ROL|PUP| _ | _ , // 7 TYPE_ROCK,
+    _ |PAD| _ |MLT| _ |PH4| _ |GND|CVY| _ | _ | _ | _ | _ | _ | _ |PSH|GRB| _ | _ | _ | _ |XPD| _ | _ |ROL|PUP| _ | _ , // 8 TYPE_DOGE,
+    _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 9 TYPE_MELLON_HUSK_PRE,
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ |QUI| _ | _ |SQB|PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 10 TYPE_MELLON_HUSK,
    CNR|PAD| _ | _ |DIS|PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |DRT| _ |PER|XPD| _ | _ | _ | _ |DRP| _ , // 11 TYPE_PEBBLE1,
     _ |PAD| _ | _ | _ |PH2| _ | _ | _ | _ | _ |RKF|QUI| _ | _ | _ | _ | _ | _ | _ |SPC|PER|XPD| _ | _ | _ | _ | _ | _ , // 12 TYPE_DUST_0,
@@ -256,16 +256,15 @@ const unsigned int Attribute[] = {
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 45 TYPE_STAR_FALLING
     _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 46 TYPE_STAR_EXPLODING
     _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ |PSH| _ | _ | _ | _ | _ | _ | _ | _ |ROL|PUP| _ | _ , // 47 TYPE_ROCK_BONUS
-    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 48 TYPE_MOUNT
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 49 TYPE_BOMB
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 52 TYPE_CRACKED_BRICK
-    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ |ROL| _ |DRP| _ , // 53 TYPE_CONCRETE
-    _ |PAD| _ | _ | _ |PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PER| _ | _ | _ | _ | _ | _ | _ | _ , // 54 TYPE_TELEPORT (walkable, solid -- like TYPE_STAR's ground; PH4 drives its idle sparkle, see board.c)
-    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 55 TYPE_KEY (solid ground pickup -- auto-grabbed by walking onto it, see mellon.c's checkHighPriorityMove; blocked while already carrying something)
-    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 56 TYPE_DOOR_OPEN (same walkable/exit bits as TYPE_OUTBOX, deliberately not TYPE_OUTBOX itself -- see its own comment)
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ |MAS| _ | _ | _ | _ | _ | _ |ROL| _ | _ |SHV, // 57 TYPE_IMMOVABLE
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ |CRU| _ | _ | _ | _ , // 58 TYPE_IMMOVABLE_FALLING
-    _ |PAD| _ | _ | _ |PH2| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 59 TYPE_ROCK_ROLLING -- PH2 (half speed) vs TYPE_ROCK_FALLING's PH1, so the roll's midpoint visibly lingers instead of snapping through in one scan pass
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 48 TYPE_BOMB
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 49 TYPE_CRACKED_BRICK
+    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ |XPD| _ | _ |ROL| _ |DRP| _ , // 50 TYPE_CONCRETE
+    _ |PAD| _ | _ | _ |PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PER| _ | _ | _ | _ | _ | _ | _ | _ , // 51 TYPE_TELEPORT (walkable, solid -- like TYPE_STAR's ground; PH4 drives its idle sparkle, see board.c)
+    _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 52 TYPE_KEY (solid ground pickup -- auto-grabbed by walking onto it, see mellon.c's checkHighPriorityMove; blocked while already carrying something)
+    _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 53 TYPE_DOOR_OPEN (same walkable/exit bits as TYPE_OUTBOX, deliberately not TYPE_OUTBOX itself -- see its own comment)
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ |MAS| _ | _ | _ | _ | _ | _ |ROL| _ | _ |SHV, // 54 TYPE_IMMOVABLE
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ |CRU| _ | _ | _ | _ , // 55 TYPE_IMMOVABLE_FALLING
+    _ |PAD| _ | _ | _ |PH2| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 56 TYPE_ROCK_ROLLING -- PH2 (half speed) vs TYPE_ROCK_FALLING's PH1, so the roll's midpoint visibly lingers instead of snapping through in one scan pass
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+---+
 
     // clang-format on

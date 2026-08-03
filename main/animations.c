@@ -379,16 +379,16 @@ const unsigned char *const AnimateBase[] = {
 
     // Type numbers are IDs, not sequential — conditional compilation can break continuity.
 
-    0,                      // 00 TYPE_BLANK
-    0,                      // 01 TYPE_PLACEHOLDER
-    0,                      // 02 TYPE_DIRT
-    0,                      // 03 TYPE_BRICKWALL
-    AnimateDoor,            // 04 TYPE_DOOR
-    AnimFlashOut,           // 05 TYPE_OUTBOX
-    0,                      // 06 TYPE_STEELWALL
-    0,                      // 07 TYPE_ROCK
-    AnimPulseDoge,          // 08 TYPE_DOGE
-    0,                      // 09 TYPE_MELLON_HUSK_PRE
+    0,                      // 0 TYPE_BLANK
+    0,                      // 1 TYPE_PLACEHOLDER
+    0,                      // 2 TYPE_DIRT
+    0,                      // 3 TYPE_BRICKWALL
+    AnimateDoor,            // 4 TYPE_DOOR
+    AnimFlashOut,           // 5 TYPE_OUTBOX
+    0,                      // 6 TYPE_STEELWALL
+    0,                      // 7 TYPE_ROCK
+    AnimPulseDoge,          // 8 TYPE_DOGE
+    0,                      // 9 TYPE_MELLON_HUSK_PRE
     AnimMellonHusk,         // 10 TYPE_MELLON_HUSK
     0,                      // 11 TYPE_PEBBLE1
     0,                      // 12 TYPE_DUST_0
@@ -427,36 +427,35 @@ const unsigned char *const AnimateBase[] = {
     0,                      // 45 TYPE_STAR_FALLING
     AnimateStarExplode,     // 46 TYPE_STAR_EXPLODE
     AnimateRockBonus,       // 47 TYPE_ROCK_BONUS
-    0,                      // 48 TYPE_MOUNT
-    AnimateBomb,            // 49 TYPE_BOMB
-    AnimateCrackedBrick,    // 52 TYPE_CRACKED_BRICK
-    0,                      // 53 TYPE_CONCRETE
-    0,                      // 54 TYPE_TELEPORT -- driveTeleportSpin() owns this one entirely
+    AnimateBomb,            // 48 TYPE_BOMB
+    AnimateCrackedBrick,    // 49 TYPE_CRACKED_BRICK
+    0,                      // 50 TYPE_CONCRETE
+    0,                      // 51 TYPE_TELEPORT -- driveTeleportSpin() owns this one entirely
                             // (below); deliberately not wired in here, see its own comment
-    0,                      // 55 TYPE_KEY -- no animation
-    AnimateDoorClose,       // 56 TYPE_DOOR_OPEN -- idle landing pad only (frame 0, holds forever,
+    0,                      // 52 TYPE_KEY -- no animation
+    AnimateDoorClose,       // 53 TYPE_DOOR_OPEN -- idle landing pad only (frame 0, holds forever,
                             // same as TYPE_OUTBOX uses it); needs a real AnimateBase entry (not 0)
                             // so processCharAnimations() actually services this type at all -- see
                             // board.c's teleport-departure trigger and CH_DOOROPEN_STATIC case
-    0,                      // 57 TYPE_IMMOVABLE -- no animation, static like TYPE_ROCK
-    0,                      // 58 TYPE_IMMOVABLE_FALLING
-    0,                      // 59 TYPE_ROCK_ROLLING -- no animation, same as TYPE_DOGE_FALLING2
+    0,                      // 54 TYPE_IMMOVABLE -- no animation, static like TYPE_ROCK
+    0,                      // 55 TYPE_IMMOVABLE_FALLING
+    0,                      // 56 TYPE_ROCK_ROLLING -- no animation, same as TYPE_DOGE_FALLING2
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
 
 const unsigned char PickupCharacter[] = {
 
-    0,                // 00 TYPE_BLANK
-    0,                // 01 TYPE_PLACEHOLDER
-    0,                // 02 TYPE_DIRT
-    0,                // 03 TYPE_BRICKWALL
-    CH_DOORCLOSED,    // 04 TYPE_DOOR
-    CH_DOOROPEN_0,    // 05 TYPE_OUTBOX
-    0,                // 06 TYPE_STEELWALL
-    CH_ROCK,          // 07 TYPE_ROCK
-    CH_DOGE_00,       // 08 TYPE_DOGE
-    0,                // 09 TYPE_MELLON_HUSK_PRE
+    0,                // 0 TYPE_BLANK
+    0,                // 1 TYPE_PLACEHOLDER
+    0,                // 2 TYPE_DIRT
+    0,                // 3 TYPE_BRICKWALL
+    CH_DOORCLOSED,    // 4 TYPE_DOOR
+    CH_DOOROPEN_0,    // 5 TYPE_OUTBOX
+    0,                // 6 TYPE_STEELWALL
+    CH_ROCK,          // 7 TYPE_ROCK
+    CH_DOGE_00,       // 8 TYPE_DOGE
+    0,                // 9 TYPE_MELLON_HUSK_PRE
     0,                // 10 TYPE_MELLON_HUSK
     0,                // 11 TYPE_PEBBLE1
     0,                // 12 TYPE_DUST_0
@@ -495,16 +494,15 @@ const unsigned char PickupCharacter[] = {
     0,                // 45 TYPE_STAR_FALLING
     0,                // 46 TYPE_STAR_EXPLODE
     CH_ROCK_BONUS,    // 47 TYPE_ROCK_BONUS
-    0,                // 48 TYPE_MOUNT
-    CH_BOMB,          // 49 TYPE_BOMB
-    0,                // 52 TYPE_CRACKED_BRICK
-    0,                // 53 TYPE_CONCRETE
-    0,                // 54 TYPE_TELEPORT
-    0,                // 55 TYPE_KEY -- auto-grabbed by walking onto it (mellon.c), not fire-button-yankable
-    0,                // 56 TYPE_DOOR_OPEN
-    0,                // 57 TYPE_IMMOVABLE -- can't be fire-button picked up, per its own name
-    0,                // 58 TYPE_IMMOVABLE_FALLING
-    0,                // 59 TYPE_ROCK_ROLLING -- transitional only, never fire-button-yankable
+    CH_BOMB,          // 48 TYPE_BOMB
+    0,                // 49 TYPE_CRACKED_BRICK
+    0,                // 50 TYPE_CONCRETE
+    0,                // 51 TYPE_TELEPORT
+    0,                // 52 TYPE_KEY -- auto-grabbed by walking onto it (mellon.c), not fire-button-yankable
+    0,                // 53 TYPE_DOOR_OPEN
+    0,                // 54 TYPE_IMMOVABLE -- can't be fire-button picked up, per its own name
+    0,                // 55 TYPE_IMMOVABLE_FALLING
+    0,                // 56 TYPE_ROCK_ROLLING -- transitional only, never fire-button-yankable
 
 };
 
