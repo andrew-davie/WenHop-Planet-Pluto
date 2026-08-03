@@ -239,6 +239,11 @@ enum ChName {
     // (current) square for a roll right/left respectively, and become blank next scan; _3/_4 are
     // the arriving square, and become the ordinary CH_ROCK_FALLING_TOP/BOTTOM pair next scan (so
     // the rock immediately continues falling from its new column) -- see doRollRock() (board.c).
+    // Artwork: same horizontal-split technique CH_ROCK_FALLING_TOP/BOTTOM already use vertically
+    // -- the rock's own image shifted 3px sideways (of its 5px cell width) and cut at the column
+    // boundary, so _1/_2 show the trailing sliver still left in the departing cell and _3/_4 show
+    // the leading bulk that's already arrived, together reading as one rock straddling both
+    // squares for that single frame.
     CH_ROCK_SIDE_1,               // 124
     CH_ROCK_SIDE_2,               // 125
     CH_ROCK_SIDE_3,               // 126
