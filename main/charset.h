@@ -7,7 +7,7 @@ typedef struct {
     unsigned char data[CARS_CHAR_charset_auto_HEIGHT * 3]; // RGB
 } character_charset_auto;
 
-extern const character_charset_auto charset_auto[164];
+extern const character_charset_auto charset_auto[168];
 
 extern const unsigned char gfx_characterset_png_map[20][16];
 
@@ -134,46 +134,50 @@ extern const unsigned char gfx_characterset_png_map[20][16];
 #define CHAR_MAP_characterset_8_11 120
 #define CHAR_MAP_characterset_9_11 121
 #define CHAR_MAP_characterset_10_11 122
-#define CHAR_MAP_characterset_0_12 123
-#define CHAR_MAP_characterset_1_12 124
-#define CHAR_MAP_characterset_2_12 125
-#define CHAR_MAP_characterset_3_12 126
-#define CHAR_MAP_characterset_4_12 127
-#define CHAR_MAP_characterset_5_12 128
-#define CHAR_MAP_characterset_6_12 129
-#define CHAR_MAP_characterset_7_12 130
-#define CHAR_MAP_characterset_8_12 131
-#define CHAR_MAP_characterset_9_12 132
-#define CHAR_MAP_characterset_0_13 133
-#define CHAR_MAP_characterset_1_13 134
-#define CHAR_MAP_characterset_2_13 135
-#define CHAR_MAP_characterset_3_13 136
-#define CHAR_MAP_characterset_0_14 137
-#define CHAR_MAP_characterset_1_14 138
-#define CHAR_MAP_characterset_2_14 139
-#define CHAR_MAP_characterset_3_14 140
-#define CHAR_MAP_characterset_4_14 141
-#define CHAR_MAP_characterset_5_14 142
-#define CHAR_MAP_characterset_6_14 143
-#define CHAR_MAP_characterset_7_14 144
-#define CHAR_MAP_characterset_8_14 145
-#define CHAR_MAP_characterset_0_15 146
-#define CHAR_MAP_characterset_1_15 147
-#define CHAR_MAP_characterset_2_15 148
-#define CHAR_MAP_characterset_3_15 149
-#define CHAR_MAP_characterset_4_15 150
-#define CHAR_MAP_characterset_5_15 151
-#define CHAR_MAP_characterset_6_15 152
-#define CHAR_MAP_characterset_7_15 153
-#define CHAR_MAP_characterset_0_16 154
-#define CHAR_MAP_characterset_1_16 155
-#define CHAR_MAP_characterset_2_16 156
-#define CHAR_MAP_characterset_3_16 157
-#define CHAR_MAP_characterset_4_16 158
-#define CHAR_MAP_characterset_5_16 159
-#define CHAR_MAP_characterset_6_16 160
-#define CHAR_MAP_characterset_0_17 161
-#define CHAR_MAP_characterset_2_17 162
-#define CHAR_MAP_characterset_0_19 163
+#define CHAR_MAP_characterset_11_11 123
+#define CHAR_MAP_characterset_12_11 124
+#define CHAR_MAP_characterset_13_11 125
+#define CHAR_MAP_characterset_14_11 126
+#define CHAR_MAP_characterset_0_12 127
+#define CHAR_MAP_characterset_1_12 128
+#define CHAR_MAP_characterset_2_12 129
+#define CHAR_MAP_characterset_3_12 130
+#define CHAR_MAP_characterset_4_12 131
+#define CHAR_MAP_characterset_5_12 132
+#define CHAR_MAP_characterset_6_12 133
+#define CHAR_MAP_characterset_7_12 134
+#define CHAR_MAP_characterset_8_12 135
+#define CHAR_MAP_characterset_9_12 136
+#define CHAR_MAP_characterset_0_13 137
+#define CHAR_MAP_characterset_1_13 138
+#define CHAR_MAP_characterset_2_13 139
+#define CHAR_MAP_characterset_3_13 140
+#define CHAR_MAP_characterset_0_14 141
+#define CHAR_MAP_characterset_1_14 142
+#define CHAR_MAP_characterset_2_14 143
+#define CHAR_MAP_characterset_3_14 144
+#define CHAR_MAP_characterset_4_14 145
+#define CHAR_MAP_characterset_5_14 146
+#define CHAR_MAP_characterset_6_14 147
+#define CHAR_MAP_characterset_7_14 148
+#define CHAR_MAP_characterset_8_14 149
+#define CHAR_MAP_characterset_0_15 150
+#define CHAR_MAP_characterset_1_15 151
+#define CHAR_MAP_characterset_2_15 152
+#define CHAR_MAP_characterset_3_15 153
+#define CHAR_MAP_characterset_4_15 154
+#define CHAR_MAP_characterset_5_15 155
+#define CHAR_MAP_characterset_6_15 156
+#define CHAR_MAP_characterset_7_15 157
+#define CHAR_MAP_characterset_0_16 158
+#define CHAR_MAP_characterset_1_16 159
+#define CHAR_MAP_characterset_2_16 160
+#define CHAR_MAP_characterset_3_16 161
+#define CHAR_MAP_characterset_4_16 162
+#define CHAR_MAP_characterset_5_16 163
+#define CHAR_MAP_characterset_6_16 164
+#define CHAR_MAP_characterset_0_17 165
+#define CHAR_MAP_characterset_2_17 166
+#define CHAR_MAP_characterset_0_19 167
 
 //EOF

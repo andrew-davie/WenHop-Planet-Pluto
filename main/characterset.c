@@ -150,10 +150,10 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_4_6),       // 121 CH_IMMOVABLE_FALLING -- same graphic as CH_IMMOVABLE, mirrors CH_ROCK/CH_ROCK_FALLING
     CH(CHAR_MAP_characterset_5_6),       // 122 CH_IMMOVABLE_FALLING_TOP
     CH(CHAR_MAP_characterset_6_6),       // 123 CH_IMMOVABLE_FALLING_BOTTOM
-    0,                                  // 124
-    0,                                  // 125
-    0,                                  // 126
-    0,                                  // 127
+    CH(CHAR_MAP_characterset_11_11),    // 124 CH_ROCK_SIDE_1
+    CH(CHAR_MAP_characterset_13_11),    // 125 CH_ROCK_SIDE_2
+    CH(CHAR_MAP_characterset_12_11),    // 126 CH_ROCK_SIDE_3
+    CH(CHAR_MAP_characterset_14_11),    // 127 CH_ROCK_SIDE_4
 
 
     // "Animated" chars that do not appear on the board but are displayed

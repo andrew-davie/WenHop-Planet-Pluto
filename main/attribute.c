@@ -135,10 +135,10 @@ const enum ObjectType CharToType[] = {
     TYPE_IMMOVABLE_FALLING,        // 121 CH_IMMOVABLE_FALLING
     TYPE_IMMOVABLE_FALLING,        // 122 CH_IMMOVABLE_FALLING_TOP
     TYPE_IMMOVABLE_FALLING,        // 123 CH_IMMOVABLE_FALLING_BOTTOM
-    0,                             // 124
-    0,                             // 125
-    0,                             // 126
-    0,                             // 127
+    TYPE_ROCK_ROLLING,             // 124 CH_ROCK_SIDE_1
+    TYPE_ROCK_ROLLING,             // 125 CH_ROCK_SIDE_2
+    TYPE_ROCK_ROLLING,             // 126 CH_ROCK_SIDE_3
+    TYPE_ROCK_ROLLING,             // 127 CH_ROCK_SIDE_4
 
     // chars 128 onwards are virtual
     // THESE SHOULD NOT BE CALLING CharToType !!!!
@@ -280,6 +280,7 @@ const unsigned int Attribute[] = {
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 56 TYPE_DOOR_OPEN (same walkable/exit bits as TYPE_OUTBOX, deliberately not TYPE_OUTBOX itself -- see its own comment)
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ |MAS| _ | _ | _ | _ | _ | _ |ROL| _ | _ |SHV, // 57 TYPE_IMMOVABLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ |CRU| _ | _ | _ | _ , // 58 TYPE_IMMOVABLE_FALLING
+    _ |PAD| _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 59 TYPE_ROCK_ROLLING
 // ---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---|---+---+---+
 
     // clang-format on

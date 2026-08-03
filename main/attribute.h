@@ -79,6 +79,11 @@ enum ObjectType {
     TYPE_IMMOVABLE,                 // 57
     TYPE_IMMOVABLE_FALLING,         // 58
 
+    // The 1-frame diagonal-roll transition (CH_ROCK_SIDE_1-4, attribute.h) a settled rock passes
+    // through when it rolls off something with ATT_ROLL underneath it instead of falling
+    // straight down -- see doRollRock()'s comment (board.c) for the full mechanic.
+    TYPE_ROCK_ROLLING,              // 59
+
     TYPE_MAX
 };
 
@@ -228,6 +233,16 @@ enum ChName {
     CH_IMMOVABLE_FALLING,         // 121
     CH_IMMOVABLE_FALLING_TOP,     // 122
     CH_IMMOVABLE_FALLING_BOTTOM,  // 123
+
+    // Diagonal-roll transition, same 1-frame-then-resolve idea as CH_DOGE_SIDE_1-4 but for a
+    // settled CH_ROCK rolling off an ATT_ROLL surface instead of a doge: _1/_2 are the departing
+    // (current) square for a roll right/left respectively, and become blank next scan; _3/_4 are
+    // the arriving square, and become the ordinary CH_ROCK_FALLING_TOP/BOTTOM pair next scan (so
+    // the rock immediately continues falling from its new column) -- see doRollRock() (board.c).
+    CH_ROCK_SIDE_1,               // 124
+    CH_ROCK_SIDE_2,               // 125
+    CH_ROCK_SIDE_3,               // 126
+    CH_ROCK_SIDE_4,               // 127
 
     // 127 is limit of board-resident character numbers
 

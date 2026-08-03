@@ -77,6 +77,7 @@ void genericPush(unsigned char *me, int row, int col, int offsetX, int offsetY);
 void genericPushReverse(unsigned char *me, int offsetX, int offsetY);
 void chainReact_Pipe(unsigned char *me);
 void doRoll(unsigned char *me, int row, int col);
+void doRollRock(unsigned char *me, int row, int col);
 void setInsulator(unsigned char *p, int row, int col);
 
 //------------------------------------------------------------------------------
@@ -609,10 +610,10 @@ static const unsigned short budget[128] = {
     _untimed_,    // 121 CH_IMMOVABLE_FALLING
     _untimed_,    // 122 CH_IMMOVABLE_FALLING_TOP
     _untimed_,    // 123 CH_IMMOVABLE_FALLING_BOTTOM
-    _untimed_,    // 124 (unused)
-    _untimed_,    // 125 (unused)
-    _untimed_,    // 126 (unused)
-    _untimed_,    // 127 (unused)
+    _untimed_,    // 124 CH_ROCK_SIDE_1
+    _untimed_,    // 125 CH_ROCK_SIDE_2
+    _untimed_,    // 126 CH_ROCK_SIDE_3
+    _untimed_,    // 127 CH_ROCK_SIDE_4
 };
 
 
@@ -1274,10 +1275,20 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     case CH_ROCK: {
         unsigned char *next = cursor.me + _BOARD_COLS;
-        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+        int attNext = Attribute[CharToType[GET(*next)]];
+
+        if (attNext & ATT_BLANK) {
             *next = FLAG(CH_ROCK_FALLING_BOTTOM);
             *cursor.me = FLAG(CH_ROCK_FALLING_TOP);
         }
+
+        // Can't fall straight down (whatever's below isn't blank), but if it's something a
+        // rock can roll off (ATT_ROLL -- another rock, a wall, concrete, etc, same convention
+        // TYPE_DOGE already uses above) and one side is open with room to keep falling past it,
+        // start rolling that way instead of just sitting there. See doRollRock()'s own comment.
+        else if (attNext & ATT_ROLL)
+            doRollRock(cursor.me, cursor.row, cursor.col);
+
         break;
     }
 
@@ -1320,6 +1331,21 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
     case CH_DOGE_SIDE_1:
     case CH_DOGE_SIDE_2:
         *cur->me = FLAG(CH_BLANK);
+        break;
+
+    case CH_ROCK_SIDE_1:
+    case CH_ROCK_SIDE_2:
+        *cur->me = FLAG(CH_BLANK);
+        break;
+
+    // Arrived in the new column -- re-enter the ordinary vertical-fall pipeline exactly as if
+    // support had just vanished from under a settled CH_ROCK (case CH_ROCK, above): TOP dissolves
+    // to dust next scan while BOTTOM (one row down, already confirmed clear or crushed by
+    // doRollRock()) becomes the real CH_ROCK_FALLING.
+    case CH_ROCK_SIDE_3:
+    case CH_ROCK_SIDE_4:
+        *cur->me = FLAG(CH_ROCK_FALLING_TOP);
+        *(cur->me + _BOARD_COLS) = FLAG(CH_ROCK_FALLING_BOTTOM);
         break;
 
     case CH_DOGE_SIDE_3:
@@ -1969,6 +1995,59 @@ void doRoll(unsigned char *me, int row, int col) {
                 }
 
                 *(sideDown) = FLAG(CH_BLANK);
+
+                int off = offset < 0 ? 4 : 0;
+
+                nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
+                nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
+                nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
+                nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+
+                return;
+            }
+        }
+    }
+}
+
+
+// A settled CH_ROCK that can't fall straight down (case CH_ROCK, above) but is resting on
+// something with ATT_ROLL tries each side in turn: if that side square is blank AND the square
+// diagonally below it is blank OR crushable, the rock commences a one-frame diagonal-roll
+// transition into that column (CH_ROCK_SIDE_1/2 here, CH_ROCK_SIDE_3/4 in the side square), which
+// then re-enters the ordinary fall pipeline from its new column next scan (case CH_ROCK_SIDE_3/4)
+// exactly as if it had just lost support underneath -- see their own comments. Same shape as
+// doRoll() (TYPE_DOGE's equivalent, above) but: (a) uses the rock's own transition characters
+// instead of doge's, and (b) also accepts a crushable landing spot, exploding it out of the way
+// rather than requiring it to already be blank -- a doge rolls off things gently, a multi-tonne
+// boulder does not.
+void doRollRock(unsigned char *me, int row, int col) {
+
+    for (int offset = -1; offset < 2; offset += 2) {
+
+        unsigned char *side = me + offset;
+        unsigned char sc = *side;
+        if (sc < FLAG_THISFRAME && (Attribute[CharToType[sc]] & ATT_BLANK)) {
+
+            unsigned char *sideDown = side + _BOARD_COLS;
+            unsigned char sd = *sideDown;
+            int attSideDown = Attribute[CharToType[sd]];
+
+            if (sd < FLAG_THISFRAME && (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
+
+                if (offset > 0) {
+                    *me = FLAG(CH_ROCK_SIDE_1);
+                    *(me + offset) = FLAG(CH_ROCK_SIDE_3);
+
+                } else {
+                    *me = FLAG(CH_ROCK_SIDE_2);
+                    *(me + offset) = FLAG(CH_ROCK_SIDE_4);
+                }
+
+                if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
+                    explode(sideDown, FLAG(CH_DUST_0));
+                    initParticles();
+                } else
+                    *(sideDown) = FLAG(CH_BLANK);
 
                 int off = offset < 0 ? 4 : 0;
 
