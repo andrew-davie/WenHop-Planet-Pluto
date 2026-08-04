@@ -820,7 +820,7 @@ void drawScore() {
             ADDAUDIO((millingTime >> 16) > 9 ? SFX_CLOCK : SFX_CLOCK_LOUD);
             char str[4];
             drawDecimalToString(str, '0', millingTime >> 16);
-            displayFloatingString(theCave->clockx, theCave->clocky, 60, str);
+            displayFloatingString(theCave->clockx, theCave->clocky, 60, str, false);
         }
     }
 

@@ -26,8 +26,7 @@ void processBoardSquares();
 void initBoard();
 void explode(unsigned char *where, unsigned char explosionShape);
 
-void displayFloatingString(int x, int y, int age, char *s);
-void displayFloatingStringCentered(int y, int age, char *s);
+void displayFloatingString(int x, int y, int age, char *s, bool centered);
 void displayFloatingNumber(int trixX, int trixY, int age, int value);
 
 // EOF

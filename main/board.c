@@ -7,7 +7,7 @@
 #include "animations.h"
 #include "attribute.h"
 #include "board.h"
-// #include "characterset.h"
+
 #include "colour.h"
 #include "decodeCaves.h"
 #include "gameState.h"
@@ -29,12 +29,14 @@
 // board.c's TYPE_MELLON_HUSK case ticks once per full board-scan (one tick every
 // SPEED_BASE real frames -- see setupBoardScanner()), i.e. ~12 ticks/sec at NTSC's 60fps.
 // 12 ticks ~= 1 second.
+
 #define TELEPORT_SWIRL_TICKS 12
 
 // Idle ambience for a teleport tile nobody's using: TYPE_TELEPORT is PH4 (attribute.c),
 // so this case is only reached ~3 times/sec per tile (1 of every 4 board scans, and full
 // scans run ~12/sec -- see TELEPORT_SWIRL_TICKS's comment above). 1-in-20 of those makes
 // a single spiral dot land roughly every 6-7 seconds on average -- occasional, not a swirl.
+
 #define TELEPORT_IDLE_SPARKLE_CHANCE 20
 
 
@@ -305,36 +307,25 @@ char convt(char ch) {
     return ch;
 }
 
-void displayFloatingString(int trixX, int trixY, int age, char *s) {
 
-    int len = 0;
-    char *w = s;
-    while (*w) {
-        len += widthOf(*w);
-        w++;
+void displayFloatingString(int trixX, int trixY, int age, char *s, bool centered) {
+
+    if (centered) {
+        int len = 0;
+        char *w = s;
+        while (*w) {
+            len += widthOf(*w);
+            w++;
+        }
+
+        trixX -= (len >> 1);
     }
-
-    // if (center)
-    //     trixX = (40 - len) >> 1;
 
     while (*s) {
         floatingCharacter(trixX, trixY, age, convt(*s));
         trixX += widthOf(*s);
         s++;
     }
-}
-
-
-void displayFloatingStringCentered(int trixY, int age, char *s) {
-
-    int len = 0;
-    char *w = s;
-    while (*w) {
-        len += widthOf(*w);
-        w++;
-    }
-
-    displayFloatingString((SCREEN_TRIX_X - len) >> 1, trixY, age, s);
 }
 
 
@@ -366,7 +357,7 @@ void setupBoardScanner() {
 
                 char str[6];
                 drawDecimalToString(str, '!', convertedGeodoge);
-                displayFloatingString(x, y, 50, str);
+                displayFloatingString(x, y, 50, str, false);
             }
 
             killAudio(SFX_UNCOVER);
@@ -812,8 +803,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         // (TELEPORT_SWIRL_PARTICLE_AGE, mellon.h) for a consistent look, just one dot instead
         // of a batch.
         if (!teleportLocked && !rangeRandom(TELEPORT_IDLE_SPARKLE_CHANCE))
-            nDots(1, cur->col, cur->row, PT_SPIRAL2, TELEPORT_SWIRL_PARTICLE_AGE, CHAR_CENTER_X, CHAR_CENTER_Y, 32,
-                  7);
+            nDots(1, cur->col, cur->row, PT_SPIRAL2, TELEPORT_SWIRL_PARTICLE_AGE, CHAR_CENTER_X, CHAR_CENTER_Y, 32, 7);
         break;
 
     case TYPE_DOGE: {
@@ -2043,21 +2033,28 @@ void doRoll(unsigned char *me, int row, int col) {
 }
 
 
-// Comic-style motion arc: 3 short-lived stationary dots on the side a rolling rock/geodoge
-// rolled IN FROM (trailSide, the opposite of the roll's direction of travel), tracing a shallow
-// curve through the cell. Speed 0 throughout -- see nDots()/drawParticles()'s "distance +=
-// speed" update -- so these never drift, they just sit at their spawn spot and fade, reading as
-// "something was just here" rather than another outward-flying spark (that's what the existing
-// PT_TWO burst in doRollRock()/doRollGeodoge() already does, on the opposite side). Ages are
-// short and fixed (no randomness) since this is meant as a quick one-frame-of-motion cue, not a
-// lingering effect.
+// Comic-style motion arc: 3 concentric arcs of short-lived stationary dots on the side a rolling
+// rock/geodoge rolled IN FROM (trailSide, the opposite of the roll's direction of travel), each
+// arc a copy of the same shallow curve shifted further out, like classic comic-book speed lines
+// stacked behind a rolling wheel. Speed 0 throughout -- see nDots()/drawParticles()'s "distance
+// += speed" update -- so these never drift, they just sit at their spawn spot and fade, reading
+// as "something was just here" rather than another outward-flying spark (that's what the
+// existing PT_TWO burst in doRollRock()/doRollGeodoge() already does, on the opposite side).
+// Ages are short and fixed (no randomness) since this is meant as a quick one-frame-of-motion
+// cue, not a lingering effect; farther-out arcs are given a little extra age so the whole trail
+// doesn't wink out in one frame.
 void doRollMotionArc(int col, int row, int trailSide) {
 
     int off = trailSide < 0 ? 4 : 0;
 
-    nDots(1, col, row, PT_TWO, 8, trailSide * 2 + off, 3, 0, 1);
-    nDots(1, col, row, PT_TWO, 11, trailSide * 4 + off, 5, 0, 1);
-    nDots(1, col, row, PT_TWO, 14, trailSide * 6 + off, 7, 0, 1);
+    for (int arc = 0; arc < 3; arc++) {
+        int radius = arc * 3;
+        int age = 8 + arc * 3;
+
+        nDots(1, col, row, PT_TWO, age, trailSide * (2 + radius) + off, 3, 0, 1);
+        nDots(1, col, row, PT_TWO, age + 3, trailSide * (4 + radius) + off, 5, 0, 1);
+        nDots(1, col, row, PT_TWO, age + 6, trailSide * (6 + radius) + off, 7, 0, 1);
+    }
 }
 
 
@@ -2070,7 +2067,8 @@ void doRollMotionArc(int col, int row, int trailSide) {
 // doRoll() (TYPE_DOGE's equivalent, above) but: (a) uses the rock's own transition characters
 // instead of doge's, and (b) also accepts a crushable landing spot, exploding it out of the way
 // rather than requiring it to already be blank -- a doge rolls off things gently, a multi-tonne
-// boulder does not.
+// rock does not.
+
 void doRollRock(unsigned char *me, int row, int col) {
 
     for (int offset = -1; offset < 2; offset += 2) {
@@ -2215,8 +2213,8 @@ void explode(unsigned char *where, unsigned char explosionShape) {
 
         else if (cellType == TYPE_DOOR)
             *cell = CH_DOOROPEN_STATIC;    // blast damage -- blown open instantly, no slide
-                                            // animation; static, not CH_DOOROPEN_0, so it doesn't
-                                            // flash forever either (see AnimateDoor's comment)
+                                           // animation; static, not CH_DOOROPEN_0, so it doesn't
+                                           // flash forever either (see AnimateDoor's comment)
     }
 
     FLASH(4, 4);

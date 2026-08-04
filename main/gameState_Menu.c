@@ -137,19 +137,19 @@ void VB_Menu() {
 }
 
 
-__attribute__((nonstring)) const char Level[][6] = {
+// __attribute__((nonstring)) const char Level[][6] = {
 
-    {""},          //
-    {"ARCTIC"},    //
-    {"LAVA;;"},    //
-    {"MOUNTS"},    //
-    {"COASTS"},    //
-    {"TROPIC"},    //
-    {"JUNGLE"},    //
-    {"PLAINS"},    //
-    {"OCEAN;"},    //
-    {"POLE;;"},    //
-};
+//     {""},          //
+//     {"ARCTIC"},    //
+//     {"LAVA;;"},    //
+//     {"MOUNTS"},    //
+//     {"COASTS"},    //
+//     {"TROPIC"},    //
+//     {"JUNGLE"},    //
+//     {"PLAINS"},    //
+//     {"OCEAN;"},    //
+//     {"POLE;;"},    //
+// };
 
 
 #include "../icc/icc.c"

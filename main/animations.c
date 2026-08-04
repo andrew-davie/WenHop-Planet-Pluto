@@ -21,7 +21,6 @@ const unsigned char AnimateCrackedBrick[] = {
 };
 
 
-
 const unsigned char AnimateBomb[] = {
 
     CH_BOMB, 0,
@@ -50,10 +49,7 @@ const unsigned char AnimateBomb[] = {
     CH_BLANK, 0,
 
     ANIM_LOOP,
-
 };
-
-
 
 
 const unsigned char AnimateStar[] = {
@@ -83,7 +79,6 @@ const unsigned char AnimateStarExplode[] = {
     CH_BLANK,3,
     CH_DOGE_04,3,
 
-
     CH_STAR,12,
     CH_DOGE_04,6,
     CH_BLANK,3,
@@ -102,10 +97,12 @@ const unsigned char AnimateRockBonus[] = {
 
 
 const unsigned char AnimateBelt[] = {
+
     CH_BELT_0, 12,
     CH_BELT_1, 12,
     ANIM_LOOP,
 };
+
 
 const unsigned char AnimatePebbleToGeoDoge[] = {
 
@@ -114,14 +111,13 @@ const unsigned char AnimatePebbleToGeoDoge[] = {
     ANIM_LOOP
 };
 
+
 const unsigned char AnimateRockPebble[] = {
 
     CH_ROCK_PEBBLE, 6,
     CH_GEODOGE, 3,
     ANIM_LOOP
 };
-
-
 
 
 const unsigned char AnimateBelt1[] = {
@@ -143,6 +139,7 @@ const unsigned char AnimateWaterFlow0[] = {
     ANIM_LOOP,
 };
 
+
 const unsigned char AnimateWaterFlow1[] = {
 
     CH_WATERFLOW_3, TRICKLE,
@@ -152,6 +149,7 @@ const unsigned char AnimateWaterFlow1[] = {
     CH_WATERFLOW_4, TRICKLE,
     ANIM_LOOP,
 };
+
 
 const unsigned char AnimateWaterFlow2[] = {
 
@@ -163,6 +161,7 @@ const unsigned char AnimateWaterFlow2[] = {
     ANIM_LOOP,
 };
 
+
 const unsigned char AnimateWaterFlow3[] = {
 
     CH_WATERFLOW_1, TRICKLE,
@@ -172,6 +171,7 @@ const unsigned char AnimateWaterFlow3[] = {
     CH_WATERFLOW_2, TRICKLE,
     ANIM_LOOP,
 };
+
 
 const unsigned char AnimateWaterFlow4[] = {
 
@@ -192,6 +192,7 @@ const unsigned char AnimateGrinder[] = {
 
     CH_GRINDER_0, 0
 };
+
 
 const unsigned char AnimateGrinder1[] = {
 
@@ -241,6 +242,7 @@ const unsigned char AnimFlashOut[] = {
 // Shared per-type like every other AnimateBase entry (see this table's own "animate in unison"
 // warning) -- if a level has more than one closed door, they all split open together the moment
 // any single one is triggered, not just the one actually interacted with.
+
 const unsigned char AnimateDoor[] = {
 
     CH_DOORCLOSED, 0,
@@ -248,6 +250,7 @@ const unsigned char AnimateDoor[] = {
     CH_DOORSLIDE_1, 14,
     CH_DOOROPEN_STATIC, 0,
 };
+
 
 // The reverse of AnimateDoor above -- used two ways: (1) the exit door (mellon.c's exit
 // trigger, via TYPE_OUTBOX) sliding shut once the player has faded almost to black
@@ -269,6 +272,7 @@ const unsigned char AnimateDoor[] = {
 // CH_DOORSLIDE_1's own comment), so holding it for longer doesn't read as a slow slide, it reads
 // as the animation freezing on a single unmoving frame for that whole stretch, then snapping
 // straight to closed. A short hold at least keeps it feeling like one continuous motion.
+
 const unsigned char AnimateDoorClose[] = {
 
     CH_DOOROPEN_STATIC, 0,
@@ -277,9 +281,10 @@ const unsigned char AnimateDoorClose[] = {
     CH_DOORCLOSED, 0,
 };
 
+
 const unsigned char AnimPulseDoge[] = {
 
-    CH_DOGE_00, 12, //ANIM_RNDSPEED,
+    CH_DOGE_00, 12,
     CH_DOGE_01, 8,
     CH_DOGE_02, 5,
     CH_DOGE_03, 4,
@@ -299,24 +304,13 @@ const unsigned char AnimMellonHusk[] = {
 
     // Note that mellon.c indexes into this with an offset so this must be kept synched
 
-    // CH_DUST_ROCK_0, 12,
-    // CH_DUST_ROCK_1, 6,
-    // CH_DUST_ROCK_2, 6,
-
     CH_DIRT, 5,
     CH_DUST_0,6,
-    // CH_BROKEN_DIRT, 3,
-    // CH_BROKEN_DIRT, 3,
+
     CH_DUST_1, 6,
     CH_DUST_2, 6,
 
     CH_BLANK, ANIM_HALT,
-
-    // @+2
-    // CH_DOGE_GRAB,8,
-    // CH_MELLON_HUSK, ANIM_HALT,
-
-    // @+2
 };
 
 
@@ -332,6 +326,7 @@ const unsigned char AnimMellonHusk[] = {
 // driveTeleportSpin() was separately forcing the fast cadence: both were writing
 // Animate[TYPE_TELEPORT]/AnimCount[TYPE_TELEPORT] every frame, and the two drifted out of sync
 // until the untouched auto-advance's slow 3-tick cadence became the one you could see.)
+
 const unsigned char AnimTeleport[] = {
     CH_TELEPORT, ANIM_HALT,
     CH_TELEPORT_1, ANIM_HALT,
@@ -343,12 +338,14 @@ const unsigned char AnimTeleport[] = {
     CH_TELEPORT_7, ANIM_HALT,
 };
 
+
 // clang-format on
 
 // Sole driver of TYPE_TELEPORT's animation, every frame, both speeds -- see AnimTeleport's own
 // comment for why processCharAnimations()/AnimateBase[] are deliberately kept out of this
 // entirely. fast is gameState_Game.c's teleportLocked -- true from the instant the player steps
 // onto the tile until initPlayer() clears it once the destination cave loads.
+
 #define TELEPORT_IDLE_HOLD_FRAMES 4    // "3 frame delay" idle cadence
 #define TELEPORT_FAST_HOLD_FRAMES 1    // one tick slower than every frame, which read as too fast
 
@@ -376,8 +373,6 @@ const unsigned char *const AnimateBase[] = {
 
     // SUPER CRITICAL:  *ALL* characters of the given type will animate in unison.
     //  You *CANNOT* use this to animate a just single character onscreen.
-
-    // Type numbers are IDs, not sequential — conditional compilation can break continuity.
 
     0,                      // 0 TYPE_BLANK
     0,                      // 1 TYPE_PLACEHOLDER
@@ -432,18 +427,19 @@ const unsigned char *const AnimateBase[] = {
     0,                      // 50 TYPE_CONCRETE
     0,                      // 51 TYPE_TELEPORT -- driveTeleportSpin() owns this one entirely
                             // (below); deliberately not wired in here, see its own comment
-    0,                      // 52 TYPE_KEY -- no animation
+    0,                      // 52 TYPE_KEY
     AnimateDoorClose,       // 53 TYPE_DOOR_OPEN -- idle landing pad only (frame 0, holds forever,
                             // same as TYPE_OUTBOX uses it); needs a real AnimateBase entry (not 0)
                             // so processCharAnimations() actually services this type at all -- see
                             // board.c's teleport-departure trigger and CH_DOOROPEN_STATIC case
     0,                      // 54 TYPE_IMMOVABLE -- no animation, static like TYPE_ROCK
     0,                      // 55 TYPE_IMMOVABLE_FALLING
-    0,                      // 56 TYPE_ROCK_ROLLING -- no animation, same as TYPE_DOGE_FALLING2
-    0,                      // 57 TYPE_GEODOGE_ROLLING -- same
+    0,                      // 56 TYPE_ROCK_ROLLING
+    0,                      // 57 TYPE_GEODOGE_ROLLING
 };
 
 _Static_assert(sizeof(AnimateBase) / sizeof(AnimateBase[0]) == TYPE_MAX, "AnimateBase table wrong size");
+
 
 const unsigned char PickupCharacter[] = {
 
@@ -501,11 +497,10 @@ const unsigned char PickupCharacter[] = {
     0,                // 51 TYPE_TELEPORT
     0,                // 52 TYPE_KEY -- auto-grabbed by walking onto it (mellon.c), not fire-button-yankable
     0,                // 53 TYPE_DOOR_OPEN
-    0,                // 54 TYPE_IMMOVABLE -- can't be fire-button picked up, per its own name
+    0,                // 54 TYPE_IMMOVABLE
     0,                // 55 TYPE_IMMOVABLE_FALLING
-    0,                // 56 TYPE_ROCK_ROLLING -- transitional only, never fire-button-yankable
-    0,                // 57 TYPE_GEODOGE_ROLLING -- same
-
+    0,                // 56 TYPE_ROCK_ROLLING
+    0,                // 57 TYPE_GEODOGE_ROLLING
 };
 
 _Static_assert(sizeof(PickupCharacter) / sizeof(PickupCharacter[0]) == TYPE_MAX, "PickupCharacter table wrong size");
@@ -526,7 +521,6 @@ void startCharAnimation(int type, const unsigned char *idx) {
 
         Animate[type] = idx++;
         AnimCount[type] = *idx;
-
     }
 }
 

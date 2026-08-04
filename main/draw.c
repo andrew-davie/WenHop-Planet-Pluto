@@ -84,6 +84,7 @@ const struct FONT {
     const unsigned char *const *asciiTable;
     const unsigned char *charWidths;
 } fonts[] = {
+
     {FONT_STANDARD, ALPHANUMERIC_FONT_HEIGHT, alphanumeric_asciiTable, alphanumeric_charWidths},
     {FONT_COMPACT, FONTCOMPACT_FONT_HEIGHT, fontcompact_asciiTable, fontcompact_charWidths},
     {FONT_LARGE, FONTLARGE_FONT_HEIGHT, fontlarge_asciiTable, fontlarge_charWidths},
@@ -590,11 +591,10 @@ void drawAttachedChar(int ch) {
 
     // ch is always `attachment` (mellon.c), which is never flagged with FLAG_THISFRAME -- see
     // its declaration -- so no GET() needed here.
-    int type = CharToType[ch];
 
+    int type = CharToType[ch];
     if (Animate[type])
         ch = *Animate[type];
-
 
     int ay = 0;
     int autoY = autoMoveY;
@@ -614,6 +614,7 @@ void drawAttachedChar(int ch) {
         // exactly which side the player is pushing from) until movePlayer() commits it into
         // shoveDestCell once the walk-in glide finishes. attachmentOffset is deliberately left
         // untouched/unused here -- see attachmentIsShove's own comment (mellon.c).
+
         offsetY = 0;
         offsetX = (faceDirection == FACE_LEFT) ? CHAR_TRIX_X : -CHAR_TRIX_X;
     }
@@ -641,6 +642,7 @@ void drawAttachedChar(int ch) {
     // door's departure (exitDepartOriginX/Y, mellon.c) is the same idea for the same reason --
     // separate storage, separate trigger (exitMode instead of teleportLocked), but otherwise an
     // exact mirror.
+
     int baseX = playerX;
     int baseY = playerY;
     int glideX = autoMoveX;
@@ -661,6 +663,7 @@ void drawAttachedChar(int ch) {
         // the key is still settling into the door, so pin the draw to doorUnlockOriginX/Y
         // (mellon.c's startDoorUnlock()) rather than the player's own now-possibly-moving
         // playerX/playerY, same reasoning as teleportDepartOriginX/Y.
+
         baseX = doorUnlockOriginX;
         baseY = doorUnlockOriginY;
         glideX = 0;
@@ -677,6 +680,7 @@ void drawAttachedChar(int ch) {
     // (this coprocessor has none -- see swipe.c's isqrt() comment); harmless since the lift is 0
     // well before the residual few percent would be visible. A no-op outside both arrival
     // windows (both return 0), same as the departure correction above is outside departure.
+
     offsetY -= (offsetY * (teleportCarryLift() + doorCarryLift())) >> 4;
 
     int y = baseY * CHAR_Y - (scrollY >> 16) * 3 + glideY /*- 20 + 1*/ - (shakeY >> 16) + offsetY;

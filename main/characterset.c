@@ -7,6 +7,8 @@
 static unsigned char char_parallaxBlank[CHAR_Y];
 
 
+// clang-format off
+
 // The teleport tile's 8-frame spinning-spoke cycle (3 bent spokes, no outer rim, 8 rotations 15
 // degrees apart -- 3-fold spoke symmetry x 15 degrees/frame = 120 degrees over 8 frames, i.e.
 // exactly a third of a full turn, so the loop is seamless) lives as real pixels in
@@ -137,131 +139,132 @@ const unsigned char *const charSet[] = {
     CH(CHAR_MAP_characterset_4_4),      // 108 CH_BOMB
     CH(CHAR_MAP_characterset_8_4),      // 109 CH_CRACKED_BRICK
     CH(CHAR_MAP_characterset_0_3),      // 110 CH_CONCRETE
-    CH(CHAR_MAP_characterset_0_15),      // 111 CH_TELEPORT (spinning-spoke cycle, frame 0)
-    CH(CHAR_MAP_characterset_3_2),       // 112 CH_KEY
-    CH(CHAR_MAP_characterset_2_17),      // 113 CH_DOOROPEN_STATIC -- same graphic as CH_DOOROPEN_0
-    CH(CHAR_MAP_characterset_4_6),       // 114 CH_IMMOVABLE
-    CH(CHAR_MAP_characterset_4_6),       // 115 CH_IMMOVABLE_FALLING -- same graphic as CH_IMMOVABLE, mirrors CH_ROCK/CH_ROCK_FALLING
-    CH(CHAR_MAP_characterset_5_6),       // 116 CH_IMMOVABLE_FALLING_TOP
-    CH(CHAR_MAP_characterset_6_6),       // 117 CH_IMMOVABLE_FALLING_BOTTOM
+    CH(CHAR_MAP_characterset_0_15),     // 111 CH_TELEPORT (spinning-spoke cycle, frame 0)
+    CH(CHAR_MAP_characterset_3_2),      // 112 CH_KEY
+    CH(CHAR_MAP_characterset_2_17),     // 113 CH_DOOROPEN_STATIC -- same graphic as CH_DOOROPEN_0
+    CH(CHAR_MAP_characterset_4_6),      // 114 CH_IMMOVABLE
+    CH(CHAR_MAP_characterset_4_6),      // 115 CH_IMMOVABLE_FALLING -- same graphic as CH_IMMOVABLE, mirrors
+                                        // CH_ROCK/CH_ROCK_FALLING
+    CH(CHAR_MAP_characterset_5_6),      // 116 CH_IMMOVABLE_FALLING_TOP
+    CH(CHAR_MAP_characterset_6_6),      // 117 CH_IMMOVABLE_FALLING_BOTTOM
     CH(CHAR_MAP_characterset_11_11),    // 118 CH_ROCK_SIDE_1
     CH(CHAR_MAP_characterset_13_11),    // 119 CH_ROCK_SIDE_2
     CH(CHAR_MAP_characterset_12_11),    // 120 CH_ROCK_SIDE_3
     CH(CHAR_MAP_characterset_14_11),    // 121 CH_ROCK_SIDE_4
-    CH(CHAR_MAP_characterset_13_2),      // 122 CH_GEODOGE_SIDE_1
-    CH(CHAR_MAP_characterset_14_1),      // 123 CH_GEODOGE_SIDE_2
-    CH(CHAR_MAP_characterset_14_2),      // 124 CH_GEODOGE_SIDE_3
-    CH(CHAR_MAP_characterset_13_1),      // 125 CH_GEODOGE_SIDE_4
-    0,                                   // 126 (unused)
-    0,                                   // 127 (unused)
-
+    CH(CHAR_MAP_characterset_13_2),     // 122 CH_GEODOGE_SIDE_1
+    CH(CHAR_MAP_characterset_14_1),     // 123 CH_GEODOGE_SIDE_2
+    CH(CHAR_MAP_characterset_14_2),     // 124 CH_GEODOGE_SIDE_3
+    CH(CHAR_MAP_characterset_13_1),     // 125 CH_GEODOGE_SIDE_4
+    0,                                  // 126 (unused)
+    0,                                  // 127 (unused)
 
     // "Animated" chars that do not appear on the board but are displayed
     // We do not need these to be < 128
 
-    CH(CHAR_MAP_characterset_7_12),    // 128 CH_DOGE_01
-    CH(CHAR_MAP_characterset_8_12),    // 129 CH_DOGE_02
-    CH(CHAR_MAP_characterset_9_5),     // 130 CH_DOGE_03
-    CH(CHAR_MAP_characterset_10_5),    // 131 CH_DOGE_04
-    CH(CHAR_MAP_characterset_14_5),    // 132 CH_DOGE_05
+    CH(CHAR_MAP_characterset_7_12),     // 128 CH_DOGE_01
+    CH(CHAR_MAP_characterset_8_12),     // 129 CH_DOGE_02
+    CH(CHAR_MAP_characterset_9_5),      // 130 CH_DOGE_03
+    CH(CHAR_MAP_characterset_10_5),     // 131 CH_DOGE_04
+    CH(CHAR_MAP_characterset_14_5),     // 132 CH_DOGE_05
 
-    CH(CHAR_MAP_characterset_9_4),     // 133 CH_CRACKED_BRICK_1
-    CH(CHAR_MAP_characterset_10_4),    // 134 CH_CRACKED_BRICK_2
-    CH(CHAR_MAP_characterset_11_4),    // 135 CH_CRACKED_BRICK_3
-    CH(CHAR_MAP_characterset_12_4),    // 136 CH_CRACKED_BRICK_4
-    CH(CHAR_MAP_characterset_13_4),    // 137 CH_CRACKED_BRICK_5
-    CH(CHAR_MAP_characterset_14_4),    // 138 CH_CRACKED_BRICK_6
-    CH(CHAR_MAP_characterset_15_4),    // 139 CH_CRACKED_BRICK_7
+    CH(CHAR_MAP_characterset_9_4),      // 133 CH_CRACKED_BRICK_1
+    CH(CHAR_MAP_characterset_10_4),     // 134 CH_CRACKED_BRICK_2
+    CH(CHAR_MAP_characterset_11_4),     // 135 CH_CRACKED_BRICK_3
+    CH(CHAR_MAP_characterset_12_4),     // 136 CH_CRACKED_BRICK_4
+    CH(CHAR_MAP_characterset_13_4),     // 137 CH_CRACKED_BRICK_5
+    CH(CHAR_MAP_characterset_14_4),     // 138 CH_CRACKED_BRICK_6
+    CH(CHAR_MAP_characterset_15_4),     // 139 CH_CRACKED_BRICK_7
 
-    CH2(CHAR_MAP_0to9_0_1),    // 140 CH_0
-    CH2(CHAR_MAP_0to9_1_1),    // 141 CH_1
-    CH2(CHAR_MAP_0to9_2_1),    // 142 CH_2
-    CH2(CHAR_MAP_0to9_3_1),    // 143 CH_3
-    CH2(CHAR_MAP_0to9_4_1),    // 144 CH_4
-    CH2(CHAR_MAP_0to9_5_1),    // 145 CH_5
-    CH2(CHAR_MAP_0to9_6_1),    // 146 CH_6
-    CH2(CHAR_MAP_0to9_7_1),    // 147 CH_7
-    CH2(CHAR_MAP_0to9_8_1),    // 148 CH_8
-    CH2(CHAR_MAP_0to9_9_1),    // 149 CH_9
+    CH2(CHAR_MAP_0to9_0_1),             // 140 CH_0
+    CH2(CHAR_MAP_0to9_1_1),             // 141 CH_1
+    CH2(CHAR_MAP_0to9_2_1),             // 142 CH_2
+    CH2(CHAR_MAP_0to9_3_1),             // 143 CH_3
+    CH2(CHAR_MAP_0to9_4_1),             // 144 CH_4
+    CH2(CHAR_MAP_0to9_5_1),             // 145 CH_5
+    CH2(CHAR_MAP_0to9_6_1),             // 146 CH_6
+    CH2(CHAR_MAP_0to9_7_1),             // 147 CH_7
+    CH2(CHAR_MAP_0to9_8_1),             // 148 CH_8
+    CH2(CHAR_MAP_0to9_9_1),             // 149 CH_9
 
-    CH2(CHAR_MAP_0to9_0_3),    // 150 CH_A
-    CH2(CHAR_MAP_0to9_1_3),    // 151 CH_B
-    CH2(CHAR_MAP_0to9_2_3),    // 152 CH_C
-    CH2(CHAR_MAP_0to9_3_3),    // 153 CH_D
-    CH2(CHAR_MAP_0to9_4_3),    // 154 CH_E
-    CH2(CHAR_MAP_0to9_5_3),    // 155 CH_F
-    CH2(CHAR_MAP_0to9_6_3),    // 156 CH_G
-    CH2(CHAR_MAP_0to9_7_3),    // 157 CH_H
-    CH2(CHAR_MAP_0to9_8_3),    // 158 CH_I
-    CH2(CHAR_MAP_0to9_9_3),    // 159 CH_J
-    CH2(CHAR_MAP_0to9_0_4),    // 160 CH_K
-    CH2(CHAR_MAP_0to9_1_4),    // 161 CH_L
-    CH2(CHAR_MAP_0to9_2_4),    // 162 CH_M
-    CH2(CHAR_MAP_0to9_3_4),    // 163 CH_N
-    CH2(CHAR_MAP_0to9_4_4),    // 164 CH_O
-    CH2(CHAR_MAP_0to9_5_4),    // 165 CH_P
-    CH2(CHAR_MAP_0to9_6_4),    // 166 CH_Q
-    CH2(CHAR_MAP_0to9_7_4),    // 167 CH_R
-    CH2(CHAR_MAP_0to9_8_4),    // 168 CH_S
-    CH2(CHAR_MAP_0to9_9_4),    // 169 CH_T
-    CH2(CHAR_MAP_0to9_0_5),    // 170 CH_U
-    CH2(CHAR_MAP_0to9_1_5),    // 171 CH_V
-    CH2(CHAR_MAP_0to9_2_5),    // 172 CH_W
-    CH2(CHAR_MAP_0to9_3_5),    // 173 CH_X
-    CH2(CHAR_MAP_0to9_4_5),    // 174 CH_Y
-    CH2(CHAR_MAP_0to9_5_5),    // 175 CH_Z
+    CH2(CHAR_MAP_0to9_0_3),             // 150 CH_A
+    CH2(CHAR_MAP_0to9_1_3),             // 151 CH_B
+    CH2(CHAR_MAP_0to9_2_3),             // 152 CH_C
+    CH2(CHAR_MAP_0to9_3_3),             // 153 CH_D
+    CH2(CHAR_MAP_0to9_4_3),             // 154 CH_E
+    CH2(CHAR_MAP_0to9_5_3),             // 155 CH_F
+    CH2(CHAR_MAP_0to9_6_3),             // 156 CH_G
+    CH2(CHAR_MAP_0to9_7_3),             // 157 CH_H
+    CH2(CHAR_MAP_0to9_8_3),             // 158 CH_I
+    CH2(CHAR_MAP_0to9_9_3),             // 159 CH_J
+    CH2(CHAR_MAP_0to9_0_4),             // 160 CH_K
+    CH2(CHAR_MAP_0to9_1_4),             // 161 CH_L
+    CH2(CHAR_MAP_0to9_2_4),             // 162 CH_M
+    CH2(CHAR_MAP_0to9_3_4),             // 163 CH_N
+    CH2(CHAR_MAP_0to9_4_4),             // 164 CH_O
+    CH2(CHAR_MAP_0to9_5_4),             // 165 CH_P
+    CH2(CHAR_MAP_0to9_6_4),             // 166 CH_Q
+    CH2(CHAR_MAP_0to9_7_4),             // 167 CH_R
+    CH2(CHAR_MAP_0to9_8_4),             // 168 CH_S
+    CH2(CHAR_MAP_0to9_9_4),             // 169 CH_T
+    CH2(CHAR_MAP_0to9_0_5),             // 170 CH_U
+    CH2(CHAR_MAP_0to9_1_5),             // 171 CH_V
+    CH2(CHAR_MAP_0to9_2_5),             // 172 CH_W
+    CH2(CHAR_MAP_0to9_3_5),             // 173 CH_X
+    CH2(CHAR_MAP_0to9_4_5),             // 174 CH_Y
+    CH2(CHAR_MAP_0to9_5_5),             // 175 CH_Z
 
-    CH2(CHAR_MAP_0to9_0_7),    // 176 CH_A
-    CH2(CHAR_MAP_0to9_1_7),    // 177 CH_B
-    CH2(CHAR_MAP_0to9_2_7),    // 178 CH_C
-    CH2(CHAR_MAP_0to9_3_7),    // 179 CH_D
-    CH2(CHAR_MAP_0to9_4_7),    // 180 CH_E
-    CH2(CHAR_MAP_0to9_5_7),    // 181 CH_F
-    CH2(CHAR_MAP_0to9_6_7),    // 182 CH_G
-    CH2(CHAR_MAP_0to9_7_7),    // 183 CH_H
-    CH2(CHAR_MAP_0to9_8_7),    // 184 CH_I
-    CH2(CHAR_MAP_0to9_9_7),    // 185 CH_J
-    CH2(CHAR_MAP_0to9_0_8),    // 186 CH_K
-    CH2(CHAR_MAP_0to9_1_8),    // 187 CH_L
-    CH2(CHAR_MAP_0to9_2_8),    // 188 CH_M
-    CH2(CHAR_MAP_0to9_3_8),    // 189 CH_N
-    CH2(CHAR_MAP_0to9_4_8),    // 190 CH_O
-    CH2(CHAR_MAP_0to9_5_8),    // 191 CH_P
-    CH2(CHAR_MAP_0to9_6_8),    // 192 CH_Q
-    CH2(CHAR_MAP_0to9_7_8),    // 193 CH_R
-    CH2(CHAR_MAP_0to9_8_8),    // 194 CH_S
-    CH2(CHAR_MAP_0to9_9_8),    // 195 CH_T
-    CH2(CHAR_MAP_0to9_0_9),    // 196 CH_U
-    CH2(CHAR_MAP_0to9_1_9),    // 197 CH_V
-    CH2(CHAR_MAP_0to9_2_9),    // 198 CH_W
-    CH2(CHAR_MAP_0to9_3_9),    // 199 CH_X
-    CH2(CHAR_MAP_0to9_4_9),    // 200 CH_Y
-    CH2(CHAR_MAP_0to9_5_9),    // 201 CH_Z
+    CH2(CHAR_MAP_0to9_0_7),             // 176 CH_A
+    CH2(CHAR_MAP_0to9_1_7),             // 177 CH_B
+    CH2(CHAR_MAP_0to9_2_7),             // 178 CH_C
+    CH2(CHAR_MAP_0to9_3_7),             // 179 CH_D
+    CH2(CHAR_MAP_0to9_4_7),             // 180 CH_E
+    CH2(CHAR_MAP_0to9_5_7),             // 181 CH_F
+    CH2(CHAR_MAP_0to9_6_7),             // 182 CH_G
+    CH2(CHAR_MAP_0to9_7_7),             // 183 CH_H
+    CH2(CHAR_MAP_0to9_8_7),             // 184 CH_I
+    CH2(CHAR_MAP_0to9_9_7),             // 185 CH_J
+    CH2(CHAR_MAP_0to9_0_8),             // 186 CH_K
+    CH2(CHAR_MAP_0to9_1_8),             // 187 CH_L
+    CH2(CHAR_MAP_0to9_2_8),             // 188 CH_M
+    CH2(CHAR_MAP_0to9_3_8),             // 189 CH_N
+    CH2(CHAR_MAP_0to9_4_8),             // 190 CH_O
+    CH2(CHAR_MAP_0to9_5_8),             // 191 CH_P
+    CH2(CHAR_MAP_0to9_6_8),             // 192 CH_Q
+    CH2(CHAR_MAP_0to9_7_8),             // 193 CH_R
+    CH2(CHAR_MAP_0to9_8_8),             // 194 CH_S
+    CH2(CHAR_MAP_0to9_9_8),             // 195 CH_T
+    CH2(CHAR_MAP_0to9_0_9),             // 196 CH_U
+    CH2(CHAR_MAP_0to9_1_9),             // 197 CH_V
+    CH2(CHAR_MAP_0to9_2_9),             // 198 CH_W
+    CH2(CHAR_MAP_0to9_3_9),             // 199 CH_X
+    CH2(CHAR_MAP_0to9_4_9),             // 200 CH_Y
+    CH2(CHAR_MAP_0to9_5_9),             // 201 CH_Z
 
-    CH2(CHAR_MAP_0to9_0_2),    // 202 CH_PLUS
+    CH2(CHAR_MAP_0to9_0_2),             // 202 CH_PLUS
 
-    CH2(CHAR_MAP_0to9_0_0),    // 203 CH_BIG_0
-    CH2(CHAR_MAP_0to9_1_0),    // 204 CH_BIG_1
-    CH2(CHAR_MAP_0to9_2_0),    // 205 CH_BIG_2
-    CH2(CHAR_MAP_0to9_3_0),    // 206 CH_BIG_3
-    CH2(CHAR_MAP_0to9_4_0),    // 207 CH_BIG_4
-    CH2(CHAR_MAP_0to9_5_0),    // 208 CH_BIG_5
-    CH2(CHAR_MAP_0to9_6_0),    // 209 CH_BIG_6
-    CH2(CHAR_MAP_0to9_7_0),    // 210 CH_BIG_7
-    CH2(CHAR_MAP_0to9_8_0),    // 211 CH_BIG_8
-    CH2(CHAR_MAP_0to9_9_0),    // 212 CH_BIG_9
+    CH2(CHAR_MAP_0to9_0_0),             // 203 CH_BIG_0
+    CH2(CHAR_MAP_0to9_1_0),             // 204 CH_BIG_1
+    CH2(CHAR_MAP_0to9_2_0),             // 205 CH_BIG_2
+    CH2(CHAR_MAP_0to9_3_0),             // 206 CH_BIG_3
+    CH2(CHAR_MAP_0to9_4_0),             // 207 CH_BIG_4
+    CH2(CHAR_MAP_0to9_5_0),             // 208 CH_BIG_5
+    CH2(CHAR_MAP_0to9_6_0),             // 209 CH_BIG_6
+    CH2(CHAR_MAP_0to9_7_0),             // 210 CH_BIG_7
+    CH2(CHAR_MAP_0to9_8_0),             // 211 CH_BIG_8
+    CH2(CHAR_MAP_0to9_9_0),             // 212 CH_BIG_9
 
-    CH(CHAR_MAP_characterset_1_15),    // 213 CH_TELEPORT_1
-    CH(CHAR_MAP_characterset_2_15),    // 214 CH_TELEPORT_2
-    CH(CHAR_MAP_characterset_3_15),    // 215 CH_TELEPORT_3
-    CH(CHAR_MAP_characterset_4_15),    // 216 CH_TELEPORT_4
-    CH(CHAR_MAP_characterset_5_15),    // 217 CH_TELEPORT_5
-    CH(CHAR_MAP_characterset_6_15),    // 218 CH_TELEPORT_6
-    CH(CHAR_MAP_characterset_7_15),    // 219 CH_TELEPORT_7
+    CH(CHAR_MAP_characterset_1_15),     // 213 CH_TELEPORT_1
+    CH(CHAR_MAP_characterset_2_15),     // 214 CH_TELEPORT_2
+    CH(CHAR_MAP_characterset_3_15),     // 215 CH_TELEPORT_3
+    CH(CHAR_MAP_characterset_4_15),     // 216 CH_TELEPORT_4
+    CH(CHAR_MAP_characterset_5_15),     // 217 CH_TELEPORT_5
+    CH(CHAR_MAP_characterset_6_15),     // 218 CH_TELEPORT_6
+    CH(CHAR_MAP_characterset_7_15),     // 219 CH_TELEPORT_7
 
-    CH(CHAR_MAP_characterset_0_17),    // 220 CH_DOORSLIDE_1
+    CH(CHAR_MAP_characterset_0_17),     // 220 CH_DOORSLIDE_1
 };
 
 _Static_assert(sizeof(charSet) / sizeof(charSet[0]) == CH_MAX, "charSet table wrong size");
 
+// clang-format on
 // EOF

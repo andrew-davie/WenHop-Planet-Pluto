@@ -14,7 +14,6 @@
 #include "random.h"
 #include "scroll.h"
 #include "sound.h"
-#include "swipe.h"
 #include "wyrm.h"
 
 /* **************************************** */
@@ -97,7 +96,7 @@ void decodeCave(int newCave) {
 
     if (theCave->water) {    // as if a CH_WATER tile had been placed at this line
         showWater = true;
-        liquidTrixel_8 = theCave->water << 8;    // low 8 bits are fractional
+        liquidTrixel_8 = theCave->water << 8;
     }
 
     decodingRow = 0;

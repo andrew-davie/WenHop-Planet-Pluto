@@ -247,16 +247,23 @@ void drawScreen() {
             // "obviously" fewer dispatches -- the 5x code-size growth costs
             // more in instruction-fetch than the per-iteration branch saves.
             // Keep the dispatch here, inside the loop, at this size.
-            //
-            // This had been left disabled (falling through to the plain
-            // variable shift below, the exact thing this comment argues
-            // against) -- re-enabled to match what was actually measured.
+
             switch (shift) {
-            case 1: packed >>= 1; break;
-            case 2: packed >>= 2; break;
-            case 3: packed >>= 3; break;
-            case 4: packed >>= 4; break;
-            default: packed >>= 5; break;
+            case 1:
+                packed >>= 1;
+                break;
+            case 2:
+                packed >>= 2;
+                break;
+            case 3:
+                packed >>= 3;
+                break;
+            case 4:
+                packed >>= 4;
+                break;
+            default:
+                packed >>= 5;
+                break;
             }
 
             *(pfL + (_BUFFER_SIZE << 1)) = reverseBits[(unsigned char)(packed >> 20)];    // PF2_LEFT
@@ -381,13 +388,24 @@ void drawScreenMirror(int buffer) {
             // into a compile-time-constant immediate. Unlike drawScreen()'s
             // version of this switch, this one hasn't itself been measured
             // on hardware -- PENDING HARDWARE MEASUREMENT.
+
             unsigned int px32;
             switch (shift) {
-            case 1: px32 = (unsigned int)(packed >> 1); break;
-            case 2: px32 = (unsigned int)(packed >> 2); break;
-            case 3: px32 = (unsigned int)(packed >> 3); break;
-            case 4: px32 = (unsigned int)(packed >> 4); break;
-            default: px32 = (unsigned int)(packed >> 5); break;
+            case 1:
+                px32 = (unsigned int)(packed >> 1);
+                break;
+            case 2:
+                px32 = (unsigned int)(packed >> 2);
+                break;
+            case 3:
+                px32 = (unsigned int)(packed >> 3);
+                break;
+            case 4:
+                px32 = (unsigned int)(packed >> 4);
+                break;
+            default:
+                px32 = (unsigned int)(packed >> 5);
+                break;
             }
 
             pf[0] = px32 >> 24;                                             // PF1_LEFT  (direct)

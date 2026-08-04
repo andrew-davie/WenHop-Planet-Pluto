@@ -4,6 +4,11 @@
 
 #include "gameState.h"
 
+struct dataStreams {
+    unsigned char dataStream;
+    unsigned short buffer;
+};
+
 
 #define _WENHOP_SK_ID _SK_GAME_ID
 #define GROUPING 10
@@ -63,10 +68,10 @@ extern int armCycles;
 extern unsigned int rand;
 extern unsigned char colubk;
 extern int level;
-extern int millingTime;      // negative = expired
+extern int millingTime;        // negative = expired
 extern int levelLabelTicks;    // frames left showing the level-start ID string (schedule.c) --
-                                // drawScore() (score.c) holds millingTime frozen and hides the
-                                // time string while this is nonzero
+                               // drawScore() (score.c) holds millingTime frozen and hides the
+                               // time string while this is nonzero
 extern int doges;
 extern int time;
 extern int liquidTrixel_8;
@@ -147,23 +152,11 @@ extern unsigned short debug[];
 void ClearChannel(void *ptr);
 void MemCopy32(void *ptr1, void *ptr2, unsigned int count);
 void Random(unsigned int count);
-
 void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAddress, int length);
-
 void setGameState(enum GAME_STATE state);
-
-int dirFromCoords(int x, int y, int prevX, int prevY);
 void initNewGame();
-
-struct dataStreams {
-    unsigned char dataStream;
-    unsigned short buffer;
-};
-
-
 void initDataStreams(const struct dataStreams *streams, int streamCount);
-
 void setShake(int time);
-
+int dirFromCoords(int x, int y, int prevX, int prevY);
 
 // EOF

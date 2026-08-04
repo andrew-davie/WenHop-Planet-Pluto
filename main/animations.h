@@ -9,7 +9,7 @@
 
 extern const unsigned char *const AnimateBase[];
 extern const unsigned char PickupCharacter[];
-extern const unsigned char *Animate[];
+extern const unsigned char *Animate[];    // TODO: *const?
 
 void initCharAnimations();
 void startCharAnimation(int type, const unsigned char *idx);

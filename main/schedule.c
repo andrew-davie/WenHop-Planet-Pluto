@@ -35,7 +35,8 @@ void scheduleUnpackCave() {
     // enough budget this frame" into "unlimited budget this frame" (see the equivalent fix and
     // comment on scheduleInitState()'s own margin check, main.c). Checked explicitly first so a
     // too-small budget always skips decoding this frame rather than decoding with no real limit.
-    while (availableIdleTime > 20000 && T1TC < availableIdleTime - 20000)    // <-- arbitrary time allowance for slowest cave decode
+    while (availableIdleTime > 20000 &&
+           T1TC < availableIdleTime - 20000)    // <-- arbitrary time allowance for slowest cave decode
         if (!decodeExplicitData()) {
 
             if (!totalDogePossible)
@@ -47,7 +48,8 @@ void scheduleUnpackCave() {
             levelLabelTicks = LEVEL_LABEL_TICKS;
             // Halfway between the top of the screen and true mid-screen (CHAR_TRIX_Y accounts
             // for the glyph's own height, same as the old vertically-centred position did).
-            displayFloatingStringCentered((SCREEN_TRIX_Y - CHAR_TRIX_Y) >> 2, LEVEL_LABEL_TICKS, label);
+            displayFloatingString(SCREEN_TRIX_X >> 1, (SCREEN_TRIX_Y - CHAR_TRIX_Y) >> 2, LEVEL_LABEL_TICKS, label,
+                                  true);
 
             setSchedule(SCHEDULE_START_SCAN);
 

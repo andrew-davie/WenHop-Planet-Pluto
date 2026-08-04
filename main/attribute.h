@@ -67,28 +67,30 @@ enum ObjectType {
     // (that flash is fine for the real level exit, but reads as a bug on an ordinary unlocked
     // door). Also skipped by board.c's per-visit CH_DOOROPEN_0 FLASH()/particle case, for the
     // same reason -- see CH_DOOROPEN_STATIC's own comment.
-    TYPE_DOOR_OPEN,                // 53
+    TYPE_DOOR_OPEN,    // 53
 
     // Falls like a rock (same gravity/TOP-BOTTOM split mechanism) but can't be mined (no
     // ATT_MINE) or destroyed by explosions (no ATT_EXPLODABLE), and can't be pushed or picked
     // up by the player (no ATT_PUSH/ATT_PICKUP) -- see attribute.c's own comment on its
     // Attribute[] row for the full reasoning on each omission.
-    TYPE_IMMOVABLE,                 // 54
-    TYPE_IMMOVABLE_FALLING,         // 55
+    TYPE_IMMOVABLE,            // 54
+    TYPE_IMMOVABLE_FALLING,    // 55
 
     // The 1-frame diagonal-roll transition (CH_ROCK_SIDE_1-4, attribute.h) a settled rock passes
     // through when it rolls off something with ATT_ROLL underneath it instead of falling
     // straight down -- see doRollRock()'s comment (board.c) for the full mechanic.
-    TYPE_ROCK_ROLLING,              // 56
+    TYPE_ROCK_ROLLING,    // 56
 
     // Same as TYPE_ROCK_ROLLING but for CH_GEODOGE_SIDE_1-4 -- see doRollGeodoge() (board.c).
-    TYPE_GEODOGE_ROLLING,           // 57
+    TYPE_GEODOGE_ROLLING,    // 57
 
     TYPE_MAX
 };
 
 extern const unsigned int Attribute[];
 extern const enum ObjectType CharToType[];
+
+// clang-format off
 
 enum ChName {
 
@@ -260,97 +262,97 @@ enum ChName {
     // 128 onward are virtual characters from animations
     // these can't go on board but can be displayed via realtime animation
 
-    CH_DOGE_01 = 128,      // 128
-    CH_DOGE_02,            // 129
-    CH_DOGE_03,            // 130
-    CH_DOGE_04,            // 131
-    CH_DOGE_05,            // 132
+    CH_DOGE_01 = 128,             // 128
+    CH_DOGE_02,                   // 129
+    CH_DOGE_03,                   // 130
+    CH_DOGE_04,                   // 131
+    CH_DOGE_05,                   // 132
 
-    CH_CRACKED_BRICK_1,    // 133
-    CH_CRACKED_BRICK_2,    // 134
-    CH_CRACKED_BRICK_3,    // 135
-    CH_CRACKED_BRICK_4,    // 136
-    CH_CRACKED_BRICK_5,    // 137
-    CH_CRACKED_BRICK_6,    // 138
-    CH_CRACKED_BRICK_7,    // 139
+    CH_CRACKED_BRICK_1,           // 133
+    CH_CRACKED_BRICK_2,           // 134
+    CH_CRACKED_BRICK_3,           // 135
+    CH_CRACKED_BRICK_4,           // 136
+    CH_CRACKED_BRICK_5,           // 137
+    CH_CRACKED_BRICK_6,           // 138
+    CH_CRACKED_BRICK_7,           // 139
 
-    CH_0,    // 140
-    CH_1,    // 141
-    CH_2,    // 142
-    CH_3,    // 143
-    CH_4,    // 144
-    CH_5,    // 145
-    CH_6,    // 146
-    CH_7,    // 147
-    CH_8,    // 148
-    CH_9,    // 149
+    CH_0,                         // 140
+    CH_1,                         // 141
+    CH_2,                         // 142
+    CH_3,                         // 143
+    CH_4,                         // 144
+    CH_5,                         // 145
+    CH_6,                         // 146
+    CH_7,                         // 147
+    CH_8,                         // 148
+    CH_9,                         // 149
 
-    CH_A,    // 150
-    CH_B,    // 151
-    CH_C,    // 152
-    CH_D,    // 153
-    CH_E,    // 154
-    CH_F,    // 155
-    CH_G,    // 156
-    CH_H,    // 157
-    CH_I,    // 158
-    CH_J,    // 159
-    CH_K,    // 160
-    CH_L,    // 161
-    CH_M,    // 162
-    CH_N,    // 163
-    CH_O,    // 164
-    CH_P,    // 165
-    CH_Q,    // 166
-    CH_R,    // 167
-    CH_S,    // 168
-    CH_T,    // 169
-    CH_U,    // 170
-    CH_V,    // 171
-    CH_W,    // 172
-    CH_X,    // 173
-    CH_Y,    // 174
-    CH_Z,    // 175
+    CH_A,                         // 150
+    CH_B,                         // 151
+    CH_C,                         // 152
+    CH_D,                         // 153
+    CH_E,                         // 154
+    CH_F,                         // 155
+    CH_G,                         // 156
+    CH_H,                         // 157
+    CH_I,                         // 158
+    CH_J,                         // 159
+    CH_K,                         // 160
+    CH_L,                         // 161
+    CH_M,                         // 162
+    CH_N,                         // 163
+    CH_O,                         // 164
+    CH_P,                         // 165
+    CH_Q,                         // 166
+    CH_R,                         // 167
+    CH_S,                         // 168
+    CH_T,                         // 169
+    CH_U,                         // 170
+    CH_V,                         // 171
+    CH_W,                         // 172
+    CH_X,                         // 173
+    CH_Y,                         // 174
+    CH_Z,                         // 175
 
-    CH_CAP_A,    // 176
-    CH_CAP_B,    // 177
-    CH_CAP_C,    // 178
-    CH_CAP_D,    // 179
-    CH_CAP_E,    // 180
-    CH_CAP_F,    // 181
-    CH_CAP_G,    // 182
-    CH_CAP_H,    // 183
-    CH_CAP_I,    // 184
-    CH_CAP_J,    // 185
-    CH_CAP_K,    // 186
-    CH_CAP_L,    // 187
-    CH_CAP_M,    // 188
-    CH_CAP_N,    // 189
-    CH_CAP_O,    // 190
-    CH_CAP_P,    // 191
-    CH_CAP_Q,    // 192
-    CH_CAP_R,    // 193
-    CH_CAP_S,    // 194
-    CH_CAP_T,    // 195
-    CH_CAP_U,    // 196
-    CH_CAP_V,    // 197
-    CH_CAP_W,    // 198
-    CH_CAP_X,    // 199
-    CH_CAP_Y,    // 200
-    CH_CAP_Z,    // 201
+    CH_CAP_A,                     // 176
+    CH_CAP_B,                     // 177
+    CH_CAP_C,                     // 178
+    CH_CAP_D,                     // 179
+    CH_CAP_E,                     // 180
+    CH_CAP_F,                     // 181
+    CH_CAP_G,                     // 182
+    CH_CAP_H,                     // 183
+    CH_CAP_I,                     // 184
+    CH_CAP_J,                     // 185
+    CH_CAP_K,                     // 186
+    CH_CAP_L,                     // 187
+    CH_CAP_M,                     // 188
+    CH_CAP_N,                     // 189
+    CH_CAP_O,                     // 190
+    CH_CAP_P,                     // 191
+    CH_CAP_Q,                     // 192
+    CH_CAP_R,                     // 193
+    CH_CAP_S,                     // 194
+    CH_CAP_T,                     // 195
+    CH_CAP_U,                     // 196
+    CH_CAP_V,                     // 197
+    CH_CAP_W,                     // 198
+    CH_CAP_X,                     // 199
+    CH_CAP_Y,                     // 200
+    CH_CAP_Z,                     // 201
 
-    CH_PLUS,    // 202
+    CH_PLUS,                      // 202
 
-    CH_BIG_0,    // 203
-    CH_BIG_1,    // 204
-    CH_BIG_2,    // 205
-    CH_BIG_3,    // 206
-    CH_BIG_4,    // 207
-    CH_BIG_5,    // 208
-    CH_BIG_6,    // 209
-    CH_BIG_7,    // 210
-    CH_BIG_8,    // 211
-    CH_BIG_9,    // 212
+    CH_BIG_0,                     // 203
+    CH_BIG_1,                     // 204
+    CH_BIG_2,                     // 205
+    CH_BIG_3,                     // 206
+    CH_BIG_4,                     // 207
+    CH_BIG_5,                     // 208
+    CH_BIG_6,                     // 209
+    CH_BIG_7,                     // 210
+    CH_BIG_8,                     // 211
+    CH_BIG_9,                     // 212
 
     // "Animated" chars, never placed on the board (see the >127 comment above the CH_TELEPORT
     // slot) -- the other 7 frames of the teleport tile's spinning-spoke cycle. CH_TELEPORT
@@ -358,13 +360,14 @@ enum ChName {
     // 1-7. See AnimTeleport (animations.c) -- TYPE_TELEPORT auto-advances through all 8 fixed
     // ROM bitmaps like any other animated character (processCharAnimations()), no per-frame
     // hand-holding needed.
-    CH_TELEPORT_1,    // 213
-    CH_TELEPORT_2,    // 214
-    CH_TELEPORT_3,    // 215
-    CH_TELEPORT_4,    // 216
-    CH_TELEPORT_5,    // 217
-    CH_TELEPORT_6,    // 218
-    CH_TELEPORT_7,    // 219
+
+    CH_TELEPORT_1,               // 213
+    CH_TELEPORT_2,               // 214
+    CH_TELEPORT_3,               // 215
+    CH_TELEPORT_4,               // 216
+    CH_TELEPORT_5,               // 217
+    CH_TELEPORT_6,               // 218
+    CH_TELEPORT_7,               // 219
 
     // Door slide-open frame -- AnimateDoor (animations.c). Only the closed (CH_DOORCLOSED) and
     // fully-open (CH_DOOROPEN_0) frames are ever real board bytes; this in-between frame, like
@@ -372,12 +375,12 @@ enum ChName {
     // mid-flight (drawScreen.c substitutes *Animate[type] for the raw board byte whenever it's
     // set -- see its own comment). Symmetric centre-split opening on a 5px-wide glyph only has
     // room for one such step without the door ending up fully blank -- see AnimateDoor's comment.
-    CH_DOORSLIDE_1,    // 220
+
+    CH_DOORSLIDE_1,              // 220
 
     CH_MAX
 };
 
-// clang-format off
 
 #define ENUM_BIT_VALUE(counter) (1 << counter)
 
