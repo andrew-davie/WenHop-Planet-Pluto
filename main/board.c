@@ -82,6 +82,8 @@ void doRoll(unsigned char *me, int row, int col);
 void doRollRock(unsigned char *me, int row, int col);
 void doRollGeodoge(unsigned char *me, int row, int col);
 void doRollMotionArc(int col, int row, int trailSide);
+void dotArc(int col, int row, int side, int offsetX, int offsetY, int age);
+int rollArcOffsetX(int side);
 void setInsulator(unsigned char *p, int row, int col);
 
 //------------------------------------------------------------------------------
@@ -477,7 +479,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-03 03:47 AEST
+// Last updated: 2026-08-05 22:35 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -489,7 +491,7 @@ static const unsigned short budget[128] = {
     _untimed_,    //   7 CH_STEELWALL
     _B + 346,     //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 528,     //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 292,     //  10 CH_ROCK -- updated 2026-07-28 16:26 AEST (was 291)
+    _B + 5302,    //  10 CH_ROCK -- updated 2026-08-05 22:35 AEST (was 292)
     _B + 4065,    //  11 CH_ROCK_FALLING -- updated 2026-07-29 00:48 AEST (was 3965)
     _B + 2032,    //  12 CH_DOGE_00 -- updated 2026-07-29 00:41 AEST (was 2031)
     _B + 2474,    //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
@@ -593,14 +595,14 @@ static const unsigned short budget[128] = {
     _B + 766,     // 111 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-03 03:47 AEST (was 758)
     _untimed_,    // 112 CH_KEY
     _untimed_,    // 113 CH_DOOROPEN_STATIC
-    _untimed_,    // 114 CH_IMMOVABLE
+    _B + 182,     // 114 CH_IMMOVABLE -- updated 2026-08-05 22:35 AEST (was untimed)
     _untimed_,    // 115 CH_IMMOVABLE_FALLING
     _untimed_,    // 116 CH_IMMOVABLE_FALLING_TOP
     _untimed_,    // 117 CH_IMMOVABLE_FALLING_BOTTOM
-    _untimed_,    // 118 CH_ROCK_SIDE_1
-    _untimed_,    // 119 CH_ROCK_SIDE_2
-    _untimed_,    // 120 CH_ROCK_SIDE_3
-    _untimed_,    // 121 CH_ROCK_SIDE_4
+    _B + 157,     // 118 CH_ROCK_SIDE_1 -- updated 2026-08-05 22:35 AEST (was untimed)
+    _B + 157,     // 119 CH_ROCK_SIDE_2 -- updated 2026-08-05 22:35 AEST (was untimed)
+    _B + 167,     // 120 CH_ROCK_SIDE_3 -- updated 2026-08-05 22:35 AEST (was untimed)
+    _B + 167,     // 121 CH_ROCK_SIDE_4 -- updated 2026-08-05 22:35 AEST (was untimed)
     _untimed_,    // 122 CH_GEODOGE_SIDE_1
     _untimed_,    // 123 CH_GEODOGE_SIDE_2
     _untimed_,    // 124 CH_GEODOGE_SIDE_3
@@ -1996,9 +1998,26 @@ void chainReact_Pipe(unsigned char *me) {
 }
 
 
+// Near-miss dot-arc tuning, shared by doRoll()/doRollRock()/doRollGeodoge() below: a short
+// flash (ROLL_ARC_AGE real frames) rather than the lingering ages the actual-roll effects use,
+// and only actually spawned on one eligible game-frame in ROLL_ARC_THROTTLE_MASK+1 (selectorCounter
+// & ROLL_ARC_THROTTLE_MASK == 0) -- with a 1-in-8 miss chance this frequent, drawing it on every
+// single miss would read as a near-constant flicker rather than an occasional tell.
+#define ROLL_ARC_AGE 5
+#define ROLL_ARC_THROTTLE_MASK 1    // every 2nd eligible game-frame -- roughly half the previous (untouched) flashing speed
+
+// Base offset chosen so dotArc()'s diagonal dot (offsetX - side) lands exactly on the trixel
+// immediately adjacent to the object's own edge in the neighbour cell (-1 rolling left,
+// CHAR_TRIX_X rolling right) -- i.e. touching the object, not overlapping its own cell. The
+// trailing per-side nudge (+2 left, -1 right) is no longer a clean mirror -- tuned by eye.
+int rollArcOffsetX(int side) { return CHAR_CENTER_X + side * (CHAR_CENTER_X + 3) + (side < 0 ? 2 : -1); }
+
+
 void doRoll(unsigned char *me, int row, int col) {
 
-    for (int offset = -1; offset < 2; offset += 2) {
+    bool rolled = false;
+
+    for (int offset = -1; offset < 2 && !rolled; offset += 2) {
 
         unsigned char *side = me + offset;
         unsigned char sc = *side;
@@ -2008,38 +2027,73 @@ void doRoll(unsigned char *me, int row, int col) {
             unsigned char sd = *sideDown;
             if (sd < FLAG_THISFRAME && (Attribute[CharToType[sd]] & ATT_BLANK)) {
 
-                if (offset > 0) {
-                    *me = FLAG(CH_DOGE_SIDE_1);
-                    *(me + offset) = FLAG(CH_DOGE_SIDE_3);
-
-                } else {
-                    *me = FLAG(CH_DOGE_SIDE_2);
-                    *(me + offset) = FLAG(CH_DOGE_SIDE_4);
-                }
-
-                *(sideDown) = FLAG(CH_BLANK);
-
                 int off = offset < 0 ? 4 : 0;
 
-                nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
-                nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+                // Only a 1-in-8 chance of actually rolling each time it's eligible, rather than
+                // committing the instant it can -- reads as the doge occasionally teetering
+                // before it goes.
+                if (!rangeRandom(8)) {
 
-                return;
+                    if (offset > 0) {
+                        *me = FLAG(CH_DOGE_SIDE_1);
+                        *(me + offset) = FLAG(CH_DOGE_SIDE_3);
+
+                    } else {
+                        *me = FLAG(CH_DOGE_SIDE_2);
+                        *(me + offset) = FLAG(CH_DOGE_SIDE_4);
+                    }
+
+                    *(sideDown) = FLAG(CH_BLANK);
+
+                    nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
+                    nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
+                    nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
+                    nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+
+                    rolled = true;
+                }
             }
         }
+    }
+
+    // Didn't roll this call -- show a dot-arc on BOTH sides, full stop, regardless of whether
+    // either side is individually eligible to actually roll into (a wall on one side doesn't
+    // stop that side's arc from showing -- this is "the doge might roll" ambient feedback, not
+    // a per-side near-miss cue anymore). Alternates which one is visible on any given eligible
+    // game-frame rather than flashing both in sync -- relies on ROLL_ARC_THROTTLE_MASK being
+    // exactly 1 (a single low bit) so "the other phase" is simply its complement; revisit this
+    // if the mask ever widens again.
+    if (!rolled) {
+        if ((selectorCounter & ROLL_ARC_THROTTLE_MASK) == 0)
+            dotArc(col, row, -1, rollArcOffsetX(-1), 3, ROLL_ARC_AGE);
+        else
+            dotArc(col, row, 1, rollArcOffsetX(1), 3, ROLL_ARC_AGE);
     }
 }
 
 
-// Comic-style motion arc: 3 concentric arcs of short-lived stationary dots on the side a rolling
+// A "dot-arc": two particles vertically stacked (offsetY+1, offsetY-1 -- the pair's top stays
+// anchored at offsetY-1, extended one further trixel downward), plus a third diagonally
+// above-and-toward-object from the top of that pair (offsetX - side, offsetY-2 -- one trixel
+// each way, not a wider sweep). `side` is the direction AWAY from the object (same sign
+// convention every caller already uses for offset/trailSide: -1 left, +1 right), so the
+// diagonal dot's shift-toward-object comes out correct regardless of which side this is drawn
+// on. offsetX/offsetY is the pair's original (pre-extension) lower-dot reference; age is shared
+// by all three. Speed 0 throughout -- see nDots()/drawParticles()'s "distance += speed" update
+// -- so none of the three drift, they just sit at their spawn spot and fade.
+void dotArc(int col, int row, int side, int offsetX, int offsetY, int age) {
+
+    // Colour 1 -- same as the rock/geodoge/doge's own burst + motion-arc effects above (all
+    // three already use it), not a distinct "near-miss" colour.
+    nDots(1, col, row, PT_TWO, age, offsetX, offsetY + 1, 0, 1);
+    nDots(1, col, row, PT_TWO, age, offsetX, offsetY - 1, 0, 1);
+    nDots(1, col, row, PT_TWO, age, offsetX - side, offsetY - 2, 0, 1);
+}
+
+
+// Comic-style motion arc: 3 concentric dot-arcs (see dotArc(), above) on the side a rolling
 // rock/geodoge rolled IN FROM (trailSide, the opposite of the roll's direction of travel), each
-// arc a copy of the same shallow curve shifted further out, like classic comic-book speed lines
-// stacked behind a rolling wheel. Speed 0 throughout -- see nDots()/drawParticles()'s "distance
-// += speed" update -- so these never drift, they just sit at their spawn spot and fade, reading
-// as "something was just here" rather than another outward-flying spark (that's what the
-// existing PT_TWO burst in doRollRock()/doRollGeodoge() already does, on the opposite side).
+// one shifted further out, like classic comic-book speed lines stacked behind a rolling wheel.
 // Ages are short and fixed (no randomness) since this is meant as a quick one-frame-of-motion
 // cue, not a lingering effect; farther-out arcs are given a little extra age so the whole trail
 // doesn't wink out in one frame.
@@ -2051,9 +2105,7 @@ void doRollMotionArc(int col, int row, int trailSide) {
         int radius = arc * 3;
         int age = 8 + arc * 3;
 
-        nDots(1, col, row, PT_TWO, age, trailSide * (2 + radius) + off, 3, 0, 1);
-        nDots(1, col, row, PT_TWO, age + 3, trailSide * (4 + radius) + off, 5, 0, 1);
-        nDots(1, col, row, PT_TWO, age + 6, trailSide * (6 + radius) + off, 7, 0, 1);
+        dotArc(col, row, trailSide, trailSide * (2 + radius) + off, 7, age);
     }
 }
 
@@ -2071,7 +2123,9 @@ void doRollMotionArc(int col, int row, int trailSide) {
 
 void doRollRock(unsigned char *me, int row, int col) {
 
-    for (int offset = -1; offset < 2; offset += 2) {
+    bool rolled = false;
+
+    for (int offset = -1; offset < 2 && !rolled; offset += 2) {
 
         unsigned char *side = me + offset;
         unsigned char sc = *side;
@@ -2090,43 +2144,56 @@ void doRollRock(unsigned char *me, int row, int col) {
             if (sd < FLAG_THISFRAME && sideDownType != TYPE_MELLON_HUSK && sideDownType != TYPE_MELLON_HUSK_PRE &&
                 (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
 
-                if (offset > 0) {
-                    *me = FLAG(CH_ROCK_SIDE_1);
-                    *(me + offset) = FLAG(CH_ROCK_SIDE_3);
-
-                } else {
-                    *me = FLAG(CH_ROCK_SIDE_2);
-                    *(me + offset) = FLAG(CH_ROCK_SIDE_4);
-                }
-
-                // Single-cell crush, not explode() -- explode() hits the full 3x3 area around
-                // sideDown, and TYPE_MELLON_HUSK carries ATT_EXPLODABLE (so a bomb's blast can
-                // kill the player standing in it), which would let a rock rolling past crush the
-                // player via splash damage from an ADJACENT cell even with the direct-target
-                // exclusion above. A rock rolling over one specific squashable thing has no
-                // business having a blast radius at all.
-                if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
-                    ADDAUDIO(SFX_ROCK2);
-                    *(sideDown) = FLAG(CH_DUST_0);
-                } else
-                    *(sideDown) = FLAG(CH_BLANK);
-
                 int off = offset < 0 ? 4 : 0;
 
-                nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
-                nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+                // Only a 1-in-8 chance of actually rolling each time it's eligible, rather than
+                // committing the instant it can -- see doRoll()'s own comment for the reasoning.
+                if (!rangeRandom(8)) {
 
-                // Comic-style motion arc: a few stationary (speed 0, so distance never grows --
-                // see nDots()/drawParticles()) dots trailing on the side the rock rolled IN
-                // FROM, not the spark burst's direction of travel above. Fixed short fades, no
-                // randomness -- just a "this was here a moment ago" cue, not another burst.
-                doRollMotionArc(col, row, -offset);
+                    if (offset > 0) {
+                        *me = FLAG(CH_ROCK_SIDE_1);
+                        *(me + offset) = FLAG(CH_ROCK_SIDE_3);
 
-                return;
+                    } else {
+                        *me = FLAG(CH_ROCK_SIDE_2);
+                        *(me + offset) = FLAG(CH_ROCK_SIDE_4);
+                    }
+
+                    // Single-cell crush, not explode() -- explode() hits the full 3x3 area around
+                    // sideDown, and TYPE_MELLON_HUSK carries ATT_EXPLODABLE (so a bomb's blast can
+                    // kill the player standing in it), which would let a rock rolling past crush the
+                    // player via splash damage from an ADJACENT cell even with the direct-target
+                    // exclusion above. A rock rolling over one specific squashable thing has no
+                    // business having a blast radius at all.
+                    if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
+                        ADDAUDIO(SFX_ROCK2);
+                        *(sideDown) = FLAG(CH_DUST_0);
+                    } else
+                        *(sideDown) = FLAG(CH_BLANK);
+
+                    nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
+                    nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
+                    nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
+                    nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+
+                    // Comic-style motion arc: a few stationary (speed 0, so distance never grows --
+                    // see nDots()/drawParticles()) dots trailing on the side the rock rolled IN
+                    // FROM, not the spark burst's direction of travel above. Fixed short fades, no
+                    // randomness -- just a "this was here a moment ago" cue, not another burst.
+                    doRollMotionArc(col, row, -offset);
+
+                    rolled = true;
+                }
             }
         }
+    }
+
+    // See doRoll()'s own comment for the full reasoning -- both sides, full stop, alternating.
+    if (!rolled) {
+        if ((selectorCounter & ROLL_ARC_THROTTLE_MASK) == 0)
+            dotArc(col, row, -1, rollArcOffsetX(-1), 3, ROLL_ARC_AGE);
+        else
+            dotArc(col, row, 1, rollArcOffsetX(1), 3, ROLL_ARC_AGE);
     }
 }
 
@@ -2137,7 +2204,9 @@ void doRollRock(unsigned char *me, int row, int col) {
 // CH_GEODOGE_FALLING_TOP/BOTTOM instead of the rock's own pair).
 void doRollGeodoge(unsigned char *me, int row, int col) {
 
-    for (int offset = -1; offset < 2; offset += 2) {
+    bool rolled = false;
+
+    for (int offset = -1; offset < 2 && !rolled; offset += 2) {
 
         unsigned char *side = me + offset;
         unsigned char sc = *side;
@@ -2151,33 +2220,46 @@ void doRollGeodoge(unsigned char *me, int row, int col) {
             if (sd < FLAG_THISFRAME && sideDownType != TYPE_MELLON_HUSK && sideDownType != TYPE_MELLON_HUSK_PRE &&
                 (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
 
-                if (offset > 0) {
-                    *me = FLAG(CH_GEODOGE_SIDE_1);
-                    *(me + offset) = FLAG(CH_GEODOGE_SIDE_3);
-
-                } else {
-                    *me = FLAG(CH_GEODOGE_SIDE_2);
-                    *(me + offset) = FLAG(CH_GEODOGE_SIDE_4);
-                }
-
-                if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
-                    ADDAUDIO(SFX_ROCK2);
-                    *(sideDown) = FLAG(CH_DUST_0);
-                } else
-                    *(sideDown) = FLAG(CH_BLANK);
-
                 int off = offset < 0 ? 4 : 0;
 
-                nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
-                nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+                // Only a 1-in-8 chance of actually rolling each time it's eligible -- see
+                // doRoll()'s own comment for the reasoning.
+                if (!rangeRandom(8)) {
 
-                doRollMotionArc(col, row, -offset);
+                    if (offset > 0) {
+                        *me = FLAG(CH_GEODOGE_SIDE_1);
+                        *(me + offset) = FLAG(CH_GEODOGE_SIDE_3);
 
-                return;
+                    } else {
+                        *me = FLAG(CH_GEODOGE_SIDE_2);
+                        *(me + offset) = FLAG(CH_GEODOGE_SIDE_4);
+                    }
+
+                    if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
+                        ADDAUDIO(SFX_ROCK2);
+                        *(sideDown) = FLAG(CH_DUST_0);
+                    } else
+                        *(sideDown) = FLAG(CH_BLANK);
+
+                    nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
+                    nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
+                    nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
+                    nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+
+                    doRollMotionArc(col, row, -offset);
+
+                    rolled = true;
+                }
             }
         }
+    }
+
+    // See doRoll()'s own comment for the full reasoning -- both sides, full stop, alternating.
+    if (!rolled) {
+        if ((selectorCounter & ROLL_ARC_THROTTLE_MASK) == 0)
+            dotArc(col, row, -1, rollArcOffsetX(-1), 3, ROLL_ARC_AGE);
+        else
+            dotArc(col, row, 1, rollArcOffsetX(1), 3, ROLL_ARC_AGE);
     }
 }
 
