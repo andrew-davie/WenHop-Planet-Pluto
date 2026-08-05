@@ -82,8 +82,8 @@ void doRoll(unsigned char *me, int row, int col);
 void doRollRock(unsigned char *me, int row, int col);
 void doRollGeodoge(unsigned char *me, int row, int col);
 void doRollMotionArc(int col, int row, int trailSide);
-bool canActuallyRoll(unsigned char *me, int offset);
-bool canRoll(unsigned char *me, int offset);
+enum RollEligibility { ROLL_NONE, ROLL_LOOSE, ROLL_STRICT };
+enum RollEligibility rollEligibility(unsigned char *me, int offset);
 void setInsulator(unsigned char *p, int row, int col);
 
 //------------------------------------------------------------------------------
@@ -479,7 +479,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-05 23:32 AEST
+// Last updated: 2026-08-05 23:40 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -491,7 +491,7 @@ static const unsigned short budget[128] = {
     _untimed_,    //   7 CH_STEELWALL
     _B + 346,     //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 528,     //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 3751,    //  10 CH_ROCK -- updated 2026-08-05 23:32 AEST (was 292)
+    _B + 5541,    //  10 CH_ROCK -- updated 2026-08-05 23:40 AEST (was 262)
     _B + 4065,    //  11 CH_ROCK_FALLING -- updated 2026-07-29 00:48 AEST (was 3965)
     _B + 2032,    //  12 CH_DOGE_00 -- updated 2026-07-29 00:41 AEST (was 2031)
     _B + 2474,    //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
@@ -595,14 +595,14 @@ static const unsigned short budget[128] = {
     _B + 766,     // 111 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-03 03:47 AEST (was 758)
     _untimed_,    // 112 CH_KEY
     _untimed_,    // 113 CH_DOOROPEN_STATIC
-    _B + 195,     // 114 CH_IMMOVABLE -- updated 2026-08-05 23:32 AEST (was untimed)
-    _untimed_,    // 115 CH_IMMOVABLE_FALLING
-    _untimed_,    // 116 CH_IMMOVABLE_FALLING_TOP
-    _untimed_,    // 117 CH_IMMOVABLE_FALLING_BOTTOM
+    _B + 207,     // 114 CH_IMMOVABLE -- updated 2026-08-05 23:40 AEST (was 195)
+    _B + 2024,    // 115 CH_IMMOVABLE_FALLING -- updated 2026-08-05 23:40 AEST (was untimed)
+    _B + 169,     // 116 CH_IMMOVABLE_FALLING_TOP -- updated 2026-08-05 23:40 AEST (was untimed)
+    _B + 169,     // 117 CH_IMMOVABLE_FALLING_BOTTOM -- updated 2026-08-05 23:40 AEST (was untimed)
     _B + 170,     // 118 CH_ROCK_SIDE_1 -- updated 2026-08-05 23:32 AEST (was untimed)
     _B + 170,     // 119 CH_ROCK_SIDE_2 -- updated 2026-08-05 23:32 AEST (was untimed)
     _B + 176,     // 120 CH_ROCK_SIDE_3 -- updated 2026-08-05 23:32 AEST (was untimed)
-    _B + 176,     // 121 CH_ROCK_SIDE_4 -- updated 2026-08-05 23:32 AEST (was untimed)
+    _B + 177,     // 121 CH_ROCK_SIDE_4 -- updated 2026-08-05 23:40 AEST (was 176)
     _untimed_,    // 122 CH_GEODOGE_SIDE_1
     _untimed_,    // 123 CH_GEODOGE_SIDE_2
     _untimed_,    // 124 CH_GEODOGE_SIDE_3
@@ -2060,48 +2060,47 @@ void doRollMotionArc(int col, int row, int trailSide) {
 }
 
 
-// Strict: can this object LITERALLY roll this way -- the side square is ATT_BLANK, and the
-// square diagonally below THAT is ALSO ATT_BLANK. TYPE_MELLON_HUSK/_PRE (the player's own board
-// placeholder) is never ATT_BLANK, so a player standing in either cell already fails this on its
-// own merits -- no separate exclusion needed. Gates whether the dice is rolled at all (see
-// doRollRock()/doRollGeodoge(), below); the actual commit re-checks the landing cell itself
-// (still allows a squashable landing spot, not just blank -- see its own comment) but can never
-// land on the player either way, since this gate already excluded that case.
-bool canActuallyRoll(unsigned char *me, int offset) {
-
-    if (!(Attribute[CharToType[GET(*(me + offset))]] & ATT_BLANK))
-        return false;
-
-    return Attribute[CharToType[GET(*(me + offset + _BOARD_COLS))]] & ATT_BLANK;
-}
-
-
-// Looser: side square is EITHER ATT_BLANK or the player's own square, AND the square diagonally
-// below THAT is EITHER ATT_BLANK or the player's own square. Used only to decide whether to show
-// the near-miss particle burst when the object didn't actually roll this tick (see
-// canActuallyRoll(), above, for the strict version that gates the dice/commit) -- a rock/geodoge
-// that's blocked ONLY by the player standing right where it would roll still reads as "trying"
-// rather than just sitting there doing nothing visible.
-bool canRoll(unsigned char *me, int offset) {
+// Classifies one side (offset -1/+1) in a SINGLE pass over the two relevant cells -- avoids
+// doing the same GET()/CharToType[]/Attribute[] lookups twice over via separate strict+loose
+// checks, and lets the caller bail out immediately when neither side is even worth a second
+// glance (the common case: a rock boxed in solid on both sides, which never gets past here).
+//
+// ROLL_STRICT: side is ATT_BLANK AND the square diagonally below THAT is ALSO ATT_BLANK -- a
+// real roll is physically possible this way. TYPE_MELLON_HUSK/_PRE (the player's own board
+// placeholder) is never ATT_BLANK, so the player standing in either cell already fails this on
+// its own merits.
+//
+// ROLL_LOOSE: side is blank-or-player AND below-that is blank-or-player, but not both plain
+// blank (i.e. blocked only by the player somewhere) -- not enough to actually roll, but enough
+// to show the near-miss particle burst instead of nothing visible happening at all.
+//
+// ROLL_NONE: solid on this side, full stop.
+enum RollEligibility rollEligibility(unsigned char *me, int offset) {
 
     enum ObjectType sideType = CharToType[GET(*(me + offset))];
-    if (!(Attribute[sideType] & ATT_BLANK) && sideType != TYPE_MELLON_HUSK && sideType != TYPE_MELLON_HUSK_PRE)
-        return false;
+    bool sideBlank = Attribute[sideType] & ATT_BLANK;
+    if (!sideBlank && sideType != TYPE_MELLON_HUSK && sideType != TYPE_MELLON_HUSK_PRE)
+        return ROLL_NONE;
 
-    enum ObjectType sideDownType = CharToType[GET(*(me + offset + _BOARD_COLS))];
+    enum ObjectType downType = CharToType[GET(*(me + offset + _BOARD_COLS))];
+    bool downBlank = Attribute[downType] & ATT_BLANK;
+    if (!downBlank && downType != TYPE_MELLON_HUSK && downType != TYPE_MELLON_HUSK_PRE)
+        return ROLL_NONE;
 
-    return (Attribute[sideDownType] & ATT_BLANK) || sideDownType == TYPE_MELLON_HUSK ||
-           sideDownType == TYPE_MELLON_HUSK_PRE;
+    return (sideBlank && downBlank) ? ROLL_STRICT : ROLL_LOOSE;
 }
 
 
 // A settled CH_ROCK that can't fall straight down (case CH_ROCK, above) but is resting on
-// something with ATT_ROLL tries each side in turn (see canRoll(), above): if eligible, a 1-in-8
-// chance of actually committing the roll each time, rather than the instant it can -- reads as
-// the rock occasionally teetering before it goes. If it doesn't roll this tick (dice missed, or
-// eligible only via canRoll()'s looser player-square allowance), a burst of particles at the
-// rock's own base reads as "it just shifted/settled without going anywhere" instead of nothing
-// visible happening at all.
+// something with ATT_ROLL classifies each side with rollEligibility(), above, and bails out
+// immediately if neither is even ROLL_LOOSE (the common case for a rock boxed in solid on both
+// sides) -- every resting rock on the board pays this cost every PH2 pass regardless of whether
+// anything is ever going to happen, so an ASAP early-out here matters far more than anything
+// downstream of it. If a side IS at least ROLL_STRICT, a 1-in-8 chance of actually committing
+// the roll each time, rather than the instant it can -- reads as the rock occasionally teetering
+// before it goes. If it doesn't roll this tick (dice missed, or neither side reached
+// ROLL_STRICT), a single particle at the rock's own base reads as "it just shifted/settled
+// without going anywhere" instead of nothing visible happening at all.
 //
 // When it DOES commit: if that side square is blank AND the square diagonally below it is blank
 // OR crushable, the rock commences a one-frame diagonal-roll transition into that column
@@ -2116,137 +2115,131 @@ bool canRoll(unsigned char *me, int offset) {
 
 void doRollRock(unsigned char *me, int row, int col) {
 
-    for (int offset = -1; offset < 2; offset += 2) {
+    enum RollEligibility left = rollEligibility(me, -1);
+    enum RollEligibility right = rollEligibility(me, 1);
 
-        if (!canActuallyRoll(me, offset))
-            continue;
+    if (left == ROLL_NONE && right == ROLL_NONE)
+        return;
 
-        if (!rangeRandom(8)) {
+    int offset = left == ROLL_STRICT ? -1 : right == ROLL_STRICT ? 1 : 0;
 
-            unsigned char *side = me + offset;
-            unsigned char *sideDown = side + _BOARD_COLS;
-            unsigned char sd = *sideDown;
-            enum ObjectType sideDownType = CharToType[sd];
-            int attSideDown = Attribute[sideDownType];
+    if (offset && !rangeRandom(8)) {
 
-            // canActuallyRoll() above already guarantees sideDown is ATT_BLANK (and never the
-            // player, who's never ATT_BLANK), so this re-check only matters for the extra
-            // ATT_SQUASHABLE_TO_BLANKS landing-spot case canActuallyRoll() doesn't allow --
-            // still excludes TYPE_MELLON_HUSK/_PRE explicitly since ATT_SQUASHABLE_TO_BLANKS is
-            // also set on the player's own placeholder for unrelated reasons (see mellon.c).
-            if (sd < FLAG_THISFRAME && sideDownType != TYPE_MELLON_HUSK && sideDownType != TYPE_MELLON_HUSK_PRE &&
-                (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
+        unsigned char *side = me + offset;
+        unsigned char *sideDown = side + _BOARD_COLS;
+        unsigned char sd = *sideDown;
+        enum ObjectType sideDownType = CharToType[sd];
+        int attSideDown = Attribute[sideDownType];
 
-                if (offset > 0) {
-                    *me = FLAG(CH_ROCK_SIDE_1);
-                    *(me + offset) = FLAG(CH_ROCK_SIDE_3);
+        // rollEligibility() above already guarantees sideDown is ATT_BLANK (and never the
+        // player, who's never ATT_BLANK) whenever it returned ROLL_STRICT, so this re-check
+        // only matters for the extra ATT_SQUASHABLE_TO_BLANKS landing-spot case that doesn't
+        // reach ROLL_STRICT -- still excludes TYPE_MELLON_HUSK/_PRE explicitly since
+        // ATT_SQUASHABLE_TO_BLANKS is also set on the player's own placeholder for unrelated
+        // reasons (see mellon.c).
+        if (sd < FLAG_THISFRAME && sideDownType != TYPE_MELLON_HUSK && sideDownType != TYPE_MELLON_HUSK_PRE &&
+            (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
 
-                } else {
-                    *me = FLAG(CH_ROCK_SIDE_2);
-                    *(me + offset) = FLAG(CH_ROCK_SIDE_4);
-                }
+            if (offset > 0) {
+                *me = FLAG(CH_ROCK_SIDE_1);
+                *(me + offset) = FLAG(CH_ROCK_SIDE_3);
 
-                // Single-cell crush, not explode() -- explode() hits the full 3x3 area around
-                // sideDown, and TYPE_MELLON_HUSK carries ATT_EXPLODABLE (so a bomb's blast can
-                // kill the player standing in it), which would let a rock rolling past crush the
-                // player via splash damage from an ADJACENT cell even with the direct-target
-                // exclusion above. A rock rolling over one specific squashable thing has no
-                // business having a blast radius at all.
-                if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
-                    ADDAUDIO(SFX_ROCK2);
-                    *(sideDown) = FLAG(CH_DUST_0);
-                } else
-                    *(sideDown) = FLAG(CH_BLANK);
-
-                int off = offset < 0 ? 4 : 0;
-
-                nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
-                nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
-
-                // Comic-style motion arc: a few stationary (speed 0, so distance never grows --
-                // see nDots()/drawParticles()) dots trailing on the side the rock rolled IN
-                // FROM, not the spark burst's direction of travel above. Fixed short fades, no
-                // randomness -- just a "this was here a moment ago" cue, not another burst.
-                doRollMotionArc(col, row, -offset);
-
-                return;
+            } else {
+                *me = FLAG(CH_ROCK_SIDE_2);
+                *(me + offset) = FLAG(CH_ROCK_SIDE_4);
             }
-        }
 
-        // Strictly eligible on this side but didn't commit (dice missed) -- stop trying the
-        // other side (this tick's one attempt is used up) and fall through to the near-miss
-        // particle check below.
-        break;
+            // Single-cell crush, not explode() -- explode() hits the full 3x3 area around
+            // sideDown, and TYPE_MELLON_HUSK carries ATT_EXPLODABLE (so a bomb's blast can
+            // kill the player standing in it), which would let a rock rolling past crush the
+            // player via splash damage from an ADJACENT cell even with the direct-target
+            // exclusion above. A rock rolling over one specific squashable thing has no
+            // business having a blast radius at all.
+            if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
+                ADDAUDIO(SFX_ROCK2);
+                *(sideDown) = FLAG(CH_DUST_0);
+            } else
+                *(sideDown) = FLAG(CH_BLANK);
+
+            int off = offset < 0 ? 4 : 0;
+
+            nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
+            nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
+            nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
+            nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+
+            // Comic-style motion arc: a few stationary (speed 0, so distance never grows --
+            // see nDots()/drawParticles()) dots trailing on the side the rock rolled IN
+            // FROM, not the spark burst's direction of travel above. Fixed short fades, no
+            // randomness -- just a "this was here a moment ago" cue, not another burst.
+            doRollMotionArc(col, row, -offset);
+
+            return;
+        }
     }
 
-    // Didn't roll this tick -- show the near-miss burst if EITHER side is at least plausibly
-    // blocked only by the player (canRoll(), looser than canActuallyRoll() above). Single dot at
-    // the rock's own trixel center-x, base-y (bottom row of its own cell) -- 5 dots per miss was
-    // enough of them, this frequently, to blow the per-character time budget (see budget[]'s own
-    // comment), so down to 1. sphereDot() still assigns it its own random dir each time (see
+    // Didn't roll this tick -- single particle at the rock's own trixel center-x, base-y
+    // (bottom row of its own cell). sphereDot() assigns it its own random dir each time (see
     // nDots()'s own comment), at a slowish random speed (0-0x1F) and a short 10-frame age.
-    if (canRoll(me, -1) || canRoll(me, 1))
-        nDots(1, col, row, PT_TWO, 10, CHAR_CENTER_X, CHAR_TRIX_Y - 1, 0x20, 5);
+    nDots(1, col, row, PT_TWO, 10, CHAR_CENTER_X, CHAR_TRIX_Y - 1, 0x20, 5);
 }
 
 
 // Same as doRollRock() above, but for a settled CH_GEODOGE rolling off an ATT_ROLL surface --
 // see its comment for the full reasoning (single-cell crush not explode(), player-square
-// exclusion, near-miss base burst, etc). Only the transition characters differ (CH_GEODOGE_SIDE_1-4,
-// resolving into CH_GEODOGE_FALLING_TOP/BOTTOM instead of the rock's own pair).
+// exclusion, near-miss base burst, ASAP early-out, etc). Only the transition characters differ
+// (CH_GEODOGE_SIDE_1-4, resolving into CH_GEODOGE_FALLING_TOP/BOTTOM instead of the rock's own
+// pair).
 void doRollGeodoge(unsigned char *me, int row, int col) {
 
-    for (int offset = -1; offset < 2; offset += 2) {
+    enum RollEligibility left = rollEligibility(me, -1);
+    enum RollEligibility right = rollEligibility(me, 1);
 
-        if (!canActuallyRoll(me, offset))
-            continue;
+    if (left == ROLL_NONE && right == ROLL_NONE)
+        return;
 
-        if (!rangeRandom(8)) {
+    int offset = left == ROLL_STRICT ? -1 : right == ROLL_STRICT ? 1 : 0;
 
-            unsigned char *side = me + offset;
-            unsigned char *sideDown = side + _BOARD_COLS;
-            unsigned char sd = *sideDown;
-            enum ObjectType sideDownType = CharToType[sd];
-            int attSideDown = Attribute[sideDownType];
+    if (offset && !rangeRandom(8)) {
 
-            if (sd < FLAG_THISFRAME && sideDownType != TYPE_MELLON_HUSK && sideDownType != TYPE_MELLON_HUSK_PRE &&
-                (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
+        unsigned char *side = me + offset;
+        unsigned char *sideDown = side + _BOARD_COLS;
+        unsigned char sd = *sideDown;
+        enum ObjectType sideDownType = CharToType[sd];
+        int attSideDown = Attribute[sideDownType];
 
-                if (offset > 0) {
-                    *me = FLAG(CH_GEODOGE_SIDE_1);
-                    *(me + offset) = FLAG(CH_GEODOGE_SIDE_3);
+        if (sd < FLAG_THISFRAME && sideDownType != TYPE_MELLON_HUSK && sideDownType != TYPE_MELLON_HUSK_PRE &&
+            (attSideDown & (ATT_BLANK | ATT_SQUASHABLE_TO_BLANKS))) {
 
-                } else {
-                    *me = FLAG(CH_GEODOGE_SIDE_2);
-                    *(me + offset) = FLAG(CH_GEODOGE_SIDE_4);
-                }
+            if (offset > 0) {
+                *me = FLAG(CH_GEODOGE_SIDE_1);
+                *(me + offset) = FLAG(CH_GEODOGE_SIDE_3);
 
-                if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
-                    ADDAUDIO(SFX_ROCK2);
-                    *(sideDown) = FLAG(CH_DUST_0);
-                } else
-                    *(sideDown) = FLAG(CH_BLANK);
-
-                int off = offset < 0 ? 4 : 0;
-
-                nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
-                nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
-                nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
-
-                doRollMotionArc(col, row, -offset);
-
-                return;
+            } else {
+                *me = FLAG(CH_GEODOGE_SIDE_2);
+                *(me + offset) = FLAG(CH_GEODOGE_SIDE_4);
             }
-        }
 
-        break;
+            if (attSideDown & ATT_SQUASHABLE_TO_BLANKS) {
+                ADDAUDIO(SFX_ROCK2);
+                *(sideDown) = FLAG(CH_DUST_0);
+            } else
+                *(sideDown) = FLAG(CH_BLANK);
+
+            int off = offset < 0 ? 4 : 0;
+
+            nDots(1, col, row, PT_TWO, 15, offset * 2 + off, 4, 0, 1);
+            nDots(1, col, row, PT_TWO, 20, offset * 4 + off, 4, 0, 1);
+            nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
+            nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
+
+            doRollMotionArc(col, row, -offset);
+
+            return;
+        }
     }
 
-    if (canRoll(me, -1) || canRoll(me, 1))
-        nDots(1, col, row, PT_TWO, 10, CHAR_CENTER_X, CHAR_TRIX_Y - 1, 0x20, 5);
+    nDots(1, col, row, PT_TWO, 10, CHAR_CENTER_X, CHAR_TRIX_Y - 1, 0x20, 5);
 }
 
 
