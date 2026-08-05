@@ -61,10 +61,10 @@ bool showLava;
 
 int cave;
 bool caveSequenceStarted;    // set true the moment any game actually starts (initGameState_Game()),
-                              // regardless of whether GS_MENU ran first -- lets initKernel_Menu()
-                              // tell a genuine first-ever boot apart from "a cave was already played
-                              // via some path that bypassed the menu", so it doesn't hand out cave 0
-                              // twice.
+                             // regardless of whether GS_MENU ran first -- lets initKernel_Menu()
+                             // tell a genuine first-ever boot apart from "a cave was already played
+                             // via some path that bypassed the menu", so it doesn't hand out cave 0
+                             // twice.
 unsigned char bufferedSWCHA;
 unsigned int usableSWCHA;
 unsigned int inhibitSWCHA;
@@ -119,8 +119,8 @@ void runARM_Load_SaveKey();
 void runARM_VerticalBlank();
 void runARM_Overscan();
 
-void HandleControls();
-void SilenceTIA();
+// void HandleControls();
+// void SilenceTIA();
 
 void initNextLife();
 
@@ -190,7 +190,7 @@ const unsigned char input_repeat[12] = {7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7};
 
 // internal control handling variables - no need for direct user access
 unsigned short input_counter[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-static unsigned short input_target[12];
+// static unsigned short input_target[12];
 
 
 //------------------------------------------------------------------------------
@@ -340,6 +340,7 @@ void runARM_VerticalBlank() {
     // availableIdleTime and permanently failing scheduleInitState()'s budget check regardless of
     // margin. Checking nextGameState instead means the reset resumes the instant a transition out
     // of DetectConsole is requested, not once it's already finished.
+
     if (nextGameState != GS_DETECT_CONSOLE) {
         T1TC = 0;
         T1TCR = 1;
@@ -349,6 +350,7 @@ void runARM_VerticalBlank() {
 
     // Always dispatch on the CURRENTLY active state, even while a transition is pending --
     // nextGameState only takes effect once scheduleInitState() finishes and flips gameState itself.
+
     (*verticalBlank[gameState])();
 
     if (gameSchedule != SCHEDULE_NONE)
@@ -410,6 +412,11 @@ void scheduleInitState() {
         return;    // not enough of this phase's budget left -- old kernel/state keeps running
                    // completely unchanged, try again next VB/OS
 
+    // TODO: CHECK! AND REPLACE ABOVE
+    // if (T1TC + SCHEDULE_INIT_MARGIN >= availableIdleTime)
+    //     return;
+
+
     // Default to idle. initGameState_Game() overrides this itself (to SCHEDULE_UNPACK_CAVE) as
     // its own last act, below, chaining straight into Game's own cave-unpack/board-scan pipeline.
     // Every other state's init leaves it here.
@@ -423,6 +430,7 @@ void scheduleInitState() {
     gameState = nextGameState;    // atomic handoff: only now does the new kernel actually go live
 }
 
+
 void runARM_Overscan() {
 
     inOverscanPhase = true;
@@ -433,7 +441,7 @@ void runARM_Overscan() {
         T1TCR = 1;
     }
 
-    availableIdleTime = RAM[_INTIM] * armCycles - 5000;
+    availableIdleTime = RAM[_INTIM] * armCycles - 5000;    // TODO:  5k?
 
 
     playAudio();
@@ -461,47 +469,47 @@ void runARM_Overscan() {
 // Controller Handler - converts raw input to debounced pulsed wait and repeat
 // timings
 
-void HandleControls() {
+// void HandleControls() {
 
-    unsigned short SWCH_input = (unsigned short)RAM[_SWCHA];
+//     unsigned short SWCH_input = (unsigned short)RAM[_SWCHA];
 
-    SWCH_input |= ((RAM[_INPT4] >> 7) & 1) << 8      //
-                  | ((RAM[_INPT5] >> 7) & 1) << 9    //
-                  | (RAM[_SWCHB] & 1) << 10          //
-                  | ((RAM[_SWCHB] >> 1) & 1) << 11;
+//     SWCH_input |= ((RAM[_INPT4] >> 7) & 1) << 8      //
+//                   | ((RAM[_INPT5] >> 7) & 1) << 9    //
+//                   | (RAM[_SWCHB] & 1) << 10          //
+//                   | ((RAM[_SWCHB] >> 1) & 1) << 11;
 
-    CBW_swch = ((RAM[_SWCHB] & 0b00001000) != 0);
-    P0_diff = ((RAM[_SWCHB] & 0b01000000) != 0);
-    P1_diff = ((RAM[_SWCHB] & 0b10000000) != 0);
+//     CBW_swch = ((RAM[_SWCHB] & 0b00001000) != 0);
+//     P0_diff = ((RAM[_SWCHB] & 0b01000000) != 0);
+//     P1_diff = ((RAM[_SWCHB] & 0b10000000) != 0);
 
-    for (int i = 0; i <= 11; i++) {
-        input_flag[i] = false;
-        if ((SWCH_input & 1) == 0) {
-            input_counter[i]++;
-            if (input_counter[i] == 1) {
-                input_flag[i] = true;
-                input_target[i] = input_wait[i] + 1;
-            }
-            if (input_counter[i] == input_target[i]) {
-                input_flag[i] = true;
-                input_target[i] = input_target[i] + input_repeat[i] + 1;
-            }
-        } else {
-            input_counter[i] = 0;
-        }
-        SWCH_input = SWCH_input / 2;
-    }
-}
+//     for (int i = 0; i <= 11; i++) {
+//         input_flag[i] = false;
+//         if ((SWCH_input & 1) == 0) {
+//             input_counter[i]++;
+//             if (input_counter[i] == 1) {
+//                 input_flag[i] = true;
+//                 input_target[i] = input_wait[i] + 1;
+//             }
+//             if (input_counter[i] == input_target[i]) {
+//                 input_flag[i] = true;
+//                 input_target[i] = input_target[i] + input_repeat[i] + 1;
+//             }
+//         } else {
+//             input_counter[i] = 0;
+//         }
+//         SWCH_input = SWCH_input / 2;
+//     }
+// }
 
 // Used to set TIA sound to all silent / no note
-void SilenceTIA() {
+// void SilenceTIA() {
 
-    for (int i = 0; i < 2; i++) {
-        RAM[_BUF_AUDV + i] = 0;
-        RAM[_BUF_AUDC + i] = 0;
-        RAM[_BUF_AUDF + i] = 0;
-    }
-}
+//     for (int i = 0; i < 2; i++) {
+//         RAM[_BUF_AUDV + i] = 0;
+//         RAM[_BUF_AUDC + i] = 0;
+//         RAM[_BUF_AUDF + i] = 0;
+//     }
+// }
 
 void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAddress, int length) {
 
@@ -510,22 +518,6 @@ void setJumpVectors(unsigned int buffer, short int loopAddress, short int endAdd
     RAM_2B[(buffer / 2) + length - 1] = endAddress;
 }
 
-
-int dirFromCoords(int x, int y, int prevX, int prevY) {
-
-    int dir = 0;
-    if (x < prevX)
-        dir |= DIR_L;
-    if (x > prevX)
-        dir |= DIR_R;
-
-    if (y < prevY)
-        dir |= DIR_U;
-    if (y > prevY)
-        dir |= DIR_D;
-
-    return dir;
-}
 
 void initNewGame() {
 

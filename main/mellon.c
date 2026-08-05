@@ -6,7 +6,6 @@
 #include "caveData.h"
 #include "colour.h"
 #include "decodeCaves.h"
-#include "gameState.h"
 #include "main.h"
 #include "mellon.h"
 #include "particle.h"
@@ -15,8 +14,8 @@
 #include "score.h"
 #include "sound.h"
 
-int playerX;    // char pos 0-39 (use *5 for pixel)
-int playerY;    // char pos 0-21 (use *10 for pixel and then *3 for scanline)
+int playerX;    // char pos 0-39 (use * CHAR_TRIX_X for trixel)
+int playerY;    // char pos 0-21 (use *CHAR_TRIX_Y for trixel and then *3 for scanline)
 
 // What the player is currently carrying, if anything (CH_... value, or 0). Invariant: never
 // carries FLAG_THISFRAME -- every site that assigns it (pickup, drop-conversion) writes a
@@ -24,8 +23,19 @@ int playerY;    // char pos 0-21 (use *10 for pixel and then *3 for scanline)
 // one place that DOES need the flag -- the deferred board write when the carried item is
 // actually dropped -- carries it separately via dropSkipThisFrame instead of baking it into
 // this variable (see dropSkipThisFrame's own comment).
+
 int attachment = 0;
 const OFFSET *attachmentOffset = 0;
+
+// Ticks down to 0 once set; drawAttachedChar() (draw.c) blinks the carried item off on some of
+// those frames instead of drawing it. Set to ATTACHMENT_FLASH_TICKS whenever the player tries
+// to pick something up/shove a block while already carrying/shoving something else -- see the
+// three trigger sites below (fire-button pickup, walk-in key pickup, walk-in shove) -- as
+// feedback that the attempt did nothing, rather than just silently blocking the move like a
+// wall. Decremented once per real frame in VB_Game() (gameState_Game.c), same as shakeTime,
+// so it still counts down even on the frames drawAttachedChar() itself is skipped (hidden
+// player, exit fade, etc).
+int attachmentFlashTicks = 0;
 
 // True while `attachment` holds an immovable block being shoved (checkHighPriorityMove()'s
 // ATT_SHOVE trigger below) rather than something actually carried. Changes how
@@ -137,6 +147,7 @@ static int arrivalSwirlBatchCounter;
 static int arrivalSwirlX, arrivalSwirlY;
 
 void startTeleportArrivalSwirl(int x, int y) {
+
     arrivalSwirlX = x;
     arrivalSwirlY = y;
     arrivalSwirlTicks = TELEPORT_ARRIVAL_SWIRL_TICKS;
@@ -156,9 +167,6 @@ void updateTeleportArrivalSwirl() {
 
     if (arrivalSwirlTicks) {
 
-        // Countdown, not modulo -- see updateTeleportDepartSwirl()'s comment (this coprocessor
-        // has no divide instruction, and TELEPORT_ARRIVAL_SWIRL_BATCH_INTERVAL isn't a power of
-        // 2, so "counter++ % INTERVAL" would force a real libgcc __aeabi_idivmod call).
         if (arrivalSwirlBatchCounter <= 0) {
 
             arrivalSwirlBatchCounter = TELEPORT_ARRIVAL_SWIRL_BATCH_INTERVAL;
@@ -242,6 +250,17 @@ static int waitForNothing;
 bool handled;
 static bool gearsActive;
 static bool gearsWaitRelease;
+// Ticks down once per movePlayer() call (i.e. once per board scan, which only restarts every
+// gameSpeed real frames -- SPEED_BASE=5, ~12 scans/sec at NTSC's 60fps, see board.c's
+// setupBoardScanner()) -- NOT once per real frame. Set on a successful pickup (fire-button or
+// walk-in key, both below) to freeze the player for a beat: movePlayer()'s dispatch loops are
+// skipped entirely while this is nonzero, so no new move of ANY kind can start, not just a
+// fire-button re-trigger. Needed because without it, a player who just picked up a rock/boulder
+// could immediately step into the square it vacated the same tick another falling rock lands
+// there, getting crushed by something that hadn't had a chance to resolve yet. Deliberately NOT
+// set by the walk-in shove trigger below -- pushing an immovable block has no equivalent hazard
+// and should stay fully responsive.
+#define PICKUP_DELAY_TICKS 6    // ~0.5s at ~12 game-loop ticks/sec (see comment above)
 static int kdelay = 0;
 
 static unsigned char *meAtt;
@@ -472,15 +491,14 @@ void moveHusk(int dir, unsigned char *me, unsigned char *meOffset) {
 // many keyframes it's split into).
 const OFFSET sampleOffsetRight[] = {
 
-    {-5, -2 * 3}, {-5, -5 * 3}, {-4, -7 * 3}, {-4, -8 * 3},
-    {-3, -8 * 3}, {-2, -8 * 3}, {-1, -8 * 3}, {0, -8 * 3}, {0, 0},
+    {-5, -2 * 3}, {-5, -5 * 3}, {-4, -7 * 3}, {-4, -8 * 3}, {-3, -8 * 3},
+    {-2, -8 * 3}, {-1, -8 * 3}, {0, -8 * 3},  {0, 0},
 };
 
 // Mirror of sampleOffsetRight above (x negated, same y).
 const OFFSET sampleOffsetLeft[] = {
 
-    {5, -2 * 3}, {5, -5 * 3}, {4, -7 * 3}, {4, -8 * 3},
-    {3, -8 * 3}, {2, -8 * 3}, {1, -8 * 3}, {0, -8 * 3}, {0, 0},
+    {5, -2 * 3}, {5, -5 * 3}, {4, -7 * 3}, {4, -8 * 3}, {3, -8 * 3}, {2, -8 * 3}, {1, -8 * 3}, {0, -8 * 3}, {0, 0},
 };
 
 const OFFSET sampleOffsetDown[] = {
@@ -510,63 +528,60 @@ const OFFSET *pickupOffset[] = {
 // (see updateDoorUnlock(), which does exactly that) -- an ordinary drop still commits (writes
 // the board cell, clears attachment) on the very next tick regardless, long before these extra
 // entries would ever be reached.
-#define REST_HOLD(x, y)                                                                                       \
-    {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, \
-        {x, y}
+#define REST_HOLD(x, y)                                                                                                \
+    {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {  \
+        x, y                                                                                                           \
+    }
 
 const OFFSET dropOffsetRight[] = {
 
-    {0, -8 * 3},     //
-    {-1, -7 * 3},    //
-    {-2, -7 * 3},    //
-    {-3, -7 * 3},    //
-    {-4, -6 * 3},    //
-    {-4, -6 * 3},    //
-    {-5, -4 * 3},    //
-    {-5, -2 * 3},    //
-    REST_HOLD(-5, -2 * 3),
-    {0, 0},          //
+    {0, -8 * 3},                      //
+    {-1, -7 * 3},                     //
+    {-2, -7 * 3},                     //
+    {-3, -7 * 3},                     //
+    {-4, -6 * 3},                     //
+    {-4, -6 * 3},                     //
+    {-5, -4 * 3},                     //
+    {-5, -2 * 3},                     //
+    REST_HOLD(-5, -2 * 3), {0, 0},    //
 };
 
 const OFFSET dropOffsetLeft[] = {
 
-    {0, -8 * 3},    //
-    {1, -7 * 3},    //
-    {2, -7 * 3},    //
-    {3, -7 * 3},    //
-    {4, -6 * 3},    //
-    {4, -6 * 3},    //
-    {5, -4 * 3},    //
-    {5, -2 * 3},    //
-    REST_HOLD(5, -2 * 3),
-    {0, 0},         //
+    {0, -8 * 3},                     //
+    {1, -7 * 3},                     //
+    {2, -7 * 3},                     //
+    {3, -7 * 3},                     //
+    {4, -6 * 3},                     //
+    {4, -6 * 3},                     //
+    {5, -4 * 3},                     //
+    {5, -2 * 3},                     //
+    REST_HOLD(5, -2 * 3), {0, 0},    //
 };
 
 const OFFSET dropOffsetDown[] = {
 
-    {0, -8 * 3},     //
-    {-1, -7 * 3},    //
-    {-1, -6 * 3},    //
-    {-2, -5 * 3},    //
-    {-2, -2 * 3},    //
-    {-2, 2 * 3},     //
-    {-1, 5 * 3},     //
-    {0, 8 * 3},      //
-    REST_HOLD(0, 8 * 3),
-    {0, 0},          //
+    {0, -8 * 3},                    //
+    {-1, -7 * 3},                   //
+    {-1, -6 * 3},                   //
+    {-2, -5 * 3},                   //
+    {-2, -2 * 3},                   //
+    {-2, 2 * 3},                    //
+    {-1, 5 * 3},                    //
+    {0, 8 * 3},                     //
+    REST_HOLD(0, 8 * 3), {0, 0},    //
 };
 
 const OFFSET dropOffsetUp[] = {
-    {0, -8 * 3},     //
-    {1, -8 * 3},     //
-    {1, -10 * 3},    //
-    {0, -12 * 3},    //
-    {0, -14 * 3},    //
-    {1, -13 * 3},    //
-    {1, -12 * 3},    //
-    {1, -11 * 3},    //
-    REST_HOLD(1, -11 * 3),
-    {0, 0},          //
+    {0, -8 * 3},                      //
+    {1, -8 * 3},                      //
+    {1, -10 * 3},                     //
+    {0, -12 * 3},                     //
+    {0, -14 * 3},                     //
+    {1, -13 * 3},                     //
+    {1, -12 * 3},                     //
+    {1, -11 * 3},                     //
+    REST_HOLD(1, -11 * 3), {0, 0},    //
 };
 
 
@@ -636,6 +651,17 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                     ADDAUDIO(SFX_DROP);
                     return true;
                 }
+
+                // Fire-button aimed at something liftable (PickupCharacter[] nonzero), but
+                // already carrying/shoving something else -- same "did nothing" feedback as the
+                // walk-in key pickup and walk-in shove attempts below: flash the carried item
+                // instead of silently doing nothing. Falls through unchanged otherwise -- not
+                // ATT_BLANK and not liftable just means bump into it like a wall, same as before.
+                // Guarded on !attachmentFlashTicks so holding the direction/button against it
+                // doesn't keep restarting the flash from its (deliberately blank) first frame --
+                // let an already-running flash finish its cycle undisturbed.
+                else if (PickupCharacter[type2] && !attachmentFlashTicks)
+                    attachmentFlashTicks = ATTACHMENT_FLASH_TICKS;
             }
 
             else if (!attachment) {
@@ -643,7 +669,7 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                 unsigned char pickup = PickupCharacter[CharToType[GET(*meAtt)]];
                 if (pickup) {
 
-                    kdelay = 5;
+                    kdelay = PICKUP_DELAY_TICKS;
 
                     faceDirection = faceDirectionDef[dir];
 
@@ -782,6 +808,8 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
             ADDAUDIO(SFX_LIFT);
 
+            kdelay = PICKUP_DELAY_TICKS;
+
             attachment = CH_KEY;
             attachmentOffset = pickupOffset[dir];
 
@@ -805,6 +833,14 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
             handled = true;
         }
+
+        // Same trigger as the fire-button pickup's PickupCharacter[] case above -- already
+        // carrying/shoving something, so the auto-pickup just above is skipped and the move
+        // stays blocked (see its own comment); flash the carried item as feedback that walking
+        // into the key did something rather than nothing. !attachmentFlashTicks guard: see that
+        // case's own comment -- don't restart an already-running flash.
+        else if (attachment && destType == TYPE_KEY && !attachmentFlashTicks)
+            attachmentFlashTicks = ATTACHMENT_FLASH_TICKS;
 
         // Carrying a key up to a still-locked door (CH_DOORCLOSED specifically, not just any
         // TYPE_DOOR -- board.c's ambient CH_DOORCLOSED case also opens these once
@@ -878,6 +914,13 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                 handled = true;
             }
         }
+
+        // Same trigger as above -- already carrying/shoving something, so the shove just above
+        // is skipped and the move stays blocked; flash the carried item as feedback.
+        // !attachmentFlashTicks guard: see the fire-button pickup case's own comment -- don't
+        // restart an already-running flash.
+        else if (attachment && (dir == 1 || dir == 3) && (Attribute[destType] & ATT_SHOVE) && !attachmentFlashTicks)
+            attachmentFlashTicks = ATTACHMENT_FLASH_TICKS;
 
         else if (Attribute[destType] & (ATT_BLANK | ATT_PERMEABLE | ATT_GRAB | ATT_EXIT)) {
 
@@ -1287,13 +1330,19 @@ void movePlayer(BoardCursor *cur) {
         gearsWaitRelease = false;
 
 
-    for (int dir = 0; dir < 4; dir++)
-        if (checkHighPriorityMove(cur, dir))
-            return;
+    // kdelay: see its own comment above -- freezes the player for a beat right after a pickup,
+    // so no new move of any kind (including checkLowPriorityMove()'s ordinary walk) can start
+    // until it expires.
+    if (!kdelay) {
 
-    for (int dir = 0; dir < 4 && !handled; dir++)
-        if (checkLowPriorityMove(cur, dir))
-            return;
+        for (int dir = 0; dir < 4; dir++)
+            if (checkHighPriorityMove(cur, dir))
+                return;
+
+        for (int dir = 0; dir < 4 && !handled; dir++)
+            if (checkLowPriorityMove(cur, dir))
+                return;
+    }
 
     // switch back to standing facing forward, turning if required
 

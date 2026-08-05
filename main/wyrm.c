@@ -56,6 +56,24 @@ bool newWyrm(int x, int y) {
     return false;
 }
 
+
+int dirFromCoords(int x, int y, int prevX, int prevY) {
+
+    int dir = 0;
+    if (x < prevX)
+        dir |= DIR_L;
+    if (x > prevX)
+        dir |= DIR_R;
+
+    if (y < prevY)
+        dir |= DIR_U;
+    if (y > prevY)
+        dir |= DIR_D;
+
+    return dir;
+}
+
+
 void processWyrms() {
 
 

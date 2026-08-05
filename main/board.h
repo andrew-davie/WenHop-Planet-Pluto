@@ -15,6 +15,7 @@ extern bool lastOnOffHoriz[_BOARD_ROWS];
 // actual persistent-across-frames scan position lives in boardRow/boardCol
 // (see main.h), which only setupBoardScanner() and processBoardSquares()
 // touch directly.
+
 typedef struct {
     unsigned char *me;
     int row;

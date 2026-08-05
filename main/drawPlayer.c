@@ -1,17 +1,12 @@
-// #include "defines_from_dasm_for_c.h"
 #include <stdbool.h>
 
 #include "defines_dasm.h"
 
 #include "cdfjplus.h"
 
-// #include "characterset.h"
-
-#include "main.h"
-
-
 #include "colour.h"
 #include "drawPlayer.h"
+#include "main.h"
 #include "mellon.h"
 #include "playerAnimation.h"
 #include "random.h"
@@ -22,7 +17,7 @@
 
 
 #define SCORE_SCANLINES 21 /* todo: aritrary ATM */
-#define SPRITE_DEPTH 30
+#define SPRITE_DEPTH 30    /*TODO: seems wrong; we should be using height from the sprites*/
 
 
 static int playerSpriteY;
@@ -60,9 +55,8 @@ void initSprites() {
     int oldlum = luminance;
     luminance = 0;
 
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 16; i++)
         playerBaseColour[i] = playerColour[i] + rcol;
-    }
 
     luminance = oldlum;
 }
@@ -189,6 +183,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
         } else
             RAM[_P1_X] = RAM[_P0_X] + 8;
 
+
         // Position is fully committed above -- everything from here down only decides what
         // gets drawn into GRP0, which the memset at the top already left at "nothing". See
         // this function's opening comment for why hiding happens here, not on early entry.
@@ -200,6 +195,7 @@ void drawPlayerSprite() {    // --> 3956 max (30/5/2026)
         // prepare for, and forcing the X position to 0 here (instead of leaving it at wherever
         // the player actually was) is what actually stops a visible artifact showing through --
         // just skipping the shape-drawing loops below wasn't enough on its own.
+
         if (hidden) {
             if (exitMode && playerExitFade >= 15) {
                 RAM[_P0_X] = 0;

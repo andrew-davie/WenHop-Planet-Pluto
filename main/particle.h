@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 #define PARTICLE_COUNT 42
 #define ROPE_PARTICLE_COUNT 42
 #define PARTICLE_SPIRAL_ANGULAR_SPEED 6
@@ -26,6 +28,18 @@ struct Particle {
     int trixY_8;
     unsigned char dir;
     unsigned short distance;
+
+    // PT_RAIN only: the rock/geodoge roll-off steering still runs normally (rolls sideways off a
+    // rock/geodoge exactly like real rain when there's a blank pixel to roll onto), but every
+    // point that would otherwise splash-and-terminate (water, board bounds, the player, no clear
+    // side to roll toward, roll blocked with nowhere to go, any other solid pixel) instead just
+    // lets it keep falling straight through -- no SFX_DRIP2, no splash burst, no termination --
+    // until its own preset age runs out and it dies quietly. For a short decorative fall that
+    // isn't real weather and, unlike real rain, typically spawns already touching/inside solid
+    // background (e.g. right at an object's base) where real rain's collisions would otherwise
+    // end it almost immediately. False (collides and splashes normally, unchanged) for every
+    // other spawn, including real weather (makeRain()).
+    bool silent;
 };
 
 extern struct Particle particle[PARTICLE_COUNT];

@@ -4,7 +4,6 @@
 
 #include "cdfjplus.h"
 
-// #include "characterset.h"
 #include "colour.h"
 #include "main.h"
 #include "random.h"
@@ -36,7 +35,9 @@ const unsigned char TranslateColour[] = {0x00, 0x20, 0x20, 0x40, 0x60, 0x80, 0xA
 
 const unsigned char TranslateSecamColour[] = {0, 0xC, 0xC, 4, 4, 6, 6, 2, 2, 2, 8, 8, 8, 8, 0xC, 0xC};
 
+
 unsigned char secamConvert(unsigned char col) {
+
     unsigned char c = TranslateSecamColour[col >> 4];
 
     if ((col & 0xF) >= 4) {
@@ -92,6 +93,7 @@ unsigned char convertColour(unsigned char colour) {
     return adjustBrightness(colour);
 }
 
+
 void pulseBackgroundColour(unsigned char colour, int ftime) {
     colubk = convertColour(colour);
     flashTime = ftime;
@@ -114,7 +116,6 @@ void fadeBackgroundColour() {
     }
 }
 
-// const unsigned char pfColour[] = {0xA8, 0x28, 0xC8, 0xC8};    //{0x88, 0x28, 0xD8, 0xD8};
 
 void setPFColours(const unsigned char *palette, unsigned char *colourBuffer) {
 
@@ -129,6 +130,7 @@ void setPFColours(const unsigned char *palette, unsigned char *colourBuffer) {
         colourBuffer[i] = pfConvertedColour[roller];
     }
 }
+
 
 void adjustLuminance(int speed) {
 

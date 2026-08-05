@@ -8,7 +8,6 @@
 #include "animations.h"
 #include "board.h"
 #include "caveData.h"
-#include "characterset.h"
 #include "colour.h"
 #include "decodeCaves.h"
 #include "draw.h"
@@ -76,6 +75,7 @@ void initGameState_Game() {
 // first) and startTeleportWarp() (caveData.c), which calls this directly, mid-game, to switch
 // to a different cave without resetting score/lives. Everything initGameState_Game() used to
 // do apart from initNewGame() lives here unchanged.
+
 void loadCave(int newCave) {
 
     cave = newCave;
@@ -114,11 +114,9 @@ void loadCave(int newCave) {
 
     luminance = -15;
     lumTarget = 0;
-    loadPalette();
+    loadPalette();    // redundant?  caves now hold palette
 
     setSchedule(SCHEDULE_UNPACK_CAVE);
-
-    //    myMemsetInt((unsigned int *)(RAM + _GAME_BUFFERS_START), 0, _GAME_BUFFERS_SIZE / 4);
 
     gameSpeed = SPEED_BASE;
     gameFrame = gameSpeed;    // force rollover
@@ -164,6 +162,7 @@ void VB_Game() {
     // frame -- that's what forces the screen black while drawScreen() itself
     // is also skipped during unpack (see OS_Game()), regardless of whatever
     // stale buffer contents are sitting there.
+
     if (gameSchedule != SCHEDULE_UNPACK_CAVE)
         swipe(50000);    // Bumped from 35000, confirmed on hardware -- now safe to hold back more of the
                          // frame for other VB_Game systems without any visible cost, because circle()'s
@@ -179,14 +178,15 @@ void VB_Game() {
 
     gameFrame++;
 
+    if (attachmentFlashTicks)
+        attachmentFlashTicks--;
+
 
 #if ENABLE_SHAKE
-
 
     if (shakeTime) {
 
         shakeTime--;
-
 
         int lastShakeX = shakeX;
         int lastShakeY = shakeY;
@@ -199,22 +199,18 @@ void VB_Game() {
             if (shakeX >= 2 << 16)
                 shakeX = -(1 << 16);
         }
-
-
-    }
-
-    else
+    } else
         shakeX = shakeY = 0;
+
 #endif
 
     if (RAM[_SWCHB] != 0x3F)
         setGameState(GS_MENU);
 
-    processCharAnimations();              // does NOT drive TYPE_TELEPORT -- see driveTeleportSpin()'s
-                                          // own comment (animations.c) for why that's deliberate
-    driveTeleportSpin(teleportLocked);    // idle spin normally, faster for as long as the player is
-                                          // actually entering the tile
+    processCharAnimations();
+    driveTeleportSpin(teleportLocked);
     updateTeleportArrivalSwirl();
+
     setPalette(_BUF_GAME_COLUBK);
 
     if (gameSchedule != SCHEDULE_UNPACK_CAVE) {
@@ -250,6 +246,7 @@ void VB_Game() {
         // the swipe fully completes. levelLabelTicks ticks down in lockstep right here, once
         // per call, so it always reaches zero on the exact frame the ID string's own particle
         // age does (see its comment in main.h) regardless of maskNeeded.
+
         if (levelLabelTicks)
             levelLabelTicks--;
 
@@ -275,6 +272,7 @@ void VB_Game() {
             // and behind the drifting-away player, instead of staying down where it was
             // dropped. Teleport doesn't need the equivalent check: isPlayerHidden() already
             // hides it within a frame or two of landing, well before its own arc could exhaust.
+
             if (!isPlayerHidden() && !(exitMode && playerExitFade >= 15) &&
                 !(exitMode && attachment && !attachmentOffset))
                 drawAttachedChar(attachment);

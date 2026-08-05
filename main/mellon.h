@@ -19,6 +19,14 @@ typedef struct {
 
 extern int attachment;    // what the player is currently carrying, if anything (CH_... value, or 0)
 extern const OFFSET *attachmentOffset;
+extern int attachmentFlashTicks;    // see its own comment, mellon.c
+
+// 0.8 seconds at 60fps. Shared with draw.c's drawAttachedChar(), which measures elapsed time
+// against this (ATTACHMENT_FLASH_TICKS - attachmentFlashTicks) rather than testing
+// attachmentFlashTicks directly, so the blink always starts BLANK on the very first frame
+// regardless of this value's own bit pattern. mellon.c's trigger sites all guard on
+// !attachmentFlashTicks, so a flash already in progress never restarts/retriggers.
+#define ATTACHMENT_FLASH_TICKS 48
 
 // See attachmentIsShove/shoveDestCell's own comments (mellon.c) -- the "attachment held rigidly
 // beside the player while shoving an immovable block" mode and the board cell to commit it into.

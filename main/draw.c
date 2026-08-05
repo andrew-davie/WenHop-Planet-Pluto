@@ -592,6 +592,17 @@ void drawAttachedChar(int ch) {
     // ch is always `attachment` (mellon.c), which is never flagged with FLAG_THISFRAME -- see
     // its declaration -- so no GET() needed here.
 
+    // Blink off every other few frames while attachmentFlashTicks is counting down (mellon.c) --
+    // feedback for a blocked pickup/shove attempt. Tested against ELAPSED time since the flash
+    // was triggered (ATTACHMENT_FLASH_TICKS - attachmentFlashTicks), not the remaining-ticks
+    // value directly, so frame 0 is always BLANK regardless of ATTACHMENT_FLASH_TICKS's own bit
+    // pattern -- mellon.c's trigger sites all guard on !attachmentFlashTicks now (don't restart
+    // an already-running flash), so this only ever needs to be right about a fresh trigger, not
+    // a retrigger mid-cycle. The leading `attachmentFlashTicks &&` is what keeps this a no-op
+    // outside the flash -- elapsed alone doesn't know that.
+    if (attachmentFlashTicks && !((ATTACHMENT_FLASH_TICKS - attachmentFlashTicks) & 8))
+        return;
+
     int type = CharToType[ch];
     if (Animate[type])
         ch = *Animate[type];

@@ -194,6 +194,7 @@ void drawScreen() {
 
     int sXpix = sX >> 16;
     int characterX = DIV(sXpix, CHAR_TRIX_X);
+#undef DIV
     int shift = CHAR_TRIX_X - (sXpix - characterX * CHAR_TRIX_X);
 
     unsigned char leftMaskLeft = theCave->flags & CAVEDEF_MASK_LEFT_PIXEL ? 0b11100000 : 0b11110000;
@@ -351,6 +352,7 @@ void drawScreenMirror(int buffer) {
 
     int sXpix = sX >> 16;
     int characterX = DIV(sXpix, CHAR_TRIX_X);
+#undef DIV
     int shift = CHAR_TRIX_X - (sXpix - characterX * CHAR_TRIX_X);
 
     int scanline = 0;

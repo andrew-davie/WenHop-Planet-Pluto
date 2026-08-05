@@ -2096,11 +2096,11 @@ enum RollEligibility rollEligibility(unsigned char *me, int offset) {
 // immediately if neither is even ROLL_LOOSE (the common case for a rock boxed in solid on both
 // sides) -- every resting rock on the board pays this cost every PH2 pass regardless of whether
 // anything is ever going to happen, so an ASAP early-out here matters far more than anything
-// downstream of it. If a side IS at least ROLL_STRICT, a 1-in-8 chance of actually committing
-// the roll each time, rather than the instant it can -- reads as the rock occasionally teetering
-// before it goes. If it doesn't roll this tick (dice missed, or neither side reached
-// ROLL_STRICT), a single particle at the rock's own base reads as "it just shifted/settled
-// without going anywhere" instead of nothing visible happening at all.
+// downstream of it. If a side IS at least ROLL_STRICT, it always rolls -- no dice -- picking at
+// random between left/right if BOTH reached ROLL_STRICT. If neither side reached ROLL_STRICT
+// (only blocked by the player, or truly boxed in), a single raindrop particle at the rock's own
+// base reads as "it just shifted/settled without going anywhere" instead of nothing visible
+// happening at all.
 //
 // When it DOES commit: if that side square is blank AND the square diagonally below it is blank
 // OR crushable, the rock commences a one-frame diagonal-roll transition into that column
@@ -2109,9 +2109,7 @@ enum RollEligibility rollEligibility(unsigned char *me, int offset) {
 // lost support underneath -- see their own comments. Same shape as doRoll() (TYPE_DOGE's
 // equivalent, above) but: (a) uses the rock's own transition characters instead of doge's, (b)
 // also accepts a crushable landing spot, exploding it out of the way rather than requiring it to
-// already be blank -- a doge rolls off things gently, a multi-tonne rock does not, and (c) has
-// the probabilistic teeter + near-miss burst doRoll() deliberately doesn't -- see doRoll()'s own
-// comment for why TYPE_DOGE stays immediate.
+// already be blank -- a doge rolls off things gently, a multi-tonne rock does not.
 
 void doRollRock(unsigned char *me, int row, int col) {
 
@@ -2121,9 +2119,19 @@ void doRollRock(unsigned char *me, int row, int col) {
     if (left == ROLL_NONE && right == ROLL_NONE)
         return;
 
-    int offset = left == ROLL_STRICT ? -1 : right == ROLL_STRICT ? 1 : 0;
+    // Always rolls when at least one side is ROLL_STRICT -- no dice. If BOTH sides are, pick
+    // between them at random instead of always favouring left.
+    int offset;
+    if (left == ROLL_STRICT && right == ROLL_STRICT)
+        offset = rangeRandom(2) ? 1 : -1;
+    else if (left == ROLL_STRICT)
+        offset = -1;
+    else if (right == ROLL_STRICT)
+        offset = 1;
+    else
+        offset = 0;
 
-    if (offset && !rangeRandom(8)) {
+    if (offset) {
 
         unsigned char *side = me + offset;
         unsigned char *sideDown = side + _BOARD_COLS;
@@ -2178,10 +2186,33 @@ void doRollRock(unsigned char *me, int row, int col) {
         }
     }
 
-    // Didn't roll this tick -- single particle at the rock's own trixel center-x, base-y
-    // (bottom row of its own cell). sphereDot() assigns it its own random dir each time (see
-    // nDots()'s own comment), at a slowish random speed (0-0x1F) and a short 10-frame age.
-    nDots(1, col, row, PT_TWO, 10, CHAR_CENTER_X, CHAR_TRIX_Y - 1, 0x20, 5);
+    // Didn't roll this tick -- roughly 1-in-2 chance of a single literal raindrop along the
+    // rock's own base (bottom row of its own cell), at any of its 5 trixel columns (picked at
+    // random). Same spawn makeRain() (particle.c) uses for real weather -- sphereDot() directly
+    // (not nDots()), same dir/distance/speed reset right after (PT_RAIN repurposes dir as a
+    // fall-velocity accumulator that has to start at rest, not sphereDot()'s randomized compass
+    // angle -- see its own comment) -- but a much shorter 30-frame age; makeRain()'s own 200
+    // (appropriate for a drop falling the length of the whole screen) left this one lingering
+    // far too long for something already spawned at ground level.
+    if (!rangeRandom(2)) {
+
+        // 3 drops per trigger, each independently at a random column. Middle columns (1-3) sit
+        // one trixel lower than the edge columns (0, 4) -- the rock's own base glyph isn't
+        // flat, so this keeps each drop's spawn hugging it visually.
+        for (int n = 0; n < 3; n++) {
+
+            int rc = rangeRandom(CHAR_TRIX_X);
+            int ry = CHAR_TRIX_Y - 1 + (rc >= 1 && rc <= 3 ? 1 : 0);
+
+            int idx = sphereDot(col * CHAR_TRIX_X + rc, row * CHAR_TRIX_Y + ry, PT_RAIN, 30, 5);
+            if (idx >= 0) {
+                particle[idx].dir = 0;
+                particle[idx].distance = 0;
+                particle[idx].speed = 0;
+                particle[idx].silent = true;    // no splash SFX/burst -- see struct Particle's own comment
+            }
+        }
+    }
 }
 
 
@@ -2198,9 +2229,19 @@ void doRollGeodoge(unsigned char *me, int row, int col) {
     if (left == ROLL_NONE && right == ROLL_NONE)
         return;
 
-    int offset = left == ROLL_STRICT ? -1 : right == ROLL_STRICT ? 1 : 0;
+    // Always rolls when at least one side is ROLL_STRICT -- no dice. If BOTH sides are, pick
+    // between them at random instead of always favouring left.
+    int offset;
+    if (left == ROLL_STRICT && right == ROLL_STRICT)
+        offset = rangeRandom(2) ? 1 : -1;
+    else if (left == ROLL_STRICT)
+        offset = -1;
+    else if (right == ROLL_STRICT)
+        offset = 1;
+    else
+        offset = 0;
 
-    if (offset && !rangeRandom(8)) {
+    if (offset) {
 
         unsigned char *side = me + offset;
         unsigned char *sideDown = side + _BOARD_COLS;
@@ -2239,7 +2280,26 @@ void doRollGeodoge(unsigned char *me, int row, int col) {
         }
     }
 
-    nDots(1, col, row, PT_TWO, 10, CHAR_CENTER_X, CHAR_TRIX_Y - 1, 0x20, 5);
+    // Same literal-raindrop spawn as doRollRock() -- see its own comment.
+    if (!rangeRandom(2)) {
+
+        // 3 drops per trigger, each independently at a random column. Middle columns (1-3) sit
+        // one trixel lower than the edge columns (0, 4) -- the rock's own base glyph isn't
+        // flat, so this keeps each drop's spawn hugging it visually.
+        for (int n = 0; n < 3; n++) {
+
+            int rc = rangeRandom(CHAR_TRIX_X);
+            int ry = CHAR_TRIX_Y - 1 + (rc >= 1 && rc <= 3 ? 1 : 0);
+
+            int idx = sphereDot(col * CHAR_TRIX_X + rc, row * CHAR_TRIX_Y + ry, PT_RAIN, 30, 5);
+            if (idx >= 0) {
+                particle[idx].dir = 0;
+                particle[idx].distance = 0;
+                particle[idx].speed = 0;
+                particle[idx].silent = true;    // no splash SFX/burst -- see struct Particle's own comment
+            }
+        }
+    }
 }
 
 

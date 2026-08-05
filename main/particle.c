@@ -484,8 +484,12 @@ void drawParticles() {
     for (int i = 0; i < PARTICLE_COUNT && TIME_OK(DRAWPARTICLE); i++)
         if (particle[i].age && particle[i].type != PT_CHARACTER) {
 
-            int xOffset = (sin_cos[particle[i].dir >> 3] * particle[i].distance) >> 8;
-            int yOffset = (sin_cos[((particle[i].dir + 64) & 0xFF) >> 3] * particle[i].distance * 3) >> 8;
+            int distance3x = particle[i].distance * 3;    // roller==0 gating above only advances
+                                                            // distance 1 real frame in 3, so scale
+                                                            // it back up here to keep the same
+                                                            // effective speed
+            int xOffset = (sin_cos[particle[i].dir >> 3] * distance3x) >> 8;
+            int yOffset = (sin_cos[((particle[i].dir + 64) & 0xFF) >> 3] * distance3x * 3) >> 8;
 
             int y = (particle[i].trixY_8 + yOffset) >> 8;
             int x = (particle[i].trixX_8 + xOffset) >> 8;
@@ -522,8 +526,10 @@ void drawParticles() {
                 particle[i].trixY_8 += particle[i].dir;
 
                 if (showWater && (particle[i].trixY_8 >> 8) >= (liquidTrixel_8 >> 8)) {
-                    ADDAUDIO(SFX_DRIP2);
-                    nDotsAtTrixel(3, particle[i].trixX_8 >> 8, liquidTrixel_8 >> 8, 12, PT_TWO, 30, 7);
+                    if (!particle[i].silent) {
+                        ADDAUDIO(SFX_DRIP2);
+                        nDotsAtTrixel(3, particle[i].trixX_8 >> 8, liquidTrixel_8 >> 8, 12, PT_TWO, 30, 7);
+                    }
                     pushParticle(i);
                     continue;
                 }
@@ -532,8 +538,10 @@ void drawParticles() {
                 int cellRow = ((particle[i].trixY_8 >> 8) * ((0x10000 + CHAR_TRIX_Y - 1) / CHAR_TRIX_Y)) >> 16;
 
                 if (cellRow < 0 || cellRow >= _BOARD_ROWS || cellCol < 0 || cellCol >= _BOARD_COLS) {
-                    ADDAUDIO(SFX_DRIP2);
-                    nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
+                    if (!particle[i].silent) {
+                        ADDAUDIO(SFX_DRIP2);
+                        nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
+                    }
                     pushParticle(i);
                     continue;
                 }
@@ -547,8 +555,10 @@ void drawParticles() {
                 // person-shaped obstacle: outer columns pass through, inner
                 // three splash at the top of the cell.
                 if (cellCol == playerX && cellRow == playerY && subCol > 0 && subCol < CHAR_TRIX_X - 1) {
-                    ADDAUDIO(SFX_DRIP2);
-                    nDotsAtTrixel(3, particle[i].trixX_8 >> 8, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
+                    if (!particle[i].silent) {
+                        ADDAUDIO(SFX_DRIP2);
+                        nDotsAtTrixel(3, particle[i].trixX_8 >> 8, cellRow * CHAR_TRIX_Y, 12, PT_TWO, 30, 7);
+                    }
                     pushParticle(i);
                     continue;
                 }
@@ -593,6 +603,11 @@ void drawParticles() {
                     int half = CHAR_TRIX_X >> 1;
 
                     if (subCol == half) {
+                        // silent: no clear side to roll toward -- keep falling straight through
+                        // rather than splashing and dying (see the roll-blocked case below for
+                        // the same reasoning).
+                        if (particle[i].silent)
+                            break;
                         ADDAUDIO(SFX_DRIP2);
                         nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                         pushParticle(i);
@@ -610,6 +625,11 @@ void drawParticles() {
                         particle[i].trixX_8 = newTrixX << 8;
                         particle[i].trixY_8 -= particle[i].dir;
                         particle[i].dir >>= 2;    // sheds most of its speed onto the rock
+                    } else if (particle[i].silent) {
+                        // silent: can't find a blank pixel to roll onto -- rather than splashing
+                        // and dying like real rain would, just keep falling straight down
+                        // through the obstruction; it re-tests from its new (already-fallen)
+                        // position next frame.
                     } else {
                         ADDAUDIO(SFX_DRIP2);
                         nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
@@ -617,7 +637,7 @@ void drawParticles() {
                         continue;
                     }
 
-                } else if (pixelSolid) {
+                } else if (pixelSolid && !particle[i].silent) {
 
                     ADDAUDIO(SFX_DRIP2);
                     nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
@@ -632,13 +652,14 @@ void drawParticles() {
                 break;
             }
 
-            particle[i].distance += particle[i].speed;
+            if (roller == 0)
+                particle[i].distance += particle[i].speed;
 
             if (!--particle[i].age || !drawBit(x, y, particle[i].colour)) {
 
                 // Age/off-screen safety net -- splash here too so a rain
                 // drop never silently vanishes without hitting anything.
-                if (particle[i].type == PT_RAIN) {
+                if (particle[i].type == PT_RAIN && !particle[i].silent) {
                     ADDAUDIO(SFX_DRIP2);
                     nDotsAtTrixel(3, particle[i].trixX_8 >> 8, particle[i].trixY_8 >> 8, 12, PT_TWO, 30, 7);
                 }
@@ -779,6 +800,7 @@ int sphereDot(int trixX, int trixY, int type, unsigned char age, unsigned char c
 
                 particle[whichDrop].dir = getRandom32();    // 16.16 angle
                 particle[whichDrop].distance = 0;
+                particle[whichDrop].silent = false;
             }
         }
     }
