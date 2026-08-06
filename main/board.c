@@ -497,7 +497,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-07 01:57 AEST
+// Last updated: 2026-08-07 02:11 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -510,9 +510,9 @@ static const unsigned short budget[128] = {
     _B + 346,     //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 528,     //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 2426,    //  10 CH_ROCK -- updated 2026-08-07 01:41 AEST (was 2325)
-    _B + 2488,    //  11 CH_ROCK_FALLING -- updated 2026-08-07 01:57 AEST (was 2453)
+    _B + 3088,    //  11 CH_ROCK_FALLING -- updated 2026-08-07 02:11 AEST (was 2488)
     _B + 2064,    //  12 CH_DOGE_00 -- updated 2026-08-07 00:03 AEST (was 2063)
-    _B + 2467,    //  13 CH_DOGE_FALLING -- updated 2026-08-07 00:00 AEST (was 390)
+    _B + 2498,    //  13 CH_DOGE_FALLING -- updated 2026-08-07 02:11 AEST (was 2467)
     _B + 292,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-08-06 23:32 AEST (was 291)
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
@@ -614,7 +614,7 @@ static const unsigned short budget[128] = {
     _untimed_,    // 112 CH_KEY
     _untimed_,    // 113 CH_DOOROPEN_STATIC
     _B + 424,     // 114 CH_IMMOVABLE -- updated 2026-08-06 23:32 AEST (was 261)
-    _B + 2299,    // 115 CH_IMMOVABLE_FALLING -- updated 2026-08-06 23:32 AEST (was 2024)
+    _B + 2348,    // 115 CH_IMMOVABLE_FALLING -- updated 2026-08-07 02:11 AEST (was 2299)
     _B + 213,     // 116 CH_IMMOVABLE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 169)
     _B + 213,     // 117 CH_IMMOVABLE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 169)
     _B + 213,     // 118 CH_ROCK_SIDE_1 -- updated 2026-08-06 23:27 AEST (was 170)
