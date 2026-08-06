@@ -39,6 +39,12 @@
 
 #define TELEPORT_IDLE_SPARKLE_CHANCE 20
 
+// Very short compared to SHAKE_TICKS (mellon.c, half a second -- the player-triggered
+// shove/pickup feedback): this one repeats every scan for as long as the player stays put
+// underneath a blocked rock/geodoge (case CH_ROCK/CH_GEODOGE, below), so each individual shake
+// only needs to read as a single strained flinch, not a sustained vibration.
+#define HAZARD_SHAKE_TICKS 10
+
 
 // must be init'd at startup
 static int selectorCounter;
@@ -333,6 +339,16 @@ void displayFloatingString(int trixX, int trixY, int age, char *s, bool centered
 
 void setupBoardScanner() {
 
+#if ENABLE_SWIPE
+    // Freeze all board processing until the swipe reveal (level intro/outro iris) has fully
+    // finished -- nothing should fall/roll/move while the screen is still being revealed.
+    // gameFrame just keeps counting up past gameSpeed in the meantime (harmless -- it's only
+    // ever compared against that threshold below), so the very next call after the swipe
+    // finishes resumes immediately, with no extra lag tacked on.
+    if (!checkSwipeFinished())
+        return;
+#endif
+
     // After board scan complete, throttles until we're at correct FPS
     if (gameFrame >= gameSpeed) {    // && !autoMoveFrameCount) {
 
@@ -479,7 +495,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-05 23:40 AEST
+// Last updated: 2026-08-06 18:59 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -601,8 +617,8 @@ static const unsigned short budget[128] = {
     _B + 169,     // 117 CH_IMMOVABLE_FALLING_BOTTOM -- updated 2026-08-05 23:40 AEST (was untimed)
     _B + 170,     // 118 CH_ROCK_SIDE_1 -- updated 2026-08-05 23:32 AEST (was untimed)
     _B + 170,     // 119 CH_ROCK_SIDE_2 -- updated 2026-08-05 23:32 AEST (was untimed)
-    _B + 176,     // 120 CH_ROCK_SIDE_3 -- updated 2026-08-05 23:32 AEST (was untimed)
-    _B + 177,     // 121 CH_ROCK_SIDE_4 -- updated 2026-08-05 23:40 AEST (was 176)
+    _B + 196,     // 120 CH_ROCK_SIDE_3 -- updated 2026-08-06 18:59 AEST (was 176)
+    _B + 196,     // 121 CH_ROCK_SIDE_4 -- updated 2026-08-06 18:59 AEST (was 177)
     _untimed_,    // 122 CH_GEODOGE_SIDE_1
     _untimed_,    // 123 CH_GEODOGE_SIDE_2
     _untimed_,    // 124 CH_GEODOGE_SIDE_3
@@ -1353,25 +1369,63 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
 
     // Arrived in the new column -- re-enter the ordinary vertical-fall pipeline exactly as if
     // support had just vanished from under a settled CH_ROCK (case CH_ROCK, above): TOP dissolves
-    // to dust next scan while BOTTOM (one row down, already confirmed clear or crushed by
-    // doRollRock()) becomes the real CH_ROCK_FALLING.
+    // to dust next scan while BOTTOM (one row down, normally already confirmed clear or crushed
+    // by doRollRock()) becomes the real CH_ROCK_FALLING.
+    //
+    // That "one row down is clear" assumption breaks when TWO rocks roll into the SAME column
+    // from vertically adjacent rows on the same tick (e.g. a tall gap beside a rock column --
+    // every rock along that edge is independently roll-eligible at once): the lower rock can be
+    // anywhere along ITS OWN transition -- still CH_ROCK_SIDE_3/4 (TYPE_ROCK_ROLLING, PH2 --
+    // lingers 2 scans), or already past that into CH_ROCK_FALLING_TOP/BOTTOM (TYPE_ROCK_FALLING,
+    // PH1 -- resolves every scan) -- by the time this upper rock gets looked at again. Either way
+    // it's still mid-transition through this exact cell, not really settled there yet, so defer
+    // (do nothing, stay CH_ROCK_SIDE_3/4) rather than risk clobbering whatever it's about to
+    // become. Once the cell below is neither, it's either genuinely blank (the lower rock has
+    // moved on) -- commit normally -- or it raced ahead and actually SETTLED there (landed on
+    // solid ground one row down and stopped) -- in which case this rock can't fall through after
+    // all either; settle it as an ordinary resting CH_ROCK instead of overwriting whatever
+    // that turned out to be.
     case CH_ROCK_SIDE_3:
-    case CH_ROCK_SIDE_4:
-        *cur->me = FLAG(CH_ROCK_FALLING_TOP);
-        *(cur->me + _BOARD_COLS) = FLAG(CH_ROCK_FALLING_BOTTOM);
+    case CH_ROCK_SIDE_4: {
+        unsigned char *below = cur->me + _BOARD_COLS;
+        enum ObjectType belowType = CharToType[GET(*below)];
+
+        if (belowType == TYPE_ROCK_ROLLING || belowType == TYPE_ROCK_FALLING)
+            break;
+
+        if (Attribute[belowType] & ATT_BLANK) {
+            *cur->me = FLAG(CH_ROCK_FALLING_TOP);
+            *below = FLAG(CH_ROCK_FALLING_BOTTOM);
+        } else
+            *cur->me = FLAG(CH_ROCK);
+
         break;
+    }
 
     case CH_GEODOGE_SIDE_1:
     case CH_GEODOGE_SIDE_2:
         *cur->me = FLAG(CH_BLANK);
         break;
 
-    // Same idea as CH_ROCK_SIDE_3/4 above, but resolving into the geodoge's own falling pair.
+    // Same idea as CH_ROCK_SIDE_3/4 above, but resolving into the geodoge's own falling pair --
+    // see its own comment for the same "two rocks roll into one column" collision this guards
+    // against.
     case CH_GEODOGE_SIDE_3:
-    case CH_GEODOGE_SIDE_4:
-        *cur->me = FLAG(CH_GEODOGE_FALLING_TOP);
-        *(cur->me + _BOARD_COLS) = FLAG(CH_GEODOGE_FALLING_BOTTOM);
+    case CH_GEODOGE_SIDE_4: {
+        unsigned char *below = cur->me + _BOARD_COLS;
+        enum ObjectType belowType = CharToType[GET(*below)];
+
+        if (belowType == TYPE_GEODOGE_ROLLING || belowType == TYPE_GEODOGE_FALLING)
+            break;
+
+        if (Attribute[belowType] & ATT_BLANK) {
+            *cur->me = FLAG(CH_GEODOGE_FALLING_TOP);
+            *below = FLAG(CH_GEODOGE_FALLING_BOTTOM);
+        } else
+            *cur->me = FLAG(CH_GEODOGE);
+
         break;
+    }
 
     case CH_DOGE_SIDE_3:
     case CH_DOGE_SIDE_4:
@@ -1626,7 +1680,7 @@ void restartBoardScan() {
             shakeTime = 40;
             FLASH(0x34, 20);
 
-            attachment = 0;
+            attachments[SLOT_CARRY].type = 0;
 
             explodeCount = 6;
             explodeRadius = 10;
@@ -2186,6 +2240,23 @@ void doRollRock(unsigned char *me, int row, int col) {
         }
     }
 
+    // Blocked from rolling specifically by the player, not just boxed in solid --
+    // rollEligibility()'s ROLL_LOOSE (see its own comment) only ever comes back that way when
+    // the player (or their pre-materialization placeholder) is occupying the side or
+    // diagonal-below cell it needs, so this is precisely "would have rolled here, but the player
+    // is standing in the way" -- strain in place: a very short shake (findFreeHazardSlot(),
+    // mellon.h). Doesn't skip or replace the under-rock raindrop cue below -- that fires
+    // independently on its own chance regardless of whether this also fires. A DIFFERENT rock
+    // could simultaneously be blocked this way from the other side (one flanking the player on
+    // the left, a completely different one on the right) -- that's what the second hazard slot
+    // is for.
+    if (left == ROLL_LOOSE || right == ROLL_LOOSE) {
+
+        int slot = findFreeHazardSlot();
+        if (slot >= 0)
+            shakeObject(slot, me, col, row, HAZARD_SHAKE_TICKS);
+    }
+
     // Didn't roll this tick -- roughly 1-in-2 chance of a single literal raindrop along the
     // rock's own base (bottom row of its own cell), at any of its 5 trixel columns (picked at
     // random). Same spawn makeRain() (particle.c) uses for real weather -- sphereDot() directly
@@ -2278,6 +2349,15 @@ void doRollGeodoge(unsigned char *me, int row, int col) {
 
             return;
         }
+    }
+
+    // Blocked from rolling specifically by the player -- same reasoning as doRollRock()'s own
+    // hazard-shake, above -- doesn't skip or replace the raindrop cue below either, same as there.
+    if (left == ROLL_LOOSE || right == ROLL_LOOSE) {
+
+        int slot = findFreeHazardSlot();
+        if (slot >= 0)
+            shakeObject(slot, me, col, row, HAZARD_SHAKE_TICKS);
     }
 
     // Same literal-raindrop spawn as doRollRock() -- see its own comment.
