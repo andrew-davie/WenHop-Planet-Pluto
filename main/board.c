@@ -91,6 +91,7 @@ void doRollMotionArc(int col, int row, int trailSide);
 void spawnBaseRaindrops(int col, int row);
 enum RollEligibility { ROLL_NONE, ROLL_LOOSE, ROLL_STRICT };
 enum RollEligibility rollEligibility(unsigned char *me, int offset);
+bool blockedByPlayerBelow(unsigned char *me, int offset);
 void setInsulator(unsigned char *p, int row, int col);
 
 //------------------------------------------------------------------------------
@@ -496,7 +497,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-06 18:59 AEST
+// Last updated: 2026-08-06 23:27 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
@@ -508,23 +509,23 @@ static const unsigned short budget[128] = {
     _untimed_,    //   7 CH_STEELWALL
     _B + 346,     //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 528,     //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 5541,    //  10 CH_ROCK -- updated 2026-08-05 23:40 AEST (was 262)
-    _B + 4065,    //  11 CH_ROCK_FALLING -- updated 2026-07-29 00:48 AEST (was 3965)
-    _B + 2032,    //  12 CH_DOGE_00 -- updated 2026-07-29 00:41 AEST (was 2031)
-    _B + 2474,    //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
-    _B + 282,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-07-28 16:26 AEST (was 281)
+    _B + 2305,    //  10 CH_ROCK -- updated 2026-08-06 23:27 AEST (was 262)
+    _B + 2525,    //  11 CH_ROCK_FALLING -- updated 2026-08-06 23:27 AEST (was 262)
+    _B + 262,     //  12 CH_DOGE_00 -- updated 2026-07-29 00:41 AEST (was 2031)
+    _B + 262,     //  13 CH_DOGE_FALLING -- updated 2026-07-28 00:07 AEST
+    _B + 291,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-08-06 23:27 AEST (was 282)
     _untimed_,    //  15 CH_LAVA_BLANK
     _untimed_,    //  16 CH_LAVA_SMALL
     _untimed_,    //  17 CH_LAVA_MEDIUM
     _untimed_,    //  18 CH_LAVA_LARGE
-    _B + 9600,    //  19 CH_MELLON_HUSK -- updated 2026-07-29 00:45 AEST (was 9587)
+    _B + 10122,   //  19 CH_MELLON_HUSK -- updated 2026-08-06 23:27 AEST (was 5000)
     _B + 195,     //  20 CH_DOGE_STATIC -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 181,     //  21 CH_PEBBLE_ROCK -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 210,     //  22 CH_ROCK_PEBBLE -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 210,     //  23 CH_ROCK_PEBBLE_1 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 209,     //  24 CH_DUST_0 -- updated 2026-07-28 16:35 AEST (was untimed)
-    _B + 209,     //  25 CH_DUST_1 -- updated 2026-07-28 16:35 AEST (was untimed)
-    _B + 207,     //  26 CH_DUST_2 -- updated 2026-07-28 17:17 AEST (was 206)
+    _B + 252,     //  24 CH_DUST_0 -- updated 2026-08-06 23:27 AEST (was 209)
+    _B + 251,     //  25 CH_DUST_1 -- updated 2026-08-06 23:27 AEST (was 209)
+    _B + 249,     //  26 CH_DUST_2 -- updated 2026-08-06 23:27 AEST (was 207)
     // Manually bumped to match CH_ROCK's own measured value (was _B + 265, last measured
     // 2026-07-28 -- well before doRollGeodoge() grew the same rollEligibility()/hazard-shake
     // work doRollRock() has, which is what pushed CH_ROCK's own entry from 262 to 5541 on
@@ -532,9 +533,9 @@ static const unsigned short budget[128] = {
     // headroom until a fresh CSV captures its own real worst case and update_budget_from_csv.py
     // overwrites this with a measured number.
     _B + 5541,    //  27 CH_GEODOGE -- manually bumped 2026-08-06 (was 265, stale since 07-28)
-    _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
-    _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
-    _B + 207,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:35 AEST (was untimed)
+    _B + 252,     //  28 CH_DUST_ROCK_0 -- updated 2026-08-06 23:27 AEST (was 242)
+    _B + 252,     //  29 CH_DUST_ROCK_1 -- updated 2026-08-06 23:27 AEST (was 242)
+    _B + 250,     //  30 CH_DUST_ROCK_2 -- updated 2026-08-06 23:27 AEST (was 207)
     _B + 434,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-07-29 00:41 AEST (was 433)
     _B + 165,     //  32 CH_HORIZONTAL_BAR -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 2319,    //  33 CH_PUSH_LEFT -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -556,7 +557,7 @@ static const unsigned short budget[128] = {
     _untimed_,    //  49 CH_WYRM_HEAD_R
     _untimed_,    //  50 CH_WYRM_HEAD_D
     _untimed_,    //  51 CH_WYRM_HEAD_L
-    _B + 3360,    //  52 CH_GEODOGE_FALLING -- updated 2026-07-27 23:24 AEST
+    _B + 262,     //  52 CH_GEODOGE_FALLING -- updated 2026-07-27 23:24 AEST
     _untimed_,    //  53 CH_FLIP_GRAVITY_0
     _untimed_,    //  54 CH_FLIP_GRAVITY_1
     _untimed_,    //  55 CH_FLIP_GRAVITY_2
@@ -564,7 +565,7 @@ static const unsigned short budget[128] = {
     _B + 452,     //  57 CH_GRINDER_0 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 436,     //  58 CH_GRINDER_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _untimed_,    //  59 CH_HUB
-    _B + 232,     //  60 CH_WATER -- updated 2026-08-03 03:47 AEST (was 229)
+    _B + 283,     //  60 CH_WATER -- updated 2026-08-06 23:27 AEST (was 232)
     _B + 292,     //  61 CH_WATERFLOW_0 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 296,     //  62 CH_WATERFLOW_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 1256,    //  63 CH_WATERFLOW_2 -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -583,8 +584,8 @@ static const unsigned short budget[128] = {
     _untimed_,    //  76 CH_WYRM_TAIL_L
     _B + 240,     //  77 CH_DOGE_FALLING_TOP -- updated 2026-07-28 00:07 AEST
     _B + 240,     //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-07-28 16:25 AEST (was 234)
-    _B + 240,     //  79 CH_ROCK_FALLING_TOP -- updated 2026-07-28 16:26 AEST (was 239)
-    _B + 240,     //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-07-28 00:07 AEST
+    _B + 250,     //  79 CH_ROCK_FALLING_TOP -- updated 2026-08-06 23:27 AEST (was 240)
+    _B + 256,     //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-08-06 23:27 AEST (was 240)
     _B + 1487,    //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-07-28 00:07 AEST
     _B + 240,     //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-07-28 16:26 AEST (was 234)
     _B + 226,     //  83 CH_DOGE_FALLING_TOP2 -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -615,17 +616,17 @@ static const unsigned short budget[128] = {
     _B + 1366,    // 108 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
     _B + 4594,    // 109 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
     _untimed_,    // 110 CH_CONCRETE
-    _B + 766,     // 111 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-03 03:47 AEST (was 758)
+    _B + 883,     // 111 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-06 23:27 AEST (was 766)
     _untimed_,    // 112 CH_KEY
     _untimed_,    // 113 CH_DOOROPEN_STATIC
-    _B + 207,     // 114 CH_IMMOVABLE -- updated 2026-08-05 23:40 AEST (was 195)
+    _B + 261,     // 114 CH_IMMOVABLE -- updated 2026-08-06 23:27 AEST (was 207)
     _B + 2024,    // 115 CH_IMMOVABLE_FALLING -- updated 2026-08-05 23:40 AEST (was untimed)
     _B + 169,     // 116 CH_IMMOVABLE_FALLING_TOP -- updated 2026-08-05 23:40 AEST (was untimed)
     _B + 169,     // 117 CH_IMMOVABLE_FALLING_BOTTOM -- updated 2026-08-05 23:40 AEST (was untimed)
-    _B + 170,     // 118 CH_ROCK_SIDE_1 -- updated 2026-08-05 23:32 AEST (was untimed)
-    _B + 170,     // 119 CH_ROCK_SIDE_2 -- updated 2026-08-05 23:32 AEST (was untimed)
-    _B + 196,     // 120 CH_ROCK_SIDE_3 -- updated 2026-08-06 18:59 AEST (was 176)
-    _B + 196,     // 121 CH_ROCK_SIDE_4 -- updated 2026-08-06 18:59 AEST (was 177)
+    _B + 213,     // 118 CH_ROCK_SIDE_1 -- updated 2026-08-06 23:27 AEST (was 170)
+    _B + 213,     // 119 CH_ROCK_SIDE_2 -- updated 2026-08-06 23:27 AEST (was 170)
+    _B + 277,     // 120 CH_ROCK_SIDE_3 -- updated 2026-08-06 23:27 AEST (was 196)
+    _B + 277,     // 121 CH_ROCK_SIDE_4 -- updated 2026-08-06 23:27 AEST (was 196)
     _untimed_,    // 122 CH_GEODOGE_SIDE_1
     _untimed_,    // 123 CH_GEODOGE_SIDE_2
     _untimed_,    // 124 CH_GEODOGE_SIDE_3
@@ -2232,6 +2233,24 @@ enum RollEligibility rollEligibility(unsigned char *me, int offset) {
     return (sideBlank && downBlank) ? ROLL_STRICT : ROLL_LOOSE;
 }
 
+// Narrower than "rollEligibility() == ROLL_LOOSE": that also fires when the player is standing
+// directly BESIDE the object (side itself is the player, same row) -- which is exactly the
+// position needed to fire-button pick the object up, so using it as the hazard-shake trigger made
+// simply walking up to a rock resting on another ATT_ROLL surface immediately shake it into
+// CH_PLACEHOLDER, breaking pickup entirely. This only returns true for the specific "would roll
+// down into the player's own column" case the shake is meant for: the side square itself is
+// genuinely open (not the player), but the square diagonally below THAT is the player (or their
+// pre-materialization placeholder) blocking the landing spot -- standing beside the object in the
+// same row never matches this.
+bool blockedByPlayerBelow(unsigned char *me, int offset) {
+
+    if (!(Attribute[CharToType[GET(*(me + offset))]] & ATT_BLANK))
+        return false;
+
+    enum ObjectType downType = CharToType[GET(*(me + offset + _BOARD_COLS))];
+    return downType == TYPE_MELLON_HUSK || downType == TYPE_MELLON_HUSK_PRE;
+}
+
 
 // A settled CH_ROCK that can't fall straight down (case CH_ROCK, above) but is resting on
 // something with ATT_ROLL classifies each side with rollEligibility(), above, and bails out
@@ -2329,17 +2348,18 @@ void doRollRock(unsigned char *me, int row, int col) {
         }
     }
 
-    // Blocked from rolling specifically by the player, not just boxed in solid --
-    // rollEligibility()'s ROLL_LOOSE (see its own comment) only ever comes back that way when
-    // the player (or their pre-materialization placeholder) is occupying the side or
-    // diagonal-below cell it needs, so this is precisely "would have rolled here, but the player
-    // is standing in the way" -- strain in place: a very short shake (findFreeHazardSlot(),
-    // mellon.h). Doesn't skip or replace the under-rock raindrop cue below -- that fires
-    // independently on its own chance regardless of whether this also fires. A DIFFERENT rock
-    // could simultaneously be blocked this way from the other side (one flanking the player on
-    // the left, a completely different one on the right) -- that's what the second hazard slot
-    // is for.
-    if (left == ROLL_LOOSE || right == ROLL_LOOSE) {
+    // Blocked from rolling specifically because the player is standing in the LANDING spot one
+    // row down (blockedByPlayerBelow(), above) -- deliberately narrower than "rollEligibility()
+    // returned ROLL_LOOSE", which also fires when the player is standing directly BESIDE this
+    // rock in the same row (exactly the position needed to fire-button pick it up) -- using that
+    // broader check here used to shake (and CH_PLACEHOLDER) a rock the instant the player walked
+    // up next to it, breaking pickup outright. Strain in place: a very short shake
+    // (findFreeHazardSlot(), mellon.h). Doesn't skip or replace the under-rock raindrop cue
+    // below -- that fires independently on its own chance regardless of whether this also fires.
+    // A DIFFERENT rock could simultaneously be blocked this way from the other side (one flanking
+    // the player on the left, a completely different one on the right) -- that's what the second
+    // hazard slot is for.
+    if (blockedByPlayerBelow(me, -1) || blockedByPlayerBelow(me, 1)) {
 
         int slot = findFreeHazardSlot(col, row);
         if (slot >= 0)
@@ -2416,9 +2436,10 @@ void doRollGeodoge(unsigned char *me, int row, int col) {
         }
     }
 
-    // Blocked from rolling specifically by the player -- same reasoning as doRollRock()'s own
-    // hazard-shake, above -- doesn't skip or replace the raindrop cue below either, same as there.
-    if (left == ROLL_LOOSE || right == ROLL_LOOSE) {
+    // Blocked from rolling specifically because the player is standing in the landing spot one
+    // row down -- see blockedByPlayerBelow()'s own comment (doRollRock(), above) for why this is
+    // narrower than a plain ROLL_LOOSE check.
+    if (blockedByPlayerBelow(me, -1) || blockedByPlayerBelow(me, 1)) {
 
         int slot = findFreeHazardSlot(col, row);
         if (slot >= 0)
