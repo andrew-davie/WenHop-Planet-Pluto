@@ -74,7 +74,8 @@ void initKernel_Menu() {
 
     // caveSequenceStarted is only false on a genuine first-ever entry (nothing has played yet,
     // including via a menu-bypassing dev shortcut) -- see main.c. In that case cave keeps its
-    // zero-initialised default. Otherwise, advance to the next cave in sequence, wrapping.
+    // initial value (main.c -- the starting cave). Otherwise, advance to the next cave in
+    // sequence, wrapping.
     if (caveSequenceStarted && ++cave >= caveCount)
         cave = 0;
 

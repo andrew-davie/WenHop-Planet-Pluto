@@ -21,30 +21,38 @@ const unsigned char AnimateCrackedBrick[] = {
 };
 
 
+// CH_PLACEHOLDER, not CH_BLANK, for every intermediate "off" flash beat below -- it renders
+// exactly as invisible as CH_BLANK (charSet[] maps both to the same empty glyph -- see its own
+// comment, mellon.c) but is a distinct value, which matters here: processTypes()'s TYPE_BOMB
+// case detonates the instant *Animate[TYPE_BOMB] == CH_BLANK, so if the off-beats were also
+// literal CH_BLANK (as they used to be, before a since-reverted "use CH_BLANK instead of a
+// dedicated CH_BOMB_FLASH character" simplification), the bomb detonated on the very FIRST
+// off-beat -- right after the opening CH_BOMB,10 -- instead of after the full flashing
+// countdown. CH_BLANK is reserved for the real final entry alone now.
 const unsigned char AnimateBomb[] = {
 
     CH_BOMB, 0,
 
     CH_BOMB, 10,
-    CH_BLANK, 10,
+    CH_PLACEHOLDER, 10,
     CH_BOMB, 9,
-    CH_BLANK, 9,
+    CH_PLACEHOLDER, 9,
     CH_BOMB, 8,
-    CH_BLANK, 8,
+    CH_PLACEHOLDER, 8,
     CH_BOMB, 7,
-    CH_BLANK, 7,
+    CH_PLACEHOLDER, 7,
     CH_BOMB, 6,
-    CH_BLANK, 6,
+    CH_PLACEHOLDER, 6,
     CH_BOMB, 5,
-    CH_BLANK, 5,
+    CH_PLACEHOLDER, 5,
     CH_BOMB, 4,
-    CH_BLANK, 4,
+    CH_PLACEHOLDER, 4,
     CH_BOMB, 3,
-    CH_BLANK, 3,
+    CH_PLACEHOLDER, 3,
     CH_BOMB, 2,
-    CH_BLANK, 2,
+    CH_PLACEHOLDER, 2,
     CH_BOMB, 1,
-    CH_BLANK, 1,
+    CH_PLACEHOLDER, 1,
 
     CH_BLANK, 0,
 

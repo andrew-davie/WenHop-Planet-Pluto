@@ -17,21 +17,85 @@ typedef struct {
 } OFFSET;
 
 
-extern int attachment;    // what the player is currently carrying, if anything (CH_... value, or 0)
-extern const OFFSET *attachmentOffset;
+// A player interaction with the board can leave something visibly "detached" from its normal
+// place: carried above their head, shoved along beside them, or briefly vibrating in place after
+// a failed lift/shove attempt. All three used to be three separate ad-hoc variable sets
+// (attachment/attachmentOffset, attachmentIsShove/shoveDestCell, attachment2/Col/Row/Ticks) --
+// they're now just Attachments distinguished by `mode`. type == 0 means the slot is empty; every
+// setter keeps it clean of FLAG_THISFRAME, so every reader can compare/index with it directly, no
+// GET() needed.
+enum AttachMode {
+    ATTACH_CARRY,    // above the player's head, drop/pickup arc (offset) -- commits into a board
+                     // cell via the ordinary "if (drop)" path (movePlayer(), mellon.c)
+    ATTACH_SHOVE,    // rigid beside the player, slides with the walk-in glide -- commits into
+                     // destCell once the glide settles (movePlayer(), mellon.c)
+    ATTACH_SHAKE,    // anchored at (col, row), jitters in place -- restores itself to the board
+                     // once ticks reaches 0 (VB_Game(), gameState_Game.c)
+};
+
+typedef struct {
+
+    int type;    // CH_* value, or 0 if this slot is empty
+    enum AttachMode mode;
+
+    const OFFSET *offset;        // ATTACH_CARRY only -- drop/pickup arc cursor (draw.c)
+    unsigned char *destCell;     // ATTACH_SHOVE only -- board cell to commit into on settle
+    int col, row;                // ATTACH_SHAKE only -- board anchor to draw/restore at
+    int ticks;                   // ATTACH_SHAKE only -- countdown to auto-restore
+
+    int rollerY;                 // ATTACH_SHAKE only -- countdown to next jitter re-roll (draw.c)
+    int jitterY;                 // ATTACH_SHAKE only -- current vertical jitter, held between re-rolls
+
+} Attachment;
+
+// How often (in real frames) drawAttachment() (draw.c) re-rolls a shake's vertical jitter --
+// held steady between re-rolls instead of re-rolling every single frame, so it reads as a
+// jerky, discrete vibration rather than a smooth blur.
+#define SHAKE_ROLLER_TICKS_Y 3
+
+// Amplitude, in trixels, of a shake's vertical jitter -- drawAttachment() (draw.c) picks a new
+// offset in [-SHAKE_AMPLITUDE_Y, +SHAKE_AMPLITUDE_Y] every SHAKE_ROLLER_TICKS_Y frames.
+#define SHAKE_AMPLITUDE_Y 1
+
+// SLOT_CARRY is always the player's own held item (or 0) -- everything that used to read/write
+// the old `attachment` variable directly now goes through attachments[SLOT_CARRY]. SLOT_ACTION is
+// whichever of SHOVE or SHAKE is currently in progress from a player ACTION, if either (never
+// both at once -- see their trigger sites, mellon.c) -- entirely independent of SLOT_CARRY, which
+// is what lets the player shove an immovable while still carrying something else.
+//
+// SLOT_HAZARD1/2 are separate again: ambient shakes driven by the board scan itself rather than
+// player input -- specifically, a rock/geodoge that can't ROLL off its perch because the player
+// is standing in the landing spot it needs (doRollRock()/doRollGeodoge(), board.c,
+// rollEligibility()'s ROLL_LOOSE) -- so they can't collide with whatever the player is doing in
+// the other two slots. Two of them, not one: a rock resting one row up can be blocked by the
+// player on its LEFT and a completely different rock one row up can independently be blocked on
+// its RIGHT at the same time (two rocks flanking the player diagonally) -- findFreeHazardSlot()
+// (mellon.c) picks whichever of the two is free.
+#define SLOT_CARRY    0
+#define SLOT_ACTION   1
+#define SLOT_HAZARD1  2
+#define SLOT_HAZARD2  3
+#define NUM_ATTACHMENTS 4
+extern Attachment attachments[NUM_ATTACHMENTS];
+
+// Returns SLOT_HAZARD1 or SLOT_HAZARD2 for the cell at (col, row), or -1 if neither is available
+// (already shaking that exact cell mid-handoff, or both genuinely busy elsewhere) -- board.c's
+// CH_ROCK/CH_GEODOGE cases skip the shake for that pass in the -1 case (harmless: it's
+// re-evaluated again next scan while the condition persists).
+int findFreeHazardSlot(int col, int row);
+
 extern int attachmentFlashTicks;    // see its own comment, mellon.c
 
-// 0.8 seconds at 60fps. Shared with draw.c's drawAttachedChar(), which measures elapsed time
+// 0.8 seconds at 60fps. Shared with draw.c's drawAttachment(), which measures elapsed time
 // against this (ATTACHMENT_FLASH_TICKS - attachmentFlashTicks) rather than testing
 // attachmentFlashTicks directly, so the blink always starts BLANK on the very first frame
 // regardless of this value's own bit pattern. mellon.c's trigger sites all guard on
 // !attachmentFlashTicks, so a flash already in progress never restarts/retriggers.
 #define ATTACHMENT_FLASH_TICKS 48
 
-// See attachmentIsShove/shoveDestCell's own comments (mellon.c) -- the "attachment held rigidly
-// beside the player while shoving an immovable block" mode and the board cell to commit it into.
-extern bool attachmentIsShove;
-extern unsigned char *shoveDestCell;
+// See ATTACH_SHAKE's own comment above -- fills in attachments[slot] and reserves `cell` with
+// CH_PLACEHOLDER for `ticks` frames.
+void shakeObject(int slot, unsigned char *cell, int col, int row, int ticks);
 
 extern int frameAdjustX;
 extern int frameAdjustY;
@@ -118,7 +182,7 @@ bool isPlayerHidden();
 #define TELEPORT_CARRY_LIFT_MAX MOVE_SPEED
 
 // 0 (normal carry height) .. TELEPORT_CARRY_LIFT_MAX (fully merged with the player) -- see its
-// own comment (mellon.c). drawAttachedChar() (draw.c) pulls the carried-object icon's draw
+// own comment (mellon.c). drawAttachment() (draw.c) pulls the carried-object icon's draw
 // offset toward the player's own position by this much on arrival, so it visibly rises out of
 // them instead of popping straight to fully-carried.
 int teleportCarryLift();
@@ -166,7 +230,7 @@ void updateDoorUnlock();
 
 // The tile the player was standing on when the key touched the door -- recorded by
 // startDoorUnlock() (mellon.c), same role as teleportDepartOriginX/Y and exitDepartOriginX/Y
-// above. Needed because doorLocked no longer freezes the player: drawAttachedChar() (draw.c)
+// above. Needed because doorLocked no longer freezes the player: drawAttachment() (draw.c)
 // draws the settling key relative to THIS fixed position instead of the player's own
 // (potentially now-moving) playerX/playerY, so it stays pinned to the door instead of
 // following the player off across the board.

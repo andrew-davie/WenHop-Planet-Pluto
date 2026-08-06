@@ -73,7 +73,8 @@
       "Bash(python3 /tmp/analyze_bash2.py)",
       "Bash(git commit *)",
       "Bash(gcc -O2 -o verify_seq verify_seq.c)",
-      "Bash(./verify_seq)"
+      "Bash(./verify_seq)",
+      "Bash"
     ],
     "additionalDirectories": [
       "/tmp"

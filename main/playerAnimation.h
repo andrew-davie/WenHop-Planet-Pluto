@@ -34,7 +34,7 @@ enum AnimationIdent {
 
     // Push-cycle: same 4-frame/6-tick/loop shape as ID_Walk, using FRAME_PUSH1-4 (sprites.h)
     // instead of the ordinary walk frames -- see mellon.c's checkHighPriorityMove() ATT_SHOVE
-    // branch (attachmentIsShove) for what triggers it.
+    // branch (ATTACH_SHOVE, mellon.h) for what triggers it.
     ID_Push,           // 18
 
     ID_MAX

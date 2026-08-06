@@ -544,16 +544,24 @@ const unsigned char P0_caveNew[] = {
 
     // Random objects
 
-    3,
-    CH_DIRT,10,20,20,20,20,
-    CH_GEODOGE, 80,40,40,40,40,
-    CH_ROCK, 50,40,40,40,40,
+    0,
+    // CH_DIRT,10,20,20,20,20,
+    // CH_GEODOGE, 80,40,40,40,40,
+    // CH_ROCK, 50,40,40,40,40,
 
     DRAW_FILLED_RECT, CH_STEELWALL, 1,1,9,8, CH_ROCK,
 
-    DRAW_FILLED_RECT, CH_GEODOGE, 30, 2, 10, 5, CH_GEODOGE,
+//    DRAW_FILLED_RECT, CH_GEODOGE, 30, 2, 10, 5, CH_GEODOGE,
 
 
+    // CH_DIRT, not CH_BLANK -- this needs to start as diggable ground, not open air. Open air
+    // directly beside the flanking rock pillars (cols 2 and 8, from the CH_ROCK rect above) makes
+    // rollEligibility() (board.c) true for every rock along that edge (side blank AND diagonally
+    // below it blank) the instant the cave loads, so both pillars immediately roll into the
+    // shaft and fall -- not a bug, just this rect creating exactly that condition from frame one.
+    // Dirt isn't ATT_BLANK, so the pillars stay solid until the player actually digs through it
+    // (walking through, or the fire-button dig), at which point the rolls happen as an earned
+    // gameplay consequence instead of an instant one.
     DRAW_FILLED_RECT, CH_BLANK, 3, 2, 5, 4, CH_BLANK,
     DRAW_FILLED_RECT, CH_BRICKWALL, 3, 5, 5, 4, CH_STAR,
 
@@ -563,6 +571,10 @@ const unsigned char P0_caveNew[] = {
 
     CH_DOOROPEN_0, 5, 6,
     CH_MELLON_HUSK_BIRTH, 5, 2,
+
+    CH_IMMOVABLE, 6,4,
+    CH_IMMOVABLE, 4,4,
+
 
     CH_BOMB,2,7,
 

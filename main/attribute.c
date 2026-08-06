@@ -262,7 +262,7 @@ const unsigned int Attribute[] = {
     _ |PAD| _ | _ | _ |PH4| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PER| _ | _ | _ | _ | _ | _ | _ | _ , // 51 TYPE_TELEPORT (walkable, solid -- like TYPE_STAR's ground; PH4 drives its idle sparkle, see board.c)
     _ |PAD| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 52 TYPE_KEY (solid ground pickup -- auto-grabbed by walking onto it, see mellon.c's checkHighPriorityMove; blocked while already carrying something)
     _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |MIN| _ | _ |XIT| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ , // 53 TYPE_DOOR_OPEN (same walkable/exit bits as TYPE_OUTBOX, deliberately not TYPE_OUTBOX itself -- see its own comment)
-    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ |MAS| _ | _ | _ | _ | _ | _ |ROL| _ | _ |SHV, // 54 TYPE_IMMOVABLE
+    _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ |MAS| _ | _ | _ | _ | _ | _ | _ | _ | _ |SHV, // 54 TYPE_IMMOVABLE
     _ | _ | _ | _ | _ |PH1| _ | _ | _ | _ | _ | _ | _ | _ |HRD| _ | _ | _ | _ | _ | _ | _ | _ | _ |CRU| _ | _ | _ | _ , // 55 TYPE_IMMOVABLE_FALLING
     _ |PAD| _ | _ | _ |PH2| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 56 TYPE_ROCK_ROLLING -- PH2 (half speed) vs TYPE_ROCK_FALLING's PH1, so the roll's midpoint visibly lingers instead of snapping through in one scan pass
     _ |PAD| _ | _ | _ |PH2| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |PSH| _ | _ | _ | _ | _ |XPD| _ | _ | _ | _ | _ | _ , // 57 TYPE_GEODOGE_ROLLING -- same PH2 reasoning as TYPE_ROCK_ROLLING

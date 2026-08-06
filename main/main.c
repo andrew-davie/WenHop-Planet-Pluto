@@ -59,7 +59,7 @@ int liquidTrixel_8;
 bool showWater;
 bool showLava;
 
-int cave;
+int cave = 0;    // starting cave -- index into caveList[] (caveData.c), 10 planets x 10 levels each
 bool caveSequenceStarted;    // set true the moment any game actually starts (initGameState_Game()),
                              // regardless of whether GS_MENU ran first -- lets initKernel_Menu()
                              // tell a genuine first-ever boot apart from "a cave was already played
@@ -536,7 +536,7 @@ void initNewGame() {
     // the loadCave() at the far end, via initPlayer(), ever clears it), so it's the way to tell
     // that apart from an actual fresh game here.
     if (!doorExitArmsCarryLift)
-        attachment = 0;
+        attachments[SLOT_CARRY].type = 0;
 
     initNextLife();
 }

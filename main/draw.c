@@ -12,6 +12,7 @@
 #include "main.h"
 #include "mellon.h"
 #include "playerAnimation.h"
+#include "random.h"
 #include "reverseBits.h"
 #include "score.h"
 #include "scroll.h"
@@ -587,59 +588,79 @@ void blitShape(int ch, int trixX, int y, int height, int buffer) {
 }
 
 
-void drawAttachedChar(int ch) {
+void drawAttachment(int slot) {
 
-    // ch is always `attachment` (mellon.c), which is never flagged with FLAG_THISFRAME -- see
-    // its declaration -- so no GET() needed here.
+    Attachment *att = &attachments[slot];
 
-    // Blink off every other few frames while attachmentFlashTicks is counting down (mellon.c) --
-    // feedback for a blocked pickup/shove attempt. Tested against ELAPSED time since the flash
-    // was triggered (ATTACHMENT_FLASH_TICKS - attachmentFlashTicks), not the remaining-ticks
-    // value directly, so frame 0 is always BLANK regardless of ATTACHMENT_FLASH_TICKS's own bit
-    // pattern -- mellon.c's trigger sites all guard on !attachmentFlashTicks now (don't restart
-    // an already-running flash), so this only ever needs to be right about a fresh trigger, not
-    // a retrigger mid-cycle. The leading `attachmentFlashTicks &&` is what keeps this a no-op
-    // outside the flash -- elapsed alone doesn't know that.
-    if (attachmentFlashTicks && !((ATTACHMENT_FLASH_TICKS - attachmentFlashTicks) & 8))
+    if (!att->type)
         return;
 
+    // att->type is never flagged with FLAG_THISFRAME (every setter strips it -- see Attachment's
+    // own declaration, mellon.h) -- so no GET() needed here.
+
+    // Blink off every other few frames while attachmentFlashTicks is counting down (mellon.c) --
+    // feedback for a blocked pickup attempt. Tested against ELAPSED time since the flash was
+    // triggered (ATTACHMENT_FLASH_TICKS - attachmentFlashTicks), not the remaining-ticks value
+    // directly, so frame 0 is always BLANK regardless of ATTACHMENT_FLASH_TICKS's own bit
+    // pattern -- mellon.c's trigger site guards on !attachmentFlashTicks (don't restart an
+    // already-running flash), so this only ever needs to be right about a fresh trigger, not a
+    // retrigger mid-cycle. Only the carry slot ever sets attachmentFlashTicks (mellon.c) -- a
+    // shove or shake in the action slot always draws solid.
+    if (att->mode == ATTACH_CARRY && attachmentFlashTicks && !((ATTACHMENT_FLASH_TICKS - attachmentFlashTicks) & 8))
+        return;
+
+    int ch = att->type;
     int type = CharToType[ch];
     if (Animate[type])
         ch = *Animate[type];
 
-    int ay = 0;
-    int autoY = autoMoveY;
-    while (autoY > 0) {
-        autoY -= 3;
-        ay++;
+    if (att->mode == ATTACH_SHAKE) {
+
+        // Anchored to its own board cell (att->col/row), not the player, and has no drop/
+        // pickup/carry arc at all: just a vertical jitter, held for SHAKE_ROLLER_TICKS_Y frames
+        // between re-rolls (mellon.h) instead of re-rolling every frame, for as long as
+        // att->ticks (mellon.c) is counting down -- reads as a jerky, discrete vibration rather
+        // than a smooth blur. Y only -- X stays fixed. Countdown, not modulo -- this coprocessor
+        // has no divide instruction (see swipe.c's isqrt() comment).
+        if (att->rollerY <= 0) {
+            att->rollerY = SHAKE_ROLLER_TICKS_Y;
+            att->jitterY = rangeRandom(2 * SHAKE_AMPLITUDE_Y + 1) - SHAKE_AMPLITUDE_Y;
+        }
+        att->rollerY--;
+
+        int y = att->row * CHAR_Y - (scrollY >> 16) * 3 - (shakeY >> 16) + att->jitterY;
+        int trixX = ((att->col - 1) * CHAR_TRIX_X) + -(scrollX >> 16) + 2 - (shakeX >> 16);
+
+        blitShape(ch, trixX, y, CHAR_Y, _BUF_GAME_PF0_LEFT);
+        return;
     }
 
     int offsetX = 0;
-    int offsetY = attachment == CH_DOGE_00 ? -12 : -24;
+    int offsetY = att->type == CH_DOGE_00 ? -12 : -24;
 
-    if (attachmentIsShove) {
+    if (att->mode == ATTACH_SHOVE) {
 
         // Rigidly beside the player at their own height, not above their head, and not
         // animated at all -- no drop/pickup arc, it just sits there (mellon.c's
         // checkHighPriorityMove() sets faceDirection to match the shove direction, so this is
         // exactly which side the player is pushing from) until movePlayer() commits it into
-        // shoveDestCell once the walk-in glide finishes. attachmentOffset is deliberately left
-        // untouched/unused here -- see attachmentIsShove's own comment (mellon.c).
+        // destCell once the walk-in glide finishes. att->offset is deliberately left
+        // untouched/unused here -- see ATTACH_SHOVE's own comment (mellon.h).
 
         offsetY = 0;
         offsetX = (faceDirection == FACE_LEFT) ? CHAR_TRIX_X : -CHAR_TRIX_X;
     }
 
-    else if (attachmentOffset) {
+    else if (att->offset) {
 
-        offsetX = attachmentOffset->x;
-        offsetY = attachmentOffset->y;
+        offsetX = att->offset->x;
+        offsetY = att->offset->y;
 
-        if ((attachmentOffset + 1)->x || (attachmentOffset + 1)->y)
-            attachmentOffset++;
+        if ((att->offset + 1)->x || (att->offset + 1)->y)
+            att->offset++;
 
         else
-            attachmentOffset = 0;
+            att->offset = 0;
     }
 
     // Departure: draw relative to the tile the player stood on BEFORE stepping onto the

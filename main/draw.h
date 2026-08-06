@@ -17,7 +17,7 @@ void initString();
 void drawString(int fontNumber, int colour, int delay, int buffer, int colbuf, const char *string, int y);
 bool drawNextChar();
 
-void drawAttachedChar(int ch);
+void drawAttachment(int slot);
 void blitShape(int ch, int trixX, int y, int height, int buffer);
 
 // EOF

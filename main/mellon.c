@@ -17,42 +17,67 @@
 int playerX;    // char pos 0-39 (use * CHAR_TRIX_X for trixel)
 int playerY;    // char pos 0-21 (use *CHAR_TRIX_Y for trixel and then *3 for scanline)
 
-// What the player is currently carrying, if anything (CH_... value, or 0). Invariant: never
-// carries FLAG_THISFRAME -- every site that assigns it (pickup, drop-conversion) writes a
-// plain CH_ value, so every reader can compare/index with it directly, no GET() needed. The
-// one place that DOES need the flag -- the deferred board write when the carried item is
-// actually dropped -- carries it separately via dropSkipThisFrame instead of baking it into
-// this variable (see dropSkipThisFrame's own comment).
+// See Attachment/SLOT_CARRY/SLOT_ACTION's own comments (mellon.h) for the full picture. type == 0
+// means a slot is empty; every setter keeps it clean of FLAG_THISFRAME -- every reader can
+// compare/index with it directly, no GET() needed. The one place that DOES need the flag -- the
+// deferred board write when a carried item is actually dropped -- carries it separately via
+// dropSkipThisFrame instead of baking it into attachments[SLOT_CARRY].type (see
+// dropSkipThisFrame's own comment).
+Attachment attachments[NUM_ATTACHMENTS];
 
-int attachment = 0;
-const OFFSET *attachmentOffset = 0;
-
-// Ticks down to 0 once set; drawAttachedChar() (draw.c) blinks the carried item off on some of
+// Ticks down to 0 once set; drawAttachment() (draw.c) blinks the carried item off on some of
 // those frames instead of drawing it. Set to ATTACHMENT_FLASH_TICKS whenever the player tries
-// to pick something up/shove a block while already carrying/shoving something else -- see the
-// three trigger sites below (fire-button pickup, walk-in key pickup, walk-in shove) -- as
-// feedback that the attempt did nothing, rather than just silently blocking the move like a
-// wall. Decremented once per real frame in VB_Game() (gameState_Game.c), same as shakeTime,
-// so it still counts down even on the frames drawAttachedChar() itself is skipped (hidden
-// player, exit fade, etc).
+// to pick something up while already carrying something else -- see the two PickupCharacter[]
+// trigger sites below (fire-button pickup, walk-in key pickup) -- as feedback that the attempt
+// did nothing, rather than just silently blocking the move like a wall. Decremented once per
+// real frame in VB_Game() (gameState_Game.c), same as shakeTime, so it still counts down even
+// on the frames drawAttachment() itself is skipped (hidden player, exit fade, etc).
 int attachmentFlashTicks = 0;
 
-// True while `attachment` holds an immovable block being shoved (checkHighPriorityMove()'s
-// ATT_SHOVE trigger below) rather than something actually carried. Changes how
-// drawAttachedChar() (draw.c) positions it -- rigidly beside the player at their own height,
-// not above their head, and ignoring attachmentOffset entirely (no drop/pickup arc, it just
-// doesn't move relative to the player until movePlayer() (below) commits it into
-// shoveDestCell once the walk-in glide finishes) -- and guards the ordinary fire-button
-// drop/pickup block (checkHighPriorityMove()'s own top section) from treating it as a normal
-// carried item mid-shove.
-bool attachmentIsShove;
+#define SHAKE_TICKS 30    // half a second at 60fps -- player-triggered shove/pickup feedback
 
-// Where to commit the real CH_IMMOVABLE once the walk-in glide finishes (autoMoveFrameCount
-// reaches 0) and attachmentIsShove clears -- see movePlayer()'s own check, below. Holds
-// CH_PLACEHOLDER (looks blank, isn't enterable -- see the trigger's own comment) in the
-// meantime, so the destination can't be walked into or spawned onto while the block is still
-// mid-carry.
-unsigned char *shoveDestCell;
+// See SLOT_HAZARD1/2's own comment (mellon.h). col/row are the candidate cell's own board
+// position -- checked against both slots first (regardless of which, if either, is free) because
+// gameState_Game.c's restore keeps a just-restored slot's type nonzero for one extra frame after
+// the real object is already back on the board (see its own comment), and re-qualifying THAT
+// same cell during that one frame must not be handed the OTHER free slot -- that would let two
+// slots fight over a single cell instead of cleanly finishing the handoff.
+int findFreeHazardSlot(int col, int row) {
+
+    if (attachments[SLOT_HAZARD1].type && attachments[SLOT_HAZARD1].col == col && attachments[SLOT_HAZARD1].row == row)
+        return -1;
+
+    if (attachments[SLOT_HAZARD2].type && attachments[SLOT_HAZARD2].col == col && attachments[SLOT_HAZARD2].row == row)
+        return -1;
+
+    if (!attachments[SLOT_HAZARD1].type)
+        return SLOT_HAZARD1;
+
+    if (!attachments[SLOT_HAZARD2].type)
+        return SLOT_HAZARD2;
+
+    return -1;
+}
+
+// Pulls `cell` off the board into attachments[slot] and reserves its square with CH_PLACEHOLDER
+// for `ticks` frames -- see ATTACH_SHAKE's own comment (mellon.h) for the full picture. col/row
+// are the cell's own board position, needed so drawAttachment() (draw.c) and the eventual
+// restore (gameState_Game.c) both know where it belongs.
+void shakeObject(int slot, unsigned char *cell, int col, int row, int ticks) {
+
+    attachments[slot].type = GET(*cell);
+    attachments[slot].mode = ATTACH_SHAKE;
+    attachments[slot].col = col;
+    attachments[slot].row = row;
+    attachments[slot].ticks = ticks;
+
+    // Roll the first jitter immediately (drawAttachment(), draw.c) rather than waiting a full
+    // SHAKE_ROLLER_TICKS_Y for a first re-roll.
+    attachments[slot].rollerY = 0;
+    attachments[slot].jitterY = 0;
+
+    *cell = FLAG(CH_PLACEHOLDER);
+}
 
 bool teleportLocked;
 bool teleportCountingDown;
@@ -61,14 +86,14 @@ bool teleportRequested;
 
 // Departure: the tile the player stood on just before stepping onto the teleport tile --
 // checkHighPriorityMove() below records this the instant it locks teleportLocked, and
-// drawAttachedChar() (draw.c) draws the carried-object "drop" relative to THIS fixed tile
+// drawAttachment() (draw.c) draws the carried-object "drop" relative to THIS fixed tile
 // instead of the already-updated-to-destination playerX/playerY, so it renders exactly like
 // an ordinary stationary drop (player standing still, dropping in the direction they just
 // walked) rather than inheriting the walk-in glide's motion.
 int teleportDepartOriginX, teleportDepartOriginY;
 
 // Door-exit counterpart to teleportDepartOriginX/Y -- same role (checkHighPriorityMove()'s
-// exit trigger below records it, drawAttachedChar() draws relative to it instead of playerX/Y),
+// exit trigger below records it, drawAttachment() draws relative to it instead of playerX/Y),
 // entirely separate storage. Needed for exactly the same reason teleport needs its own copy:
 // playerX/playerY get updated onto the door tile a few lines after the trigger fires (the
 // shared ATT_BLANK|PERMEABLE|GRAB|EXIT movement code just below it), so without a frozen
@@ -80,7 +105,7 @@ int exitDepartOriginX, exitDepartOriginY;
 // Door-exit counterpart to teleportCarryLift() below -- same shape (armed to
 // DOOR_CARRY_LIFT_MAX, ticks down by one per visible frame), entirely separate counter, so it
 // can't add to or interfere with teleport's own ramp even though both ultimately feed the same
-// drawAttachedChar() offsetY pull (draw.c sums the two -- see its own comment). Armed by
+// drawAttachment() offsetY pull (draw.c sums the two -- see its own comment). Armed by
 // initPlayer() only when doorExitArmsCarryLift was left set by the exit trigger just below
 // (checkHighPriorityMove()), never for a teleport arrival or a fresh level start, and cleared
 // right back to false there every time regardless, so it can only ever fire for the one cave
@@ -90,7 +115,7 @@ static int doorCarryLiftTicks;
 // Not static -- initNewGame() (main.c) reads this too. Walking out through an exit door doesn't
 // go straight to loadCave() the way a teleport does: it routes through GS_MENU then GS_GLOBE
 // before GS_GAME is re-entered, and initGameState_Game() calls initNewGame() (which clears
-// attachment -- see its own comment, main.c) unconditionally on every entry to GS_GAME, not just
+// SLOT_CARRY -- see its own comment, main.c) unconditionally on every entry to GS_GAME, not just
 // a genuine fresh game. Left true here for that whole detour (only initPlayer() below ever
 // clears it, on the loadCave() at the far end), initNewGame() checks it to tell "just finished a
 // level via the door" apart from "actually starting over", so the carried item survives the trip
@@ -194,7 +219,7 @@ bool isTeleportArrivalPlayerHidden() {
 // True exactly when drawPlayerSprite() (drawPlayer.c) is suppressing the player's own sprite
 // for a teleport in progress -- departure (once the walk-in glide onto the tile has settled)
 // or arrival (isTeleportArrivalPlayerHidden(), above). Shared so anything else drawn "on" the
-// player -- currently just the carried-object icon, gameState_Game.c's drawAttachedChar()
+// player -- currently just the carried-object icon, gameState_Game.c's drawAttachment()
 // call -- can be suppressed in lockstep instead of being left floating in place with no player
 // underneath it once the sprite itself vanishes into/out of the tile.
 bool isPlayerHidden() {
@@ -202,8 +227,8 @@ bool isPlayerHidden() {
 }
 
 // Arrival only (departure uses a different mechanism entirely -- checkHighPriorityMove()'s
-// dropOffset[] trigger and drawAttachedChar()'s teleportLocked correction, draw.c). How far
-// drawAttachedChar() should pull the carried-object icon toward the player's own default draw
+// dropOffset[] trigger and drawAttachment()'s teleportLocked correction, draw.c). How far
+// drawAttachment() should pull the carried-object icon toward the player's own default draw
 // position -- 0 = normal carry height, TELEPORT_CARRY_LIFT_MAX (mellon.h) = fully merged with
 // the player. The instant the player stops being hidden on arrival
 // (isTeleportArrivalPlayerHidden() clearing), this starts at MAX and falls to 0 over the next
@@ -244,6 +269,12 @@ int playerExitFade;
 // snapping back open).
 bool doorClosing;
 static unsigned int pushCounter;
+
+// True from the moment the fire-button dirt-dig (checkHighPriorityMove(), below) commits until
+// the fire button is released -- see movePlayer()'s own check for the release detection. Holds
+// the dig/grab animation and blocks all movement for as long as it's true, same idea as kdelay
+// but keyed to the button rather than a fixed tick count.
+static bool digging;
 enum FaceDirectionX faceDirection;
 bool playerDead;
 static int waitForNothing;
@@ -266,9 +297,9 @@ static int kdelay = 0;
 static unsigned char *meAtt;
 static bool drop = false;
 
-// attachment itself is always kept clean of FLAG_THISFRAME (every setter strips it, every
-// reader can compare/index with it directly -- see attachment's own declaration below) --
-// but the deferred board write in movePlayer()'s "if (drop)" block (one frame after this is
+// attachments[SLOT_CARRY].type is always kept clean of FLAG_THISFRAME (every setter strips it,
+// every reader can compare/index with it directly -- see Attachment's own declaration, mellon.h)
+// -- but the deferred board write in movePlayer()'s "if (drop)" block (one frame after this is
 // set) still needs to know whether ITS write should carry the flag, same reasoning as
 // FLAG(CH_DUST_0) elsewhere: a cell dropped into a board position the scanner hasn't reached
 // yet this pass (right/down of the player, given scan order) must skip processing until next
@@ -282,11 +313,11 @@ static bool dropSkipThisFrame;
 // calling updateDoorUnlock() alongside it whenever doorLocked is set. First the key's normal
 // drop arc (dropOffset[], same table every other drop uses) settles into the door's cell,
 // then the door itself becomes CH_DOOROPEN_0 and a short pause follows before doorLocked
-// clears. The player can walk off mid-animation -- drawAttachedChar() (draw.c) keeps drawing
+// clears. The player can walk off mid-animation -- drawAttachment() (draw.c) keeps drawing
 // the settling key pinned to doorUnlockOriginX/Y (recorded below) instead of the player's own
 // current position, exactly like teleportDepartOriginX/Y does for a teleport departure.
 // checkHighPriorityMove() also guards its trigger and the fire-button drop/pickup block with
-// !doorLocked, since attachment is still "spoken for" by the door until updateDoorUnlock()
+// !doorLocked, since SLOT_CARRY is still "spoken for" by the door until updateDoorUnlock()
 // clears it -- without that, walking straight back into the door (or firing to drop/pick up
 // elsewhere) mid-animation could re-trigger or double-consume the key.
 bool doorLocked;
@@ -296,10 +327,10 @@ static bool doorOpened;
 int doorUnlockOriginX, doorUnlockOriginY;
 
 // This case only ticks once every SPEED_BASE (5) real render frames (see
-// TELEPORT_SWIRL_TICKS's comment above, board.c) -- drawAttachedChar() (draw.c) advances
-// attachmentOffset once per render call regardless. dropOffset[]'s arc used to be 8 real
+// TELEPORT_SWIRL_TICKS's comment above, board.c) -- drawAttachment() (draw.c) advances the
+// carry slot's offset once per render call regardless. dropOffset[]'s arc used to be 8 real
 // keyframes deep and ran out well before a multi-tick put phase could commit, snapping the
-// key back to attachment's *default* draw offset (the "carried above head" pose) for the
+// key back to the carry slot's *default* draw offset (the "carried above head" pose) for the
 // remaining wait -- see REST_HOLD (above the dropOffset* tables) for the fix: 15 extra
 // repeats of the resting keyframe, 23 real entries total, good for ~4.6 ticks (23 render
 // calls / 5 per tick) before it would run out. Keep this at or below 4 so it stays inside
@@ -362,8 +393,8 @@ void updateDoorUnlock() {
         *doorUnlockCell = CH_DOOROPEN_STATIC;    // not CH_DOOROPEN_0 -- see AnimateDoor's comment
         ADDAUDIO(SFX_DOOR);
 
-        attachment = 0;
-        attachmentOffset = 0;
+        attachments[SLOT_CARRY].type = 0;
+        attachments[SLOT_CARRY].offset = 0;
 
         doorOpened = true;
         doorUnlockTicks = DOOR_UNLOCK_PAUSE_TICKS;
@@ -417,7 +448,7 @@ void initPlayer() {
     gearsWaitRelease = false;
 
     drop = false;
-    attachmentOffset = 0;
+    attachments[SLOT_CARRY].offset = 0;
 
     // Door-exit counterpart to teleport arrival's own carry-lift ramp (which needs no arming
     // here -- teleportCarryLift() drives itself purely off arrivalSwirlTicks, untouched).
@@ -425,7 +456,7 @@ void initPlayer() {
     // (checkHighPriorityMove()) for the one cave load it set up; every other load through here
     // (a teleport arrival, a fresh level start) leaves it false, so doorCarryLiftTicks stays 0
     // and doorCarryLift() is a no-op for them, same as it always was pre-door.
-    doorCarryLiftTicks = (doorExitArmsCarryLift && attachment) ? DOOR_CARRY_LIFT_MAX : 0;
+    doorCarryLiftTicks = (doorExitArmsCarryLift && attachments[SLOT_CARRY].type) ? DOOR_CARRY_LIFT_MAX : 0;
     doorExitArmsCarryLift = false;
 
     startPlayerAnimation(ID_Stand);    // tmp
@@ -521,13 +552,13 @@ const OFFSET *pickupOffset[] = {
 
 
 // The last real keyframe in each table below is where the dropped object comes to rest --
-// repeated an extra REST_HOLD times before the {0,0} terminator so drawAttachedChar() (draw.c)
+// repeated an extra REST_HOLD times before the {0,0} terminator so drawAttachment() (draw.c)
 // keeps showing it sitting there instead of its own per-render auto-advance running off the
-// end and falling back to attachment's default "carried above head" draw offset. Only actually
-// exercised by callers that hold attachment/drop deliberately for several ticks after landing
-// (see updateDoorUnlock(), which does exactly that) -- an ordinary drop still commits (writes
-// the board cell, clears attachment) on the very next tick regardless, long before these extra
-// entries would ever be reached.
+// end and falling back to the carry slot's default "carried above head" draw offset. Only
+// actually exercised by callers that hold the slot/drop deliberately for several ticks after
+// landing (see updateDoorUnlock(), which does exactly that) -- an ordinary drop still commits
+// (writes the board cell, clears the slot) on the very next tick regardless, long before these
+// extra entries would ever be reached.
 #define REST_HOLD(x, y)                                                                                                \
     {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {x, y}, {  \
         x, y                                                                                                           \
@@ -603,30 +634,30 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
     if (usableSWCHA & joyBit)
         return false;
 
-    // !doorLocked: attachment is still CH_KEY (and still "spoken for" by the settling door,
+    // !doorLocked: the carry slot is still CH_KEY (and still "spoken for" by the settling door,
     // startDoorUnlock() below) for as long as doorLocked holds -- since the player can now
     // walk around during that window, this block would otherwise let a fire-button press
     // drop/re-pick-up that same key elsewhere while it's also mid-way into the door,
     // double-consuming it. See doorLocked's own comment above for the full picture.
     //
-    // !attachmentIsShove: same reasoning -- attachment is CH_IMMOVABLE and "spoken for" by
-    // the in-progress shove (checkHighPriorityMove()'s ATT_SHOVE trigger, below) until the
-    // walk-in glide commits it (movePlayer()'s own check); without this guard a fire-button
-    // press mid-shove would try to drop/re-pick-up the block as if it were an ordinary carry.
-    if (!doorLocked && !attachmentIsShove && !kdelay && !waitRelease) {
+    // Not guarded on the action slot being mid-shove any more -- SLOT_CARRY and SLOT_ACTION are
+    // now independent (see their own comment, mellon.h), so a fire-button press while shoving
+    // just acts on whatever's in SLOT_CARRY, if anything, same as it would with no shove going
+    // on at all.
+    if (!doorLocked && !kdelay && !waitRelease) {
         if (!(inpt4 & 0x80)) {
 
             meAtt = cur->me + dirOffset[dir];
 
-            if (attachment) {
+            if (attachments[SLOT_CARRY].type) {
 
                 int type2 = CharToType[GET(*meAtt)];
                 if (Attribute[type2] & ATT_BLANK) {
 
                     // What's being converted here is what's actually being CARRIED
-                    // (CharToType[attachment]), not the target cell (type2) -- type2 is
-                    // guaranteed blank by the check just above, and neither TYPE_ROCK nor
-                    // TYPE_GEODOGE is ever ATT_BLANK, so comparing type2 against them here
+                    // (CharToType[attachments[SLOT_CARRY].type]), not the target cell (type2) --
+                    // type2 is guaranteed blank by the check just above, and neither TYPE_ROCK
+                    // nor TYPE_GEODOGE is ever ATT_BLANK, so comparing type2 against them here
                     // could never be true (this used to compare type2, dead code). Only
                     // convert to the falling variant if there's ALSO nothing solid directly
                     // below the target -- landing right on solid ground (dirt, wall, rock,
@@ -637,34 +668,34 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                     // too) needs to actually fall first.
                     if (Attribute[CharToType[GET(*(meAtt + _BOARD_COLS))]] & ATT_BLANK) {
 
-                        if (CharToType[attachment] == TYPE_GEODOGE)
-                            attachment = CH_GEODOGE_FALLING;
+                        if (CharToType[attachments[SLOT_CARRY].type] == TYPE_GEODOGE)
+                            attachments[SLOT_CARRY].type = CH_GEODOGE_FALLING;
 
-                        else if (CharToType[attachment] == TYPE_ROCK)
-                            attachment = CH_ROCK_FALLING;
+                        else if (CharToType[attachments[SLOT_CARRY].type] == TYPE_ROCK)
+                            attachments[SLOT_CARRY].type = CH_ROCK_FALLING;
                     }
 
                     dropSkipThisFrame = (dir == 1 || dir == 2);
 
                     drop = true;
-                    attachmentOffset = dropOffset[dir];
+                    attachments[SLOT_CARRY].offset = dropOffset[dir];
                     ADDAUDIO(SFX_DROP);
                     return true;
                 }
 
                 // Fire-button aimed at something liftable (PickupCharacter[] nonzero), but
-                // already carrying/shoving something else -- same "did nothing" feedback as the
-                // walk-in key pickup and walk-in shove attempts below: flash the carried item
-                // instead of silently doing nothing. Falls through unchanged otherwise -- not
-                // ATT_BLANK and not liftable just means bump into it like a wall, same as before.
-                // Guarded on !attachmentFlashTicks so holding the direction/button against it
-                // doesn't keep restarting the flash from its (deliberately blank) first frame --
-                // let an already-running flash finish its cycle undisturbed.
+                // already carrying something else -- same "did nothing" feedback as the walk-in
+                // key pickup attempt below: flash the carried item instead of silently doing
+                // nothing. Falls through unchanged otherwise -- not ATT_BLANK and not liftable
+                // just means bump into it like a wall, same as before. Guarded on
+                // !attachmentFlashTicks so holding the direction/button against it doesn't keep
+                // restarting the flash from its (deliberately blank) first frame -- let an
+                // already-running flash finish its cycle undisturbed.
                 else if (PickupCharacter[type2] && !attachmentFlashTicks)
                     attachmentFlashTicks = ATTACHMENT_FLASH_TICKS;
             }
 
-            else if (!attachment) {
+            else {
 
                 unsigned char pickup = PickupCharacter[CharToType[GET(*meAtt)]];
                 if (pickup) {
@@ -673,7 +704,8 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
                     faceDirection = faceDirectionDef[dir];
 
-                    attachment = pickup;
+                    attachments[SLOT_CARRY].type = pickup;
+                    attachments[SLOT_CARRY].mode = ATTACH_CARRY;
 
                     ADDAUDIO(SFX_LIFT);
 
@@ -681,12 +713,51 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                     if (pickup == CH_BOMB)
                         startCharAnimation(TYPE_BOMB, AnimateBomb);
 
-                    attachmentOffset = pickupOffset[dir];
+                    attachments[SLOT_CARRY].offset = pickupOffset[dir];
 
                     *meAtt = FLAG(CH_DUST_0);
                     waitRelease = true;
                     return true;
                 }
+            }
+
+            // Fire-button aimed at something that can't be lifted at all (PickupCharacter[] is 0
+            // for TYPE_IMMOVABLE) -- give the same "did nothing" feedback as the walk-in
+            // shove-blocked case below, via the independent action slot (SLOT_ACTION, mellon.h)
+            // instead of silently bumping into it. Checked regardless of what's in SLOT_CARRY --
+            // shaking one object doesn't care whether the player is also carrying something else
+            // -- and guarded on the action slot being free so this can't stomp an in-progress
+            // shove/shake.
+            if (!attachments[SLOT_ACTION].type && CharToType[GET(*meAtt)] == TYPE_IMMOVABLE)
+                shakeObject(SLOT_ACTION, meAtt, playerX + xdir[dir], playerY + ydir[dir], SHAKE_TICKS);
+
+            // Fire-button dig: instantly clears dirt in the aimed direction without having to
+            // walk into it like the normal walk-through consumption does (moveHusk()'s ATT_DIRT
+            // branch, below) -- works regardless of whether the player is currently carrying/
+            // shoving something, since dirt is neither ATT_BLANK nor liftable and so falls
+            // through both branches above untouched either way. Same SFX_DIRT/dust-cloud cue as
+            // walking through it.
+            if (CharToType[GET(*meAtt)] == TYPE_DIRT) {
+
+                ADDAUDIO(SFX_DIRT);
+                nDots(6, playerX + xdir[dir], playerY + ydir[dir], PT_ONE, 30, CHAR_CENTER_X, CHAR_CENTER_Y, 30, 2);
+
+                *meAtt = FLAG(CH_DUST_0);
+
+                // No dedicated grab animation -- reuse the directional mining pose
+                // (mineAnimation[], same selection checkLowPriorityMove() uses for the
+                // walk-and-hold mining mechanic) as a placeholder. digging (see its own
+                // comment) holds it -- and blocks all movement -- until the fire button is
+                // released; movePlayer()'s existing "switch back to standing" check already
+                // covers ID_Mine/ID_MineUp/ID_MineDown, so releasing needs no special-case
+                // cleanup here.
+                int anim = mineAnimation[dir];
+                if (!(dir & 1) && gravity < 0)
+                    anim ^= ID_MineDown ^ ID_MineUp;
+                startPlayerAnimation(anim);
+
+                digging = true;
+                return true;
             }
         }
     }
@@ -798,20 +869,21 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
             handled = true;
         }
 
-        // Auto-pickup on walk-in, same as TYPE_STAR above -- but gated on !attachment, unlike
-        // STAR: a key is something you carry (via `attachment`, same field the fire-button
+        // Auto-pickup on walk-in, same as TYPE_STAR above -- but gated on the carry slot being
+        // free, unlike STAR: a key is something you carry (SLOT_CARRY, same slot the fire-button
         // pickup path above uses), so if you're already carrying something this branch is
         // simply skipped -- destType == TYPE_KEY has no ATT_BLANK/PERMEABLE/GRAB/EXIT either
         // (attribute.c), so the generic walkable check below won't catch it and the move is
         // blocked, same as walking into a wall.
-        else if (!attachment && destType == TYPE_KEY) {
+        else if (!attachments[SLOT_CARRY].type && destType == TYPE_KEY) {
 
             ADDAUDIO(SFX_LIFT);
 
             kdelay = PICKUP_DELAY_TICKS;
 
-            attachment = CH_KEY;
-            attachmentOffset = pickupOffset[dir];
+            attachments[SLOT_CARRY].type = CH_KEY;
+            attachments[SLOT_CARRY].mode = ATTACH_CARRY;
+            attachments[SLOT_CARRY].offset = pickupOffset[dir];
 
             playerX += xdir[dir];
             playerY += ydir[dir];
@@ -835,34 +907,44 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
         }
 
         // Same trigger as the fire-button pickup's PickupCharacter[] case above -- already
-        // carrying/shoving something, so the auto-pickup just above is skipped and the move
-        // stays blocked (see its own comment); flash the carried item as feedback that walking
-        // into the key did something rather than nothing. !attachmentFlashTicks guard: see that
-        // case's own comment -- don't restart an already-running flash.
-        else if (attachment && destType == TYPE_KEY && !attachmentFlashTicks)
-            attachmentFlashTicks = ATTACHMENT_FLASH_TICKS;
+        // carrying something, so the auto-pickup just above is skipped and the move stays
+        // blocked (see its own comment): flash the carried item AND shake the key itself, as
+        // feedback that walking into it did something rather than nothing.
+        else if (attachments[SLOT_CARRY].type && destType == TYPE_KEY) {
+
+            // !attachmentFlashTicks guard: see the fire-button pickup case's own comment --
+            // don't restart an already-running flash.
+            if (!attachmentFlashTicks)
+                attachmentFlashTicks = ATTACHMENT_FLASH_TICKS;
+
+            // !attachments[SLOT_ACTION].type guard: see the fire-button immovable-shake case's
+            // own comment -- shakeObject() immediately swaps the cell to CH_PLACEHOLDER, so this
+            // naturally can't re-fire until the shake settles and the key is written back.
+            if (!attachments[SLOT_ACTION].type)
+                shakeObject(SLOT_ACTION, meOffset, playerX + xdir[dir], playerY + ydir[dir], SHAKE_TICKS);
+        }
 
         // Carrying a key up to a still-locked door (CH_DOORCLOSED specifically, not just any
         // TYPE_DOOR -- board.c's ambient CH_DOORCLOSED case also opens these once
         // !doges, this is just an earlier/alternate trigger): a normal drop, using the exact
-        // same attachmentOffset arc (dropOffset[dir]) and attachment (still CH_KEY, still
-        // drawn by drawAttachedChar()) as any other drop -- attachment doesn't get zeroed
-        // until updateDoorUnlock() actually commits. The key never becomes a real board
-        // character -- doorLocked (board.c's TYPE_MELLON_HUSK case) drives updateDoorUnlock()
-        // every frame until it swaps the door open; see its own comment for the two-phase
-        // timing and for why the player is NOT frozen while this plays out.
+        // same offset arc (dropOffset[dir]) and SLOT_CARRY (still CH_KEY, still drawn by
+        // drawAttachment()) as any other drop -- the slot doesn't get cleared until
+        // updateDoorUnlock() actually commits. The key never becomes a real board character --
+        // doorLocked (board.c's TYPE_MELLON_HUSK case) drives updateDoorUnlock() every frame
+        // until it swaps the door open; see its own comment for the two-phase timing and for
+        // why the player is NOT frozen while this plays out.
         //
         // !doorLocked here (as well as guarding the fire-button block above) stops this from
         // re-triggering every frame the player holds the direction into a door that's already
-        // mid-open -- attachment stays CH_KEY and *meOffset stays CH_DOORCLOSED for the whole
+        // mid-open -- SLOT_CARRY stays CH_KEY and *meOffset stays CH_DOORCLOSED for the whole
         // window, so without the guard this would just keep restarting startDoorUnlock().
         //
-        // attachment is never flagged with FLAG_THISFRAME (every setter strips it -- see its
-        // declaration), so it can be compared directly here; *meOffset is a real board cell
-        // and still needs GET().
-        else if (!doorLocked && attachment == CH_KEY && GET(*meOffset) == CH_DOORCLOSED) {
+        // attachments[SLOT_CARRY].type is never flagged with FLAG_THISFRAME (every setter
+        // strips it), so it can be compared directly here; *meOffset is a real board cell and
+        // still needs GET().
+        else if (!doorLocked && attachments[SLOT_CARRY].type == CH_KEY && GET(*meOffset) == CH_DOORCLOSED) {
 
-            attachmentOffset = dropOffset[dir];
+            attachments[SLOT_CARRY].offset = dropOffset[dir];
             startDoorUnlock(meOffset, dir);
 
             handled = true;
@@ -873,12 +955,13 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
         // shove it one square further the same way -- distinct from ATT_PUSH/PSH (board.c's
         // genericPush(), a mechanical pusher-bar shoving something), this is the PLAYER doing
         // it by walking into it. No vertical case -- shoving is left/right only (dir 1 or 3).
-        // Reuses the ordinary carry-attachment system instead of any new board characters: see
-        // attachmentIsShove's own comment for the full picture. !attachment guards against
-        // shoving while already carrying/shoving something else, and naturally also prevents
-        // re-triggering on the SAME block before its previous shove has settled (attachment
-        // stays CH_IMMOVABLE, non-zero, for the whole walk-in glide).
-        else if (!attachment && (dir == 1 || dir == 3) && (Attribute[destType] & ATT_SHOVE)) {
+        // Uses the action slot (SLOT_ACTION, mellon.h), entirely independent of SLOT_CARRY -- the
+        // player can shove an immovable while still carrying something else in the other slot.
+        // !attachments[SLOT_ACTION].type guards against shoving a second block while one's
+        // already mid-shove/shake, and naturally also prevents re-triggering on the SAME block
+        // before its previous shove has settled (the action slot stays CH_IMMOVABLE, non-zero,
+        // for the whole walk-in glide).
+        else if (!attachments[SLOT_ACTION].type && (dir == 1 || dir == 3) && (Attribute[destType] & ATT_SHOVE)) {
 
             unsigned char *behindCell = meOffset + dirOffset[dir];
 
@@ -887,13 +970,13 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                 // Reserve the destination with CH_PLACEHOLDER -- looks blank (charSet[] maps
                 // it to the same invisible glyph as CH_BLANK) but has no ATT_BLANK/PERMEABLE
                 // etc of its own, so nothing else can walk into or spawn onto it while the
-                // real object is still mid-carry. shoveDestCell remembers where to commit the
-                // real CH_IMMOVABLE once the walk-in glide finishes (movePlayer(), below).
+                // real object is still mid-carry. destCell remembers where to commit the real
+                // CH_IMMOVABLE once the walk-in glide finishes (movePlayer(), below).
                 *behindCell = CH_PLACEHOLDER;
-                shoveDestCell = behindCell;
 
-                attachment = CH_IMMOVABLE;
-                attachmentIsShove = true;
+                attachments[SLOT_ACTION].type = CH_IMMOVABLE;
+                attachments[SLOT_ACTION].mode = ATTACH_SHOVE;
+                attachments[SLOT_ACTION].destCell = behindCell;
 
                 playerX += xdir[dir];
                 playerY += ydir[dir];
@@ -913,14 +996,14 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
                 handled = true;
             }
-        }
 
-        // Same trigger as above -- already carrying/shoving something, so the shove just above
-        // is skipped and the move stays blocked; flash the carried item as feedback.
-        // !attachmentFlashTicks guard: see the fire-button pickup case's own comment -- don't
-        // restart an already-running flash.
-        else if (attachment && (dir == 1 || dir == 3) && (Attribute[destType] & ATT_SHOVE) && !attachmentFlashTicks)
-            attachmentFlashTicks = ATTACHMENT_FLASH_TICKS;
+            // Shove blocked -- something solid immediately behind it -- same "did nothing"
+            // feedback as the fire-button pickup-blocked case above, via the same action slot
+            // instead of silently bumping into it. Shakes the immovable itself (meOffset), not
+            // behindCell -- behindCell is whatever's blocking it and never moves.
+            else
+                shakeObject(SLOT_ACTION, meOffset, playerX + xdir[dir], playerY + ydir[dir], SHAKE_TICKS);
+        }
 
         else if (Attribute[destType] & (ATT_BLANK | ATT_PERMEABLE | ATT_GRAB | ATT_EXIT)) {
 
@@ -958,20 +1041,20 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
                 // playerX/playerY are still the PRE-move position here (the shared
                 // playerX/playerY += xdir/ydir[dir] below hasn't run yet for this branch), so
                 // unlike teleport's version there's no subtraction needed to recover it -- just
-                // record it directly, before it changes. drawAttachedChar() (draw.c) then draws
+                // record it directly, before it changes. drawAttachment() (draw.c) then draws
                 // relative to this frozen exitDepartOriginX/Y, exactly like teleportLocked makes
                 // it draw relative to teleportDepartOriginX/Y, instead of the live (and, for the
                 // rest of the exit sequence, walk-in-gliding) playerX/playerY -- without that,
                 // the drop arc's offsets were being added on top of a base position that kept
                 // moving under it for the last few frames of the glide, reading as the item
                 // jumping around instead of settling into a single dropped position.
-                // attachment itself is untouched -- initPlayer() (gameState_Game.c's loadCave())
+                // SLOT_CARRY itself is untouched -- initPlayer() (gameState_Game.c's loadCave())
                 // carries it into the next cave and arms doorCarryLiftTicks so it rises back
                 // into carry pose there, same as a teleport arrival (see its own comment).
-                if (attachment) {
+                if (attachments[SLOT_CARRY].type) {
                     exitDepartOriginX = playerX;
                     exitDepartOriginY = playerY;
-                    attachmentOffset = dropOffset[dir];
+                    attachments[SLOT_CARRY].offset = dropOffset[dir];
                     doorExitArmsCarryLift = true;
                 }
             }
@@ -1097,18 +1180,18 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
         ADDAUDIO(SFX_DOOR);
 
         // Carried object (if any) "dropped" in the direction just walked, using the exact same
-        // table a real fire-button drop uses -- attachment itself is left untouched (no board
+        // table a real fire-button drop uses -- SLOT_CARRY itself is left untouched (no board
         // write, nothing cleared). playerX/playerY are already updated to the destination
         // (teleport) tile by this point, so the origin tile is recovered by subtracting this
-        // move back off -- drawAttachedChar() (draw.c) draws relative to that recorded origin,
+        // move back off -- drawAttachment() (draw.c) draws relative to that recorded origin,
         // not playerX/playerY, so the result is pixel-identical to a real stationary drop.
         // Arrival is unrelated -- initPlayer() (called by loadCave(), well before arrival's
-        // reveal) already resets attachmentOffset to 0 on its own, and teleportCarryLift()
-        // (draw.c) takes over from there.
-        if (attachment) {
+        // reveal) already resets the offset to 0 on its own, and teleportCarryLift() (draw.c)
+        // takes over from there.
+        if (attachments[SLOT_CARRY].type) {
             teleportDepartOriginX = playerX - xdir[dir];
             teleportDepartOriginY = playerY - ydir[dir];
-            attachmentOffset = dropOffset[dir];
+            attachments[SLOT_CARRY].offset = dropOffset[dir];
         }
     }
 
@@ -1225,19 +1308,28 @@ void movePlayer(BoardCursor *cur) {
 
     if (kdelay)
         --kdelay;
+
+    // digging's own release check -- inpt4 & 0x80 is the fire button NOT pressed (see its
+    // established sense throughout checkHighPriorityMove()'s own fire-button block). Cleared
+    // before the movement-dispatch gate below is evaluated so movement (and the existing
+    // ID_Mine*-to-standing reset already in the "switch back to standing" block, further down)
+    // resumes the very same frame the button comes up, not one frame late.
+    if (digging && (inpt4 & 0x80))
+        digging = false;
+
     handled = false;
 
 
     if (drop) {
 
-        if (attachment == CH_BOMB)
+        if (attachments[SLOT_CARRY].type == CH_BOMB)
             startCharAnimation(TYPE_BOMB, AnimateBomb + 2);
 
-        attachmentOffset = 0;
-        *meAtt = dropSkipThisFrame ? FLAG(attachment) : attachment;
+        attachments[SLOT_CARRY].offset = 0;
+        *meAtt = dropSkipThisFrame ? FLAG(attachments[SLOT_CARRY].type) : attachments[SLOT_CARRY].type;
         drop = false;
 
-        if (Attribute[CharToType[attachment]] & ATT_MASSIVE) {
+        if (Attribute[CharToType[attachments[SLOT_CARRY].type]] & ATT_MASSIVE) {
 
             int attBelow = Attribute[CharToType[GET(*(meAtt + _BOARD_COLS))]];
 
@@ -1258,7 +1350,7 @@ void movePlayer(BoardCursor *cur) {
 
 
         waitRelease = true;
-        attachment = 0;
+        attachments[SLOT_CARRY].type = 0;
 
         return;
     }
@@ -1302,7 +1394,7 @@ void movePlayer(BoardCursor *cur) {
     // move started on the exact same frame the shove glide ended, the commit would otherwise be
     // skipped -- leaving the immovable attached and following the player through however many
     // subsequent moves it took before a frame finally passed with no new move beginning.
-    if (attachmentIsShove) {
+    if (attachments[SLOT_ACTION].mode == ATTACH_SHOVE && attachments[SLOT_ACTION].type) {
 
         // Check for support right here instead of just settling as CH_IMMOVABLE and waiting for
         // board.c's own ambient check (case CH_IMMOVABLE) to notice on its next scan pass: that
@@ -1311,16 +1403,16 @@ void movePlayer(BoardCursor *cur) {
         // revisits this cell once per sweep -- a settled-looking, still-pushable CH_IMMOVABLE
         // could get shoved clean across a pit, one square at a time, without ever falling in.
         // Falling has to win that race, not input.
-        unsigned char *below = shoveDestCell + _BOARD_COLS;
+        unsigned char *destCell = attachments[SLOT_ACTION].destCell;
+        unsigned char *below = destCell + _BOARD_COLS;
         if (Attribute[CharToType[GET(*below)]] & ATT_BLANK) {
             *below = FLAG(CH_IMMOVABLE_FALLING_BOTTOM);
-            *shoveDestCell = FLAG(CH_IMMOVABLE_FALLING_TOP);
+            *destCell = FLAG(CH_IMMOVABLE_FALLING_TOP);
         } else
-            *shoveDestCell = CH_IMMOVABLE;
+            *destCell = CH_IMMOVABLE;
 
-        shoveDestCell = 0;
-        attachment = 0;
-        attachmentIsShove = false;
+        attachments[SLOT_ACTION].destCell = 0;
+        attachments[SLOT_ACTION].type = 0;
     }
 
     lastUsableSWCHA = usableSWCHA;
@@ -1332,8 +1424,9 @@ void movePlayer(BoardCursor *cur) {
 
     // kdelay: see its own comment above -- freezes the player for a beat right after a pickup,
     // so no new move of any kind (including checkLowPriorityMove()'s ordinary walk) can start
-    // until it expires.
-    if (!kdelay) {
+    // until it expires. digging: same freeze, held for as long as the fire-button dig's grab
+    // animation is up (see its own comment) rather than a fixed tick count.
+    if (!kdelay && !digging) {
 
         for (int dir = 0; dir < 4; dir++)
             if (checkHighPriorityMove(cur, dir))

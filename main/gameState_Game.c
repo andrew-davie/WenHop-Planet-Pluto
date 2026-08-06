@@ -181,6 +181,28 @@ void VB_Game() {
     if (attachmentFlashTicks)
         attachmentFlashTicks--;
 
+    // ATTACH_SHAKE (mellon.c): once a shake's run its course, write the real object straight
+    // back to the board cell it was pulled from (replacing the CH_PLACEHOLDER shakeObject()
+    // left there) one gameframe BEFORE clearing the slot and stopping the overlay draw --
+    // restoring and clearing on the very same frame left a one-frame gap where neither the real
+    // (still-placeholder, per the board's own render pass) object nor the overlay was visible,
+    // reading as a flash. Checked across every slot -- SLOT_ACTION (player-triggered) and
+    // SLOT_HAZARD1/2 (ambient, board.c's doRollRock()/doRollGeodoge()) each run their own
+    // independent countdown; SLOT_CARRY is never ATTACH_SHAKE so it's a no-op here.
+    for (int i = 0; i < NUM_ATTACHMENTS; i++) {
+
+        if (attachments[i].mode != ATTACH_SHAKE || !attachments[i].ticks)
+            continue;
+
+        attachments[i].ticks--;
+
+        if (attachments[i].ticks == 1)
+            RAM[_BOARD + attachments[i].row * _BOARD_COLS + attachments[i].col] = attachments[i].type;
+
+        else if (attachments[i].ticks == 0)
+            attachments[i].type = 0;
+    }
+
 
 #if ENABLE_SHAKE
 
@@ -250,6 +272,20 @@ void VB_Game() {
         if (levelLabelTicks)
             levelLabelTicks--;
 
+        // SLOT_HAZARD1/2 (mellon.h) drawn here, before drawFloatingChars(), so floating text --
+        // notably the once-a-second level-timer digits (drawScore()'s millingTime countdown,
+        // score.c) -- always renders on top of a shaking rock/geodoge instead of the two
+        // alternating frame-to-frame. Both write into the same shared overlay buffer
+        // (drawAttachment()/floatingCharacter(), draw.c/particle.c both target
+        // _BUF_GAME_PF0_LEFT), so whichever draws LAST wins any pixels they share -- previously
+        // that was the hazard shake (drawn after drawFloatingChars() further down), so the timer
+        // digits flickered out every time the shake's own restore/re-trigger cycle happened to
+        // land the same frame the digits redrew. Harmless to draw this early even mid-swipe-
+        // reveal (maskNeeded) -- board processing (and so shakeObject()) never runs until the
+        // swipe finishes, so both slots are simply empty (a no-op) until then regardless.
+        drawAttachment(SLOT_HAZARD1);
+        drawAttachment(SLOT_HAZARD2);
+
         drawFloatingChars();
 
         if (!maskNeeded) {
@@ -263,19 +299,29 @@ void VB_Game() {
             // drawPlayerSprite() is suppressing the sprite for a teleport departure/arrival or
             // an exit-sequence fade to black.
             //
-            // Also suppressed once the door-exit drop (exitDepartOriginX/Y's attachmentOffset
-            // arc, mellon.c's exit trigger) has run its course -- attachmentOffset naturally
-            // exhausts back to 0 a couple of dozen real frames after landing (dropOffset[]'s
-            // REST_HOLD, mellon.c), long before playerExitFade catches up to 15, and without
-            // this the item fell back to its default "carried above head" draw offset for the
-            // rest of the walk-off/fade -- popping back into view floating at the door, above
-            // and behind the drifting-away player, instead of staying down where it was
-            // dropped. Teleport doesn't need the equivalent check: isPlayerHidden() already
-            // hides it within a frame or two of landing, well before its own arc could exhaust.
+            // Also suppressed once the door-exit drop (exitDepartOriginX/Y's carry-slot offset
+            // arc, mellon.c's exit trigger) has run its course -- the offset naturally exhausts
+            // back to 0 a couple of dozen real frames after landing (dropOffset[]'s REST_HOLD,
+            // mellon.c), long before playerExitFade catches up to 15, and without this the item
+            // fell back to its default "carried above head" draw offset for the rest of the
+            // walk-off/fade -- popping back into view floating at the door, above and behind the
+            // drifting-away player, instead of staying down where it was dropped. Teleport
+            // doesn't need the equivalent check: isPlayerHidden() already hides it within a
+            // frame or two of landing, well before its own arc could exhaust.
 
             if (!isPlayerHidden() && !(exitMode && playerExitFade >= 15) &&
-                !(exitMode && attachment && !attachmentOffset))
-                drawAttachedChar(attachment);
+                !(exitMode && attachments[SLOT_CARRY].type && !attachments[SLOT_CARRY].offset))
+                drawAttachment(SLOT_CARRY);
+
+            // The action slot (mellon.h) rides with the player when it's a shove -- same
+            // visibility rules as the carry slot above, minus the drop-arc refinement (a shove
+            // is a live push, never a settled drop) -- but a shake is anchored to its own board
+            // cell, not the player, so it always draws regardless of exitMode/teleport/door-fade
+            // state.
+            if (attachments[SLOT_ACTION].mode == ATTACH_SHAKE)
+                drawAttachment(SLOT_ACTION);
+            else if (!isPlayerHidden() && !(exitMode && playerExitFade >= 15))
+                drawAttachment(SLOT_ACTION);
 
             drawMace();
             // drawRope();

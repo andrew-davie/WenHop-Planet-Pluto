@@ -88,6 +88,7 @@ void doRoll(unsigned char *me, int row, int col);
 void doRollRock(unsigned char *me, int row, int col);
 void doRollGeodoge(unsigned char *me, int row, int col);
 void doRollMotionArc(int col, int row, int trailSide);
+void spawnBaseRaindrops(int col, int row);
 enum RollEligibility { ROLL_NONE, ROLL_LOOSE, ROLL_STRICT };
 enum RollEligibility rollEligibility(unsigned char *me, int offset);
 void setInsulator(unsigned char *p, int row, int col);
@@ -524,7 +525,13 @@ static const unsigned short budget[128] = {
     _B + 209,     //  24 CH_DUST_0 -- updated 2026-07-28 16:35 AEST (was untimed)
     _B + 209,     //  25 CH_DUST_1 -- updated 2026-07-28 16:35 AEST (was untimed)
     _B + 207,     //  26 CH_DUST_2 -- updated 2026-07-28 17:17 AEST (was 206)
-    _B + 265,     //  27 CH_GEODOGE -- updated 2026-07-28 16:30 AEST (was untimed)
+    // Manually bumped to match CH_ROCK's own measured value (was _B + 265, last measured
+    // 2026-07-28 -- well before doRollGeodoge() grew the same rollEligibility()/hazard-shake
+    // work doRollRock() has, which is what pushed CH_ROCK's own entry from 262 to 5541 on
+    // 2026-08-05). CH_GEODOGE runs the structurally identical logic, so it needs the same
+    // headroom until a fresh CSV captures its own real worst case and update_budget_from_csv.py
+    // overwrites this with a measured number.
+    _B + 5541,    //  27 CH_GEODOGE -- manually bumped 2026-08-06 (was 265, stale since 07-28)
     _B + 242,     //  28 CH_DUST_ROCK_0 -- updated 2026-07-28 00:07 AEST
     _B + 242,     //  29 CH_DUST_ROCK_1 -- updated 2026-07-28 00:07 AEST
     _B + 207,     //  30 CH_DUST_ROCK_2 -- updated 2026-07-28 16:35 AEST (was untimed)
@@ -1286,6 +1293,11 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         if (attNext & ATT_BLANK) {
             *next = FLAG(CH_ROCK_FALLING_BOTTOM);
             *cursor.me = FLAG(CH_ROCK_FALLING_TOP);
+
+            // Same under-object raindrop cue doRollRock() uses when it settles without rolling
+            // (see spawnBaseRaindrops()'s own comment) -- here it's the "just committed to
+            // falling straight down" moment instead.
+            spawnBaseRaindrops(cursor.col, cursor.row);
         }
 
         // Can't fall straight down (whatever's below isn't blank), but if it's something a
@@ -1310,6 +1322,22 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         else if ((attNext & ATT_ROLL) && !(selectorCounter & 1))
             doRollRock(cursor.me, cursor.row, cursor.col);
 
+        // Can't fall AND can't roll off because the thing directly underneath is specifically
+        // the player (TYPE_MELLON_HUSK isn't ATT_BLANK or ATT_ROLL) -- strain against them: a
+        // very short shake (findFreeHazardSlot(), mellon.h) plus the same under-object raindrop
+        // cue as the genuine-fall case above, same mechanism as the roll-blocked case
+        // (doRollRock()'s ROLL_LOOSE). Raindrops fire regardless of whether a hazard slot was
+        // actually free -- "something's straining here" reads fine even on the rare pass where
+        // both slots are already busy elsewhere and the shake itself has to wait.
+        else if (CharToType[GET(*next)] == TYPE_MELLON_HUSK) {
+
+            int slot = findFreeHazardSlot(cursor.col, cursor.row);
+            if (slot >= 0)
+                shakeObject(slot, cursor.me, cursor.col, cursor.row, HAZARD_SHAKE_TICKS);
+
+            spawnBaseRaindrops(cursor.col, cursor.row);
+        }
+
         break;
     }
 
@@ -1320,12 +1348,25 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
         if (attNext & ATT_BLANK) {
             *next = FLAG(CH_GEODOGE_FALLING_BOTTOM);
             *cursor.me = FLAG(CH_GEODOGE_FALLING_TOP);
+
+            // Same under-object raindrop cue as case CH_ROCK, above.
+            spawnBaseRaindrops(cursor.col, cursor.row);
         }
 
         // Same roll mechanic as CH_ROCK (see doRollRock()'s comment), same PH2 phase gate for
         // the same consistent-timing reason -- see case CH_ROCK, above.
         else if ((attNext & ATT_ROLL) && !(selectorCounter & 1))
             doRollGeodoge(cursor.me, cursor.row, cursor.col);
+
+        // Same "blocked specifically by the player" strain as CH_ROCK, above.
+        else if (CharToType[GET(*next)] == TYPE_MELLON_HUSK) {
+
+            int slot = findFreeHazardSlot(cursor.col, cursor.row);
+            if (slot >= 0)
+                shakeObject(slot, cursor.me, cursor.col, cursor.row, HAZARD_SHAKE_TICKS);
+
+            spawnBaseRaindrops(cursor.col, cursor.row);
+        }
 
         break;
     }
@@ -1334,10 +1375,23 @@ void processCreatures(BoardCursor *cur, unsigned char creature) {
     // block can't be pushed or mined away, but gravity doesn't ask permission.
     case CH_IMMOVABLE: {
         unsigned char *next = cursor.me + _BOARD_COLS;
-        if (Attribute[CharToType[GET(*next)]] & ATT_BLANK) {
+        int attNext = Attribute[CharToType[GET(*next)]];
+
+        if (attNext & ATT_BLANK) {
             *next = FLAG(CH_IMMOVABLE_FALLING_BOTTOM);
             *cursor.me = FLAG(CH_IMMOVABLE_FALLING_TOP);
         }
+
+        // Can't fall because the thing directly underneath is specifically the player -- no
+        // roll option for an immovable (unlike CH_ROCK/CH_GEODOGE, it never rolls off anything),
+        // so this is the only "can't fall" case it has.
+        else if (CharToType[GET(*next)] == TYPE_MELLON_HUSK) {
+
+            int slot = findFreeHazardSlot(cursor.col, cursor.row);
+            if (slot >= 0)
+                shakeObject(slot, cursor.me, cursor.col, cursor.row, HAZARD_SHAKE_TICKS);
+        }
+
         break;
     }
 
@@ -2114,6 +2168,40 @@ void doRollMotionArc(int col, int row, int trailSide) {
 }
 
 
+// Roughly 1-in-2 chance of a single literal raindrop along the object's own base (bottom row of
+// its own cell), at any of its 5 trixel columns (picked at random). Same spawn makeRain()
+// (particle.c) uses for real weather -- sphereDot() directly (not nDots()), same dir/distance/
+// speed reset right after (PT_RAIN repurposes dir as a fall-velocity accumulator that has to
+// start at rest, not sphereDot()'s randomized compass angle -- see its own comment) -- but a much
+// shorter 30-frame age; makeRain()'s own 200 (appropriate for a drop falling the length of the
+// whole screen) left this one lingering far too long for something already spawned at ground
+// level. Shared by doRollRock()/doRollGeodoge() (settled without rolling) and case
+// CH_ROCK/CH_GEODOGE (just committed to falling straight down) -- same "something's happening
+// here" cue either way.
+void spawnBaseRaindrops(int col, int row) {
+
+    if (rangeRandom(2))
+        return;
+
+    // 3 drops per trigger, each independently at a random column. Middle columns (1-3) sit
+    // one trixel lower than the edge columns (0, 4) -- the object's own base glyph isn't flat,
+    // so this keeps each drop's spawn hugging it visually.
+    for (int n = 0; n < 3; n++) {
+
+        int rc = rangeRandom(CHAR_TRIX_X);
+        int ry = CHAR_TRIX_Y - 1 + (rc >= 1 && rc <= 3 ? 1 : 0);
+
+        int idx = sphereDot(col * CHAR_TRIX_X + rc, row * CHAR_TRIX_Y + ry, PT_RAIN, 30, 5);
+        if (idx >= 0) {
+            particle[idx].dir = 0;
+            particle[idx].distance = 0;
+            particle[idx].speed = 0;
+            particle[idx].silent = true;    // no splash SFX/burst -- see struct Particle's own comment
+        }
+    }
+}
+
+
 // Classifies one side (offset -1/+1) in a SINGLE pass over the two relevant cells -- avoids
 // doing the same GET()/CharToType[]/Attribute[] lookups twice over via separate strict+loose
 // checks, and lets the caller bail out immediately when neither side is even worth a second
@@ -2234,7 +2322,8 @@ void doRollRock(unsigned char *me, int row, int col) {
             // see nDots()/drawParticles()) dots trailing on the side the rock rolled IN
             // FROM, not the spark burst's direction of travel above. Fixed short fades, no
             // randomness -- just a "this was here a moment ago" cue, not another burst.
-            doRollMotionArc(col, row, -offset);
+            // Temporarily disabled for evaluation -- see doRollGeodoge()'s own call site too.
+            // doRollMotionArc(col, row, -offset);
 
             return;
         }
@@ -2252,38 +2341,13 @@ void doRollRock(unsigned char *me, int row, int col) {
     // is for.
     if (left == ROLL_LOOSE || right == ROLL_LOOSE) {
 
-        int slot = findFreeHazardSlot();
+        int slot = findFreeHazardSlot(col, row);
         if (slot >= 0)
             shakeObject(slot, me, col, row, HAZARD_SHAKE_TICKS);
     }
 
-    // Didn't roll this tick -- roughly 1-in-2 chance of a single literal raindrop along the
-    // rock's own base (bottom row of its own cell), at any of its 5 trixel columns (picked at
-    // random). Same spawn makeRain() (particle.c) uses for real weather -- sphereDot() directly
-    // (not nDots()), same dir/distance/speed reset right after (PT_RAIN repurposes dir as a
-    // fall-velocity accumulator that has to start at rest, not sphereDot()'s randomized compass
-    // angle -- see its own comment) -- but a much shorter 30-frame age; makeRain()'s own 200
-    // (appropriate for a drop falling the length of the whole screen) left this one lingering
-    // far too long for something already spawned at ground level.
-    if (!rangeRandom(2)) {
-
-        // 3 drops per trigger, each independently at a random column. Middle columns (1-3) sit
-        // one trixel lower than the edge columns (0, 4) -- the rock's own base glyph isn't
-        // flat, so this keeps each drop's spawn hugging it visually.
-        for (int n = 0; n < 3; n++) {
-
-            int rc = rangeRandom(CHAR_TRIX_X);
-            int ry = CHAR_TRIX_Y - 1 + (rc >= 1 && rc <= 3 ? 1 : 0);
-
-            int idx = sphereDot(col * CHAR_TRIX_X + rc, row * CHAR_TRIX_Y + ry, PT_RAIN, 30, 5);
-            if (idx >= 0) {
-                particle[idx].dir = 0;
-                particle[idx].distance = 0;
-                particle[idx].speed = 0;
-                particle[idx].silent = true;    // no splash SFX/burst -- see struct Particle's own comment
-            }
-        }
-    }
+    // Didn't roll this tick -- see spawnBaseRaindrops()'s own comment.
+    spawnBaseRaindrops(col, row);
 }
 
 
@@ -2345,7 +2409,8 @@ void doRollGeodoge(unsigned char *me, int row, int col) {
             nDots(1, col, row, PT_TWO, 25, offset * 6 + off, 7, 0, 1);
             nDots(1, col, row, PT_TWO, 30, offset * 7 + off, 10, 0, 1);
 
-            doRollMotionArc(col, row, -offset);
+            // Temporarily disabled for evaluation -- see doRollRock()'s own call site too.
+            // doRollMotionArc(col, row, -offset);
 
             return;
         }
@@ -2355,31 +2420,13 @@ void doRollGeodoge(unsigned char *me, int row, int col) {
     // hazard-shake, above -- doesn't skip or replace the raindrop cue below either, same as there.
     if (left == ROLL_LOOSE || right == ROLL_LOOSE) {
 
-        int slot = findFreeHazardSlot();
+        int slot = findFreeHazardSlot(col, row);
         if (slot >= 0)
             shakeObject(slot, me, col, row, HAZARD_SHAKE_TICKS);
     }
 
-    // Same literal-raindrop spawn as doRollRock() -- see its own comment.
-    if (!rangeRandom(2)) {
-
-        // 3 drops per trigger, each independently at a random column. Middle columns (1-3) sit
-        // one trixel lower than the edge columns (0, 4) -- the rock's own base glyph isn't
-        // flat, so this keeps each drop's spawn hugging it visually.
-        for (int n = 0; n < 3; n++) {
-
-            int rc = rangeRandom(CHAR_TRIX_X);
-            int ry = CHAR_TRIX_Y - 1 + (rc >= 1 && rc <= 3 ? 1 : 0);
-
-            int idx = sphereDot(col * CHAR_TRIX_X + rc, row * CHAR_TRIX_Y + ry, PT_RAIN, 30, 5);
-            if (idx >= 0) {
-                particle[idx].dir = 0;
-                particle[idx].distance = 0;
-                particle[idx].speed = 0;
-                particle[idx].silent = true;    // no splash SFX/burst -- see struct Particle's own comment
-            }
-        }
-    }
+    // Same literal-raindrop spawn as doRollRock() -- see spawnBaseRaindrops()'s own comment.
+    spawnBaseRaindrops(col, row);
 }
 
 
