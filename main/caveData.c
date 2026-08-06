@@ -1473,16 +1473,22 @@ void empty() {
 const struct caveHandler caveList[] = {
 
     // PLANET 0
-    {caveraintest, none, 5, 2},    // level 0
-    {caveBlank, none, 6, 5},       // level 1
-    {caveBlank, none, 6, 5},       // level 2
-    {caveBlank, none, 6, 5},       // level 3
-    {caveBlank, none, 6, 5},       // level 4
-    {caveBlank, none, 6, 5},       // level 5
-    {caveBlank, none, 6, 5},       // level 6
-    {caveBlank, none, 6, 5},       // level 7
-    {caveBlank, none, 6, 5},       // level 8
-    {caveBlank, none, 6, 5},       // level 9
+    {P3_starsAndStripes, spec, 2, 2},    // level 0
+    {P4_caveA4, none, 0, 0},             // level 0
+
+    {P2_caveWyrms, empty, 5, 5},     // level 0
+    {P1_caveUseWall, none, 2, 3},    // level 0
+    {P0_caveNew, none, 5, 2},        // level 0
+    {caveraintest, none, 5, 2},      // level 0
+    {caveBlank, none, 6, 5},         // level 1
+    {caveBlank, none, 6, 5},         // level 2
+    {caveBlank, none, 6, 5},         // level 3
+    {caveBlank, none, 6, 5},         // level 4
+    {caveBlank, none, 6, 5},         // level 5
+    {caveBlank, none, 6, 5},         // level 6
+    {caveBlank, none, 6, 5},         // level 7
+    {caveBlank, none, 6, 5},         // level 8
+    {caveBlank, none, 6, 5},         // level 9
 
     // PLANET 1
     {P0_caveNew, none, 5, 2},    // level 0

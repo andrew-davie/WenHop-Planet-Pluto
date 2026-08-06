@@ -649,9 +649,15 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
             meAtt = cur->me + dirOffset[dir];
 
+            // Computed once and reused by every check below (the ATT_BLANK/PickupCharacter[]
+            // tests here, plus the unconditional TYPE_IMMOVABLE/TYPE_DIRT tests further down) --
+            // nothing writes to *meAtt before any of them run (both branches that do return
+            // immediately afterward), so a single lookup is always equivalent to recomputing it
+            // fresh each time.
+            int type2 = CharToType[GET(*meAtt)];
+
             if (attachments[SLOT_CARRY].type) {
 
-                int type2 = CharToType[GET(*meAtt)];
                 if (Attribute[type2] & ATT_BLANK) {
 
                     // What's being converted here is what's actually being CARRIED
@@ -697,7 +703,7 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
             else {
 
-                unsigned char pickup = PickupCharacter[CharToType[GET(*meAtt)]];
+                unsigned char pickup = PickupCharacter[type2];
                 if (pickup) {
 
                     kdelay = PICKUP_DELAY_TICKS;
@@ -728,7 +734,7 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
             // shaking one object doesn't care whether the player is also carrying something else
             // -- and guarded on the action slot being free so this can't stomp an in-progress
             // shove/shake.
-            if (!attachments[SLOT_ACTION].type && CharToType[GET(*meAtt)] == TYPE_IMMOVABLE)
+            if (!attachments[SLOT_ACTION].type && type2 == TYPE_IMMOVABLE)
                 shakeObject(SLOT_ACTION, meAtt, playerX + xdir[dir], playerY + ydir[dir], SHAKE_TICKS);
 
             // Fire-button dig: instantly clears dirt in the aimed direction without having to
@@ -737,7 +743,7 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
             // shoving something, since dirt is neither ATT_BLANK nor liftable and so falls
             // through both branches above untouched either way. Same SFX_DIRT/dust-cloud cue as
             // walking through it.
-            if (CharToType[GET(*meAtt)] == TYPE_DIRT) {
+            if (type2 == TYPE_DIRT) {
 
                 ADDAUDIO(SFX_DIRT);
                 nDots(6, playerX + xdir[dir], playerY + ydir[dir], PT_ONE, 30, CHAR_CENTER_X, CHAR_CENTER_Y, 30, 2);
@@ -773,37 +779,14 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
 
     {    // no fire button
 
-        int type = CharToType[GET(*meOffset)];
-
-        if (type == TYPE_GRINDER || type == TYPE_GRINDER_1) {
-            ADDAUDIO(SFX_EXPLODE_QUIET);
-
-
-            nDots(4, playerX, playerY, PT_TWO, 40,    //
-                  ((xdir[dir] + 1) >> 1) * CHAR_TRIX_X + (ydir[dir] ? CHAR_CENTER_X : 0),
-                  ((ydir[dir] + 1) >> 1) * CHAR_TRIX_Y + (xdir[dir] ? CHAR_CENTER_Y : 0), 50, rangeRandom(7) + 1);
-
-
-            if (!gearsWaitRelease) {
-
-                gearsWaitRelease = true;
-                gearsActive = !gearsActive;
-
-                if (gearsActive)
-                    FLASH(0x28, 10);
-
-                toggleGears(gearsActive);
-            }
-
-#if ENABLE_SHAKE
-
-            if (!gearsActive)
-                setShake(5);
-#endif
-        }
-
-
-        else if (type == TYPE_ELECTRIC) {
+        // TYPE_ELECTRIC and TYPE_STAR are checked before the generic walkable case below despite
+        // costing two extra comparisons on the common path, because both genuinely satisfy that
+        // case's own attribute mask (TYPE_ELECTRIC is ATT_BLANK, TYPE_STAR is ATT_PERMEABLE |
+        // ATT_GRAB -- attribute.c) and would otherwise be silently walked through as ordinary
+        // floor instead of zapping/collecting. Every other special case below (GRINDER, KEY,
+        // door-key-drop, SHOVE) has no overlap with that mask, so those are safe to check AFTER
+        // the common case instead -- see its own comment for why that ordering matters for speed.
+        if (destType == TYPE_ELECTRIC) {
 
             FLASH(0x28, 13);
 
@@ -869,142 +852,13 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
             handled = true;
         }
 
-        // Auto-pickup on walk-in, same as TYPE_STAR above -- but gated on the carry slot being
-        // free, unlike STAR: a key is something you carry (SLOT_CARRY, same slot the fire-button
-        // pickup path above uses), so if you're already carrying something this branch is
-        // simply skipped -- destType == TYPE_KEY has no ATT_BLANK/PERMEABLE/GRAB/EXIT either
-        // (attribute.c), so the generic walkable check below won't catch it and the move is
-        // blocked, same as walking into a wall.
-        else if (!attachments[SLOT_CARRY].type && destType == TYPE_KEY) {
-
-            ADDAUDIO(SFX_LIFT);
-
-            kdelay = PICKUP_DELAY_TICKS;
-
-            attachments[SLOT_CARRY].type = CH_KEY;
-            attachments[SLOT_CARRY].mode = ATTACH_CARRY;
-            attachments[SLOT_CARRY].offset = pickupOffset[dir];
-
-            playerX += xdir[dir];
-            playerY += ydir[dir];
-
-            moveHusk(dir, cur->me, meOffset);
-
-            int dir2 = (gravity < 0) ? dir ^ 2 : dir;
-
-            if (playerAnimationID != WalkAnimation[dir2])
-                startPlayerAnimation(WalkAnimation[dir2]);
-
-            if (!autoMoveFrameCount) {
-
-                autoMoveFrameCount = ((MOVE_SPEED) << playerSlow);
-
-                autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
-                autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
-            }
-
-            handled = true;
-        }
-
-        // Same trigger as the fire-button pickup's PickupCharacter[] case above -- already
-        // carrying something, so the auto-pickup just above is skipped and the move stays
-        // blocked (see its own comment): flash the carried item AND shake the key itself, as
-        // feedback that walking into it did something rather than nothing.
-        else if (attachments[SLOT_CARRY].type && destType == TYPE_KEY) {
-
-            // !attachmentFlashTicks guard: see the fire-button pickup case's own comment --
-            // don't restart an already-running flash.
-            if (!attachmentFlashTicks)
-                attachmentFlashTicks = ATTACHMENT_FLASH_TICKS;
-
-            // !attachments[SLOT_ACTION].type guard: see the fire-button immovable-shake case's
-            // own comment -- shakeObject() immediately swaps the cell to CH_PLACEHOLDER, so this
-            // naturally can't re-fire until the shake settles and the key is written back.
-            if (!attachments[SLOT_ACTION].type)
-                shakeObject(SLOT_ACTION, meOffset, playerX + xdir[dir], playerY + ydir[dir], SHAKE_TICKS);
-        }
-
-        // Carrying a key up to a still-locked door (CH_DOORCLOSED specifically, not just any
-        // TYPE_DOOR -- board.c's ambient CH_DOORCLOSED case also opens these once
-        // !doges, this is just an earlier/alternate trigger): a normal drop, using the exact
-        // same offset arc (dropOffset[dir]) and SLOT_CARRY (still CH_KEY, still drawn by
-        // drawAttachment()) as any other drop -- the slot doesn't get cleared until
-        // updateDoorUnlock() actually commits. The key never becomes a real board character --
-        // doorLocked (board.c's TYPE_MELLON_HUSK case) drives updateDoorUnlock() every frame
-        // until it swaps the door open; see its own comment for the two-phase timing and for
-        // why the player is NOT frozen while this plays out.
-        //
-        // !doorLocked here (as well as guarding the fire-button block above) stops this from
-        // re-triggering every frame the player holds the direction into a door that's already
-        // mid-open -- SLOT_CARRY stays CH_KEY and *meOffset stays CH_DOORCLOSED for the whole
-        // window, so without the guard this would just keep restarting startDoorUnlock().
-        //
-        // attachments[SLOT_CARRY].type is never flagged with FLAG_THISFRAME (every setter
-        // strips it), so it can be compared directly here; *meOffset is a real board cell and
-        // still needs GET().
-        else if (!doorLocked && attachments[SLOT_CARRY].type == CH_KEY && GET(*meOffset) == CH_DOORCLOSED) {
-
-            attachments[SLOT_CARRY].offset = dropOffset[dir];
-            startDoorUnlock(meOffset, dir);
-
-            handled = true;
-        }
-
-
-        // Walking into an ATT_SHOVE object (TYPE_IMMOVABLE) from the left or right tries to
-        // shove it one square further the same way -- distinct from ATT_PUSH/PSH (board.c's
-        // genericPush(), a mechanical pusher-bar shoving something), this is the PLAYER doing
-        // it by walking into it. No vertical case -- shoving is left/right only (dir 1 or 3).
-        // Uses the action slot (SLOT_ACTION, mellon.h), entirely independent of SLOT_CARRY -- the
-        // player can shove an immovable while still carrying something else in the other slot.
-        // !attachments[SLOT_ACTION].type guards against shoving a second block while one's
-        // already mid-shove/shake, and naturally also prevents re-triggering on the SAME block
-        // before its previous shove has settled (the action slot stays CH_IMMOVABLE, non-zero,
-        // for the whole walk-in glide).
-        else if (!attachments[SLOT_ACTION].type && (dir == 1 || dir == 3) && (Attribute[destType] & ATT_SHOVE)) {
-
-            unsigned char *behindCell = meOffset + dirOffset[dir];
-
-            if (Attribute[CharToType[GET(*behindCell)]] & ATT_BLANK) {
-
-                // Reserve the destination with CH_PLACEHOLDER -- looks blank (charSet[] maps
-                // it to the same invisible glyph as CH_BLANK) but has no ATT_BLANK/PERMEABLE
-                // etc of its own, so nothing else can walk into or spawn onto it while the
-                // real object is still mid-carry. destCell remembers where to commit the real
-                // CH_IMMOVABLE once the walk-in glide finishes (movePlayer(), below).
-                *behindCell = CH_PLACEHOLDER;
-
-                attachments[SLOT_ACTION].type = CH_IMMOVABLE;
-                attachments[SLOT_ACTION].mode = ATTACH_SHOVE;
-                attachments[SLOT_ACTION].destCell = behindCell;
-
-                playerX += xdir[dir];
-                playerY += ydir[dir];
-
-                moveHusk(dir, cur->me, meOffset);
-
-                if (playerAnimationID != ID_Push)
-                    startPlayerAnimation(ID_Push);
-
-                if (!autoMoveFrameCount) {
-
-                    autoMoveFrameCount = (MOVE_SPEED << playerSlow);
-
-                    autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
-                    autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
-                }
-
-                handled = true;
-            }
-
-            // Shove blocked -- something solid immediately behind it -- same "did nothing"
-            // feedback as the fire-button pickup-blocked case above, via the same action slot
-            // instead of silently bumping into it. Shakes the immovable itself (meOffset), not
-            // behindCell -- behindCell is whatever's blocking it and never moves.
-            else
-                shakeObject(SLOT_ACTION, meOffset, playerX + xdir[dir], playerY + ydir[dir], SHAKE_TICKS);
-        }
-
+        // Ordinary walkable terrain (open ground/dirt/an exit/a doge to grab) -- by far the most
+        // common outcome of a movement check, so it's checked as early as correctness allows
+        // (right after the two attribute-overlapping exceptions above -- see their own comment).
+        // GRINDER/KEY/door-key-drop/SHOVE below have no attribute overlap with this mask, so
+        // moving them after this instead of before (as they used to be) doesn't change which one
+        // ever fires for a given destType, just how many comparisons an ordinary walk pays for
+        // first: 2 now, instead of the previous 7.
         else if (Attribute[destType] & (ATT_BLANK | ATT_PERMEABLE | ATT_GRAB | ATT_EXIT)) {
 
             pushCounter = 0;
@@ -1152,6 +1006,174 @@ bool checkHighPriorityMove(BoardCursor *cur, int dir) {
             }
 
             handled = true;
+        }
+
+        // Rare fixtures/interactions that don't overlap the walkable attribute mask above, so
+        // their position relative to it doesn't affect correctness -- checked after it now
+        // instead of before, since an ordinary walk (the common case, handled above) never
+        // matches any of these anyway.
+
+        else if (destType == TYPE_GRINDER || destType == TYPE_GRINDER_1) {
+            ADDAUDIO(SFX_EXPLODE_QUIET);
+
+
+            nDots(4, playerX, playerY, PT_TWO, 40,    //
+                  ((xdir[dir] + 1) >> 1) * CHAR_TRIX_X + (ydir[dir] ? CHAR_CENTER_X : 0),
+                  ((ydir[dir] + 1) >> 1) * CHAR_TRIX_Y + (xdir[dir] ? CHAR_CENTER_Y : 0), 50, rangeRandom(7) + 1);
+
+
+            if (!gearsWaitRelease) {
+
+                gearsWaitRelease = true;
+                gearsActive = !gearsActive;
+
+                if (gearsActive)
+                    FLASH(0x28, 10);
+
+                toggleGears(gearsActive);
+            }
+
+#if ENABLE_SHAKE
+
+            if (!gearsActive)
+                setShake(5);
+#endif
+        }
+
+        // Auto-pickup on walk-in, same as TYPE_STAR above -- but gated on the carry slot being
+        // free, unlike STAR: a key is something you carry (SLOT_CARRY, same slot the fire-button
+        // pickup path above uses), so if you're already carrying something this branch is
+        // simply skipped -- destType == TYPE_KEY has no ATT_BLANK/PERMEABLE/GRAB/EXIT either
+        // (attribute.c), so the walkable check above doesn't catch it and the move is blocked,
+        // same as walking into a wall.
+        else if (!attachments[SLOT_CARRY].type && destType == TYPE_KEY) {
+
+            ADDAUDIO(SFX_LIFT);
+
+            kdelay = PICKUP_DELAY_TICKS;
+
+            attachments[SLOT_CARRY].type = CH_KEY;
+            attachments[SLOT_CARRY].mode = ATTACH_CARRY;
+            attachments[SLOT_CARRY].offset = pickupOffset[dir];
+
+            playerX += xdir[dir];
+            playerY += ydir[dir];
+
+            moveHusk(dir, cur->me, meOffset);
+
+            int dir2 = (gravity < 0) ? dir ^ 2 : dir;
+
+            if (playerAnimationID != WalkAnimation[dir2])
+                startPlayerAnimation(WalkAnimation[dir2]);
+
+            if (!autoMoveFrameCount) {
+
+                autoMoveFrameCount = ((MOVE_SPEED) << playerSlow);
+
+                autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
+                autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
+            }
+
+            handled = true;
+        }
+
+        // Same trigger as the fire-button pickup's PickupCharacter[] case above -- already
+        // carrying something, so the auto-pickup just above is skipped and the move stays
+        // blocked (see its own comment): flash the carried item AND shake the key itself, as
+        // feedback that walking into it did something rather than nothing.
+        else if (attachments[SLOT_CARRY].type && destType == TYPE_KEY) {
+
+            // !attachmentFlashTicks guard: see the fire-button pickup case's own comment --
+            // don't restart an already-running flash.
+            if (!attachmentFlashTicks)
+                attachmentFlashTicks = ATTACHMENT_FLASH_TICKS;
+
+            // !attachments[SLOT_ACTION].type guard: see the fire-button immovable-shake case's
+            // own comment -- shakeObject() immediately swaps the cell to CH_PLACEHOLDER, so this
+            // naturally can't re-fire until the shake settles and the key is written back.
+            if (!attachments[SLOT_ACTION].type)
+                shakeObject(SLOT_ACTION, meOffset, playerX + xdir[dir], playerY + ydir[dir], SHAKE_TICKS);
+        }
+
+        // Carrying a key up to a still-locked door (CH_DOORCLOSED specifically, not just any
+        // TYPE_DOOR -- board.c's ambient CH_DOORCLOSED case also opens these once
+        // !doges, this is just an earlier/alternate trigger): a normal drop, using the exact
+        // same offset arc (dropOffset[dir]) and SLOT_CARRY (still CH_KEY, still drawn by
+        // drawAttachment()) as any other drop -- the slot doesn't get cleared until
+        // updateDoorUnlock() actually commits. The key never becomes a real board character --
+        // doorLocked (board.c's TYPE_MELLON_HUSK case) drives updateDoorUnlock() every frame
+        // until it swaps the door open; see its own comment for the two-phase timing and for
+        // why the player is NOT frozen while this plays out.
+        //
+        // !doorLocked here (as well as guarding the fire-button block above) stops this from
+        // re-triggering every frame the player holds the direction into a door that's already
+        // mid-open -- SLOT_CARRY stays CH_KEY and *meOffset stays CH_DOORCLOSED for the whole
+        // window, so without the guard this would just keep restarting startDoorUnlock().
+        //
+        // attachments[SLOT_CARRY].type is never flagged with FLAG_THISFRAME (every setter
+        // strips it), so it can be compared directly here; *meOffset is a real board cell and
+        // still needs GET().
+        else if (!doorLocked && attachments[SLOT_CARRY].type == CH_KEY && GET(*meOffset) == CH_DOORCLOSED) {
+
+            attachments[SLOT_CARRY].offset = dropOffset[dir];
+            startDoorUnlock(meOffset, dir);
+
+            handled = true;
+        }
+
+
+        // Walking into an ATT_SHOVE object (TYPE_IMMOVABLE) from the left or right tries to
+        // shove it one square further the same way -- distinct from ATT_PUSH/PSH (board.c's
+        // genericPush(), a mechanical pusher-bar shoving something), this is the PLAYER doing
+        // it by walking into it. No vertical case -- shoving is left/right only (dir 1 or 3).
+        // Uses the action slot (SLOT_ACTION, mellon.h), entirely independent of SLOT_CARRY -- the
+        // player can shove an immovable while still carrying something else in the other slot.
+        // !attachments[SLOT_ACTION].type guards against shoving a second block while one's
+        // already mid-shove/shake, and naturally also prevents re-triggering on the SAME block
+        // before its previous shove has settled (the action slot stays CH_IMMOVABLE, non-zero,
+        // for the whole walk-in glide).
+        else if (!attachments[SLOT_ACTION].type && (dir == 1 || dir == 3) && (Attribute[destType] & ATT_SHOVE)) {
+
+            unsigned char *behindCell = meOffset + dirOffset[dir];
+
+            if (Attribute[CharToType[GET(*behindCell)]] & ATT_BLANK) {
+
+                // Reserve the destination with CH_PLACEHOLDER -- looks blank (charSet[] maps
+                // it to the same invisible glyph as CH_BLANK) but has no ATT_BLANK/PERMEABLE
+                // etc of its own, so nothing else can walk into or spawn onto it while the
+                // real object is still mid-carry. destCell remembers where to commit the real
+                // CH_IMMOVABLE once the walk-in glide finishes (movePlayer(), below).
+                *behindCell = CH_PLACEHOLDER;
+
+                attachments[SLOT_ACTION].type = CH_IMMOVABLE;
+                attachments[SLOT_ACTION].mode = ATTACH_SHOVE;
+                attachments[SLOT_ACTION].destCell = behindCell;
+
+                playerX += xdir[dir];
+                playerY += ydir[dir];
+
+                moveHusk(dir, cur->me, meOffset);
+
+                if (playerAnimationID != ID_Push)
+                    startPlayerAnimation(ID_Push);
+
+                if (!autoMoveFrameCount) {
+
+                    autoMoveFrameCount = (MOVE_SPEED << playerSlow);
+
+                    autoMoveX = autoMoveDeltaX = animDeltaX[dir] >> playerSlow;
+                    autoMoveY = autoMoveDeltaY = animDeltaY[dir] >> playerSlow;
+                }
+
+                handled = true;
+            }
+
+            // Shove blocked -- something solid immediately behind it -- same "did nothing"
+            // feedback as the fire-button pickup-blocked case above, via the same action slot
+            // instead of silently bumping into it. Shakes the immovable itself (meOffset), not
+            // behindCell -- behindCell is whatever's blocking it and never moves.
+            else
+                shakeObject(SLOT_ACTION, meOffset, playerX + xdir[dir], playerY + ydir[dir], SHAKE_TICKS);
         }
     }
 
