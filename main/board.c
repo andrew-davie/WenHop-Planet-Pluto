@@ -497,7 +497,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-07 00:00 AEST
+// Last updated: 2026-08-07 00:03 AEST
 static const unsigned short budget[128] = {
     _untimed_,     //   0 CH_BLANK
     _untimed_,     //   1 CH_PLACEHOLDER
@@ -509,10 +509,10 @@ static const unsigned short budget[128] = {
     _untimed_,     //   7 CH_STEELWALL
     _B + 346,      //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 528,      //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 2323,    //  10 CH_ROCK -- updated 2026-08-06 23:57 AEST (was 1975)
-    _B + 2429,    //  11 CH_ROCK_FALLING -- updated 2026-08-07 00:00 AEST (was 2407)
-    _B + 2063,    //  12 CH_DOGE_00 -- updated 2026-08-07 00:00 AEST (was 2003)
-    _B + 2467,    //  13 CH_DOGE_FALLING -- updated 2026-08-07 00:00 AEST (was 390)
+    _B + 2325,    //  10 CH_ROCK -- updated 2026-08-07 00:03 AEST (was 2323)
+    _B + 2429,     //  11 CH_ROCK_FALLING -- updated 2026-08-07 00:00 AEST (was 2407)
+    _B + 2064,    //  12 CH_DOGE_00 -- updated 2026-08-07 00:03 AEST (was 2063)
+    _B + 2467,     //  13 CH_DOGE_FALLING -- updated 2026-08-07 00:00 AEST (was 390)
     _B + 292,      //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-08-06 23:32 AEST (was 291)
     _untimed_,     //  15 CH_LAVA_BLANK
     _untimed_,     //  16 CH_LAVA_SMALL
@@ -524,9 +524,9 @@ static const unsigned short budget[128] = {
     _B + 210,      //  22 CH_ROCK_PEBBLE -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 210,      //  23 CH_ROCK_PEBBLE_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 252,      //  24 CH_DUST_0 -- updated 2026-08-06 23:27 AEST (was 209)
-    _B + 252,     //  25 CH_DUST_1 -- updated 2026-08-06 23:57 AEST (was 251)
-    _B + 250,     //  26 CH_DUST_2 -- updated 2026-08-06 23:57 AEST (was 249)
-    _B + 1608,    //  27 CH_GEODOGE -- manually bumped 2026-08-06 (was 265, stale since 07-28) -- updated 2026-08-07 00:00 AEST (was 262)
+    _B + 252,      //  25 CH_DUST_1 -- updated 2026-08-06 23:57 AEST (was 251)
+    _B + 250,      //  26 CH_DUST_2 -- updated 2026-08-06 23:57 AEST (was 249)
+    _B + 2366,    //  27 CH_GEODOGE -- updated 2026-08-07 00:03 AEST (was 1608)
     _B + 252,      //  28 CH_DUST_ROCK_0 -- updated 2026-08-06 23:27 AEST (was 242)
     _B + 252,      //  29 CH_DUST_ROCK_1 -- updated 2026-08-06 23:27 AEST (was 242)
     _B + 250,      //  30 CH_DUST_ROCK_2 -- updated 2026-08-06 23:27 AEST (was 207)
@@ -551,7 +551,7 @@ static const unsigned short budget[128] = {
     _B + 235,      //  49 CH_WYRM_HEAD_R -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  50 CH_WYRM_HEAD_D -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  51 CH_WYRM_HEAD_L -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 632,      //  52 CH_GEODOGE_FALLING -- updated 2026-08-06 23:32 AEST (was 262)
+    _B + 1814,    //  52 CH_GEODOGE_FALLING -- updated 2026-08-07 00:03 AEST (was 632)
     _untimed_,     //  53 CH_FLIP_GRAVITY_0
     _untimed_,     //  54 CH_FLIP_GRAVITY_1
     _untimed_,     //  55 CH_FLIP_GRAVITY_2
@@ -576,7 +576,7 @@ static const unsigned short budget[128] = {
     _B + 235,      //  74 CH_WYRM_TAIL_R -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  75 CH_WYRM_TAIL_D -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  76 CH_WYRM_TAIL_L -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 250,     //  77 CH_DOGE_FALLING_TOP -- updated 2026-08-07 00:00 AEST (was 249)
+    _B + 250,      //  77 CH_DOGE_FALLING_TOP -- updated 2026-08-07 00:00 AEST (was 249)
     _B + 250,      //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 240)
     _B + 250,      //  79 CH_ROCK_FALLING_TOP -- updated 2026-08-06 23:27 AEST (was 240)
     _B + 256,      //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-08-06 23:27 AEST (was 240)
@@ -584,7 +584,7 @@ static const unsigned short budget[128] = {
     _B + 250,      //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 240)
     _B + 226,      //  83 CH_DOGE_FALLING_TOP2 -- updated 2026-07-31 13:42 AEST (was untimed)
     _untimed_,     //  84 CH_DOGE_FALLING_BOTTOM2
-    _B + 249,      //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 16:30 AEST (was 240)
+    _B + 250,     //  85 CH_DOGE_SIDE_1 -- updated 2026-08-07 00:03 AEST (was 249)
     _B + 272,      //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:30 AEST (was 263)
     _B + 249,      //  87 CH_DOGE_SIDE_2 -- updated 2026-07-28 16:30 AEST (was 240)
     _B + 272,      //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:30 AEST (was 263)
@@ -596,8 +596,8 @@ static const unsigned short budget[128] = {
     _B + 4085,     //  94 CH_INSULATOR_TOP -- updated 2026-07-29 00:45 AEST (was 4047)
     _B + 236,      //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-29 03:45 AEST (was 230)
     _B + 2003,     //  96 CH_STAR -- updated 2026-07-29 00:37 AEST (was 1985)
-    _B + 250,     //  97 CH_STAR_FALLING_TOP -- updated 2026-08-07 00:00 AEST (was 249)
-    _B + 250,     //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-08-07 00:00 AEST (was 249)
+    _B + 250,      //  97 CH_STAR_FALLING_TOP -- updated 2026-08-07 00:00 AEST (was 249)
+    _B + 250,      //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-08-07 00:00 AEST (was 249)
     _untimed_,     //  99 CH_ROCK_BONUS
     _B + 374,      // 100 CH_STAR_EXPLODE -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 6736,     // 101 CH_INSULATOR_L -- updated 2026-07-29 00:45 AEST (was 3771)
@@ -620,7 +620,7 @@ static const unsigned short budget[128] = {
     _B + 213,      // 118 CH_ROCK_SIDE_1 -- updated 2026-08-06 23:27 AEST (was 170)
     _B + 213,      // 119 CH_ROCK_SIDE_2 -- updated 2026-08-06 23:27 AEST (was 170)
     _B + 281,      // 120 CH_ROCK_SIDE_3 -- updated 2026-08-06 23:32 AEST (was 277)
-    _B + 277,      // 121 CH_ROCK_SIDE_4 -- updated 2026-08-06 23:27 AEST (was 196)
+    _B + 281,     // 121 CH_ROCK_SIDE_4 -- updated 2026-08-07 00:03 AEST (was 277)
     _B + 213,      // 122 CH_GEODOGE_SIDE_1 -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 213,      // 123 CH_GEODOGE_SIDE_2 -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 275,      // 124 CH_GEODOGE_SIDE_3 -- updated 2026-08-06 23:32 AEST (was untimed)
