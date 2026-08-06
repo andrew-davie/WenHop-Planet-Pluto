@@ -497,7 +497,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-06 23:55 AEST
+// Last updated: 2026-08-06 23:57 AEST
 static const unsigned short budget[128] = {
     _untimed_,     //   0 CH_BLANK
     _untimed_,     //   1 CH_PLACEHOLDER
@@ -509,8 +509,8 @@ static const unsigned short budget[128] = {
     _untimed_,     //   7 CH_STEELWALL
     _B + 346,      //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 528,      //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 1975,    //  10 CH_ROCK -- updated 2026-08-06 23:55 AEST (was 262)
-    _B + 2525,     //  11 CH_ROCK_FALLING -- updated 2026-08-06 23:27 AEST (was 262)
+    _B + 2323,    //  10 CH_ROCK -- updated 2026-08-06 23:57 AEST (was 1975)
+    _B + 2407,    //  11 CH_ROCK_FALLING -- updated 2026-08-06 23:57 AEST (was 262)
     _B + 2003,     //  12 CH_DOGE_00 -- updated 2026-08-06 23:32 AEST (was 262)
     _B + 390,      //  13 CH_DOGE_FALLING -- updated 2026-08-06 23:32 AEST (was 262)
     _B + 292,      //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-08-06 23:32 AEST (was 291)
@@ -524,115 +524,109 @@ static const unsigned short budget[128] = {
     _B + 210,      //  22 CH_ROCK_PEBBLE -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 210,      //  23 CH_ROCK_PEBBLE_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 252,      //  24 CH_DUST_0 -- updated 2026-08-06 23:27 AEST (was 209)
-    _B + 251,      //  25 CH_DUST_1 -- updated 2026-08-06 23:27 AEST (was 209)
-    _B + 249,      //  26 CH_DUST_2 -- updated 2026-08-06 23:27 AEST (was 207)
-    // Manually bumped to match CH_ROCK's own measured value (was _B + 265, last measured
-    // 2026-07-28 -- well before doRollGeodoge() grew the same rollEligibility()/hazard-shake
-    // work doRollRock() has, which is what pushed CH_ROCK's own entry from 262 to 5541 on
-    // 2026-08-05). CH_GEODOGE runs the structurally identical logic, so it needs the same
-    // headroom until a fresh CSV captures its own real worst case and update_budget_from_csv.py
-    // overwrites this with a measured number.
-    _B + 5541,    //  27 CH_GEODOGE -- manually bumped 2026-08-06 (was 265, stale since 07-28)
-    _B + 252,     //  28 CH_DUST_ROCK_0 -- updated 2026-08-06 23:27 AEST (was 242)
-    _B + 252,     //  29 CH_DUST_ROCK_1 -- updated 2026-08-06 23:27 AEST (was 242)
-    _B + 250,     //  30 CH_DUST_ROCK_2 -- updated 2026-08-06 23:27 AEST (was 207)
-    _B + 466,     //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-08-06 23:32 AEST (was 434)
-    _B + 165,     //  32 CH_HORIZONTAL_BAR -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 2319,    //  33 CH_PUSH_LEFT -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 235,     //  34 CH_PUSH_LEFT_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 2142,    //  35 CH_PUSH_RIGHT -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 236,     //  36 CH_PUSH_RIGHT_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 165,     //  37 CH_VERTICAL_BAR -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 2319,    //  38 CH_PUSH_UP -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 235,     //  39 CH_PUSH_UP_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 395,     //  40 CH_PUSH_DOWN -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 236,     //  41 CH_PUSH_DOWN_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 235,     //  42 CH_WYRM_BODY -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  43 CH_WYRM_VERT_BODY -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  44 CH_WYRM_CORNER_LD -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 234,     //  45 CH_WYRM_CORNER_RD -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  46 CH_WYRM_CORNER_LU -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  47 CH_WYRM_CORNER_RU -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  48 CH_WYRM_HEAD_U -- updated 2026-08-06 23:32 AEST (was 221)
-    _B + 235,     //  49 CH_WYRM_HEAD_R -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  50 CH_WYRM_HEAD_D -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  51 CH_WYRM_HEAD_L -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 632,     //  52 CH_GEODOGE_FALLING -- updated 2026-08-06 23:32 AEST (was 262)
-    _untimed_,    //  53 CH_FLIP_GRAVITY_0
-    _untimed_,    //  54 CH_FLIP_GRAVITY_1
-    _untimed_,    //  55 CH_FLIP_GRAVITY_2
-    _B + 228,     //  56 CH_BLOCK -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 452,     //  57 CH_GRINDER_0 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 436,     //  58 CH_GRINDER_1 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _untimed_,    //  59 CH_HUB
-    _B + 283,     //  60 CH_WATER -- updated 2026-08-06 23:27 AEST (was 232)
-    _B + 292,     //  61 CH_WATERFLOW_0 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 296,     //  62 CH_WATERFLOW_1 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 1256,    //  63 CH_WATERFLOW_2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 1256,    //  64 CH_WATERFLOW_3 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 296,     //  65 CH_WATERFLOW_4 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _untimed_,    //  66 CH_HUB_1
-    _B + 198,     //  67 CH_OUTLET -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 268,     //  68 CH_BELT_0 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 268,     //  69 CH_BELT_1 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _untimed_,    //  70 CH_PUSH_DOWN2
-    _untimed_,    //  71 CH_GEODOGE_CONVERT
-    _B + 514,     //  72 CH_CONVERT_PIPE -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 235,     //  73 CH_WYRM_TAIL_U -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  74 CH_WYRM_TAIL_R -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  75 CH_WYRM_TAIL_D -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,     //  76 CH_WYRM_TAIL_L -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 249,     //  77 CH_DOGE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 240)
-    _B + 250,     //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 240)
-    _B + 250,     //  79 CH_ROCK_FALLING_TOP -- updated 2026-08-06 23:27 AEST (was 240)
-    _B + 256,     //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-08-06 23:27 AEST (was 240)
-    _B + 1495,    //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 1487)
-    _B + 250,     //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 240)
-    _B + 226,     //  83 CH_DOGE_FALLING_TOP2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _untimed_,    //  84 CH_DOGE_FALLING_BOTTOM2
-    _B + 249,     //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 16:30 AEST (was 240)
-    _B + 272,     //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:30 AEST (was 263)
-    _B + 249,     //  87 CH_DOGE_SIDE_2 -- updated 2026-07-28 16:30 AEST (was 240)
-    _B + 272,     //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:30 AEST (was 263)
-    _B + 483,     //  89 CH_ELECTRIC_0 -- updated 2026-08-06 23:32 AEST (was 476)
-    _B + 398,     //  90 CH_ELECTRIC_1 -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 398,     //  91 CH_ELECTRIC_2 -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 400,     //  92 CH_ELECTRIC_3 -- updated 2026-08-06 23:32 AEST (was 393)
-    _untimed_,    //  93 CH_BROKEN_DIRT
-    _B + 4085,    //  94 CH_INSULATOR_TOP -- updated 2026-07-29 00:45 AEST (was 4047)
-    _B + 236,     //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-29 03:45 AEST (was 230)
-    _B + 2003,    //  96 CH_STAR -- updated 2026-07-29 00:37 AEST (was 1985)
-    _B + 249,     //  97 CH_STAR_FALLING_TOP -- updated 2026-07-28 17:27 AEST (was 234)
-    _B + 249,     //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-29 03:45 AEST (was 248)
-    _untimed_,    //  99 CH_ROCK_BONUS
-    _B + 374,     // 100 CH_STAR_EXPLODE -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 6736,    // 101 CH_INSULATOR_L -- updated 2026-07-29 00:45 AEST (was 3771)
-    _B + 236,     // 102 CH_INSULATOR_R -- updated 2026-07-29 03:45 AEST (was 230)
-    _B + 483,     // 103 CH_ELECTRIC_H0 -- updated 2026-08-06 23:32 AEST (was 476)
-    _B + 398,     // 104 CH_ELECTRIC_H1 -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 398,     // 105 CH_ELECTRIC_H2 -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 400,     // 106 CH_ELECTRIC_H3 -- updated 2026-08-06 23:32 AEST (was 393)
-    _B + 235,     // 107 CH_CROSSED_STREAMS -- updated 2026-08-06 23:32 AEST (was 197)
-    _B + 1366,    // 108 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
-    _B + 4594,    // 109 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
-    _untimed_,    // 110 CH_CONCRETE
-    _B + 883,     // 111 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-06 23:27 AEST (was 766)
-    _untimed_,    // 112 CH_KEY
-    _untimed_,    // 113 CH_DOOROPEN_STATIC
-    _B + 424,     // 114 CH_IMMOVABLE -- updated 2026-08-06 23:32 AEST (was 261)
-    _B + 2299,    // 115 CH_IMMOVABLE_FALLING -- updated 2026-08-06 23:32 AEST (was 2024)
-    _B + 213,     // 116 CH_IMMOVABLE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 169)
-    _B + 213,     // 117 CH_IMMOVABLE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 169)
-    _B + 213,     // 118 CH_ROCK_SIDE_1 -- updated 2026-08-06 23:27 AEST (was 170)
-    _B + 213,     // 119 CH_ROCK_SIDE_2 -- updated 2026-08-06 23:27 AEST (was 170)
-    _B + 281,     // 120 CH_ROCK_SIDE_3 -- updated 2026-08-06 23:32 AEST (was 277)
-    _B + 277,     // 121 CH_ROCK_SIDE_4 -- updated 2026-08-06 23:27 AEST (was 196)
-    _B + 213,     // 122 CH_GEODOGE_SIDE_1 -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 213,     // 123 CH_GEODOGE_SIDE_2 -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 275,     // 124 CH_GEODOGE_SIDE_3 -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 276,     // 125 CH_GEODOGE_SIDE_4 -- updated 2026-08-06 23:32 AEST (was untimed)
-    _untimed_,    // 126 (unused)
-    _untimed_,    // 127 (unused)
+    _B + 252,     //  25 CH_DUST_1 -- updated 2026-08-06 23:57 AEST (was 251)
+    _B + 250,     //  26 CH_DUST_2 -- updated 2026-08-06 23:57 AEST (was 249)
+    _B + 262,      //  27 CH_GEODOGE -- manually bumped 2026-08-06 (was 265, stale since 07-28)
+    _B + 252,      //  28 CH_DUST_ROCK_0 -- updated 2026-08-06 23:27 AEST (was 242)
+    _B + 252,      //  29 CH_DUST_ROCK_1 -- updated 2026-08-06 23:27 AEST (was 242)
+    _B + 250,      //  30 CH_DUST_ROCK_2 -- updated 2026-08-06 23:27 AEST (was 207)
+    _B + 466,      //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-08-06 23:32 AEST (was 434)
+    _B + 165,      //  32 CH_HORIZONTAL_BAR -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 2319,     //  33 CH_PUSH_LEFT -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 235,      //  34 CH_PUSH_LEFT_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 2142,     //  35 CH_PUSH_RIGHT -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 236,      //  36 CH_PUSH_RIGHT_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 165,      //  37 CH_VERTICAL_BAR -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 2319,     //  38 CH_PUSH_UP -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 235,      //  39 CH_PUSH_UP_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 395,      //  40 CH_PUSH_DOWN -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 236,      //  41 CH_PUSH_DOWN_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 235,      //  42 CH_WYRM_BODY -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  43 CH_WYRM_VERT_BODY -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  44 CH_WYRM_CORNER_LD -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 234,      //  45 CH_WYRM_CORNER_RD -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  46 CH_WYRM_CORNER_LU -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  47 CH_WYRM_CORNER_RU -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  48 CH_WYRM_HEAD_U -- updated 2026-08-06 23:32 AEST (was 221)
+    _B + 235,      //  49 CH_WYRM_HEAD_R -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  50 CH_WYRM_HEAD_D -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  51 CH_WYRM_HEAD_L -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 632,      //  52 CH_GEODOGE_FALLING -- updated 2026-08-06 23:32 AEST (was 262)
+    _untimed_,     //  53 CH_FLIP_GRAVITY_0
+    _untimed_,     //  54 CH_FLIP_GRAVITY_1
+    _untimed_,     //  55 CH_FLIP_GRAVITY_2
+    _B + 228,      //  56 CH_BLOCK -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 452,      //  57 CH_GRINDER_0 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 436,      //  58 CH_GRINDER_1 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _untimed_,     //  59 CH_HUB
+    _B + 283,      //  60 CH_WATER -- updated 2026-08-06 23:27 AEST (was 232)
+    _B + 292,      //  61 CH_WATERFLOW_0 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 296,      //  62 CH_WATERFLOW_1 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 1256,     //  63 CH_WATERFLOW_2 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 1256,     //  64 CH_WATERFLOW_3 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 296,      //  65 CH_WATERFLOW_4 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _untimed_,     //  66 CH_HUB_1
+    _B + 198,      //  67 CH_OUTLET -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 268,      //  68 CH_BELT_0 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 268,      //  69 CH_BELT_1 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _untimed_,     //  70 CH_PUSH_DOWN2
+    _untimed_,     //  71 CH_GEODOGE_CONVERT
+    _B + 514,      //  72 CH_CONVERT_PIPE -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 235,      //  73 CH_WYRM_TAIL_U -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  74 CH_WYRM_TAIL_R -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  75 CH_WYRM_TAIL_D -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 235,      //  76 CH_WYRM_TAIL_L -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 249,      //  77 CH_DOGE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 240)
+    _B + 250,      //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 240)
+    _B + 250,      //  79 CH_ROCK_FALLING_TOP -- updated 2026-08-06 23:27 AEST (was 240)
+    _B + 256,      //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-08-06 23:27 AEST (was 240)
+    _B + 1495,     //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 1487)
+    _B + 250,      //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 240)
+    _B + 226,      //  83 CH_DOGE_FALLING_TOP2 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _untimed_,     //  84 CH_DOGE_FALLING_BOTTOM2
+    _B + 249,      //  85 CH_DOGE_SIDE_1 -- updated 2026-07-28 16:30 AEST (was 240)
+    _B + 272,      //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:30 AEST (was 263)
+    _B + 249,      //  87 CH_DOGE_SIDE_2 -- updated 2026-07-28 16:30 AEST (was 240)
+    _B + 272,      //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:30 AEST (was 263)
+    _B + 483,      //  89 CH_ELECTRIC_0 -- updated 2026-08-06 23:32 AEST (was 476)
+    _B + 398,      //  90 CH_ELECTRIC_1 -- updated 2026-08-06 23:32 AEST (was 391)
+    _B + 398,      //  91 CH_ELECTRIC_2 -- updated 2026-08-06 23:32 AEST (was 391)
+    _B + 400,      //  92 CH_ELECTRIC_3 -- updated 2026-08-06 23:32 AEST (was 393)
+    _untimed_,     //  93 CH_BROKEN_DIRT
+    _B + 4085,     //  94 CH_INSULATOR_TOP -- updated 2026-07-29 00:45 AEST (was 4047)
+    _B + 236,      //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-29 03:45 AEST (was 230)
+    _B + 2003,     //  96 CH_STAR -- updated 2026-07-29 00:37 AEST (was 1985)
+    _B + 249,      //  97 CH_STAR_FALLING_TOP -- updated 2026-07-28 17:27 AEST (was 234)
+    _B + 249,      //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-07-29 03:45 AEST (was 248)
+    _untimed_,     //  99 CH_ROCK_BONUS
+    _B + 374,      // 100 CH_STAR_EXPLODE -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 6736,     // 101 CH_INSULATOR_L -- updated 2026-07-29 00:45 AEST (was 3771)
+    _B + 236,      // 102 CH_INSULATOR_R -- updated 2026-07-29 03:45 AEST (was 230)
+    _B + 483,      // 103 CH_ELECTRIC_H0 -- updated 2026-08-06 23:32 AEST (was 476)
+    _B + 398,      // 104 CH_ELECTRIC_H1 -- updated 2026-08-06 23:32 AEST (was 391)
+    _B + 398,      // 105 CH_ELECTRIC_H2 -- updated 2026-08-06 23:32 AEST (was 391)
+    _B + 400,      // 106 CH_ELECTRIC_H3 -- updated 2026-08-06 23:32 AEST (was 393)
+    _B + 235,      // 107 CH_CROSSED_STREAMS -- updated 2026-08-06 23:32 AEST (was 197)
+    _B + 1366,     // 108 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
+    _B + 4594,     // 109 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
+    _untimed_,     // 110 CH_CONCRETE
+    _B + 883,      // 111 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-06 23:27 AEST (was 766)
+    _untimed_,     // 112 CH_KEY
+    _untimed_,     // 113 CH_DOOROPEN_STATIC
+    _B + 424,      // 114 CH_IMMOVABLE -- updated 2026-08-06 23:32 AEST (was 261)
+    _B + 2299,     // 115 CH_IMMOVABLE_FALLING -- updated 2026-08-06 23:32 AEST (was 2024)
+    _B + 213,      // 116 CH_IMMOVABLE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 169)
+    _B + 213,      // 117 CH_IMMOVABLE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 169)
+    _B + 213,      // 118 CH_ROCK_SIDE_1 -- updated 2026-08-06 23:27 AEST (was 170)
+    _B + 213,      // 119 CH_ROCK_SIDE_2 -- updated 2026-08-06 23:27 AEST (was 170)
+    _B + 281,      // 120 CH_ROCK_SIDE_3 -- updated 2026-08-06 23:32 AEST (was 277)
+    _B + 277,      // 121 CH_ROCK_SIDE_4 -- updated 2026-08-06 23:27 AEST (was 196)
+    _B + 213,      // 122 CH_GEODOGE_SIDE_1 -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 213,      // 123 CH_GEODOGE_SIDE_2 -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 275,      // 124 CH_GEODOGE_SIDE_3 -- updated 2026-08-06 23:32 AEST (was untimed)
+    _B + 276,      // 125 CH_GEODOGE_SIDE_4 -- updated 2026-08-06 23:32 AEST (was untimed)
+    _untimed_,     // 126 (unused)
+    _untimed_,     // 127 (unused)
 };
 
 
