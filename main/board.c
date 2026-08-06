@@ -497,35 +497,35 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-06 23:32 AEST
+// Last updated: 2026-08-06 23:55 AEST
 static const unsigned short budget[128] = {
-    _untimed_,    //   0 CH_BLANK
-    _untimed_,    //   1 CH_PLACEHOLDER
-    _untimed_,    //   2 CH_DIRT
-    _untimed_,    //   3 CH_BRICKWALL
-    _B + 336,     //   4 CH_DOORCLOSED -- updated 2026-07-28 18:21 AEST (was 201)
-    _untimed_,    //   5 CH_DOOROPEN_0
-    _untimed_,    //   6 CH_EXITBLANK
-    _untimed_,    //   7 CH_STEELWALL
-    _B + 346,     //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 528,     //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 2334,    //  10 CH_ROCK -- updated 2026-08-06 23:32 AEST (was 2305)
-    _B + 2525,    //  11 CH_ROCK_FALLING -- updated 2026-08-06 23:27 AEST (was 262)
-    _B + 2003,    //  12 CH_DOGE_00 -- updated 2026-08-06 23:32 AEST (was 262)
-    _B + 390,     //  13 CH_DOGE_FALLING -- updated 2026-08-06 23:32 AEST (was 262)
-    _B + 292,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-08-06 23:32 AEST (was 291)
-    _untimed_,    //  15 CH_LAVA_BLANK
-    _untimed_,    //  16 CH_LAVA_SMALL
-    _untimed_,    //  17 CH_LAVA_MEDIUM
-    _untimed_,    //  18 CH_LAVA_LARGE
-    _B + 10123,   //  19 CH_MELLON_HUSK -- updated 2026-08-06 23:32 AEST (was 10122)
-    _B + 195,     //  20 CH_DOGE_STATIC -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 181,     //  21 CH_PEBBLE_ROCK -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 210,     //  22 CH_ROCK_PEBBLE -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 210,     //  23 CH_ROCK_PEBBLE_1 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 252,     //  24 CH_DUST_0 -- updated 2026-08-06 23:27 AEST (was 209)
-    _B + 251,     //  25 CH_DUST_1 -- updated 2026-08-06 23:27 AEST (was 209)
-    _B + 249,     //  26 CH_DUST_2 -- updated 2026-08-06 23:27 AEST (was 207)
+    _untimed_,     //   0 CH_BLANK
+    _untimed_,     //   1 CH_PLACEHOLDER
+    _untimed_,     //   2 CH_DIRT
+    _untimed_,     //   3 CH_BRICKWALL
+    _B + 336,      //   4 CH_DOORCLOSED -- updated 2026-07-28 18:21 AEST (was 201)
+    _untimed_,     //   5 CH_DOOROPEN_0
+    _untimed_,     //   6 CH_EXITBLANK
+    _untimed_,     //   7 CH_STEELWALL
+    _B + 346,      //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 528,      //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 1975,    //  10 CH_ROCK -- updated 2026-08-06 23:55 AEST (was 262)
+    _B + 2525,     //  11 CH_ROCK_FALLING -- updated 2026-08-06 23:27 AEST (was 262)
+    _B + 2003,     //  12 CH_DOGE_00 -- updated 2026-08-06 23:32 AEST (was 262)
+    _B + 390,      //  13 CH_DOGE_FALLING -- updated 2026-08-06 23:32 AEST (was 262)
+    _B + 292,      //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-08-06 23:32 AEST (was 291)
+    _untimed_,     //  15 CH_LAVA_BLANK
+    _untimed_,     //  16 CH_LAVA_SMALL
+    _untimed_,     //  17 CH_LAVA_MEDIUM
+    _untimed_,     //  18 CH_LAVA_LARGE
+    _B + 10123,    //  19 CH_MELLON_HUSK -- updated 2026-08-06 23:32 AEST (was 10122)
+    _B + 195,      //  20 CH_DOGE_STATIC -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 181,      //  21 CH_PEBBLE_ROCK -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 210,      //  22 CH_ROCK_PEBBLE -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 210,      //  23 CH_ROCK_PEBBLE_1 -- updated 2026-07-31 13:42 AEST (was untimed)
+    _B + 252,      //  24 CH_DUST_0 -- updated 2026-08-06 23:27 AEST (was 209)
+    _B + 251,      //  25 CH_DUST_1 -- updated 2026-08-06 23:27 AEST (was 209)
+    _B + 249,      //  26 CH_DUST_2 -- updated 2026-08-06 23:27 AEST (was 207)
     // Manually bumped to match CH_ROCK's own measured value (was _B + 265, last measured
     // 2026-07-28 -- well before doRollGeodoge() grew the same rollEligibility()/hazard-shake
     // work doRollRock() has, which is what pushed CH_ROCK's own entry from 262 to 5541 on
@@ -2208,6 +2208,12 @@ void spawnBaseRaindrops(int col, int row) {
 // checks, and lets the caller bail out immediately when neither side is even worth a second
 // glance (the common case: a rock boxed in solid on both sides, which never gets past here).
 //
+// Checks the DIAGONAL-BELOW cell (me + offset + _BOARD_COLS) before the side cell (me + offset),
+// deliberately the opposite of reading order -- in a typical cave, solid ground one row down is
+// far more likely than an open side, so this early-outs to ROLL_NONE on the more-likely-to-fail
+// check first, skipping the side lookup entirely in the common "boxed in below" case. Same final
+// result either order; this is purely about which lookup happens first.
+//
 // ROLL_STRICT: side is ATT_BLANK AND the square diagonally below THAT is ALSO ATT_BLANK -- a
 // real roll is physically possible this way. TYPE_MELLON_HUSK/_PRE (the player's own board
 // placeholder) is never ATT_BLANK, so the player standing in either cell already fails this on
@@ -2220,14 +2226,14 @@ void spawnBaseRaindrops(int col, int row) {
 // ROLL_NONE: solid on this side, full stop.
 enum RollEligibility rollEligibility(unsigned char *me, int offset) {
 
-    enum ObjectType sideType = CharToType[GET(*(me + offset))];
-    bool sideBlank = Attribute[sideType] & ATT_BLANK;
-    if (!sideBlank && sideType != TYPE_MELLON_HUSK && sideType != TYPE_MELLON_HUSK_PRE)
-        return ROLL_NONE;
-
     enum ObjectType downType = CharToType[GET(*(me + offset + _BOARD_COLS))];
     bool downBlank = Attribute[downType] & ATT_BLANK;
     if (!downBlank && downType != TYPE_MELLON_HUSK && downType != TYPE_MELLON_HUSK_PRE)
+        return ROLL_NONE;
+
+    enum ObjectType sideType = CharToType[GET(*(me + offset))];
+    bool sideBlank = Attribute[sideType] & ATT_BLANK;
+    if (!sideBlank && sideType != TYPE_MELLON_HUSK && sideType != TYPE_MELLON_HUSK_PRE)
         return ROLL_NONE;
 
     return (sideBlank && downBlank) ? ROLL_STRICT : ROLL_LOOSE;
