@@ -502,7 +502,7 @@ void moveHusk(int dir, unsigned char *me, unsigned char *meOffset) {
                                        : 9 - ysize + rangeRandom(ysize);    // + rangeRandom(ysize);
             } else {
                 ysize = CHAR_TRIX_Y - 1;
-                xsize = 0;
+                xsize = 0;                        // toDO: so why randomRange(xsize) below???
                 yoff = rangeRandom(ysize) + 1;    // rangeRandom(xsize);
                 xoff = (xdir[dir] < 0) ? 1 + rangeRandom(xsize)
                                        : 4 - xsize + rangeRandom(xsize);    // + rangeRandom(ysize);
