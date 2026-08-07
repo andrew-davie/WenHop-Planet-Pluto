@@ -7,8 +7,6 @@
 
 #include "main.h"
 
-#include "attribute.h"
-#include "characterset.h"
 #include "colour.h"
 #include "gameState.h"
 #include "kernels.h"
@@ -22,7 +20,7 @@
 #include "swipe.h"
 
 #ifdef DEBUG_TIMES
-unsigned short debug[CH_MAX] = {[0 ... CH_MAX - 1] = 0};
+unsigned int debug[386] = {[0 ... 385] = 0};
 #endif
 
 
@@ -59,7 +57,7 @@ int liquidTrixel_8;
 bool showWater;
 bool showLava;
 
-int cave = 0;    // starting cave -- index into caveList[] (caveData.c), 10 planets x 10 levels each
+int cave = 0;                // starting cave -- index into caveList[] (caveData.c), 10 planets x 10 levels each
 bool caveSequenceStarted;    // set true the moment any game actually starts (initGameState_Game()),
                              // regardless of whether GS_MENU ran first -- lets initKernel_Menu()
                              // tell a genuine first-ever boot apart from "a cave was already played
@@ -107,7 +105,7 @@ unsigned char colubk;
 // Overscan returns, before VerticalBlank even runs that frame (see _mainLoop.asm -- Overscan,
 // then VSYNC, then VerticalBlank, then the visible kernel). A flip completed mid-VerticalBlank
 // would miss that frame's RAM[_kernel] sync entirely, landing one frame later than the ARM-side
-// gameState change -- confirmed as the actual cause of the CouchCompliant/RasterBleed blackscreen
+// gameState change -- confirmed as the actual cause of the CouchCompliant blackscreen
 // (VB_DetectConsole() calls setGameState() from inside VerticalBlank, so that transition's first
 // opportunity to complete was always exactly this unsafe case). Set true/false at the top of each.
 bool inOverscanPhase;
@@ -217,7 +215,6 @@ void (*const initialiseGameState[GS_MAX])() = {
     initGameState_Game,              // 6  GS_GAME
     initGameState_Skull,             // 7  GS_SKULL
     initGameState_Globe,             // 8  GS_GLOBE
-    initGameState_RasterBleed,       // 9  GS_RASTER_BLEED
 };
 
 void (*const initialiseKernel[_KERNEL_MAX])() = {
@@ -229,7 +226,6 @@ void (*const initialiseKernel[_KERNEL_MAX])() = {
     initKernel_Game,              // 5
     initKernel_Skull,             // 6
     initKernel_Globe,             // 7
-    initKernel_RasterBleed,       // 8
 };
 
 //------------------------------------------------------------------------------
@@ -318,7 +314,6 @@ void (*const verticalBlank[GS_MAX])() = {
     VB_Game,              // 5
     VB_Skull,             // 6
     VB_Globe,             // 7
-    VB_RasterBleed,       // 8
 };
 
 
@@ -369,7 +364,6 @@ void (*const overscan[GS_MAX])() = {
     OS_Game,              // 5  GS_GAME
     OS_Skull,             // 6  GS_SKULL
     OS_Globe,             // 7  GS_GLOBE
-    OS_RasterBleed,       // 8 GS_RASTER_BLEED
 };
 
 const unsigned char whichKernel[GS_MAX] = {
@@ -383,7 +377,6 @@ const unsigned char whichKernel[GS_MAX] = {
     _KERNEL_GAME,              // 5 GS_GAME
     _KERNEL_SKULL,             // 6 GS_SKULL
     _KERNEL_GLOBE,             // 7 GS_GLOBE
-    _KERNEL_COPYRIGHT,         // 8 GS_RASTER_BLEED
 };
 
 // Headroom reserved for scheduleInitState() below: the single most expensive

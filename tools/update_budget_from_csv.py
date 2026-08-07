@@ -5,32 +5,53 @@ budget[128] table in main/board.c.
 
 Looks for *.csv files sitting directly in the project root (Gopher2600
 globals-dump exports, columns: Parent,Name,Type,Address,Value; rows of
-interest look like `debug,debug[N],short unsigned int,ADDR,0xHEX`).
+interest look like `debug,debug[N],unsigned int,ADDR,0xHEX`).
 
-Non-_untimed_ entries are written as `_B + N` (e.g. `_B + 330`), where _B
-is a #define'd global margin added to every timed entry (main/board.c)
-and N is the raw measured value. Comparisons/replacements below always
-operate on N, never on N+_B.
+debug[] (main.h/main.c) records BOTH a running MAX and a running AVERAGE for
+every raw character number n (0-127), unconditionally, every visit -- three
+fixed 128-wide blocks:
+
+    debug[n]         MAX   -- worst single-visit T1TC tick count for character n.
+    debug[128 + n]   SUM   -- running sum of ticks across every visit to character n.
+    debug[256 + n]   COUNT -- visit count for character n (debug[128+n] / debug[256+n]
+                              is that character's average cost).
+
+Every CSV capture therefore always carries both kinds of data, and this
+script always merges both, per character, independently:
+
+  - MAX  -> budget[]'s own value/token (the `_B + N` / `_untimed_` / `_nop_`
+            part), replacing it only when the CSV's value is strictly larger
+            than what's already there. `_nop_` entries are never touched --
+            that's a hand-verified "no handler exists" fact, not a timing
+            measurement.
+  - AVERAGE -> a "(avg: N)" annotation inside budget[]'s trailing comment,
+            independent of the token to its left, same replace-only-if-
+            larger rule -- "(avg: N)" always shows the worst AVERAGE seen
+            across every capture, not just the latest one. Skipped for a
+            character whose visit count is 0 in this capture (no data).
 
 For each CSV not already recorded in tools/.budget_csv_manifest.txt:
-  - parse debug[0..127] values
-  - for each budget[] entry in main/board.c:
-      - if it's currently the _untimed_ placeholder and the CSV value is
-        nonzero, replace it with `_B + <csv value>`
-      - if it's already `_B + N` and the CSV value is strictly larger
-        than N, replace N with the CSV value
-      - otherwise leave it alone
-  - whenever an entry's value is actually changed, its own trailing
-    comment gets a " -- updated YYYY-MM-DD HH:MM TZ (was <old N>)" stamp
-    appended (old N is "untimed" if it was _untimed_ before); any previous
-    per-line stamp is replaced, not stacked -- untouched lines keep
-    whatever stamp (or lack of one) they already had
-  - the '// Last updated: ...' stamp above budget[128] is refreshed
-    whenever a new CSV is processed, whether or not it actually changed
-    any budget[] values -- it is not touched on runs with no new CSVs
+  - if it doesn't have the full MAX+SUM+COUNT layout (debug[386], main.h --
+    e.g. a capture from before this scheme existed, when debug[] was a
+    single smaller block with different semantics), skip merging it -- an
+    older layout's numbers don't mean the same thing and merging them in
+    unchecked is exactly how budget[] got corrupted once already (see git
+    history around 2026-08-07) -- but still record it as processed so it's
+    never retried
+  - otherwise merge both MAX and AVERAGE for every budget[] entry as above
+  - whenever a line's token and/or "(avg: N)" actually changes, the line's
+    trailing comment gets a " -- updated YYYY-MM-DD HH:MM TZ (was X[, avg was
+    Y])" stamp -- only the piece(s) that actually changed appear in "(was
+    ...)"; any hand-written free-text comment already on the line (e.g.
+    CH_TELEPORT's "(PH4, idle sparkle -- not yet measured)") is preserved
+    verbatim, after the "(avg: N)" slot; untouched lines keep whatever stamp
+    (or lack of one) they already had
+  - the '// Last updated: ...' stamp above budget[128] is refreshed whenever
+    a new CSV is processed, whether or not it actually changed any budget[]
+    values -- it is not touched on runs with no new CSVs
   - git add + commit main/board.c and the manifest for each CSV processed
-    (never a blanket `git add .`, since other unrelated files in this
-    tree may have their own in-progress uncommitted changes)
+    (never a blanket `git add .`, since other unrelated files in this tree
+    may have their own in-progress uncommitted changes)
   - record the CSV filename in the manifest either way, so it's never
     reprocessed
 
@@ -57,19 +78,29 @@ MANIFEST = os.path.join(ROOT, "tools", ".budget_csv_manifest.txt")
 BUDGET_START_RE = re.compile(r"^static const unsigned short budget\[128\] = \{")
 BUDGET_END_RE = re.compile(r"^\};")
 # token is everything up to the single comma before the trailing comment --
-# covers both "_untimed_" and "_B + 330" (which contains spaces, so the
-# token group can't be restricted to \S+)
-ENTRY_RE = re.compile(r"^(\s*)(.+),(\s*)//\s*(\d+)\s+(.*)$")
+# covers "_untimed_", "_nop_" and "_B + 330" (which contains spaces, so the
+# token group can't be restricted to \S+); `rest` is everything after the
+# index, unparsed (name + optional "(avg: N)" + optional hand comment +
+# optional "-- updated ..." stamp, in whatever order they currently appear).
+ENTRY_RE = re.compile(r"^(\s*)(.+?),(\s*)//\s*(\d+)\s+(.*)$")
 BASE_TOKEN_RE = re.compile(r"^_B\s*\+\s*(\d+)$")
 STAMP_RE = re.compile(r"^// Last updated: .*$")
-LINE_STAMP_RE = re.compile(r"\s*--\s*updated\s+.*$")
+STAMP_TAIL_RE = re.compile(r"\s*--\s*updated\s+.*$")
+AVG_RE = re.compile(r"\(avg:\s*(\d+)\)")
 UNTIMED_TOKEN = "_untimed_"
+NOP_TOKEN = "_nop_"
 
 DEBUG_NAME_RE = re.compile(r"^debug\[(\d+)\]$")
 
+# Sentinel index that only exists in the current 3-block (MAX/SUM/COUNT) x 128
+# + overrun-scratch debug[386] layout (main.h) -- its presence in a CSV is
+# how we tell "new layout, safe to merge both" from "older/incompatible
+# capture, don't touch budget[] with it".
+NEW_LAYOUT_SENTINEL = 383
+
 
 def parse_csv(path):
-    """Return {index: value} for debug[0..127] rows in the CSV."""
+    """Return {index: value} for every debug[N] row in the CSV."""
     values = {}
     with open(path, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
@@ -81,8 +112,6 @@ def parse_csv(path):
             if not m:
                 continue
             idx = int(m.group(1))
-            if idx > 127:
-                continue
             raw = (row.get("Value") or "").strip().lower()
             if not raw:
                 continue
@@ -91,8 +120,7 @@ def parse_csv(path):
             try:
                 # exporter always writes Value as plain hex (fixed-width,
                 # zero-padded to the type size), never prefixed with "0x"
-                # and never decimal -- confirmed against debug[4] (0x00b5
-                # = 181 = CH_DOORCLOSED's known-correct budget[] value)
+                # and never decimal.
                 val = int(raw, 16)
             except ValueError:
                 continue
@@ -100,8 +128,12 @@ def parse_csv(path):
     return values
 
 
-def format_entry(token, idx, name):
-    return "    " + (token + ",").ljust(14) + "// " + str(idx).rjust(3) + " " + name
+def has_new_layout(csv_values):
+    return NEW_LAYOUT_SENTINEL in csv_values
+
+
+def format_entry(token, idx, rest):
+    return "    " + (token + ",").ljust(14) + "// " + str(idx).rjust(3) + " " + rest
 
 
 def format_value_token(value):
@@ -109,9 +141,9 @@ def format_value_token(value):
 
 
 def parse_token(token):
-    """Return the raw measured value N (an int), or None for _untimed_
-    (and, as a degenerate fallback, for anything else unparseable)."""
-    if token == UNTIMED_TOKEN:
+    """Return the raw measured MAX value N (an int), or None for _untimed_/
+    _nop_ (and, as a degenerate fallback, for anything else unparseable)."""
+    if token in (UNTIMED_TOKEN, NOP_TOKEN):
         return None
     m = BASE_TOKEN_RE.match(token)
     if m:
@@ -122,8 +154,37 @@ def parse_token(token):
         return None
 
 
+def split_rest(rest):
+    """Split a budget[] line's trailing comment (everything after the index)
+    into (name, extra_hand_comment, cur_avg_or_None, old_stamp_or_'')."""
+    stamp_m = STAMP_TAIL_RE.search(rest)
+    body = rest[: stamp_m.start()] if stamp_m else rest
+    old_stamp = stamp_m.group(0) if stamp_m else ""
+
+    avg_m = AVG_RE.search(body)
+    cur_avg = avg_m.group(1) if avg_m else None
+    body = AVG_RE.sub("", body)
+    body = re.sub(r"\s+", " ", body).strip()
+
+    parts = body.split(None, 1)
+    name = parts[0] if parts else ""
+    extra = parts[1] if len(parts) > 1 else ""
+    return name, extra, cur_avg, old_stamp
+
+
+def build_rest(name, extra, avg_s, stamp):
+    parts = [name]
+    if avg_s is not None:
+        parts.append(f"(avg: {avg_s})")
+    if extra:
+        parts.append(extra)
+    return " ".join(parts) + stamp
+
+
 def merge(board_lines, csv_values):
-    """Return (new_lines, list_of_changes)."""
+    """Return (new_lines, list_of_changes). Merges MAX (into the token) and
+    AVERAGE (into "(avg: N)") independently for every budget[] line, from
+    the same CSV, in one pass."""
     out = []
     changes = []
     in_block = False
@@ -141,27 +202,52 @@ def merge(board_lines, csv_values):
             if not m:
                 out.append(line)
                 continue
-            indent, token, pad, idx_s, name = m.groups()
+            _indent, token, _pad, idx_s, rest = m.groups()
             idx = int(idx_s)
-            csv_val = csv_values.get(idx)
-            current = parse_token(token)
+            name, extra, cur_avg, _old_stamp = split_rest(rest)
 
-            new_value = None
-            if csv_val is not None and csv_val != 0:
-                if current is None:
-                    new_value = csv_val
-                elif csv_val > current:
-                    new_value = csv_val
+            new_token = token
+            new_avg = cur_avg
+            token_changed = False
+            avg_changed = False
+            old_token_disp = None
+            old_avg_disp = None
 
-            if new_value is not None:
-                new_token = format_value_token(new_value)
-                base_name = LINE_STAMP_RE.sub("", name)
-                old_display = "untimed" if current is None else str(current)
-                stamped_name = f"{base_name} -- updated {stamp_now()} (was {old_display})"
-                changes.append((idx, base_name, token, new_token))
-                out.append(format_entry(new_token, idx, stamped_name) + "\n")
-            else:
+            if token != NOP_TOKEN:
+                csv_val = csv_values.get(idx)    # MAX block
+                current = parse_token(token)
+                if csv_val is not None and csv_val != 0:
+                    if current is None or csv_val > current:
+                        old_token_disp = "untimed" if current is None else str(current)
+                        new_token = format_value_token(csv_val)
+                        token_changed = True
+
+            total = csv_values.get(idx + 128)    # SUM block
+            count = csv_values.get(idx + 256)    # COUNT block
+            if count:
+                avg_val = (total or 0) // count
+                cur_avg_val = int(cur_avg) if cur_avg is not None else None
+                if cur_avg_val is None or avg_val > cur_avg_val:
+                    old_avg_disp = cur_avg    # None means "first capture, nothing to compare"
+                    new_avg = str(avg_val)
+                    avg_changed = True
+
+            if not token_changed and not avg_changed:
                 out.append(line)
+                continue
+
+            was_bits = []
+            if token_changed:
+                was_bits.append(f"was {old_token_disp}")
+            if avg_changed and old_avg_disp is not None:
+                was_bits.append(f"avg was {old_avg_disp}")
+            new_stamp = f" -- updated {stamp_now()}"
+            if was_bits:
+                new_stamp += " (" + ", ".join(was_bits) + ")"
+
+            new_rest = build_rest(name, extra, new_avg, new_stamp)
+            changes.append((idx, name, token, new_token, cur_avg, new_avg))
+            out.append(format_entry(new_token, idx, new_rest) + "\n")
             continue
         out.append(line)
     return out, changes
@@ -218,8 +304,15 @@ def main():
 
     for fname in todo:
         path = os.path.join(ROOT, fname)
-        print(f"processing {fname}")
         csv_values = parse_csv(path)
+
+        if not has_new_layout(csv_values):
+            print(f"skipping {fname}: doesn't have the MAX+SUM+COUNT debug[386] layout (main.h) -- older/incompatible capture, recording as processed, not merging")
+            if not dry_run:
+                append_manifest(fname)
+            continue
+
+        print(f"processing {fname}")
 
         with open(BOARD_C) as f:
             board_lines = f.readlines()
@@ -229,8 +322,13 @@ def main():
 
         if changes:
             print(f"  {len(changes)} budget[] entries updated:")
-            for idx, name, old, new in changes:
-                print(f"    [{idx:3d}] {name}: {old} -> {new}")
+            for idx, name, old_tok, new_tok, old_avg, new_avg in changes:
+                bits = []
+                if old_tok != new_tok:
+                    bits.append(f"{old_tok} -> {new_tok}")
+                if old_avg != new_avg:
+                    bits.append(f"avg {old_avg or '(none)'} -> {new_avg}")
+                print(f"    [{idx:3d}] {name}: " + ", ".join(bits))
         else:
             print("  no changes (all csv values already <= current budget[])")
 
@@ -244,7 +342,7 @@ def main():
 
         git(["add", "main/board.c", "tools/.budget_csv_manifest.txt"])
         if changes:
-            msg = f"budget[]: merge {len(changes)} timing update(s) from {fname}"
+            msg = f"budget[]: merge {len(changes)} update(s) from {fname}"
         else:
             msg = f"budget[]: record {fname} as processed (no changes)"
         r = git(["commit", "-m", msg])

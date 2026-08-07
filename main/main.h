@@ -122,29 +122,34 @@ extern int shakeX, shakeY, shakeTime;
 #define DEBUG_TIMES
 #ifdef DEBUG_TIMES
 
-// Sized CH_MAX (attribute.h) and indexed by raw character number -- see
-// processBoardSquares() in board.c, which tracks the worst-case T1TC ticks
-// spent per character number, one array slot per chName value.
-// unsigned short: ticks for a single board cell never approach 64K, and
-// this way the full usable range is available instead of losing half of it
-// to a sign bit.
+// processBoardSquares() (board.c) records BOTH a running MAX and a running AVERAGE for every raw
+// character number n (0-127), unconditionally, every visit -- no mode switch (there used to be
+// one, DEBUG_TIMES_AVERAGE, gating one or the other; removed, since tracking both costs nothing
+// worth caring about and needing to rebuild/recapture twice to get both numbers was pure friction).
+// Three fixed 128-wide blocks:
 //
-// Size given explicitly (133, i.e. CH_MAX -- hardcoded rather than pulling
-// in attribute.h just for the one constant; checked against CH_MAX by a
-// _Static_assert next to the real definition in main.c). Root cause of
-// debug going missing from the debugger's globals view was tracked down to
-// the Gopher2600 DWARF parser (coprocessor/developer/dwarf/dwarf_builder.go
-// in gopher2600, not this codebase): a variable declared via an unsized
-// `extern T foo[];` gets an incomplete array type at the declaration site,
-// and the parser's abstract-origin/specification resolution never falls
-// back to the complete type carried by the definition, so the variable's
-// type resolves to nil and it's silently dropped. Not a volatile/attribute
-// issue, not an LTO dead-store elimination issue, not a Go map ordering
-// issue -- those were all considered and ruled out first. Fixed on the
-// gopher2600 side but broke something else there and got reverted, so
-// working around it here instead: giving the declaration an explicit size
-// means it never has an incomplete type to begin with.
-extern unsigned short debug[];
+//   debug[n]         MAX   -- running max T1TC ticks for a single visit to character n.
+//   debug[128 + n]   SUM   -- running sum of ticks across every visit to character n.
+//   debug[256 + n]   COUNT -- visit count for character n. debug[128+n] / debug[256+n] is the
+//                     average cost of character n (see budget[]'s own comment, board.c, for the
+//                     "(avg: N)" annotation this feeds).
+//
+// debug[384]/[385] -- past all three real blocks -- are the ad-hoc overrun-capture scratch (T1TC
+// overshoot / offending creature) when a pass runs past availableIdleTime; they used to double up
+// on debug[200]/[201] back when debug[] only had one 128-wide block, but with all three blocks
+// real now there's no gap left in the middle to reuse, hence pushed to the very end instead.
+//
+// Root cause of debug going missing from the debugger's globals view was tracked down to the
+// Gopher2600 DWARF parser (coprocessor/developer/dwarf/dwarf_builder.go in gopher2600, not this
+// codebase): a variable declared via an unsized `extern T foo[];` gets an incomplete array type
+// at the declaration site, and the parser's abstract-origin/specification resolution never falls
+// back to the complete type carried by the definition, so the variable's type resolves to nil and
+// it's silently dropped. Not a volatile/attribute issue, not an LTO dead-store elimination issue,
+// not a Go map ordering issue -- those were all considered and ruled out first. Fixed on the
+// gopher2600 side but broke something else there and got reverted, so working around it here
+// instead: giving the declaration an explicit size means it never has an incomplete type to begin
+// with.
+extern unsigned int debug[386];
 
 #endif
 

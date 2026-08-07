@@ -485,9 +485,9 @@ void drawParticles() {
         if (particle[i].age && particle[i].type != PT_CHARACTER) {
 
             int distance3x = particle[i].distance * 3;    // roller==0 gating above only advances
-                                                            // distance 1 real frame in 3, so scale
-                                                            // it back up here to keep the same
-                                                            // effective speed
+                                                          // distance 1 real frame in 3, so scale
+                                                          // it back up here to keep the same
+                                                          // effective speed
             int xOffset = (sin_cos[particle[i].dir >> 3] * distance3x) >> 8;
             int yOffset = (sin_cos[((particle[i].dir + 64) & 0xFF) >> 3] * distance3x * 3) >> 8;
 
@@ -815,17 +815,17 @@ int nDots(int count, int trixX, int trixY, int type, unsigned char age, int offs
     // Note: if type == PT_CHARACTER, then colour = CH_* name
 
     int lastIdx = -1;
-    // if (gravity < 0)
-    //     offsetY = CHAR_TRIX_Y - offsetY;
+
+    int pixelX = trixX * CHAR_TRIX_X + offsetX;
+    int pixelY = trixY * CHAR_TRIX_Y + offsetY;
 
     for (int i = 0; i < count; i++) {
-        int idx = sphereDot(trixX * CHAR_TRIX_X + offsetX, trixY * CHAR_TRIX_Y + offsetY, type, age, colour);
+        int idx = sphereDot(pixelX, pixelY, type, age, colour);
         if (idx >= 0) {
             particle[idx].speed = rangeRandom(speed);
-            if (type == PT_SPIRAL2) {
+            if (type == PT_SPIRAL2)
+                // dir already set by sphereDot() -- every particle gets one, not just SPIRAL2.
                 particle[idx].distance = rangeRandom(200) + 50;
-                particle[idx].dir = getRandom32();
-            }
             lastIdx = idx;
         } else
             break;

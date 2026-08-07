@@ -594,7 +594,7 @@ static const unsigned short budget[128] = {
     _B + 254,      //  78 CH_DOGE_FALLING_BOTTOM (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
     _B + 254,      //  79 CH_ROCK_FALLING_TOP (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
     _B + 256,      //  80 CH_ROCK_FALLING_BOTTOM (avg: 253) -- updated 2026-08-07 19:46 AEST (avg was 233)
-    _B + 1505,    //  81 CH_GEODOGE_FALLING_TOP (avg: 665) -- updated 2026-08-07 19:55 AEST (was 1495)
+    _B + 1505,     //  81 CH_GEODOGE_FALLING_TOP (avg: 665) -- updated 2026-08-07 19:55 AEST (was 1495)
     _B + 260,      //  82 CH_GEODOGE_FALLING_BOTTOM (avg: 259) -- updated 2026-08-07 19:46 AEST (was 250, avg was 239)
     _B + 226,      //  83 CH_DOGE_FALLING_TOP2 -- updated 2026-07-31 13:42 AEST (was untimed)
     _nop_,         //  84 CH_DOGE_FALLING_BOTTOM2
@@ -607,7 +607,7 @@ static const unsigned short budget[128] = {
     _B + 398,      //  91 CH_ELECTRIC_2 (avg: 394) -- updated 2026-08-07 19:46 AEST (avg was 380)
     _B + 400,      //  92 CH_ELECTRIC_3 (avg: 396) -- updated 2026-08-07 19:46 AEST (avg was 382)
     _nop_,         //  93 CH_BROKEN_DIRT
-    _B + 4114,    //  94 CH_INSULATOR_TOP (avg: 446) -- updated 2026-08-07 19:55 AEST (was 4110, avg was 425)
+    _B + 4114,     //  94 CH_INSULATOR_TOP (avg: 446) -- updated 2026-08-07 19:55 AEST (was 4110, avg was 425)
     _B + 239,      //  95 CH_INSULATOR_BOTTOM (avg: 238) -- updated 2026-08-07 19:46 AEST (was 236, avg was 218)
     _B + 2003,     //  96 CH_STAR (avg: 252) -- updated 2026-08-07 19:46 AEST (avg was 234)
     _B + 254,      //  97 CH_STAR_FALLING_TOP (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
@@ -621,7 +621,7 @@ static const unsigned short budget[128] = {
     _B + 398,      // 105 CH_ELECTRIC_H2 (avg: 394) -- updated 2026-08-07 19:46 AEST
     _B + 400,      // 106 CH_ELECTRIC_H3 (avg: 396) -- updated 2026-08-07 19:46 AEST
     _B + 239,      // 107 CH_CROSSED_STREAMS (avg: 238) -- updated 2026-08-07 19:46 AEST (was 235)
-    _B + 785,     // 108 CH_BOMB (avg: 784) -- updated 2026-08-07 19:55 AEST (was 200)
+    _B + 785,      // 108 CH_BOMB (avg: 784) -- updated 2026-08-07 19:55 AEST (was 200)
     _B + 4594,     // 109 CH_CRACKED_BRICK (avg: 500) -- updated 2026-08-07 19:46 AEST
     _nop_,         // 110 CH_CONCRETE
     _B + 883,      // 111 CH_TELEPORT (avg: 298) -- updated 2026-08-07 19:46 AEST
@@ -783,6 +783,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         break;
     }
 
+
     case TYPE_STAR_EXPLODE: {
 
         activeStar++;
@@ -793,6 +794,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         }
         break;
     }
+
 
     case TYPE_STAR: {
 
@@ -833,6 +835,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         }
         break;
 
+
     case TYPE_TELEPORT:
         // Quiescent tile only -- teleportLocked means THIS tile is mid-departure (its board
         // cell stays CH_TELEPORT throughout, see checkHighPriorityMove()'s comment), which
@@ -844,6 +847,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         if (!teleportLocked && !rangeRandom(TELEPORT_IDLE_SPARKLE_CHANCE))
             nDots(1, cur->col, cur->row, PT_SPIRAL2, TELEPORT_SWIRL_PARTICLE_AGE, CHAR_CENTER_X, CHAR_CENTER_Y, 32, 7);
         break;
+
 
     case TYPE_DOGE: {
 
@@ -861,13 +865,16 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
         break;
     }
 
+
     case TYPE_PEBBLE1:
         processPebble(cur->me, cur->row, cur->col);
         break;
 
+
     case TYPE_WATER:
         processWater(cur->me, cur->row);
         break;
+
 
     case TYPE_MELLON_HUSK:
         if (exitMode) {
@@ -961,6 +968,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
 
         break;
 
+
     case TYPE_WATERFLOW_0:
     case TYPE_WATERFLOW_1:
     case TYPE_WATERFLOW_2:
@@ -968,6 +976,7 @@ bool processTypes(BoardCursor *cur, enum ObjectType type, unsigned char creature
     case TYPE_WATERFLOW_4:
         processWaterFlow(cur->me, cur->row, cur->col);
         break;
+
 
     case TYPE_GRINDER:
     case TYPE_GRINDER_1:
