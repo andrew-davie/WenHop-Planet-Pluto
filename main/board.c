@@ -499,28 +499,28 @@ void setupBoardScanner() {
 
 #define _B 100
 
-// Last updated: 2026-08-07 13:27 AEST
+// Last updated: 2026-08-07 19:13 AEST
 static const unsigned short budget[128] = {
     _nop_,         //   0 CH_BLANK
     _nop_,         //   1 CH_PLACEHOLDER
     _nop_,         //   2 CH_DIRT
     _nop_,         //   3 CH_BRICKWALL
-    _B + 336,      //   4 CH_DOORCLOSED -- updated 2026-07-28 18:21 AEST (was 201)
+    _B + 140257,  //   4 CH_DOORCLOSED -- updated 2026-08-07 19:13 AEST (was 336)
     _untimed_,     //   5 CH_DOOROPEN_0
     _untimed_,     //   6 CH_EXITBLANK
     _nop_,         //   7 CH_STEELWALL
     _B + 346,      //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 528,      //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 2426,     //  10 CH_ROCK -- updated 2026-08-07 01:41 AEST (was 2325)
-    _B + 3088,     //  11 CH_ROCK_FALLING -- updated 2026-08-07 02:11 AEST (was 2488)
-    _B + 2064,     //  12 CH_DOGE_00 -- updated 2026-08-07 00:03 AEST (was 2063)
-    _B + 2498,     //  13 CH_DOGE_FALLING -- updated 2026-08-07 02:11 AEST (was 2467)
-    _B + 292,      //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-08-06 23:32 AEST (was 291)
+    _B + 1061220, //  10 CH_ROCK -- updated 2026-08-07 19:13 AEST (was 2426)
+    _B + 27860,   //  11 CH_ROCK_FALLING -- updated 2026-08-07 19:13 AEST (was 3088)
+    _B + 435459,  //  12 CH_DOGE_00 -- updated 2026-08-07 19:13 AEST (was 2064)
+    _B + 12561,   //  13 CH_DOGE_FALLING -- updated 2026-08-07 19:13 AEST (was 2498)
+    _B + 807,     //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-08-07 19:13 AEST (was 292)
     _nop_,         //  15 CH_LAVA_BLANK
     _nop_,         //  16 CH_LAVA_SMALL
     _nop_,         //  17 CH_LAVA_MEDIUM
     _nop_,         //  18 CH_LAVA_LARGE
-    _B + 10059,    //  19 CH_MELLON_HUSK -- updated 2026-08-07 01:41 AEST (was 5000)
+    _B + 1198146, //  19 CH_MELLON_HUSK -- updated 2026-08-07 19:13 AEST (was 10059)
     _B + 195,      //  20 CH_DOGE_STATIC -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 181,      //  21 CH_PEBBLE_ROCK -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 210,      //  22 CH_ROCK_PEBBLE -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -528,11 +528,11 @@ static const unsigned short budget[128] = {
     _B + 252,      //  24 CH_DUST_0 -- updated 2026-08-06 23:27 AEST (was 209)
     _B + 252,      //  25 CH_DUST_1 -- updated 2026-08-06 23:57 AEST (was 251)
     _B + 250,      //  26 CH_DUST_2 -- updated 2026-08-06 23:57 AEST (was 249)
-    _B + 2366,     //  27 CH_GEODOGE -- updated 2026-08-07 00:03 AEST (was 1608)
-    _B + 252,      //  28 CH_DUST_ROCK_0 -- updated 2026-08-06 23:27 AEST (was 242)
-    _B + 252,      //  29 CH_DUST_ROCK_1 -- updated 2026-08-06 23:27 AEST (was 242)
-    _B + 250,      //  30 CH_DUST_ROCK_2 -- updated 2026-08-06 23:27 AEST (was 207)
-    _B + 466,      //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-08-06 23:32 AEST (was 434)
+    _B + 25270393,//  27 CH_GEODOGE -- updated 2026-08-07 19:13 AEST (was 2366)
+    _B + 37393,   //  28 CH_DUST_ROCK_0 -- updated 2026-08-07 19:13 AEST (was 252)
+    _B + 35752,   //  29 CH_DUST_ROCK_1 -- updated 2026-08-07 19:13 AEST (was 252)
+    _B + 34754,   //  30 CH_DUST_ROCK_2 -- updated 2026-08-07 19:13 AEST (was 250)
+    _B + 8632,    //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-08-07 19:13 AEST (was 466)
     _B + 165,      //  32 CH_HORIZONTAL_BAR -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 2319,     //  33 CH_PUSH_LEFT -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 235,      //  34 CH_PUSH_LEFT_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -553,7 +553,7 @@ static const unsigned short budget[128] = {
     _B + 235,      //  49 CH_WYRM_HEAD_R -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  50 CH_WYRM_HEAD_D -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  51 CH_WYRM_HEAD_L -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 1846,    //  52 CH_GEODOGE_FALLING -- updated 2026-08-07 13:27 AEST (was 1814)
+    _B + 122272,  //  52 CH_GEODOGE_FALLING -- updated 2026-08-07 19:13 AEST (was 1846)
     _nop_,         //  53 CH_FLIP_GRAVITY_0
     _nop_,         //  54 CH_FLIP_GRAVITY_1
     _nop_,         //  55 CH_FLIP_GRAVITY_2
@@ -578,28 +578,28 @@ static const unsigned short budget[128] = {
     _B + 235,      //  74 CH_WYRM_TAIL_R -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  75 CH_WYRM_TAIL_D -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  76 CH_WYRM_TAIL_L -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 250,      //  77 CH_DOGE_FALLING_TOP -- updated 2026-08-07 00:00 AEST (was 249)
-    _B + 250,      //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 240)
-    _B + 250,      //  79 CH_ROCK_FALLING_TOP -- updated 2026-08-06 23:27 AEST (was 240)
-    _B + 256,      //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-08-06 23:27 AEST (was 240)
-    _B + 1495,     //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 1487)
-    _B + 250,      //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 240)
+    _B + 7226,    //  77 CH_DOGE_FALLING_TOP -- updated 2026-08-07 19:13 AEST (was 250)
+    _B + 7229,    //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-08-07 19:13 AEST (was 250)
+    _B + 4196,    //  79 CH_ROCK_FALLING_TOP -- updated 2026-08-07 19:13 AEST (was 250)
+    _B + 4199,    //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-08-07 19:13 AEST (was 256)
+    _B + 228978,  //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-08-07 19:13 AEST (was 1495)
+    _B + 82296,   //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-08-07 19:13 AEST (was 250)
     _B + 226,      //  83 CH_DOGE_FALLING_TOP2 -- updated 2026-07-31 13:42 AEST (was untimed)
     _nop_,         //  84 CH_DOGE_FALLING_BOTTOM2
-    _B + 250,      //  85 CH_DOGE_SIDE_1 -- updated 2026-08-07 00:03 AEST (was 249)
-    _B + 272,      //  86 CH_DOGE_SIDE_3 -- updated 2026-07-28 16:30 AEST (was 263)
+    _B + 1631,    //  85 CH_DOGE_SIDE_1 -- updated 2026-08-07 19:13 AEST (was 250)
+    _B + 1251,    //  86 CH_DOGE_SIDE_3 -- updated 2026-08-07 19:13 AEST (was 272)
     _B + 249,      //  87 CH_DOGE_SIDE_2 -- updated 2026-07-28 16:30 AEST (was 240)
     _B + 272,      //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:30 AEST (was 263)
-    _B + 483,      //  89 CH_ELECTRIC_0 -- updated 2026-08-06 23:32 AEST (was 476)
-    _B + 398,      //  90 CH_ELECTRIC_1 -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 398,      //  91 CH_ELECTRIC_2 -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 400,      //  92 CH_ELECTRIC_3 -- updated 2026-08-06 23:32 AEST (was 393)
+    _B + 301621,  //  89 CH_ELECTRIC_0 -- updated 2026-08-07 19:13 AEST (was 483)
+    _B + 78376,   //  90 CH_ELECTRIC_1 -- updated 2026-08-07 19:13 AEST (was 398)
+    _B + 65448,   //  91 CH_ELECTRIC_2 -- updated 2026-08-07 19:13 AEST (was 398)
+    _B + 56206,   //  92 CH_ELECTRIC_3 -- updated 2026-08-07 19:13 AEST (was 400)
     _nop_,         //  93 CH_BROKEN_DIRT
-    _B + 4110,    //  94 CH_INSULATOR_TOP -- updated 2026-08-07 13:27 AEST (was 4109)
-    _B + 236,      //  95 CH_INSULATOR_BOTTOM -- updated 2026-07-29 03:45 AEST (was 230)
-    _B + 2003,     //  96 CH_STAR -- updated 2026-07-29 00:37 AEST (was 1985)
-    _B + 250,      //  97 CH_STAR_FALLING_TOP -- updated 2026-08-07 00:00 AEST (was 249)
-    _B + 250,      //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-08-07 00:00 AEST (was 249)
+    _B + 392198,  //  94 CH_INSULATOR_TOP -- updated 2026-08-07 19:13 AEST (was 4110)
+    _B + 200729,  //  95 CH_INSULATOR_BOTTOM -- updated 2026-08-07 19:13 AEST (was 236)
+    _B + 1280039, //  96 CH_STAR -- updated 2026-08-07 19:13 AEST (was 2003)
+    _B + 3262,    //  97 CH_STAR_FALLING_TOP -- updated 2026-08-07 19:13 AEST (was 250)
+    _B + 3267,    //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-08-07 19:13 AEST (was 250)
     _untimed_,     //  99 CH_ROCK_BONUS
     _B + 374,      // 100 CH_STAR_EXPLODE -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 6736,     // 101 CH_INSULATOR_L -- updated 2026-07-29 00:45 AEST (was 3771)
@@ -612,7 +612,7 @@ static const unsigned short budget[128] = {
     _B + 1366,     // 108 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
     _B + 4594,     // 109 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
     _nop_,         // 110 CH_CONCRETE
-    _B + 883,      // 111 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-06 23:27 AEST (was 766)
+    _B + 883,      // 111 CH_TELEPORT -- updated 2026-08-06 23:27 AEST (was 766)
     _nop_,         // 112 CH_KEY
     _untimed_,     // 113 CH_DOOROPEN_STATIC
     _B + 424,      // 114 CH_IMMOVABLE -- updated 2026-08-06 23:32 AEST (was 261)
@@ -620,7 +620,7 @@ static const unsigned short budget[128] = {
     _B + 213,      // 116 CH_IMMOVABLE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 169)
     _B + 213,      // 117 CH_IMMOVABLE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 169)
     _B + 213,      // 118 CH_ROCK_SIDE_1 -- updated 2026-08-06 23:27 AEST (was 170)
-    _B + 213,      // 119 CH_ROCK_SIDE_2 -- updated 2026-08-06 23:27 AEST (was 170)
+    _B + 393,     // 119 CH_ROCK_SIDE_2 -- updated 2026-08-07 19:13 AEST (was 213)
     _B + 281,      // 120 CH_ROCK_SIDE_3 -- updated 2026-08-06 23:32 AEST (was 277)
     _B + 281,      // 121 CH_ROCK_SIDE_4 -- updated 2026-08-07 00:03 AEST (was 277)
     _B + 213,      // 122 CH_GEODOGE_SIDE_1 -- updated 2026-08-06 23:32 AEST (was untimed)
@@ -631,6 +631,145 @@ static const unsigned short budget[128] = {
     _untimed_,     // 127 (unused)
 };
 
+// === BEGIN debug[] average report (generated by tools/update_debug_averages_from_csv.py -- do not hand-edit) ===
+// Generated by tools/update_debug_averages_from_csv.py -- do not hand-edit, rerun the tool instead.
+// Command: tools/update_debug_averages_from_csv.py
+// Source CSV: globals_WenHopPlanetPluto_20260807_190140.csv
+// Last run: 2026-08-07 19:12 AEST
+//
+// debug[n] / debug[n+128] = average T1TC ticks per visit for raw character n, from
+// DEBUG_TIMES_AVERAGE mode (main.h/main.c/board.c). "--no data--" means debug[n+128] (visit
+// count) was 0 in the captured session -- this character was never gated into
+// processBoardSquares()'s timed path (see budget[] above and its _nop_ entries).
+//     --no data--,  //   0 CH_BLANK -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //   1 CH_PLACEHOLDER -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //   2 CH_DIRT -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //   3 CH_BRICKWALL -- updated 2026-08-07 19:12 AEST
+//     203,          //   4 CH_DOORCLOSED -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //   5 CH_DOOROPEN_0 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //   6 CH_EXITBLANK -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //   7 CH_STEELWALL -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //   8 CH_PEBBLE1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //   9 CH_PEBBLE2 -- updated 2026-08-07 19:12 AEST
+//     348,          //  10 CH_ROCK -- updated 2026-08-07 19:12 AEST
+//     1547,         //  11 CH_ROCK_FALLING -- updated 2026-08-07 19:12 AEST
+//     283,          //  12 CH_DOGE_00 -- updated 2026-08-07 19:12 AEST
+//     405,          //  13 CH_DOGE_FALLING -- updated 2026-08-07 19:12 AEST
+//     269,          //  14 CH_MELLON_HUSK_BIRTH -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  15 CH_LAVA_BLANK -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  16 CH_LAVA_SMALL -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  17 CH_LAVA_MEDIUM -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  18 CH_LAVA_LARGE -- updated 2026-08-07 19:12 AEST
+//     1698,         //  19 CH_MELLON_HUSK -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  20 CH_DOGE_STATIC -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  21 CH_PEBBLE_ROCK -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  22 CH_ROCK_PEBBLE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  23 CH_ROCK_PEBBLE_1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  24 CH_DUST_0 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  25 CH_DUST_1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  26 CH_DUST_2 -- updated 2026-08-07 19:12 AEST
+//     272,          //  27 CH_GEODOGE -- updated 2026-08-07 19:12 AEST
+//     235,          //  28 CH_DUST_ROCK_0 -- updated 2026-08-07 19:12 AEST
+//     235,          //  29 CH_DUST_ROCK_1 -- updated 2026-08-07 19:12 AEST
+//     233,          //  30 CH_DUST_ROCK_2 -- updated 2026-08-07 19:12 AEST
+//     411,          //  31 CH_CONVERT_GEODE_TO_DOGE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  32 CH_HORIZONTAL_BAR -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  33 CH_PUSH_LEFT -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  34 CH_PUSH_LEFT_REVERSE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  35 CH_PUSH_RIGHT -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  36 CH_PUSH_RIGHT_REVERSE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  37 CH_VERTICAL_BAR -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  38 CH_PUSH_UP -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  39 CH_PUSH_UP_REVERSE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  40 CH_PUSH_DOWN -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  41 CH_PUSH_DOWN_REVERSE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  42 CH_WYRM_BODY -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  43 CH_WYRM_VERT_BODY -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  44 CH_WYRM_CORNER_LD -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  45 CH_WYRM_CORNER_RD -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  46 CH_WYRM_CORNER_LU -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  47 CH_WYRM_CORNER_RU -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  48 CH_WYRM_HEAD_U -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  49 CH_WYRM_HEAD_R -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  50 CH_WYRM_HEAD_D -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  51 CH_WYRM_HEAD_L -- updated 2026-08-07 19:12 AEST
+//     355,          //  52 CH_GEODOGE_FALLING -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  53 CH_FLIP_GRAVITY_0 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  54 CH_FLIP_GRAVITY_1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  55 CH_FLIP_GRAVITY_2 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  56 CH_BLOCK -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  57 CH_GRINDER_0 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  58 CH_GRINDER_1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  59 CH_HUB -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  60 CH_WATER -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  61 CH_WATERFLOW_0 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  62 CH_WATERFLOW_1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  63 CH_WATERFLOW_2 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  64 CH_WATERFLOW_3 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  65 CH_WATERFLOW_4 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  66 CH_HUB_1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  67 CH_OUTLET -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  68 CH_BELT_0 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  69 CH_BELT_1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  70 CH_PUSH_DOWN2 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  71 CH_GEODOGE_CONVERT -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  72 CH_CONVERT_PIPE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  73 CH_WYRM_TAIL_U -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  74 CH_WYRM_TAIL_R -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  75 CH_WYRM_TAIL_D -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  76 CH_WYRM_TAIL_L -- updated 2026-08-07 19:12 AEST
+//     233,          //  77 CH_DOGE_FALLING_TOP -- updated 2026-08-07 19:12 AEST
+//     233,          //  78 CH_DOGE_FALLING_BOTTOM -- updated 2026-08-07 19:12 AEST
+//     233,          //  79 CH_ROCK_FALLING_TOP -- updated 2026-08-07 19:12 AEST
+//     233,          //  80 CH_ROCK_FALLING_BOTTOM -- updated 2026-08-07 19:12 AEST
+//     665,          //  81 CH_GEODOGE_FALLING_TOP -- updated 2026-08-07 19:12 AEST
+//     239,          //  82 CH_GEODOGE_FALLING_BOTTOM -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  83 CH_DOGE_FALLING_TOP2 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  84 CH_DOGE_FALLING_BOTTOM2 -- updated 2026-08-07 19:12 AEST
+//     233,          //  85 CH_DOGE_SIDE_1 -- updated 2026-08-07 19:12 AEST
+//     250,          //  86 CH_DOGE_SIDE_3 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  87 CH_DOGE_SIDE_2 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  88 CH_DOGE_SIDE_4 -- updated 2026-08-07 19:12 AEST
+//     457,          //  89 CH_ELECTRIC_0 -- updated 2026-08-07 19:12 AEST
+//     380,          //  90 CH_ELECTRIC_1 -- updated 2026-08-07 19:12 AEST
+//     380,          //  91 CH_ELECTRIC_2 -- updated 2026-08-07 19:12 AEST
+//     382,          //  92 CH_ELECTRIC_3 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  93 CH_BROKEN_DIRT -- updated 2026-08-07 19:12 AEST
+//     425,          //  94 CH_INSULATOR_TOP -- updated 2026-08-07 19:12 AEST
+//     218,          //  95 CH_INSULATOR_BOTTOM -- updated 2026-08-07 19:12 AEST
+//     234,          //  96 CH_STAR -- updated 2026-08-07 19:12 AEST
+//     233,          //  97 CH_STAR_FALLING_TOP -- updated 2026-08-07 19:12 AEST
+//     233,          //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-08-07 19:12 AEST
+//     --no data--,  //  99 CH_ROCK_BONUS -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 100 CH_STAR_EXPLODE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 101 CH_INSULATOR_L -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 102 CH_INSULATOR_R -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 103 CH_ELECTRIC_H0 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 104 CH_ELECTRIC_H1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 105 CH_ELECTRIC_H2 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 106 CH_ELECTRIC_H3 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 107 CH_CROSSED_STREAMS -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 108 CH_BOMB -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 109 CH_CRACKED_BRICK -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 110 CH_CONCRETE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 111 CH_TELEPORT -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 112 CH_KEY -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 113 CH_DOOROPEN_STATIC -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 114 CH_IMMOVABLE -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 115 CH_IMMOVABLE_FALLING -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 116 CH_IMMOVABLE_FALLING_TOP -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 117 CH_IMMOVABLE_FALLING_BOTTOM -- updated 2026-08-07 19:12 AEST
+//     196,          // 118 CH_ROCK_SIDE_1 -- updated 2026-08-07 19:12 AEST
+//     196,          // 119 CH_ROCK_SIDE_2 -- updated 2026-08-07 19:12 AEST
+//     240,          // 120 CH_ROCK_SIDE_3 -- updated 2026-08-07 19:12 AEST
+//     240,          // 121 CH_ROCK_SIDE_4 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 122 CH_GEODOGE_SIDE_1 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 123 CH_GEODOGE_SIDE_2 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 124 CH_GEODOGE_SIDE_3 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 125 CH_GEODOGE_SIDE_4 -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 126 (unused) -- updated 2026-08-07 19:12 AEST
+//     --no data--,  // 127 (unused) -- updated 2026-08-07 19:12 AEST
+// === END debug[] average report ===
 
 void processBoardSquares() {
 
@@ -647,8 +786,13 @@ void processBoardSquares() {
 #ifdef DEBUG_TIMES
         if (chIndex >= 0) {
             unsigned int elapsed = T1TC - chStart;
+#ifdef DEBUG_TIMES_AVERAGE
+            debug[chIndex] += elapsed;
+            debug[chIndex + 128]++;
+#else
             if ((int)elapsed > debug[chIndex])
                 debug[chIndex] = elapsed;
+#endif
             chIndex = -1;
         }
 #endif
@@ -673,8 +817,10 @@ void processBoardSquares() {
                     processCreatures(&cursor, creature);
 
                 if (T1TC > availableIdleTime) {
+#ifndef DEBUG_TIMES_AVERAGE
                     debug[200] = T1TC - availableIdleTime;
                     debug[201] = creature;
+#endif
                     FLASH(0xD6, 12);
                 }
             }
@@ -703,8 +849,8 @@ void processBoardSquares() {
 #ifdef DEBUG_TIMES
     if (chIndex >= 0) {
         unsigned int elapsed = T1TC - chStart;
-        if ((int)elapsed > debug[chIndex])
-            debug[chIndex] = elapsed;
+        debug[chIndex] += elapsed;
+        debug[chIndex + 128]++;
         chIndex = -1;
     }
 #endif
