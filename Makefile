@@ -106,12 +106,10 @@ SRCS = \
  gameState_Menu.c \
  gameState_Skull.c \
  gameState_Globe.c \
- gameState_RasterBleed.c \
  \
  menuCharacterSet.c \
  particle.c \
  planet.c \
- rasterBleed.c \
  reverseBits.c \
  schedule.c \
  score.c \
@@ -139,19 +137,6 @@ SRCS = \
  gfx/alphanumeric.c \
  gfx/fontcompact.c \
  gfx/fontlarge.c \
- \
- tools/sam.c \
- tools/playboy.c \
- tools/donald.c \
- tools/toystory.c \
- tools/lena.c \
- tools/dh.c \
- tools/obama.c \
- tools/buzz.c \
- tools/skull.c \
- tools/zph.c \
- tools/parrot.c \
- tools/pirate.c \
  \
  charset.c \
  charset2.c \

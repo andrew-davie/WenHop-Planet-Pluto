@@ -13,7 +13,6 @@ enum GAME_STATE {
     GS_GAME,               // 5
     GS_SKULL,              // 6
     GS_GLOBE,              // 7
-    GS_RASTER_BLEED,       // 8
 
     GS_MAX
 
@@ -48,10 +47,6 @@ void OS_Skull();
 void initGameState_Globe();
 void VB_Globe();
 void OS_Globe();
-
-void initGameState_RasterBleed();
-void VB_RasterBleed();
-void OS_RasterBleed();
 
 void loadCave(int newCave);    // shared level-(re)load body -- defined alongside GS_GAME in gameState_Game.c
 
