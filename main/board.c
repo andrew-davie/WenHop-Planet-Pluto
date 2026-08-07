@@ -497,14 +497,20 @@ void setupBoardScanner() {
 // timing pass. _B = global margin added to all.
 //
 // Each entry's trailing comment may also carry "(avg: N)" -- the worst (largest) AVERAGE cost
-// seen for that character across every capture (debug[128+n] / debug[256+n], see main.h),
-// tracked completely independently of the entry's own MAX-based value/token to its left --
-// processBoardSquares() (board.c) records both, every visit, unconditionally, so a single CSV
-// capture can update either or both of a line's token/annotation in the same run. Purely
-// informational -- never read by the scheduler, only by a human sizing budget[] itself.
+// seen for that character across every capture (debug[128+n] / debug[256+n], see main.h) -- and/or
+// a "(overtime by N)" PREFIX right after the "//", e.g. "_B + 2000, // (overtime by 252) 10
+// CH_ROCK ..." -- the worst T1TC overshoot ever seen while this character was the one being
+// processed when a whole processBoardSquares() pass ran past availableIdleTime (debugOvertime[n],
+// a separate array from debug[] -- see main.h). All three (token, avg, overtime) are tracked
+// completely independently -- a single CSV capture can update any/all of a line's token/
+// annotations in the same run. Purely informational
+// -- never read by the scheduler, only by a human sizing budget[] itself. "(overtime by N)" is a
+// warning, not a precise "increase this entry by N" prescription: an overrun means the WHOLE
+// frame's remaining idle time ran out, not that THIS character's own budget[] entry under-counts
+// its true cost by exactly N -- see processBoardSquares()'s own comment.
 //
-// Auto-updated from DEBUG_TIMES CSV exports -- see tools/update_budget_from_csv.py (merges both
-// the MAX token and the "(avg: N)" annotation from every CSV, unconditionally).
+// Auto-updated from DEBUG_TIMES CSV exports -- see tools/update_budget_from_csv.py (merges the MAX
+// token, the "(avg: N)" annotation, and the "(overtime by N)" flag from every CSV, unconditionally).
 
 #define _untimed_ 12500
 #define _nop_ 0
@@ -524,7 +530,7 @@ static const unsigned short budget[128] = {
     _B + 346,      //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 528,      //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 2426,     //  10 CH_ROCK (avg: 389) -- updated 2026-08-07 19:46 AEST (avg was 348)
-    _B + 3842,    //  11 CH_ROCK_FALLING (avg: 1730) -- updated 2026-08-07 20:47 AEST (avg was 1547)
+    _B + 3842,     //  11 CH_ROCK_FALLING (avg: 1730) -- updated 2026-08-07 20:47 AEST (avg was 1547)
     _B + 2077,     //  12 CH_DOGE_00 (avg: 314) -- updated 2026-08-07 20:37 AEST (was 2064)
     _B + 2498,     //  13 CH_DOGE_FALLING (avg: 405) -- updated 2026-08-07 02:11 AEST (was 2467)
     _B + 292,      //  14 CH_MELLON_HUSK_BIRTH (avg: 289) -- updated 2026-08-07 19:46 AEST (avg was 269)
@@ -622,15 +628,15 @@ static const unsigned short budget[128] = {
     _B + 400,      // 106 CH_ELECTRIC_H3 (avg: 396) -- updated 2026-08-07 19:46 AEST
     _B + 239,      // 107 CH_CROSSED_STREAMS (avg: 238) -- updated 2026-08-07 19:46 AEST (was 235)
     _B + 785,      // 108 CH_BOMB (avg: 784) -- updated 2026-08-07 19:55 AEST (was 200)
-    _B + 4594,    // 109 CH_CRACKED_BRICK (avg: 534) -- updated 2026-08-07 20:47 AEST (avg was 500)
+    _B + 4594,     // 109 CH_CRACKED_BRICK (avg: 534) -- updated 2026-08-07 20:47 AEST (avg was 500)
     _nop_,         // 110 CH_CONCRETE
     _B + 883,      // 111 CH_TELEPORT (avg: 298) -- updated 2026-08-07 19:46 AEST
     _nop_,         // 112 CH_KEY
     _untimed_,     // 113 CH_DOOROPEN_STATIC
     _B + 424,      // 114 CH_IMMOVABLE (avg: 264) -- updated 2026-08-07 19:46 AEST
-    _B + 2357,    // 115 CH_IMMOVABLE_FALLING (avg: 1418) -- updated 2026-08-07 20:47 AEST (was 2348)
-    _B + 213,     // 116 CH_IMMOVABLE_FALLING_TOP (avg: 180) -- updated 2026-08-07 20:47 AEST
-    _B + 213,     // 117 CH_IMMOVABLE_FALLING_BOTTOM (avg: 180) -- updated 2026-08-07 20:47 AEST
+    _B + 2357,     // 115 CH_IMMOVABLE_FALLING (avg: 1418) -- updated 2026-08-07 20:47 AEST (was 2348)
+    _B + 213,      // 116 CH_IMMOVABLE_FALLING_TOP (avg: 180) -- updated 2026-08-07 20:47 AEST
+    _B + 213,      // 117 CH_IMMOVABLE_FALLING_BOTTOM (avg: 180) -- updated 2026-08-07 20:47 AEST
     _B + 217,      // 118 CH_ROCK_SIDE_1 (avg: 216) -- updated 2026-08-07 19:46 AEST (was 213, avg was 196)
     _B + 217,      // 119 CH_ROCK_SIDE_2 (avg: 216) -- updated 2026-08-07 19:46 AEST (was 213, avg was 196)
     _B + 281,      // 120 CH_ROCK_SIDE_3 (avg: 260) -- updated 2026-08-07 19:46 AEST (avg was 240)
@@ -687,8 +693,18 @@ void processBoardSquares() {
 
                 if (T1TC > availableIdleTime) {
 #ifdef DEBUG_TIMES
-                    debug[384] = T1TC - availableIdleTime;
-                    debug[385] = creature;
+                    // Flags EVERY character ever caught here across a run, worst overshoot each
+                    // (debugOvertime[n], main.h) -- not just the last one, which the old single-
+                    // slot scratch this replaced could only ever show. This creature isn't
+                    // necessarily AT FAULT, though: `overshoot` is measured against
+                    // availableIdleTime, the whole frame's remaining budget, not against
+                    // budget[creature] specifically -- it just happened to be whichever creature
+                    // was mid-processing when the frame ran out, regardless of how little idle
+                    // time was left before it even started (see budget[]'s own comment on
+                    // "(overtime by N)" above for the same caveat).
+                    unsigned int overshoot = T1TC - availableIdleTime;
+                    if (overshoot > debugOvertime[chIndex])
+                        debugOvertime[chIndex] = overshoot;
 #endif
                     FLASH(0xD6, 12);
                 }

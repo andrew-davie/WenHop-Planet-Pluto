@@ -20,7 +20,8 @@
 #include "swipe.h"
 
 #ifdef DEBUG_TIMES
-unsigned int debug[386] = {[0 ... 385] = 0};
+unsigned int debug[384] = {[0 ... 383] = 0};
+unsigned short debugOvertime[128] = {[0 ... 127] = 0};
 #endif
 
 
