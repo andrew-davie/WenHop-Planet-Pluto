@@ -75,7 +75,6 @@ void nDotsAtTrixel(int count, int trixX, int trixY, unsigned char age, enum Part
                    unsigned char colour);
 
 void floatingCharacter(int trixX, int trixY, int age, unsigned char ch);
-void removeFloatingChars();
 void drawFloatingChars();
 
 

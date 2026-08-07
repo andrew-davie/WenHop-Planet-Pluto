@@ -110,7 +110,6 @@ extern int sound_volume;
 extern int sound_max_volume;
 
 void playAudio();
-bool addAudio(enum AudioID id);
 void killAudio(enum AudioID id);
 void killRepeatingAudio();
 void initAudio(bool killTracks);

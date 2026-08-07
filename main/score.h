@@ -34,9 +34,6 @@ void drawTheScore(int score);
 void drawScore();
 void addScore(int score);
 void setScoreCycle(enum SCORE_MODE scoreCycle);
-enum SCORE_MODE getScoreCycle();
-void setScore(int score);
-void drawTime2(int value);
 void doubleSizeScore(int x, int y, int letter, int col);
 unsigned char *drawDecimal2(unsigned char *buffer, unsigned char *colour_buffer, unsigned int colour, int cvt);
 

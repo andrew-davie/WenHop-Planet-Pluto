@@ -11,7 +11,6 @@
 #include "decodeCaves.h"
 #include "main.h"
 #include "mellon.h"
-#include "random.h"
 #include "reverseBits.h"
 #include "score.h"
 #include "sound.h"
@@ -35,8 +34,6 @@ static enum SCORE_MODE scoreCycle;
 
 static unsigned char scoreLineNew[10];
 static unsigned char scoreLineColour[10];
-
-static int toggle = 0;
 
 void addScore(int score) {
 
@@ -687,73 +684,6 @@ unsigned char *drawDecimal2(unsigned char *buffer, unsigned char *colour_buffer,
     }
 
     return buffer;
-}
-
-// clang-format off
-
-const char *planetName[] = {
-
-    "MERCURY",
-    "VENUS",
-    "EARTH",
-    "MARS",
-    "JUPITER",
-    "SATURN",
-    "URANUS",
-    "NEPTUNE",
-    "PLUTO",
-    "X"
-};
-
-// clang-format on
-
-void drawPlanetName() {
-
-    static int col = 0;
-    col++;
-
-    int caveCount = sizeof(planetName) / sizeof(planetName[0]);
-
-    const char *p = planetName[cave < caveCount ? cave : caveCount - 1];
-    for (int i = 2; *p; i++) {
-        scoreLineNew[i] = LETTER(*p++);
-        scoreLineColour[i] = col++ & 7;
-    }
-}
-
-void drawSpeedRun() {
-
-    static int speedCycle;
-    speedCycle -= 12;
-    for (int i = 0; i < 8; i++) {
-        scoreLineNew[i + 1] = LETTER("SPEEDRUN"[i]);
-        scoreLineColour[i + 1] = ((speedCycle + i * 0x30) >> 8) & 7;
-    }
-}
-
-void drawDoge() {
-
-    if (doges < 0) {
-        scoreLineNew[1] = DIGIT_PLUS;
-        scoreLineColour[1] = scoreLineColour[0] = rangeRandom(8);
-    }
-
-    int offset = 2;
-    if (RAM[_P0_X] < 80)
-        offset = 8;
-
-    drawDecimal2(scoreLineNew + offset, scoreLineColour + offset, rangeRandom(8), doges < 0 ? -doges : doges);
-}
-
-void drawTime() {
-
-    int tPos = 0;    // time >= 0xA00 ? time >= 0x6400 ? 5 : 6 : 7;
-
-    scoreLineNew[tPos] = LETTER('T');
-    scoreLineColour[tPos++] = RGB_BLUE;
-
-    if (time > 0xA00 || ++toggle & 16)
-        drawDecimal2(scoreLineNew + tPos, scoreLineColour + tPos, time < 0xA00 ? RGB_RED : RGB_AQUA, time >> 8);
 }
 
 void drawLives() {
