@@ -511,7 +511,7 @@ void setupBoardScanner() {
 
 #define _B 100
 
-// Last updated: 2026-08-07 19:55 AEST
+// Last updated: 2026-08-07 20:37 AEST
 static const unsigned short budget[128] = {
     _nop_,         //   0 CH_BLANK
     _nop_,         //   1 CH_PLACEHOLDER
@@ -525,7 +525,7 @@ static const unsigned short budget[128] = {
     _B + 528,      //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 2426,     //  10 CH_ROCK (avg: 389) -- updated 2026-08-07 19:46 AEST (avg was 348)
     _B + 3842,     //  11 CH_ROCK_FALLING (avg: 1547) -- updated 2026-08-07 19:46 AEST (was 3088)
-    _B + 2064,     //  12 CH_DOGE_00 (avg: 314) -- updated 2026-08-07 19:46 AEST (avg was 283)
+    _B + 2077,    //  12 CH_DOGE_00 (avg: 314) -- updated 2026-08-07 20:37 AEST (was 2064)
     _B + 2498,     //  13 CH_DOGE_FALLING (avg: 405) -- updated 2026-08-07 02:11 AEST (was 2467)
     _B + 292,      //  14 CH_MELLON_HUSK_BIRTH (avg: 289) -- updated 2026-08-07 19:46 AEST (avg was 269)
     _nop_,         //  15 CH_LAVA_BLANK
@@ -565,7 +565,7 @@ static const unsigned short budget[128] = {
     _B + 235,      //  49 CH_WYRM_HEAD_R -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  50 CH_WYRM_HEAD_D -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  51 CH_WYRM_HEAD_L -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 1846,     //  52 CH_GEODOGE_FALLING (avg: 374) -- updated 2026-08-07 19:46 AEST (avg was 355)
+    _B + 3393,    //  52 CH_GEODOGE_FALLING (avg: 374) -- updated 2026-08-07 20:37 AEST (was 1846)
     _nop_,         //  53 CH_FLIP_GRAVITY_0
     _nop_,         //  54 CH_FLIP_GRAVITY_1
     _nop_,         //  55 CH_FLIP_GRAVITY_2
