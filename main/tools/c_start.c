@@ -43,6 +43,40 @@ int ram_start = 0;
 
 const unsigned int BOOT_SIZE = 0x60;
 
+// The ARM C stack (C_STACK, set in the game's own .asm -- e.g. cdfj+_template.asm) starts at a
+// FIXED address near the top of the same physical RAM this tool carves "ram" (.data/.bss) out of,
+// and grows DOWNWARD from there into that same space. Before this reserve existed, `ram`'s LENGTH
+// was computed with zero regard for that -- .data/.bss was allowed to grow to within ~36 bytes of
+// C_STACK's own STARTING address, i.e. to within ~36 bytes of before the stack has pushed a single
+// byte. Any real call depth at all (this is a live risk, not theoretical: it caused visible cave-
+// data corruption once real .data/.bss usage got close enough -- see git history around
+// 2026-08-07) then overwrites .data/.bss.
+//
+// STACK_RESERVE carves out a fixed block below C_STACK that `ram_free` (and so "ram"'s LENGTH,
+// below) is NOT allowed to use, converting "silent runtime corruption once real stack depth
+// exceeds whatever's left" into "a hard, obvious link error the moment .data/.bss growth eats
+// into the reserve" -- the same way the existing `ram_free < 36` check already guards the display
+// buffer/RAM split, just extended to guard the stack too.
+//
+// 256 bytes of ACTUAL margin below C_STACK's own starting address is the target, chosen from an
+// actual -fstack-usage sweep of every function in the codebase at the time (2026-08-07) -- no
+// recursion anywhere, largest single function frame 160 bytes, the vast majority under 56 bytes --
+// so even a generously-deep (10+ level) real call chain comfortably fits. NOT a proven worst-case
+// bound (that would need a real call-graph depth analysis, including through the game state/kernel
+// function-pointer dispatch tables, which this quick pass didn't attempt) -- if a future stack-
+// related corruption bug shows up again despite this reserve, that's the next thing to build. If
+// this constant needs to grow later, that will show up as a normal "ERROR: Not enough RAM" from
+// ram_free's own existing check below, not as a mystery runtime bug -- exactly the tradeoff this
+// whole reserve exists for.
+//
+// The constant itself is 292, not 256: C_STACK sits a fixed 36 bytes below the absolute top of
+// whatever total RAM this build's ram_size resolves to (confirmed the same 36-byte gap across
+// every ROM_SIZE's C_STACK value in cdfj+_template.asm -- an existing, presumably IAR-toolchain-
+// related reserve, unrelated to this one), and ram_free is computed relative to that same
+// absolute top, not relative to C_STACK directly -- so 36 has to be added back on top of the
+// real 256-byte target to actually land the enforced boundary 256 bytes below C_STACK itself.
+#define STACK_RESERVE (256 + 36)
+
 /***************************************************/
 bool verbose = false;    // to control extra data output
 /***************************************************/
@@ -271,7 +305,7 @@ int main(int argc, char *argv[]) {
     if (verbose)
         printf("ram_size %d\n", ram_size);
 
-    ram_free = ((ram_size - 2) * 1024) - display_size;
+    ram_free = ((ram_size - 2) * 1024) - display_size - STACK_RESERVE;
     if (verbose)
         printf("ram_free %d\n", ram_free);
 
