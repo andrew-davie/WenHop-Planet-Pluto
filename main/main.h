@@ -122,11 +122,11 @@ extern int shakeX, shakeY, shakeTime;
 #define DEBUG_TIMES
 #ifdef DEBUG_TIMES
 
-// processBoardSquares() (board.c) records a running MAX and a running AVERAGE for every raw
+// processBoardSquares() (board.c) records BOTH a running MAX and a running AVERAGE for every raw
 // character number n (0-127), unconditionally, every visit -- no mode switch (there used to be
-// one, DEBUG_TIMES_AVERAGE, gating MAX vs AVERAGE; removed, since tracking both costs nothing
-// worth caring about and needing to rebuild/recapture twice to get both numbers was pure
-// friction). Three fixed 128-wide blocks:
+// one, DEBUG_TIMES_AVERAGE, gating one or the other; removed, since tracking both costs nothing
+// worth caring about and needing to rebuild/recapture twice to get both numbers was pure friction).
+// Three fixed 128-wide blocks:
 //
 //   debug[n]         MAX   -- running max T1TC ticks for a single visit to character n.
 //   debug[128 + n]   SUM   -- running sum of ticks across every visit to character n.
@@ -134,17 +134,10 @@ extern int shakeX, shakeY, shakeTime;
 //                     average cost of character n (see budget[]'s own comment, board.c, for the
 //                     "(avg: N)" annotation this feeds).
 //
-// debugOvertime[n] -- a separate, smaller array, NOT part of debug[] -- is the worst T1TC
-// overshoot seen while character n was the one being processed when a pass ran past
-// availableIdleTime (0 = character n has never been caught doing this). Kept separate and
-// unsigned short (not folded into debug[] as a 4th unsigned int block) purely for RAM: the ARM
-// side's `ram` region has almost no slack (a 4th 128-wide unsigned int block overflowed it by
-// 164 bytes), and overshoot amounts don't need unsigned int range. Every character that's EVER
-// been the one active during an overrun gets flagged here, not just the last one -- see budget[]'s
-// own comment (board.c) for the "(overtime by N)" annotation this feeds, and
-// processBoardSquares()'s own comment for why an overrun happening at all doesn't necessarily
-// mean budget[creature] itself is wrong (it means the WHOLE frame ran over, which the specific
-// creature caught mid-flight when it happened isn't solely responsible for).
+// debug[384]/[385] -- past all three real blocks -- are the ad-hoc overrun-capture scratch (T1TC
+// overshoot / offending creature) when a pass runs past availableIdleTime; they used to double up
+// on debug[200]/[201] back when debug[] only had one 128-wide block, but with all three blocks
+// real now there's no gap left in the middle to reuse, hence pushed to the very end instead.
 //
 // Root cause of debug going missing from the debugger's globals view was tracked down to the
 // Gopher2600 DWARF parser (coprocessor/developer/dwarf/dwarf_builder.go in gopher2600, not this
@@ -155,9 +148,8 @@ extern int shakeX, shakeY, shakeTime;
 // not a Go map ordering issue -- those were all considered and ruled out first. Fixed on the
 // gopher2600 side but broke something else there and got reverted, so working around it here
 // instead: giving the declaration an explicit size means it never has an incomplete type to begin
-// with. Same reasoning applies to debugOvertime[] below.
-extern unsigned int debug[384];
-extern unsigned short debugOvertime[128];
+// with.
+extern unsigned int debug[386];
 
 #endif
 
