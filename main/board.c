@@ -497,7 +497,7 @@ void setupBoardScanner() {
 #define _untimed_ 12500
 #define _B 100
 
-// Last updated: 2026-08-07 02:11 AEST
+// Last updated: 2026-08-07 11:41 AEST
 static const unsigned short budget[128] = {
     _untimed_,    //   0 CH_BLANK
     _untimed_,    //   1 CH_PLACEHOLDER
