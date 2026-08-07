@@ -520,7 +520,7 @@ static const unsigned short budget[128] = {
     _nop_,         //  16 CH_LAVA_SMALL
     _nop_,         //  17 CH_LAVA_MEDIUM
     _nop_,         //  18 CH_LAVA_LARGE
-    _B + 1198146, //  19 CH_MELLON_HUSK -- updated 2026-08-07 19:13 AEST (was 10059)
+    _B + 1216099, //  19 CH_MELLON_HUSK -- updated 2026-08-07 19:13 AEST (was 1198146)
     _B + 195,      //  20 CH_DOGE_STATIC -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 181,      //  21 CH_PEBBLE_ROCK -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 210,      //  22 CH_ROCK_PEBBLE -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -528,7 +528,7 @@ static const unsigned short budget[128] = {
     _B + 252,      //  24 CH_DUST_0 -- updated 2026-08-06 23:27 AEST (was 209)
     _B + 252,      //  25 CH_DUST_1 -- updated 2026-08-06 23:57 AEST (was 251)
     _B + 250,      //  26 CH_DUST_2 -- updated 2026-08-06 23:57 AEST (was 249)
-    _B + 25270393,//  27 CH_GEODOGE -- updated 2026-08-07 19:13 AEST (was 2366)
+    _B + 25302133,//  27 CH_GEODOGE -- updated 2026-08-07 19:13 AEST (was 25270393)
     _B + 37393,   //  28 CH_DUST_ROCK_0 -- updated 2026-08-07 19:13 AEST (was 252)
     _B + 35752,   //  29 CH_DUST_ROCK_1 -- updated 2026-08-07 19:13 AEST (was 252)
     _B + 34754,   //  30 CH_DUST_ROCK_2 -- updated 2026-08-07 19:13 AEST (was 250)
@@ -597,7 +597,7 @@ static const unsigned short budget[128] = {
     _nop_,         //  93 CH_BROKEN_DIRT
     _B + 392198,  //  94 CH_INSULATOR_TOP -- updated 2026-08-07 19:13 AEST (was 4110)
     _B + 200729,  //  95 CH_INSULATOR_BOTTOM -- updated 2026-08-07 19:13 AEST (was 236)
-    _B + 1280039, //  96 CH_STAR -- updated 2026-08-07 19:13 AEST (was 2003)
+    _B + 1283026, //  96 CH_STAR -- updated 2026-08-07 19:13 AEST (was 1280039)
     _B + 3262,    //  97 CH_STAR_FALLING_TOP -- updated 2026-08-07 19:13 AEST (was 250)
     _B + 3267,    //  98 CH_STAR_FALLING_BOTTOM -- updated 2026-08-07 19:13 AEST (was 250)
     _untimed_,     //  99 CH_ROCK_BONUS
