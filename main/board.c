@@ -497,37 +497,37 @@ void setupBoardScanner() {
 // timing pass. _B = global margin added to all.
 //
 // Each entry's trailing comment may also carry "(avg: N)" -- the worst (largest) AVERAGE cost
-// seen for that character across DEBUG_TIMES_AVERAGE captures (debug[n] / debug[n+128], see
-// main.h), tracked completely independently of the entry's own MAX-based value/token to its
-// left -- one CSV capture only ever updates one or the other, never both, since debug[256] (a
-// per-capture mode flag, main.c) records which kind of data a given capture actually is. Purely
+// seen for that character across every capture (debug[128+n] / debug[256+n], see main.h),
+// tracked completely independently of the entry's own MAX-based value/token to its left --
+// processBoardSquares() (board.c) records both, every visit, unconditionally, so a single CSV
+// capture can update either or both of a line's token/annotation in the same run. Purely
 // informational -- never read by the scheduler, only by a human sizing budget[] itself.
 //
-// Auto-updated from DEBUG_TIMES CSV exports -- see tools/update_budget_from_csv.py (handles both
-// the MAX token and the "(avg: N)" annotation, driven by whichever mode a given CSV reports).
+// Auto-updated from DEBUG_TIMES CSV exports -- see tools/update_budget_from_csv.py (merges both
+// the MAX token and the "(avg: N)" annotation from every CSV, unconditionally).
 
 #define _untimed_ 12500
 #define _nop_ 0
 
 #define _B 100
 
-// Last updated: 2026-08-07 19:31 AEST
+// Last updated: 2026-08-07 19:46 AEST
 static const unsigned short budget[128] = {
     _nop_,         //   0 CH_BLANK
     _nop_,         //   1 CH_PLACEHOLDER
     _nop_,         //   2 CH_DIRT
     _nop_,         //   3 CH_BRICKWALL
-        _B + 336,     //   4 CH_DOORCLOSED (avg: 274) -- updated 2026-08-07 19:31 AEST (avg was 203)
+    _B + 336,     //   4 CH_DOORCLOSED (avg: 223) -- updated 2026-08-07 19:46 AEST (avg was 203)
     _untimed_,     //   5 CH_DOOROPEN_0
     _untimed_,     //   6 CH_EXITBLANK
     _nop_,         //   7 CH_STEELWALL
     _B + 346,      //   8 CH_PEBBLE1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 528,      //   9 CH_PEBBLE2 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 2426,     //  10 CH_ROCK (avg: 348) -- updated 2026-08-07 01:41 AEST (was 2325)
-    _B + 3088,     //  11 CH_ROCK_FALLING (avg: 1547) -- updated 2026-08-07 02:11 AEST (was 2488)
-    _B + 2064,     //  12 CH_DOGE_00 (avg: 283) -- updated 2026-08-07 00:03 AEST (was 2063)
+    _B + 2426,    //  10 CH_ROCK (avg: 389) -- updated 2026-08-07 19:46 AEST (avg was 348)
+    _B + 3842,    //  11 CH_ROCK_FALLING (avg: 1547) -- updated 2026-08-07 19:46 AEST (was 3088)
+    _B + 2064,    //  12 CH_DOGE_00 (avg: 314) -- updated 2026-08-07 19:46 AEST (avg was 283)
     _B + 2498,     //  13 CH_DOGE_FALLING (avg: 405) -- updated 2026-08-07 02:11 AEST (was 2467)
-    _B + 292,      //  14 CH_MELLON_HUSK_BIRTH (avg: 269) -- updated 2026-08-06 23:32 AEST (was 291)
+    _B + 292,     //  14 CH_MELLON_HUSK_BIRTH (avg: 289) -- updated 2026-08-07 19:46 AEST (avg was 269)
     _nop_,         //  15 CH_LAVA_BLANK
     _nop_,         //  16 CH_LAVA_SMALL
     _nop_,         //  17 CH_LAVA_MEDIUM
@@ -537,14 +537,14 @@ static const unsigned short budget[128] = {
     _B + 181,      //  21 CH_PEBBLE_ROCK -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 210,      //  22 CH_ROCK_PEBBLE -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 210,      //  23 CH_ROCK_PEBBLE_1 -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 252,      //  24 CH_DUST_0 -- updated 2026-08-06 23:27 AEST (was 209)
-    _B + 252,      //  25 CH_DUST_1 -- updated 2026-08-06 23:57 AEST (was 251)
-    _B + 250,      //  26 CH_DUST_2 -- updated 2026-08-06 23:57 AEST (was 249)
-    _B + 2366,     //  27 CH_GEODOGE (avg: 272) -- updated 2026-08-07 00:03 AEST (was 1608)
-    _B + 252,      //  28 CH_DUST_ROCK_0 (avg: 235) -- updated 2026-08-06 23:27 AEST (was 242)
-    _B + 252,      //  29 CH_DUST_ROCK_1 (avg: 235) -- updated 2026-08-06 23:27 AEST (was 242)
-    _B + 250,      //  30 CH_DUST_ROCK_2 (avg: 233) -- updated 2026-08-06 23:27 AEST (was 207)
-    _B + 466,      //  31 CH_CONVERT_GEODE_TO_DOGE (avg: 411) -- updated 2026-08-06 23:32 AEST (was 434)
+    _B + 262,     //  24 CH_DUST_0 (avg: 261) -- updated 2026-08-07 19:46 AEST (was 252)
+    _B + 262,     //  25 CH_DUST_1 (avg: 261) -- updated 2026-08-07 19:46 AEST (was 252)
+    _B + 254,     //  26 CH_DUST_2 (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250)
+    _B + 2366,    //  27 CH_GEODOGE (avg: 292) -- updated 2026-08-07 19:46 AEST (avg was 272)
+    _B + 262,     //  28 CH_DUST_ROCK_0 (avg: 261) -- updated 2026-08-07 19:46 AEST (was 252, avg was 235)
+    _B + 262,     //  29 CH_DUST_ROCK_1 (avg: 261) -- updated 2026-08-07 19:46 AEST (was 252, avg was 235)
+    _B + 254,     //  30 CH_DUST_ROCK_2 (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
+    _B + 466,     //  31 CH_CONVERT_GEODE_TO_DOGE (avg: 443) -- updated 2026-08-07 19:46 AEST (avg was 411)
     _B + 165,      //  32 CH_HORIZONTAL_BAR -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 2319,     //  33 CH_PUSH_LEFT -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 235,      //  34 CH_PUSH_LEFT_REVERSE -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -561,11 +561,11 @@ static const unsigned short budget[128] = {
     _B + 234,      //  45 CH_WYRM_CORNER_RD -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  46 CH_WYRM_CORNER_LU -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  47 CH_WYRM_CORNER_RU -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 235,      //  48 CH_WYRM_HEAD_U -- updated 2026-08-06 23:32 AEST (was 221)
+    _B + 239,     //  48 CH_WYRM_HEAD_U (avg: 238) -- updated 2026-08-07 19:46 AEST (was 235)
     _B + 235,      //  49 CH_WYRM_HEAD_R -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  50 CH_WYRM_HEAD_D -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  51 CH_WYRM_HEAD_L -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 1846,    //  52 CH_GEODOGE_FALLING (avg: 355) -- updated 2026-08-07 13:27 AEST (was 1814)
+    _B + 1846,    //  52 CH_GEODOGE_FALLING (avg: 374) -- updated 2026-08-07 19:46 AEST (avg was 355)
     _nop_,         //  53 CH_FLIP_GRAVITY_0
     _nop_,         //  54 CH_FLIP_GRAVITY_1
     _nop_,         //  55 CH_FLIP_GRAVITY_2
@@ -573,7 +573,7 @@ static const unsigned short budget[128] = {
     _B + 452,      //  57 CH_GRINDER_0 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 436,      //  58 CH_GRINDER_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _nop_,         //  59 CH_HUB
-    _B + 283,      //  60 CH_WATER -- updated 2026-08-06 23:27 AEST (was 232)
+    _B + 283,     //  60 CH_WATER (avg: 264) -- updated 2026-08-07 19:46 AEST
     _B + 292,      //  61 CH_WATERFLOW_0 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 296,      //  62 CH_WATERFLOW_1 -- updated 2026-07-31 13:42 AEST (was untimed)
     _B + 1256,     //  63 CH_WATERFLOW_2 -- updated 2026-07-31 13:42 AEST (was untimed)
@@ -590,51 +590,51 @@ static const unsigned short budget[128] = {
     _B + 235,      //  74 CH_WYRM_TAIL_R -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  75 CH_WYRM_TAIL_D -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 235,      //  76 CH_WYRM_TAIL_L -- updated 2026-08-06 23:32 AEST (was untimed)
-    _B + 250,      //  77 CH_DOGE_FALLING_TOP (avg: 233) -- updated 2026-08-07 00:00 AEST (was 249)
-    _B + 250,      //  78 CH_DOGE_FALLING_BOTTOM (avg: 233) -- updated 2026-08-06 23:32 AEST (was 240)
-    _B + 250,      //  79 CH_ROCK_FALLING_TOP (avg: 233) -- updated 2026-08-06 23:27 AEST (was 240)
-    _B + 256,      //  80 CH_ROCK_FALLING_BOTTOM (avg: 233) -- updated 2026-08-06 23:27 AEST (was 240)
+    _B + 254,     //  77 CH_DOGE_FALLING_TOP (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
+    _B + 254,     //  78 CH_DOGE_FALLING_BOTTOM (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
+    _B + 254,     //  79 CH_ROCK_FALLING_TOP (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
+    _B + 256,     //  80 CH_ROCK_FALLING_BOTTOM (avg: 253) -- updated 2026-08-07 19:46 AEST (avg was 233)
     _B + 1495,     //  81 CH_GEODOGE_FALLING_TOP (avg: 665) -- updated 2026-08-06 23:32 AEST (was 1487)
-    _B + 250,      //  82 CH_GEODOGE_FALLING_BOTTOM (avg: 239) -- updated 2026-08-06 23:32 AEST (was 240)
+    _B + 260,     //  82 CH_GEODOGE_FALLING_BOTTOM (avg: 259) -- updated 2026-08-07 19:46 AEST (was 250, avg was 239)
     _B + 226,      //  83 CH_DOGE_FALLING_TOP2 -- updated 2026-07-31 13:42 AEST (was untimed)
     _nop_,         //  84 CH_DOGE_FALLING_BOTTOM2
-    _B + 250,      //  85 CH_DOGE_SIDE_1 (avg: 233) -- updated 2026-08-07 00:03 AEST (was 249)
-    _B + 272,      //  86 CH_DOGE_SIDE_3 (avg: 250) -- updated 2026-07-28 16:30 AEST (was 263)
-    _B + 249,      //  87 CH_DOGE_SIDE_2 -- updated 2026-07-28 16:30 AEST (was 240)
-    _B + 272,      //  88 CH_DOGE_SIDE_4 -- updated 2026-07-28 16:30 AEST (was 263)
-    _B + 483,      //  89 CH_ELECTRIC_0 (avg: 457) -- updated 2026-08-06 23:32 AEST (was 476)
-    _B + 398,      //  90 CH_ELECTRIC_1 (avg: 380) -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 398,      //  91 CH_ELECTRIC_2 (avg: 380) -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 400,      //  92 CH_ELECTRIC_3 (avg: 382) -- updated 2026-08-06 23:32 AEST (was 393)
+    _B + 253,     //  85 CH_DOGE_SIDE_1 (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
+    _B + 272,     //  86 CH_DOGE_SIDE_3 (avg: 270) -- updated 2026-08-07 19:46 AEST (avg was 250)
+    _B + 254,     //  87 CH_DOGE_SIDE_2 (avg: 253) -- updated 2026-08-07 19:46 AEST (was 249)
+    _B + 272,     //  88 CH_DOGE_SIDE_4 (avg: 271) -- updated 2026-08-07 19:46 AEST
+    _B + 483,     //  89 CH_ELECTRIC_0 (avg: 470) -- updated 2026-08-07 19:46 AEST (avg was 457)
+    _B + 398,     //  90 CH_ELECTRIC_1 (avg: 394) -- updated 2026-08-07 19:46 AEST (avg was 380)
+    _B + 398,     //  91 CH_ELECTRIC_2 (avg: 394) -- updated 2026-08-07 19:46 AEST (avg was 380)
+    _B + 400,     //  92 CH_ELECTRIC_3 (avg: 396) -- updated 2026-08-07 19:46 AEST (avg was 382)
     _nop_,         //  93 CH_BROKEN_DIRT
     _B + 4110,    //  94 CH_INSULATOR_TOP (avg: 425) -- updated 2026-08-07 13:27 AEST (was 4109)
-    _B + 236,      //  95 CH_INSULATOR_BOTTOM (avg: 218) -- updated 2026-07-29 03:45 AEST (was 230)
-    _B + 2003,     //  96 CH_STAR (avg: 234) -- updated 2026-07-29 00:37 AEST (was 1985)
-    _B + 250,      //  97 CH_STAR_FALLING_TOP (avg: 233) -- updated 2026-08-07 00:00 AEST (was 249)
-    _B + 250,      //  98 CH_STAR_FALLING_BOTTOM (avg: 233) -- updated 2026-08-07 00:00 AEST (was 249)
+    _B + 239,     //  95 CH_INSULATOR_BOTTOM (avg: 238) -- updated 2026-08-07 19:46 AEST (was 236, avg was 218)
+    _B + 2003,    //  96 CH_STAR (avg: 252) -- updated 2026-08-07 19:46 AEST (avg was 234)
+    _B + 254,     //  97 CH_STAR_FALLING_TOP (avg: 253) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
+    _B + 260,     //  98 CH_STAR_FALLING_BOTTOM (avg: 259) -- updated 2026-08-07 19:46 AEST (was 250, avg was 233)
     _untimed_,     //  99 CH_ROCK_BONUS
     _B + 374,      // 100 CH_STAR_EXPLODE -- updated 2026-07-31 13:42 AEST (was untimed)
-    _B + 6736,     // 101 CH_INSULATOR_L -- updated 2026-07-29 00:45 AEST (was 3771)
-    _B + 236,      // 102 CH_INSULATOR_R -- updated 2026-07-29 03:45 AEST (was 230)
-    _B + 483,      // 103 CH_ELECTRIC_H0 -- updated 2026-08-06 23:32 AEST (was 476)
-    _B + 398,      // 104 CH_ELECTRIC_H1 -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 398,      // 105 CH_ELECTRIC_H2 -- updated 2026-08-06 23:32 AEST (was 391)
-    _B + 400,      // 106 CH_ELECTRIC_H3 -- updated 2026-08-06 23:32 AEST (was 393)
-    _B + 235,      // 107 CH_CROSSED_STREAMS -- updated 2026-08-06 23:32 AEST (was 197)
-    _B + 1366,     // 108 CH_BOMB -- updated 2026-07-29 03:45 AEST (was 1351)
-    _B + 4594,     // 109 CH_CRACKED_BRICK -- updated 2026-07-29 15:01 AEST (was untimed)
+    _B + 6736,    // 101 CH_INSULATOR_L (avg: 1070) -- updated 2026-08-07 19:46 AEST
+    _B + 239,     // 102 CH_INSULATOR_R (avg: 238) -- updated 2026-08-07 19:46 AEST (was 236)
+    _B + 483,     // 103 CH_ELECTRIC_H0 (avg: 470) -- updated 2026-08-07 19:46 AEST
+    _B + 398,     // 104 CH_ELECTRIC_H1 (avg: 393) -- updated 2026-08-07 19:46 AEST
+    _B + 398,     // 105 CH_ELECTRIC_H2 (avg: 394) -- updated 2026-08-07 19:46 AEST
+    _B + 400,     // 106 CH_ELECTRIC_H3 (avg: 396) -- updated 2026-08-07 19:46 AEST
+    _B + 239,     // 107 CH_CROSSED_STREAMS (avg: 238) -- updated 2026-08-07 19:46 AEST (was 235)
+    _B + 1366,    // 108 CH_BOMB (avg: 1105) -- updated 2026-08-07 19:46 AEST
+    _B + 4594,    // 109 CH_CRACKED_BRICK (avg: 500) -- updated 2026-08-07 19:46 AEST
     _nop_,         // 110 CH_CONCRETE
-    _B + 883,      // 111 CH_TELEPORT (PH4, idle sparkle -- not yet measured) -- updated 2026-08-06 23:27 AEST (was 766)
+    _B + 883,     // 111 CH_TELEPORT (avg: 298) (PH4, idle sparkle -- not yet measured) -- updated 2026-08-07 19:46 AEST
     _nop_,         // 112 CH_KEY
     _untimed_,     // 113 CH_DOOROPEN_STATIC
-    _B + 424,      // 114 CH_IMMOVABLE -- updated 2026-08-06 23:32 AEST (was 261)
+    _B + 424,     // 114 CH_IMMOVABLE (avg: 264) -- updated 2026-08-07 19:46 AEST
     _B + 2348,     // 115 CH_IMMOVABLE_FALLING -- updated 2026-08-07 02:11 AEST (was 2299)
     _B + 213,      // 116 CH_IMMOVABLE_FALLING_TOP -- updated 2026-08-06 23:32 AEST (was 169)
     _B + 213,      // 117 CH_IMMOVABLE_FALLING_BOTTOM -- updated 2026-08-06 23:32 AEST (was 169)
-    _B + 213,      // 118 CH_ROCK_SIDE_1 (avg: 196) -- updated 2026-08-06 23:27 AEST (was 170)
-    _B + 213,      // 119 CH_ROCK_SIDE_2 (avg: 196) -- updated 2026-08-06 23:27 AEST (was 170)
-    _B + 281,      // 120 CH_ROCK_SIDE_3 (avg: 240) -- updated 2026-08-06 23:32 AEST (was 277)
-    _B + 281,      // 121 CH_ROCK_SIDE_4 (avg: 240) -- updated 2026-08-07 00:03 AEST (was 277)
+    _B + 217,     // 118 CH_ROCK_SIDE_1 (avg: 216) -- updated 2026-08-07 19:46 AEST (was 213, avg was 196)
+    _B + 217,     // 119 CH_ROCK_SIDE_2 (avg: 216) -- updated 2026-08-07 19:46 AEST (was 213, avg was 196)
+    _B + 281,     // 120 CH_ROCK_SIDE_3 (avg: 260) -- updated 2026-08-07 19:46 AEST (avg was 240)
+    _B + 281,     // 121 CH_ROCK_SIDE_4 (avg: 260) -- updated 2026-08-07 19:46 AEST (avg was 240)
     _B + 213,      // 122 CH_GEODOGE_SIDE_1 -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 213,      // 123 CH_GEODOGE_SIDE_2 -- updated 2026-08-06 23:32 AEST (was untimed)
     _B + 275,      // 124 CH_GEODOGE_SIDE_3 -- updated 2026-08-06 23:32 AEST (was untimed)
@@ -658,13 +658,10 @@ void processBoardSquares() {
 #ifdef DEBUG_TIMES
         if (chIndex >= 0) {
             unsigned int elapsed = T1TC - chStart;
-#ifdef DEBUG_TIMES_AVERAGE
-            debug[chIndex] += elapsed;
-            debug[chIndex + 128]++;
-#else
-            if ((int)elapsed > debug[chIndex])
+            if (elapsed > debug[chIndex])
                 debug[chIndex] = elapsed;
-#endif
+            debug[chIndex + 128] += elapsed;
+            debug[chIndex + 256]++;
             chIndex = -1;
         }
 #endif
@@ -689,9 +686,9 @@ void processBoardSquares() {
                     processCreatures(&cursor, creature);
 
                 if (T1TC > availableIdleTime) {
-#ifndef DEBUG_TIMES_AVERAGE
-                    debug[200] = T1TC - availableIdleTime;
-                    debug[201] = creature;
+#ifdef DEBUG_TIMES
+                    debug[384] = T1TC - availableIdleTime;
+                    debug[385] = creature;
 #endif
                     FLASH(0xD6, 12);
                 }
@@ -721,8 +718,10 @@ void processBoardSquares() {
 #ifdef DEBUG_TIMES
     if (chIndex >= 0) {
         unsigned int elapsed = T1TC - chStart;
-        debug[chIndex] += elapsed;
-        debug[chIndex + 128]++;
+        if (elapsed > debug[chIndex])
+            debug[chIndex] = elapsed;
+        debug[chIndex + 128] += elapsed;
+        debug[chIndex + 256]++;
         chIndex = -1;
     }
 #endif
